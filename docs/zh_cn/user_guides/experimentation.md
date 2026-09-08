@@ -2,30 +2,30 @@
 
 ## 评测任务发起
 
-评测任务的程序入口为 `run.py`，使用方法如下：
+评测任务的程序入口为 `opencompass` 命令，使用方法如下：
 
 ```shell
-python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run] [--dump-eval-details]
+opencompass $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--debug] [-m MODE] [-r [REUSE]] [-w WORKDIR] [-l] [--dry-run] [--dump-eval-details]
 ```
 
 任务配置 (`$EXP`)：
 
-- `run.py` 允许接受一个 .py 配置文件作为任务相关参数，里面需要包含 `datasets` 和 `models` 字段。
+- `opencompass` 允许接受一个 .py 配置文件作为任务相关参数，里面需要包含 `datasets` 和 `models` 字段。
 
   ```bash
-  python run.py configs/eval_demo.py
+  opencompass configs/eval_demo.py
   ```
 
 - 如果不传入配置文件，用户也可以通过 `--models MODEL1 MODEL2 ...` 和 `--datasets DATASET1 DATASET2 ...` 来指定模型和数据集:
 
   ```bash
-  python run.py --models hf_opt_350m hf_opt_125m --datasets siqa_gen winograd_ppl
+  opencompass --models hf_opt_350m hf_opt_125m --datasets siqa_gen winograd_ppl
   ```
 
 - 对于 HuggingFace 相关模型，用户也可以通过 HuggingFace 参数快速在命令行中定义一个模型，再通过 `--datasets DATASET1 DATASET2 ...` 定义数据集。
 
   ```bash
-  python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path huggyllama/llama-7b
+  opencompass --datasets siqa_gen winograd_ppl --hf-type base --hf-path huggyllama/llama-7b
   ```
 
   HuggingFace 全量参数介绍如下：
@@ -42,10 +42,10 @@ python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--deb
 
 启动方式：
 
-- 本地机器运行: `run.py $EXP`。
-- srun运行: `run.py $EXP --slurm -p $PARTITION_name`。
-- dlc运行： `run.py $EXP --dlc --aliyun-cfg $AliYun_Cfg`
-- 定制化启动: `run.py $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [数据分片](./evaluation.md)。
+- 本地机器运行: `opencompass $EXP`。
+- srun运行: `opencompass $EXP --slurm -p $PARTITION_name`。
+- dlc运行： `opencompass $EXP --dlc --aliyun-cfg $AliYun_Cfg`
+- 定制化启动: `opencompass $EXP`。这里 $EXP 为配置文件，且里面包含 `eval` 和 `infer` 字段，详细配置请参考 [数据分片](./evaluation.md)。
 
 参数解释如下：
 
@@ -92,7 +92,7 @@ python run.py $EXP {--slurm | --dlc | None} [-p PARTITION] [-q QUOTATYPE] [--deb
 3. 为了避免机器人频繁发消息形成骚扰，默认运行时状态不会自动上报。有需要时，可以通过 `-l` 或 `--lark` 启动状态上报：
 
    ```bash
-   python run.py configs/eval_demo.py -p {PARTITION} -l
+   opencompass configs/eval_demo.py -p {PARTITION} -l
    ```
 
 ## 运行结果

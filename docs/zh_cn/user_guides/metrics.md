@@ -32,7 +32,7 @@
 
 ## 如何配置
 
-评估标准配置一般放在数据集配置文件中，最终的 xxdataset_eval_cfg 会传给 `dataset.infer_cfg` 作为实例化的一个参数。
+评估标准配置一般放在数据集配置文件中，最终的 `xxdataset_eval_cfg` 会作为数据集配置的 `eval_cfg` 字段。
 
 下面是 `govrepcrs_eval_cfg` 的定义， 具体可查看 [configs/datasets/govrepcrs](https://github.com/open-compass/opencompass/tree/main/configs/datasets/govrepcrs)。
 

@@ -1,47 +1,6 @@
 # Prompt 模板
 
-## 背景
-
-在语言模型的评测中，我们常会将原始数据集以一定的规则构造成 prompt，以便模型能够按照要求回答问题。
-
-通常，我们会在 prompt 开头放入指令，几个 in-context example（上下文样例），再在最后放入题目。例如：
-
-```text
-Solve the following questions.
-1+1=?
-2
-3+9=?
-12
-5+6=?
-```
-
-大量的实验表明，即便测试的原始题目相同，对于 prompt 的不同构造方式会对模型的表现产生影响。可能影响的因素包括：
-
-- Prompt 本身的构成方式，包括指令、in-context example、题目的写法；
-- in-context example 的选择，包括了选择的数量和方式；
-- 对 prompt 的使用方式。是让模型基于 prompt 进行补全，还是从候选的 prompt 中选择一个最好的作为答案？
-
-OpenCompass 将 prompt 的构建策略定义在了数据集配置中的 `infer_cfg` 部分。一个典型的 `infer_cfg` 如下所示:
-
-```python
-infer_cfg=dict(
-    ice_template=dict(  # 用于构造 In Context Example (ice) 的模板
-        type=PromptTemplate,
-        template='{question}\n{answer}'
-    ),
-    prompt_template=dict(  # 用于构造主干 prompt 的模板
-        type=PromptTemplate,
-        template='Solve the following questions.\n</E>{question}\n{answer}',
-        ice_token="</E>"
-    ),
-    retriever=dict(type=FixKRetriever, fix_id_list=[0, 1]),  # 定义 in context example 的获取方式
-    inferencer=dict(type=GenInferencer),  # 使用何种方式推理得到 prediction
-)
-```
-
-本文档中，我们将会主要介绍 `ice_template`、`prompt_template`、`inferencer` 的定义方法。对于 `retriever` 的介绍请参考其他章节。
-
-我们首先介绍 prompt 的基本语法。
+本章介绍传统 `PromptTemplate` 的语法，以及它与 `inferencer`、`ice_template` 的配合。Prompt 构造的一般背景和 `infer_cfg` 的整体结构见[总览](overview.md)。
 
 ## 字符串式 prompt
 
@@ -494,4 +453,4 @@ datasets = [
 
 ## 使用建议
 
-建议使用 [Prompt Viewer](../tools.md) 工具对完成拼装后的 prompt 进行可视化，确认模板是否正确，结果是否符合预期。
+建议使用 [Prompt Viewer](../tools/index.md) 工具对完成拼装后的 prompt 进行可视化，确认模板是否正确，结果是否符合预期。

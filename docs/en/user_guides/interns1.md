@@ -12,7 +12,7 @@ You can deploy it based on LMdeploy/vlLM/sglang according to [this page](https:/
 
 ### Model Configs
 
-We provide a config example in `opencompass/configs/models/interns1/intern_s1.py`.
+We provide a config example in `opencompass/configs/models/intern_s/intern_s1.py`.
 Please make the changes according to your needs.
 
 ```python

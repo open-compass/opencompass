@@ -1,32 +1,18 @@
 # Meta Template
 
-## 背景
+本章介绍模型侧对话协议 **Meta Template** 在语言模型和 API 模型上的配置方法。为什么需要模型侧协议的背景见[总览](overview.md)，阅读本章前建议先了解[对话式模板](./prompt_template.md#对话式-prompt)的基本语法。
 
-在 LLM 的 Supervised Fine-Tuning (SFT) 过程中，我们常常会根据实际的要求往对话内注入一些预定义的字符串，以求模型能按照一定的要求输出内容。例如，在一些 `chat` 模型的微调中，我们可能会在每段对话的开头加入系统层级的指令，并约定一套的格式表示用户与模型之间的对话。在一段对话中，模型期望文本的格式可能如下：
-
-```Bash
-Meta instruction: You are now a helpful and harmless AI assistant.
-HUMAN: Hi!<eoh>\n
-Bot: Hello! How may I assist you?<eob>\n
-```
-
-在评测时，我们也需要按照约定的格式输入问题，模型才能发挥出其最大的性能。
-
-此外， API 模型也存在着类似的情况。一般 API 的对话模型都允许用户在调用时传入历史对话，还有些模型也允许传入 SYSTEM 层级的指令。为了更好地评测 API 模型的能力，我们希望在评测 API 模型时可以尽量让数据更贴合 API 模型本身的多轮对话模板，而并非把所有内容塞进一段指令当中。
-
-因此，我们需要针对不同模型指定不同的解析模板。在 OpenCompass 中，我们将这套解析模板其称为 **Meta Template**。Meta Template 与模型的配置相绑定，在运行时与数据集的对话式模板相结合，最终产生最适合当前模型的 prompt。
+Meta Template 与模型的配置相绑定，在运行时与数据集的对话式模板相结合，最终产生最适合当前模型的 prompt：
 
 ```Python
 # 指定时只需要把 meta_template 字段传入模型
 models = [
     dict(
         type='AnyModel',
-        meta_template = ...,  # meta tmplate
+        meta_template = ...,  # meta template
     )
 ]
 ```
-
-接下来，我们会介绍 Meta Template 在两种模型上的配置方法。建议读者在阅读本章前，先了解[对话式模板](./prompt_template.md#对话式-prompt)的基本语法。
 
 ```{note}
 在某些情况下（例如对基座的测试），我们并不需要在正常对话中注入任何的指令，此时我们可以将 meta template 置空。在这种情况下，模型接收到的 prompt 仅由数据集配置定义，是一个普通的字符串。若数据集配置使用的是对话式模板，不同角色的发言将会由 \n 拼接而成。
@@ -260,4 +246,4 @@ meta_template=dict(
 
 ## 调试
 
-如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools.md#prompt-viewer)了解更多。
+如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools/index.md#prompt-viewer)了解更多。

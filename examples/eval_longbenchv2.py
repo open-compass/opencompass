@@ -5,7 +5,7 @@ with read_base():
     # Datasets
     from opencompass.configs.datasets.longbenchv2.longbenchv2_gen import \
         LongBenchv2_datasets as LongBenchv2_datasets
-    from opencompass.configs.models.chatglm.lmdeploy_glm4_9b_chat import \
+    from opencompass.configs.models.glm.lmdeploy_glm4_9b_chat import \
         models as lmdeploy_glm4_9b_chat_model
     from opencompass.configs.models.hf_llama.lmdeploy_llama3_1_8b_instruct import \
         models as lmdeploy_llama3_1_8b_instruct_model

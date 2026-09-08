@@ -184,7 +184,7 @@ question,answer
 自定义数据集可直接通过命令行来调用开始评测。
 
 ```bash
-python run.py \
+opencompass \
     --models hf_llama2_7b \
     --custom-dataset-path xxx/test_mcq.csv \
     --custom-dataset-data-type mcq \
@@ -192,7 +192,7 @@ python run.py \
 ```
 
 ```bash
-python run.py \
+opencompass \
     --models hf_llama2_7b \
     --custom-dataset-path xxx/test_qa.jsonl \
     --custom-dataset-data-type qa \

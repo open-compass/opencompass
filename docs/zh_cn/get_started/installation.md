@@ -1,142 +1,73 @@
-# 安装
+# 安装与环境准备
 
-## 基础安装
+OpenCompass 要求 Python 3.8 或更高版本。不同模型后端对 PyTorch、CUDA 和推理框架有各自的版本约束；准备 GPU 环境时，应先按模型与后端要求安装匹配的 PyTorch，再安装 OpenCompass。
 
-1. 使用Conda准备 OpenCompass 运行环境：
+## 创建独立环境
 
-   ```bash
-   conda create --name opencompass python=3.10 -y
-   # conda create --name opencompass_lmdeploy python=3.10 -y
-
-   conda activate opencompass
-   ```
-
-   如果你希望自定义 PyTorch 版本，请参考 [官方文档](https://pytorch.org/get-started/locally/) 准备 PyTorch 环境。需要注意的是，OpenCompass 要求 `pytorch>=1.13`。
-
-2. 安装 OpenCompass：
-
-   - pip安装
-
-   ```bash
-   # 支持绝大多数数据集及模型
-   pip install -U opencompass
-
-   # 完整安装（支持更多数据集）
-   # pip install "opencompass[full]"
-
-   # API 测试（例如 OpenAI、Qwen）
-   # pip install "opencompass[api]"
-   ```
-
-   - 如果希望使用 OpenCompass 的最新功能，也可以从源代码构建它：
-
-   ```bash
-   git clone https://github.com/open-compass/opencompass opencompass
-   cd opencompass
-   pip install -e .
-   ```
-
-## 其他安装
-
-### 推理后端
+推荐使用 Python 3.12：
 
 ```bash
-# 模型推理后端，由于这些推理后端通常存在依赖冲突，建议使用不同的虚拟环境来管理它们。
-pip install "opencompass[lmdeploy]"
-# pip install "opencompass[vllm]"
+conda create -n opencompass python=3.12 -y
+conda activate opencompass
 ```
 
-- LMDeploy
+OpenCompass 的常规安装和完整安装均支持 Python 3.12。但 APPS（`apps`、`apps_mini`）、TACO 和 LiveCodeBench Code Generation 等代码执行评测依赖 `pyext==0.7`。该库不兼容 Python 3.11 及之后的版本，因此如需运行这些评测，请创建 Python 3.10 环境。
 
-可以通过下列命令判断推理后端是否安装成功，更多信息请参考 [官方文档](https://lmdeploy.readthedocs.io/zh-cn/latest/get_started.html)
+LMDeploy 与 vLLM 可能要求不同版本的 PyTorch、CUDA 或其他依赖。需要使用多个推理后端时，建议为每个后端分别创建虚拟环境。
+
+## 选择安装方式
+
+只需评测常见语言模型和数据集时，可安装基础版本：
 
 ```bash
-lmdeploy chat internlm/internlm2_5-1_8b-chat --backend turbomind
+pip install -U opencompass
 ```
 
-- vLLM
-  可以通过下列命令判断推理后端是否安装成功，更多信息请参考 [官方文档](https://docs.vllm.ai/en/latest/getting_started/quickstart.html)
+如需特定能力，可按用途安装相应的可选依赖：
 
 ```bash
-vllm serve facebook/opt-125m
+pip install "opencompass[api]"       # OpenAI、Anthropic 等接口模型
+pip install "opencompass[full]"      # 更多数据集与评测依赖
+pip install "opencompass[vlm]"       # 多模态评测
+pip install "opencompass[lmdeploy]"  # LMDeploy 后端
+pip install "opencompass[vllm]"      # vLLM 后端
 ```
 
-### API
-
-Opencompass支持不同的商业模型API调用，你可以通过pip方式安装，或者参考 [API](https://github.com/open-compass/opencompass/blob/main/requirements/api.txt) 安装对应的API模型依赖
+如需使用最新代码或参与开发，可从源码安装：
 
 ```bash
-pip install opencompass[api]
-
-# pip install openai # GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
-# pip install anthropic # Claude (API)
-# pip install dashscope #  通义千问 (API)
-# pip install volcengine-python-sdk # 字节豆包 (API)
-# ...
-```
-
-### 数据集
-
-基础安装可以支持绝大部分基础数据集，针对某些数据集（i.e. Alpaca-eval, Longbench etc.），需要安装额外的依赖。
-你可以通过pip方式安装，或者参考 [额外依赖](https://github.com/open-compass/opencompass/blob/main/requirements/extra.txt) 安装对应的依赖
-
-```bash
-pip install opencompass[full]
-```
-
-针对 HumanEvalX / HumanEval+ / MBPP+ 需要手动clone git仓库进行安装
-
-```bash
-git clone --recurse-submodules git@github.com:open-compass/human-eval.git
-cd human-eval
+git clone https://github.com/open-compass/opencompass.git
+cd opencompass
 pip install -e .
-pip install -e evalplus
 ```
 
-部分智能体评测需要安装大量依赖且可能会与已有运行环境冲突，我们建议创建不同的conda环境来管理
+源码安装后同样会注册 `opencompass` 命令；也可以在仓库根目录使用等价的 `python run.py` 入口。
+
+## 验证安装
+
+以下命令适用于 PyPI 安装和源码安装：`which python` 用于确认当前 Python 环境，随后检查 OpenCompass 的版本和实际导入路径，最后验证命令行入口及其依赖是否可用。
 
 ```bash
-# T-Eval
-pip install lagent==0.1.2
-# CIBench
-pip install -r requirements/agent.txt
+which python
+python -c "import opencompass; print(opencompass.__version__); print(opencompass.__file__)"
+opencompass --help
 ```
 
-## 数据集准备
+## 数据缓存
 
-OpenCompass 支持的数据集主要包括三个部分：
-
-1. Huggingface 数据集： [Huggingface Dataset](https://huggingface.co/datasets) 提供了大量的数据集，这部分数据集运行时会**自动下载**。
-
-2. ModelScope 数据集：[ModelScope OpenCompass Dataset](https://modelscope.cn/organization/opencompass) 支持从 ModelScope 自动下载数据集。
-
-   要启用此功能，请设置环境变量：`export DATASET_SOURCE=ModelScope`，可用的数据集包括（来源于 OpenCompassData-core.zip）：
-
-   ```plain
-   humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
-   ```
-
-3. 自建以及第三方数据集：OpenCompass 还提供了一些第三方数据集及自建**中文**数据集。运行以下命令**手动下载解压**。
-
-在 OpenCompass 项目根目录下运行下面命令，将数据集准备至 `${OpenCompass}/data` 目录下：
+数据集通常会在首次使用时下载。在共享机器上，可以通过以下环境变量指定缓存目录：
 
 ```bash
-wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
-unzip OpenCompassData-core-20240207.zip
+export HF_DATASETS_CACHE=/path/to/huggingface-cache/datasets
+export COMPASS_DATA_CACHE=/path/to/opencompass-data-cache
 ```
 
-如果需要使用 OpenCompass 提供的更加完整的数据集 (~500M)，可以使用下述命令进行下载和解压：
+其中，`HF_DATASETS_CACHE` 用于管理 Hugging Face 数据集缓存，`COMPASS_DATA_CACHE` 用于指定 OpenCompass 的数据缓存根目录。不同数据集的下载和读取方式可能不同，详细规则及离线环境准备方法请参阅[数据来源、缓存与离线运行](../user_guides/data_and_cache.md)。
 
-```bash
-# 如需代理和断点续传，请尝试 aria2c -x16 -s16 -k1M "http://ghfast.top/https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip" 
-wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
-unzip OpenCompassData-complete-20240207.zip
-cd ./data
-find . -name "*.zip" -exec unzip "{}" \;
-```
+## 检查模型及推理后端
 
-两个 `.zip` 中所含数据集列表如[此处](https://github.com/open-compass/opencompass/releases/tag/0.2.2.rc1)所示。
+成功安装 LMDeploy 或 vLLM 并不代表目标模型一定与后端兼容。建议先使用相应后端加载一个小模型，再通过 OpenCompass 运行演示数据集。使用 API 模型时，还应检查服务地址、模型名称、密钥环境变量、限流设置和超时配置。
 
-OpenCompass 已经支持了大多数常用于性能比较的数据集，具体支持的数据集列表请直接在 `configs/datasets` 下进行查找。
+## 开始评测！
 
-接下来，你可以阅读[快速上手](./quick_start.md)了解 OpenCompass 的基本用法。
+安装完成后，请继续阅读[五分钟快速开始](quick_start.md)。遇到依赖、显存或下载问题时，请参阅[常见问题与故障排查](../faq/index.md)。

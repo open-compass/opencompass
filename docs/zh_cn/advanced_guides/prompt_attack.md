@@ -16,7 +16,7 @@ pip install promptbench==0.0.4 textattack==0.3.8 lru-dict
 
 我们将使用GLUE-wnli数据集作为示例，大部分配置设置可以参考[config.md](../user_guides/config.md)获取帮助。
 
-首先，我们需要支持基本的数据集配置，你可以在`configs`中找到现有的配置文件，或者根据[new-dataset](./new_dataset.md)支持你自己的配置。
+首先，我们需要支持基本的数据集配置，你可以在`configs`中找到现有的配置文件，或者根据\[new-dataset(../extension/new_dataset.md)支持你自己的配置。
 
 以下面的`infer_cfg`为例，我们需要定义提示模板。`adv_prompt`是实验中要被攻击的基本提示占位符。`sentence1`和`sentence2`是此数据集的输入。攻击只会修改`adv_prompt`字段。
 
@@ -88,7 +88,7 @@ attack = dict(
 请在运行攻击实验时使用 `--mode infer` 选项。
 
 ```shell
-python run.py examples/eval_attack.py --mode infer
+opencompass examples/eval_attack.py --mode infer
 ```
 
 所有结果都将保存在名为“attack”的文件夹中。

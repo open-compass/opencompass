@@ -1,165 +1,117 @@
-# 学习配置文件
+# 配置语法与复用参考
 
-OpenCompass 使用 OpenMMLab 新式风格的配置文件。如果你之前熟悉 OpenMMLab 风格的配置文件，可以直接阅读
-[纯 Python 风格的配置文件（Beta）](https://mmengine.readthedocs.io/zh_CN/latest/advanced_tutorials/config.html#python-beta)
-了解新式配置文件与原配置文件的区别。如果你之前没有接触过 OpenMMLab 风格的配置文件，
-下面我将会用一个简单的例子来介绍配置文件的使用。请确保你安装了最新版本的 MMEngine，以支持新式风格的配置文件。
+本页是 OpenCompass 配置语法的速查手册。若你还没有完成过一次评测，请先阅读[使用配置文件完成一次完整评测](config_based_evaluation.md)。
 
 ## 基本格式
 
-OpenCompass 的配置文件都是 Python 格式的，遵从基本的 Python 语法，通过定义变量的形式指定每个配置项。
-比如在定义模型时，我们使用如下配置：
+配置文件是 Python 文件，通过顶层变量声明实验。最小评测配置包含两个列表：
 
 ```python
-# model_cfg.py
-from opencompass.models import HuggingFaceCausalLM
-
-models = [
-    dict(
-        type=HuggingFaceCausalLM,
-        path='huggyllama/llama-7b',
-        model_kwargs=dict(device_map='auto'),
-        tokenizer_path='huggyllama/llama-7b',
-        tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
-        max_seq_len=2048,
-        max_out_len=50,
-        run_cfg=dict(num_gpus=8, num_procs=1),
-    )
-]
+models = [dict(type=..., abbr='my-model', ...)]
+datasets = [dict(type=..., abbr='my-dataset', ...)]
 ```
 
-当读取配置文件时，使用 MMEngine 中的 `Config.fromfile` 进行解析。
+常用顶层字段如下：
+
+| 字段         | 作用                                     |
+| ------------ | ---------------------------------------- |
+| `models`     | 模型后端、路径、生成参数和资源需求       |
+| `datasets`   | 数据读取、输入构造、推理方式和评测器     |
+| `infer`      | 推理任务的 Partitioner、Runner 与 Task   |
+| `eval`       | 评测任务的 Partitioner、Runner 与 Task   |
+| `summarizer` | 指标分组、展示顺序与综合分数             |
+| `work_dir`   | 实验输出根目录，也可由 `--work-dir` 覆盖 |
+
+## 使用 `read_base()` 复用配置
+
+OpenCompass 使用 MMEngine 的纯 Python 配置继承。导入必须放在 `read_base()` 上下文中：
 
 ```python
->>> from mmengine.config import Config
->>> cfg = Config.fromfile('./model_cfg.py')
->>> print(cfg.models[0])
-{'type': HuggingFaceCausalLM, 'path': 'huggyllama/llama-7b', 'model_kwargs': {'device_map': 'auto'}, ...}
-```
-
-## 继承机制
-
-OpenCompass 的配置文件使用了 Python 的 import 机制进行配置文件的继承。需要注意的是，
-我们需要在继承配置文件时使用 `read_base` 上下文管理器。
-
-```python
-# inherit.py
 from mmengine.config import read_base
 
 with read_base():
-    from .model_cfg import models  # model_cfg.py 中的 models 被继承到本配置文件
+    from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
+        gsm8k_datasets
+    from opencompass.configs.models.qwen.hf_qwen2_1_5b_instruct import \
+        models as qwen2_models
+
+models = qwen2_models
+datasets = gsm8k_datasets
 ```
 
-使用 `Config.fromfile` 解析配置文件：
+从仓库外部配置文件导入时，使用完整的 `opencompass.configs...` 路径最清晰；位于 `opencompass/configs` 内的配置也可以使用相对导入。
+
+## 组合列表
+
+多个模型或数据集可以直接拼接：
 
 ```python
->>> from mmengine.config import Config
->>> cfg = Config.fromfile('./inherit.py')
->>> print(cfg.models[0])
-{'type': HuggingFaceCausalLM, 'path': 'huggyllama/llama-7b', 'model_kwargs': {'device_map': 'auto'}, ...}
+models = qwen2_models + api_models
+datasets = gsm8k_datasets + math_datasets
 ```
 
-## 评测配置文件示例
+建议在导入时使用有意义的别名，避免多个模块都导出 `models` 或 `datasets` 时发生覆盖。
+
+## 覆盖导入的配置
+
+导入后可以修改列表中的字典。若同一个基础配置还会被其他变量复用，先深拷贝以避免意外联动：
 
 ```python
-# configs/llama7b.py
-from mmengine.config import read_base
+from copy import deepcopy
 
-with read_base():
-    # 直接从预设数据集配置中读取需要的数据集配置
-    from .datasets.piqa.piqa_ppl import piqa_datasets
-    from .datasets.siqa.siqa_gen import siqa_datasets
-
-# 将需要评测的数据集拼接成 datasets 字段
-datasets = [*piqa_datasets, *siqa_datasets]
-
-# 使用 HuggingFaceCausalLM 评测 HuggingFace 中 AutoModelForCausalLM 支持的模型
-from opencompass.models import HuggingFaceCausalLM
-
-models = [
-    dict(
-        type=HuggingFaceCausalLM,
-        # 以下参数为 HuggingFaceCausalLM 的初始化参数
-        path='huggyllama/llama-7b',
-        tokenizer_path='huggyllama/llama-7b',
-        tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
-        max_seq_len=2048,
-        # 以下参数为各类模型都必须设定的参数，非 HuggingFaceCausalLM 的初始化参数
-        abbr='llama-7b',            # 模型简称，用于结果展示
-        max_out_len=100,            # 最长生成 token 数
-        batch_size=16,              # 批次大小
-        run_cfg=dict(num_gpus=1),   # 运行配置，用于指定资源需求
-    )
-]
+models = deepcopy(qwen2_models)
+models[0]['batch_size'] = 1
+models[0]['max_out_len'] = 512
+models[0]['run_cfg']['num_gpus'] = 1
 ```
 
-## 数据集配置文件示例
+常见错误是直接修改共享对象，导致同一文件里另一个实验组也被改变。
 
-以上示例配置文件中，我们直接以继承的方式获取了数据集相关的配置。接下来，
-我们会以 PIQA 数据集配置文件为示例，展示数据集配置文件中各个字段的含义。
-如果你不打算修改模型测试的 prompt，或者添加新的数据集，则可以跳过这一节的介绍。
+## 配置对象与注册类型
 
-PIQA 数据集 [配置文件](https://github.com/open-compass/opencompass/blob/main/configs/datasets/piqa/piqa_ppl_1cf9f0.py)
-如下，这是一个基于 PPL（困惑度）进行评测的配置，并且不使用上下文学习方法（In-Context Learning）。
+`type` 可以写导入的 Python 类：
 
 ```python
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import PPLInferencer
-from opencompass.openicl.icl_evaluator import AccEvaluator
-from opencompass.datasets import HFDataset
+from opencompass.summarizers import DefaultSummarizer
 
-# 读取配置
-# 加载后的数据集通常以字典形式组织样本，分别指定样本中用于组成 prompt 的输入字段，和作为答案的输出字段
-piqa_reader_cfg = dict(
-    input_columns=['goal', 'sol1', 'sol2'],
-    output_column='label',
-    test_split='validation',
-)
-
-# 推理配置
-piqa_infer_cfg = dict(
-    # Prompt 生成配置
-    prompt_template=dict(
-        type=PromptTemplate,
-        # Prompt 模板，模板形式与后续指定的 inferencer 类型相匹配
-        # 这里为了计算 PPL，需要指定每个答案对应的 Prompt 模板
-        template={
-            0: 'The following makes sense: \nQ: {goal}\nA: {sol1}\n',
-            1: 'The following makes sense: \nQ: {goal}\nA: {sol2}\n'
-        }),
-    # 上下文样本配置，此处指定 `ZeroRetriever`，即不使用上下文样本
-    retriever=dict(type=ZeroRetriever),
-    # 推理方式配置
-    #   - PPLInferencer 使用 PPL（困惑度）获取答案
-    #   - GenInferencer 使用模型的生成结果获取答案
-    inferencer=dict(type=PPLInferencer))
-
-# 评估配置，使用 Accuracy 作为评估指标
-piqa_eval_cfg = dict(evaluator=dict(type=AccEvaluator))
-
-# 数据集配置，以上各个变量均为此配置的参数
-# 为一个列表，用于指定一个数据集各个评测子集的配置。
-piqa_datasets = [
-    dict(
-        type=HFDataset,
-        path='piqa',
-        reader_cfg=piqa_reader_cfg,
-        infer_cfg=piqa_infer_cfg,
-        eval_cfg=piqa_eval_cfg)
-]
+summarizer = dict(type=DefaultSummarizer)
 ```
 
-其中 **Prompt 生成配置** 的详细配置方式，可以参见 [Prompt 模板](../prompt/prompt_template.md)。
+OpenCompass 解析后会通过注册表构建对应组件。配置中的参数必须与组件构造函数匹配；模型、数据集、Runner 等不同组件不能交换字段。
 
-## 进阶评测配置
+## 配置与命令行的优先级
 
-在 OpenCompass 中，我们支持了任务划分器（Partitioner）、运行后端（Runner）等配置项，
-用于更加灵活、高效的利用计算资源。
+一般情况下，配置文件声明实验，命令行控制本次启动。常见覆盖关系包括：
 
-默认情况下，我们会使用基于样本数的方式对推理任务进行划分，你可以在启动任务时使用
-`--max-partition-size` 指定进行任务划分的样本数阈值。同时，我们默认使用本地资源进行推理和评估任务，
-如果你希望使用 Slurm 集群资源，可以在启动任务时使用 `--slurm` 参数和 `--partition` 参数指定 slurm 运行后端。
+- `--work-dir` 覆盖配置的 `work_dir`；
+- `--debug` 打开 Runner 的调试模式；
+- `--max-num-workers` 只在 CLI 自动生成默认 Runner 时生效，显式配置的同名字段优先；
+- `--mode`、`--reuse` 控制执行阶段与产物复用。
 
-进一步地，如果以上功能无法满足你的任务划分和运行后端配置需求，你可以在配置文件中进行更详细的配置。
-参见[数据分片](./evaluation.md)。
+运行 `opencompass --help` 查看当前版本的完整参数，不要把旧版本文档中的参数直接复制到新环境。
+
+## 解析和检查配置
+
+使用 MMEngine 单独检查语法：
+
+```bash
+python -c "from mmengine.config import Config; Config.fromfile('my_eval.py')"
+```
+
+检查 OpenCompass 补齐默认项后的配置和任务切分：
+
+```bash
+opencompass my_eval.py --dry-run --config-verbose
+```
+
+注意：`--dry-run` 仍会创建实验时间戳目录并保存最终配置快照，但不会执行推理任务。
+
+## 配置文件的维护原则
+
+- 配置名称应表达模型、数据集、提示词与评测方式的关键差异；
+- 正式评测应固定模型修订版本、数据版本及生成参数；
+- 密钥不要写入配置仓库，优先从环境变量读取；
+- 大型配置拆成模型、数据集、汇总器和实验入口，避免复制整份字典；
+- 修改后先解析，再 dry-run，最后用少量样本试跑。
+
+模型字段详见[模型接入](models.md)，数据集结构详见[数据集配置](datasets.md)，提示词优先参考 [RawPromptTemplate](../prompt/raw_prompt_template.md)。

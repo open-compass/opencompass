@@ -44,11 +44,11 @@ pip install -e .
 
 ##### 本地评估
 
-如果您在本地评估模型，下面命令会调用机器的所有可用GPU。您可以通过设置 `CUDA_VISIBLE_DEVICES` 环境变量来限制 `OpenCompass` 的 GPU 访问。例如，使用 `CUDA_VISIBLE_DEVICES=0,1,2,3 python run.py ...` 只会向 OpenCompass 暴露前四个 GPU，确保它同时使用的 GPU 数量不超过这四个。
+如果您在本地评估模型，下面命令会调用机器的所有可用GPU。您可以通过设置 `CUDA_VISIBLE_DEVICES` 环境变量来限制 `OpenCompass` 的 GPU 访问。例如，使用 `CUDA_VISIBLE_DEVICES=0,1,2,3 opencompass ...` 只会向 OpenCompass 暴露前四个 GPU，确保它同时使用的 GPU 数量不超过这四个。
 
 ```bash
 # 本地评估
-python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
+opencompass --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
 ```
 
 ##### 在Slurm集群上评估
@@ -57,7 +57,7 @@ python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_1
 
 ```bash
 # Slurm评估
-python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### 只评估子数据集
@@ -65,13 +65,13 @@ python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_1
 如果只想测试原始的大海捞针任务设定，比如可以更换数据集的参数为`needlebench_single_128k`，这对应于128k长度下的单针版本的大海捞针测试：
 
 ```bash
-python run.py --datasets needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass --datasets needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 您也可以进一步选择子数据集，如更换数据集`--datasets`的参数为`needlebench_single_128k/needlebench_zh_datasets`，仅仅进行中文版本的单针128k长度下的大海捞针任务测试，其中`/`后面的参数代表子数据集，您可以在`opencompass/configs/datasets/needlebench_v2/needlebench_v2_128k/needlebench_v2_single_128k.py`中找到可选的子数据集变量，如：
 
 ```bash
-python run.py --datasets needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass --datasets needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意在评估前预先安装[VLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu.html)工具
@@ -89,10 +89,10 @@ pip install vllm
 
 对于其他模型，我们建议额外书写一个运行的配置文件以便对模型的`max_seq_len`, `max_out_len`参数进行修改，以便模型可以接收到完整的长文本内容。如`examples/eval_needlebench_v2.py`文件。
 
-当书写好测试的`config`文件后，我们可以命令行中通过`run.py`文件传入对应的config文件路径，例如：
+当书写好测试的`config`文件后，我们可以命令行中通过 `opencompass` 命令传入对应的config文件路径，例如：
 
 ```bash
-python run.py examples/eval_needlebench_v2.py  --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass examples/eval_needlebench_v2.py  --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 注意，此时我们不需传入`--datasets, --models, --summarizer `等参数，因为我们已经在config文件中定义了这些配置。你可以自己手动调节`--max-num-workers`的设定以调节并行工作的workers的数量。

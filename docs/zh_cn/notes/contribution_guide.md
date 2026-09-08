@@ -163,5 +163,4 @@ yapf和isort的样式配置可以在[setup.cfg](https://github.com/OpenCompass/b
 - (可选) 如果测试过程无法通过简单拼接数据集和模型配置文件的方式来实现的话，还需要提供进行测试过程的配置文件
 - (可选) 如果需要，请在文档相关位置处添加该数据集的说明。这在辅助用户理解该测试方案是非常必要的，可参考 OpenCompass 中该类型的文档：
   - [循环评测](../advanced_guides/circular_eval.md)
-  - [代码评测](../advanced_guides/code_eval.md)
-  - [污染评估](../advanced_guides/contamination_eval.md)
+  - [代码评测](../evaluation/code_eval.md)

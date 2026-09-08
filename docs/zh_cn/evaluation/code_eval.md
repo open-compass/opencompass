@@ -1,6 +1,115 @@
-# 代码评测Docker教程
+# 代码评测
 
-为了完成LLM代码能力评测，我们需要搭建一套独立的评测环境，避免在开发环境执行错误代码从而造成不可避免的损失。目前 OpenCompass 使用的代码评测服务可参考[code-evaluator](https://github.com/open-compass/code-evaluator)项目。接下来将围绕代码评测服务介绍不同需要下的评测教程。
+这里以 `humaneval` 和 `mbpp` 为例介绍 pass@1 / pass@k 的配置方式；当代码需要真实执行时（多语言 `humaneval-x`、`DS1000`），则通过独立的 Docker 代码评测服务完成，避免在开发环境执行模型生成的代码造成损失。
+
+## pass@1
+
+如果只需要生成单条回复来评测pass@1的性能，可以直接使用[configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) 和 [configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py) 并参考通用的[快速上手教程](../get_started/quick_start.md)即可。
+
+如果要进行多语言评测，可以参考本文[代码执行服务](#代码执行服务)一节。
+
+## pass@k
+
+如果对于单个example需要生成多条回复来评测pass@k的性能，需要参考以下两种情况。这里以10回复为例子：
+
+### 通常情况
+
+对于绝大多数模型来说，模型支持HF的generation中带有`num_return_sequences` 参数，我们可以直接使用来获取多回复。可以参考以下配置文件。
+
+```python
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
+
+with read_base():
+    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
+
+mbpp_datasets[0]['type'] = MBPPDatasetV2
+mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
+mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
+
+datasets = []
+datasets += humaneval_datasets
+datasets += mbpp_datasets
+
+models = [
+    dict(
+        type=HuggingFaceCausalLM,
+        ...,
+        generation_kwargs=dict(
+            num_return_sequences=10,
+            do_sample=True,
+            top_p=0.95,
+            temperature=0.8,
+        ),
+        ...,
+    )
+]
+```
+
+对于 `mbpp`，在数据集和评测上需要有新的变更，所以同步修改`type`, `eval_cfg.evaluator.type`, `reader_cfg.output_column` 字段来适应新的需求。
+
+另外我们需要模型的回复有随机性，同步需要设置`generation_kwargs`参数。这里注意要设置`num_return_sequences`得到回复数。
+
+注意：`num_return_sequences` 必须大于等于k，本身pass@k是计算的概率估计。
+
+具体可以参考以下配置文件
+[examples/eval_code_passk.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk.py)
+
+### 模型不支持多回复
+
+适用于一些没有设计好的API以及功能缺失的HF模型。这个时候我们需要重复构造数据集来达到多回复的效果。这里可以参考以下配置文件。
+
+```python
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
+
+with read_base():
+    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
+
+humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
+humaneval_datasets[0]['num_repeats'] = 10
+mbpp_datasets[0]['abbr'] = 'mbpp_pass10'
+mbpp_datasets[0]['num_repeats'] = 10
+mbpp_datasets[0]['type'] = MBPPDatasetV2
+mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
+mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
+
+datasets = []
+datasets += humaneval_datasets
+datasets += mbpp_datasets
+
+models = [
+    dict(
+        type=HuggingFaceCausalLM,
+        ...,
+        generation_kwargs=dict(
+            do_sample=True,
+            top_p=0.95,
+            temperature=0.8,
+        ),
+        ...,
+    )
+]
+```
+
+由于数据集的prompt并没有修改，我们需要替换对应的字段来达到数据集重复的目的。
+需要修改以下字段：
+
+- `num_repeats`: 数据集重复的次数
+- `abbr`: 数据集的缩写最好随着重复次数一并修改，因为数据集数量会发生变化，防止与`.cache/dataset_size.json` 中的数值出现差异导致一些潜在的问题。
+
+对于 `mbpp`，同样修改`type`, `eval_cfg.evaluator.type`, `reader_cfg.output_column` 字段。
+
+另外我们需要模型的回复有随机性，同步需要设置`generation_kwargs`参数。
+
+具体可以参考以下配置文件
+[examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk_repeat_dataset.py)
+
+## 代码执行服务
+
+代码需要真实执行的数据集，评测在一个独立的 Docker 服务中进行。OpenCompass 使用的代码评测服务基于 [code-evaluator](https://github.com/open-compass/code-evaluator)项目搭建。
+
+### 支持的数据集
 
 1. humaneval-x
 
@@ -16,7 +125,7 @@ Python 多算法库数据集 [ds1000](https://github.com/xlang-ai/DS-1000)
 
 目前支持的算法库有`Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, `Matplotlib`。
 
-## 启动代码评测服务
+### 启动代码评测服务
 
 1. 确保您已经安装了 docker，可参考[安装docker文档](https://docs.docker.com/engine/install/)
 2. 拉取代码评测服务项目，并构建 docker 镜像
@@ -62,7 +171,7 @@ telnet your_service_ip_address your_service_port
 
 ### 配置文件
 
-我们已经提供了 huamaneval-x 在 codegeex2 上评估的\[配置文件\]作为参考(https://github.com/open-compass/opencompass/blob/main/examples/eval_codegeex2.py)。
+我们已经提供了 humaneval-x 在 codegeex2 上评估的[配置文件](https://github.com/open-compass/opencompass/blob/main/examples/eval_codegeex2.py)作为参考。
 其中数据集以及相关后处理的配置文件为这个[链接](https://github.com/open-compass/opencompass/tree/main/configs/datasets/humanevalx)， 需要注意 humanevalx_eval_cfg_dict 中的evaluator 字段。
 
 ```python
@@ -107,7 +216,7 @@ humanevalx_datasets = [
 
 ### 任务启动
 
-参考[快速上手教程](../get_started.html)
+参考[五分钟快速开始](../get_started/quick_start.md)
 
 ## 异地代码评测
 
@@ -115,7 +224,7 @@ humanevalx_datasets = [
 
 ### 收集推理结果（仅针对Humanevalx）
 
-OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其配置与 `run.py` 中的 `-r` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh-cn/latest/get_started/quick_start.html#id4)。
+OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其参数含义与 `opencompass` 的 `--reuse` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh-cn/latest/get_started/quick_start.html#id4)。
 
 ```shell
 python tools/collect_code_preds.py [config] [-r latest]
@@ -126,21 +235,21 @@ python tools/collect_code_preds.py [config] [-r latest]
 ```
 workdir/humanevalx
 ├── codegeex2-6b
-│   ├── humanevalx_cpp.json
-│   ├── humanevalx_go.json
-│   ├── humanevalx_java.json
-│   ├── humanevalx_js.json
-│   └── humanevalx_python.json
+│   ├── humanevalx_cpp.json
+│   ├── humanevalx_go.json
+│   ├── humanevalx_java.json
+│   ├── humanevalx_js.json
+│   └── humanevalx_python.json
 ├── CodeLlama-13b
-│   ├── ...
+│   ├── ...
 ├── CodeLlama-13b-Instruct
-│   ├── ...
+│   ├── ...
 ├── CodeLlama-13b-Python
-│   ├── ...
+│   ├── ...
 ├── ...
 ```
 
-对于 DS1000 只需要拿到 `opencompasss` 对应生成的 prediction文件即可。
+对于 DS1000 只需要拿到 `opencompass` 对应生成的 prediction文件即可。
 
 ### 代码评测
 
@@ -180,7 +289,7 @@ curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' localhost:50
 
 DS1000支持额外 debug 参数，注意开启之后会有大量log
 
-- `full`: 额外打印每个错误样本的原始prediction，后处理后的predcition，运行程序以及最终报错。
+- `full`: 额外打印每个错误样本的原始prediction，后处理后的prediction，运行程序以及最终报错。
 - `half`: 额外打印每个错误样本的运行程序以及最终报错。
 - `error`: 额外打印每个错误样本的最终报错。
 
@@ -196,7 +305,7 @@ curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=er
 
 ### 支持新数据集
 
-可以参考[支持新数据集教程](./new_dataset.md)
+可以参考[支持新数据集](../extension/new_dataset.md)教程
 
 ### 修改后处理
 
