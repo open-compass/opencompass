@@ -28,7 +28,7 @@ def eese_score_postprocess_dict(output: dict, output_path: str) -> dict:
     # 计算总体分数
     scores = [value.get('score', 0) for value in output.values()]
     if scores:
-        overall_score = sum(scores) / (10 * len(scores))
+        overall_score = sum(scores) / (10 * len(scores)) * 100
     else:
         overall_score = 0
 

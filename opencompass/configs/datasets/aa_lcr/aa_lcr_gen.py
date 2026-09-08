@@ -37,7 +37,7 @@ aa_lcr_eval_cfg = dict(
         ),
         dataset_cfg=dict(
             type=AALCRDataset,
-            path='ArtificialAnalysis/AA-LCR',
+            path='opencompass/AA-LCR',
             reader_cfg=aa_lcr_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -50,9 +50,10 @@ aa_lcr_datasets = [
     dict(
         abbr='AA-LCR',
         type=AALCRDataset,
-        path='ArtificialAnalysis/AA-LCR',
+        path='opencompass/AA-LCR',
         reader_cfg=aa_lcr_reader_cfg,
         infer_cfg=aa_lcr_infer_cfg,
         eval_cfg=aa_lcr_eval_cfg,
+        n=3,
     )
 ]

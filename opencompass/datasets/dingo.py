@@ -94,6 +94,29 @@ class DingoEvaluator(BaseEvaluator):
             return result.model_dump()
         return dict(result)
 
+    @staticmethod
+    def _inject_fasttext_path():
+        """Point dingo's language detector at a local fasttext model.
+
+        dingo-python>=1.11 downloads lid.176.bin from dl.fbaipublicfiles.com
+        on first use, which fails in offline eval containers. When the model
+        file exists under DINGO_EVAL_PATH (or its default on shared storage),
+        register it via dingo's set_fasttext so no download is attempted.
+        """
+        eval_path = os.environ.get(
+            'DINGO_EVAL_PATH',
+            '')
+        model_path = os.path.abspath(os.path.join(eval_path, 'lid.176.bin'))
+        if not os.path.isfile(model_path):
+            return
+        try:
+            from dingo.model.rule.utils.detect_lang import set_fasttext
+            set_fasttext(model_path)
+        except Exception:
+            # Old dingo versions (<1.11) fetch the model via huggingface_hub
+            # instead, so there is nothing to inject here.
+            pass
+
     def score(self, origin_prompt: List, predictions: List) -> dict:
         try:
             from dingo.exec import Executor
@@ -114,6 +137,7 @@ class DingoEvaluator(BaseEvaluator):
                 json.dump(d, f, ensure_ascii=False)
                 f.write('\n')
         try:
+            self._inject_fasttext_path()
             input_args = self._build_input_args(file_name)
             executor = Executor.exec_map['local'](input_args)
             result = executor.execute()

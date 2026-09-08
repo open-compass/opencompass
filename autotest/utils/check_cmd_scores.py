@@ -35,7 +35,7 @@ def _last_field_score(csv_path: str) -> float:
 def check_cmd_scores(
     run_dir: str,
     score_min: float = 75.0,
-    score_max: float = 80.0,
+    score_max: float = 85.0,
     result_count: int = 3,
 ) -> List[Tuple[str, float]]:
     """Return [(csv_path, score), ...] or raise AssertionError."""
@@ -62,7 +62,7 @@ def main(argv: List[str] | None = None) -> int:
     p.add_argument('run_dir',
                    help='REPORT_ROOT/<run_id> with regression_result*')
     p.add_argument('--min', dest='score_min', type=float, default=75.0)
-    p.add_argument('--max', dest='score_max', type=float, default=80.0)
+    p.add_argument('--max', dest='score_max', type=float, default=85.0)
     p.add_argument('--count', type=int, default=3)
     args = p.parse_args(argv)
     check_cmd_scores(

@@ -729,11 +729,26 @@ def call_method(method, inputs):
     return _inner_call_method(method)
 
 
+def _get_current_vmsize_bytes():
+    if platform.uname().system != 'Linux':
+        return 0
+
+    import os
+
+    with open('/proc/self/statm', encoding='utf-8') as f:
+        vmsize_pages = int(f.read().split()[0])
+    return vmsize_pages * os.sysconf('SC_PAGE_SIZE')
+
+
 def reliability_guard(maximum_memory_bytes=None):
     """This disables various destructive functions and prevents the generated
     code from interfering with the test (e.g. fork bomb, killing other
     processes, removing filesystem files, etc.) WARNING This function is NOT a
     security sandbox.
+
+    On Linux, ``maximum_memory_bytes`` is added to the worker's current virtual
+    memory size so framework mappings do not consume the generated code's
+    address-space budget.
 
     Untrusted code, including, model- generated code, should not be blindly
     executed outside of one. See the Codex paper for more information about
@@ -741,15 +756,20 @@ def reliability_guard(maximum_memory_bytes=None):
     """
 
     if maximum_memory_bytes is not None:
-        import resource
+        if platform.uname().system != 'Linux':
+            import warnings
 
-        resource.setrlimit(resource.RLIMIT_AS,
-                           (maximum_memory_bytes, maximum_memory_bytes))
-        resource.setrlimit(resource.RLIMIT_DATA,
-                           (maximum_memory_bytes, maximum_memory_bytes))
-        if not platform.uname().system == 'Darwin':
-            resource.setrlimit(resource.RLIMIT_STACK,
-                               (maximum_memory_bytes, maximum_memory_bytes))
+            warnings.warn(
+                'Memory limit is only supported on Linux; skipping setup.',
+                RuntimeWarning)
+        else:
+            import resource
+
+            effective_memory_limit_bytes = (_get_current_vmsize_bytes() +
+                                            maximum_memory_bytes)
+            resource.setrlimit(
+                resource.RLIMIT_AS,
+                (effective_memory_limit_bytes, effective_memory_limit_bytes))
 
     faulthandler.disable()
 

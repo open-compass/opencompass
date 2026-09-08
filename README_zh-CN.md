@@ -57,27 +57,19 @@
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2026.08.25\]** OpenCompass 现已集成 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，支持原生加载多模态数据集、通过 OpenAI 兼容接口完成推理，并使用 VLMEvalKit 官方评测逻辑计算指标。详情请参阅 [MMBench 评测示例](examples/eval_mmbench_vlmevalkit.py)和 [MMMU-Pro 评测示例](examples/eval_mmmu_pro_vlmevalkit.py)！🔥🔥🔥
+- **\[2026.07.28\]** OpenCompass 进一步扩展了 API 模型生态，新增 OpenAI Responses API 和 LiteLLM AI Gateway 支持，并将 Gemini 与 Anthropic 集成更新至最新 SDK 接口。详情请参阅 [OpenAI Responses API 实现](opencompass/models/openai_response.py)、[LiteLLM AI Gateway 实现](opencompass/models/litellm_api.py)、[Gemini SDK 实现](opencompass/models/gemini_sdk_api.py)和 [Anthropic SDK 实现](opencompass/models/claude_sdk_api.py)！
+- **\[2026.07.27\]** OpenCompass 的 `GenInferencer` 现已支持多轮推理，并新增 Multi-IF 数据集支持，用于评测模型的多轮指令遵循能力。详情请参阅 [Multi-IF 评测配置](opencompass/configs/datasets/MultiIF/MultiIF_gen.py)！🔥🔥🔥
+- **\[2026.05.25\]** OpenCompass 新增重复输出分析工具，支持检测模型生成中的重复内容与循环输出，可用于分析当前评测任务或已有的评测结果。详情请参阅 [重复输出分析工具](tools/analyze_repeat.py)！
+- **\[2026.03.20\]** OpenCompass 现已支持跨任务并发推理与评测监听，可协同监控已完成的推理任务并触发后续评测。并行 Inferencer、任务监控及心跳机制进一步提升了大规模评测效率。详情请参阅 [并发推理实现](opencompass/tasks/openicl_infer_concurrent.py) 和 [评测监听实现](opencompass/tasks/openicl_eval_watch.py)！
+- **\[2026.03.17\]** OpenCompass 新增 `RawPromptTemplate`，可以在不引入非预期格式转换的情况下向模型传递 benchmark 的原始 Prompt 和结构化对话，并支持 API 模型、ChatML 数据集，以及模型侧的额外 Prompt 内容附加。详情请参阅 [RawPromptTemplate 使用指南](docs/zh_cn/notes/rawprompttemplate.md)！
 - **\[2026.02.05\]** OpenCompass 现已支持Intern-S1-Pro相关的通用及科学评测基准，请参阅[Intern-S1-Pro评测示例](examples/eval_intern_s1_pro.py)和[模型信息](https://huggingface.co/internlm/Intern-S1-Pro)了解详情！🔥🔥🔥
 - **\[2025.12.08\]** OpenCompass 现已支持SciReasoner评测，请参阅[SciReasoner评测示例](examples/eval_scireasoner.py)和[原项目地址](https://github.com/InternScience/SciReason)了解详情！🔥🔥🔥
 - **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1评测教程](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/interns1.html)了解详情！🔥🔥🔥
 - **\[2025.04.01\]** OpenCompass 现已支持 `CascadeEvaluator`，允许多个评估器按顺序工作，可以为更复杂的评估场景创建自定义评估流程，查看[文档](docs/zh_cn/advanced_guides/llm_judge.md)了解具体用法！🔥🔥🔥
 - **\[2025.03.11\]** 现已支持 `SuperGPQA`  覆盖285 个研究生学科的知识能力评测，欢迎尝试！🔥🔥🔥
 - **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了教程，请查看 [评估推理模型](docs/zh_cn/user_guides/deepseek_r1.md) 了解更多详情！🔥🔥🔥
-- **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于LLM作为评判器的`GenericLLMEvaluator`和用于数学推理评估的`MATHVerifyEvaluator`。查看[LLM评判器](docs/zh_cn/advanced_guides/llm_judge.md)和[数学能力评测](docs/zh_cn/advanced_guides/general_math.md)文档了解更多详情！🔥🔥🔥
-- **\[2025.01.16\]** 我们现已支持 [InternLM3-8B-Instruct](https://huggingface.co/internlm/internlm3-8b-instruct) 模型，该模型在推理、知识类任务上取得同量级最优性能，欢迎尝试。
-- **\[2024.12.17\]** 我们提供了12月CompassAcademic学术榜单评估脚本 [CompassAcademic](configs/eval_academic_leaderboard_202412.py)，你可以通过简单地配置复现官方评测结果。
-- **\[2024.10.14\]** 现已支持OpenAI多语言问答数据集[MMMLU](https://huggingface.co/datasets/openai/MMMLU)，欢迎尝试! 🔥🔥🔥
-- **\[2024.09.19\]** 现已支持[Qwen2.5](https://huggingface.co/Qwen)(0.5B to 72B) ，可以使用多种推理后端(huggingface/vllm/lmdeploy), 欢迎尝试! 🔥🔥🔥
-- **\[2024.09.05\]** 现已支持OpenAI o1 模型(`o1-mini-2024-09-12` and `o1-preview-2024-09-12`), 欢迎尝试! 🔥🔥🔥
-- **\[2024.09.05\]** OpenCompass 现在支持通过模型后处理来进行答案提取，以更准确地展示模型的能力。作为此次更新的一部分，我们集成了 [XFinder](https://github.com/IAAR-Shanghai/xFinder) 作为首个后处理模型。具体信息请参阅 [文档](opencompass/utils/postprocessors/xfinder/README.md)，欢迎尝试！ 🔥🔥🔥
-- **\[2024.08.20\]** OpenCompass 现已支持 [SciCode](https://github.com/scicode-bench/SciCode): A Research Coding Benchmark Curated by Scientists。 🔥🔥🔥
-- **\[2024.08.16\]** OpenCompass 现已支持全新的长上下文语言模型评估基准——[RULER](https://arxiv.org/pdf/2404.06654)。RULER 通过灵活的配置，提供了对长上下文包括检索、多跳追踪、聚合和问答等多种任务类型的评测，欢迎访问[RULER](configs/datasets/ruler/README.md)。🔥🔥🔥
-- **\[2024.07.23\]** 我们支持了[Gemma2](https://huggingface.co/collections/google/gemma-2-release-667d6600fd5220e7b967f315)模型，欢迎试用！🔥🔥🔥
-- **\[2024.07.23\]** 我们支持了[ModelScope](www.modelscope.cn)数据集，您可以按需加载，无需事先下载全部数据到本地，欢迎试用！🔥🔥🔥
-- **\[2024.07.17\]** 我们发布了CompassBench-202407榜单的示例数据和评测规则，敬请访问 [CompassBench](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/compassbench_intro.html) 获取更多信息。 🔥🔥🔥
-- **\[2024.07.17\]** 我们正式发布 NeedleBench 的[技术报告](http://arxiv.org/abs/2407.11963)。诚邀您访问我们的[帮助文档](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/needleinahaystack_eval.html)进行评估。🔥🔥🔥
-- **\[2024.07.04\]** OpenCompass 现已支持 InternLM2.5， 它拥有卓越的推理性能、有效支持百万字超长上下文以及工具调用能力整体升级，欢迎访问[OpenCompass Config](https://github.com/open-compass/opencompass/tree/main/configs/models/hf_internlm) 和 [InternLM](https://github.com/InternLM/InternLM) .🔥🔥🔥.
-- **\[2024.06.20\]** OpenCompass 现已支持一键切换推理加速后端，助力评测过程更加高效。除了默认的HuggingFace推理后端外，还支持了常用的 [LMDeploy](https://github.com/InternLM/lmdeploy) 和 [vLLM](https://github.com/vllm-project/vllm) ，支持命令行一键切换和部署 API 加速服务两种方式，详细使用方法见[文档](docs/zh_cn/advanced_guides/accelerator_intro.md)。欢迎试用！🔥🔥🔥.
+- **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于 LLM 作为评判器的 `GenericLLMEvaluator` 和用于数学推理评估的 `MATHVerifyEvaluator`。查看 [LLM 评判器](docs/zh_cn/advanced_guides/llm_judge.md)和[数学能力评测](docs/zh_cn/advanced_guides/math_verify.md)文档了解更多详情！🔥🔥🔥
 
 > [更多](docs/zh_cn/notes/news.md)
 

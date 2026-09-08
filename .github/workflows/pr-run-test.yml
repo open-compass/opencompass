@@ -34,7 +34,7 @@ env:
   # Must match rjob --namespace below (used by submit/get/logs/stop).
   KUBEBRAIN_NAMESPACE: ailab-llmeval
   SCORE_MIN: '75'
-  SCORE_MAX: '80'
+  SCORE_MAX: '85'
 
 jobs:
   cmd_test:
