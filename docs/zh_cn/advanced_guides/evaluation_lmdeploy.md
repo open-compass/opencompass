@@ -82,5 +82,5 @@ models = [
 把上述配置放在文件中，比如 "configs/eval_internlm2_lmdeploy.py"。然后，在 OpenCompass 的项目目录下，执行如下命令可得到评测结果：
 
 ```shell
-python run.py configs/eval_internlm2_lmdeploy.py -w outputs
+opencompass configs/eval_internlm2_lmdeploy.py -w outputs
 ```

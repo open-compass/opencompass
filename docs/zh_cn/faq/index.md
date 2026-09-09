@@ -1,4 +1,4 @@
-# 常见问题
+# 常见问题与故障排查
 
 ## 通用
 
@@ -55,7 +55,7 @@ OpenCompass 使用称为 task (任务) 的单位处理评估请求。每个任�
 目前，没有直接的方法来指定 OpenCompass 可以使用的 GPU 数量。但以下是一些间接策略：
 
 **如果在本地评估：**
-您可以通过设置 `CUDA_VISIBLE_DEVICES` 环境变量来限制 OpenCompass 的 GPU 访问。例如，使用 `CUDA_VISIBLE_DEVICES=0,1,2,3 python run.py ...` 只会向 OpenCompass 暴露前四个 GPU，确保它同时使用的 GPU 数量不超过这四个。
+您可以通过设置 `CUDA_VISIBLE_DEVICES` 环境变量来限制 OpenCompass 的 GPU 访问。例如，使用 `CUDA_VISIBLE_DEVICES=0,1,2,3 opencompass ...` 只会向 OpenCompass 暴露前四个 GPU，确保它同时使用的 GPU 数量不超过这四个。
 
 **如果使用 Slurm 或 DLC：**
 尽管 OpenCompass 没有直接访问资源池，但您可以调整 `--max-num-workers` 参数以限制同时提交的评估任务数量。这将间接管理 OpenCompass 使用的 GPU 数量。例如，如果每个任务需要 4 个 GPU，您希望分配总共 8 个 GPU，那么应将 `--max-num-workers` 设置为 2。
@@ -96,12 +96,12 @@ Error: mkl-service + Intel(R) MKL: MKL_THREADING_LAYER=INTEL is incompatible wit
 - 通过指定环境变量 `http_proxy` 和 `https_proxy`，挂上代理；
 - 使用其他机器的缓存文件。首先在有 HuggingFace 访问权限的机器上运行实验，然后将缓存文件复制 / 软链到离线的机器上。缓存文件默认位于 `~/.cache/huggingface/`（[文档](https://huggingface.co/docs/datasets/cache#cache-directory)）。当缓存文件准备好时，您可以在离线模式下启动评估：
   ```python
-  HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_EVALUATE_OFFLINE=1 HF_HUB_OFFLINE=1 python run.py ...
+  HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_EVALUATE_OFFLINE=1 HF_HUB_OFFLINE=1 opencompass ...
   ```
   这样，评估不再需要网络连接。但是，如果缓存中缺少任何数据集或模型的文件，仍然会引发错误。
 - 使用中国大陆内的镜像源，例如 [hf-mirror](https://hf-mirror.com/)
   ```python
-  HF_ENDPOINT=https://hf-mirror.com python run.py ...
+  HF_ENDPOINT=https://hf-mirror.com opencompass ...
   ```
 
 ### 我的服务器无法连接到互联网，我如何使用 OpenCompass？
@@ -136,12 +136,12 @@ OpenCompass 中的每个任务代表等待评估的特定模型和数据集部�
 如果您已经提前下载好 Huggingface 的模型文件，请手动指定模型路径. 示例如下
 
 ```bash
-python run.py --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
+opencompass --datasets siqa_gen winograd_ppl --hf-type base --hf-path /path/to/model
 ```
 
 ## 数据集
 
 ### 如何构建自己的评测数据集
 
-- 客观数据集构建参见：[支持新数据集](../advanced_guides/new_dataset.md)
-- 主观数据集构建参见：[主观评测指引](../advanced_guides/subjective_evaluation.md)
+- 客观数据集构建参见：[支持新数据集](../extension/new_dataset.md)
+- 主观数据集构建参见：[主观评测指引](../evaluation/subjective_evaluation.md)

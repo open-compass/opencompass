@@ -168,7 +168,7 @@ work_dir = 'outputs/obj_all/'
 ### 第二步 启动评测并输出评测结果
 
 ```shell
-python run.py eval_math_llm_judge.py
+opencompass eval_math_llm_judge.py
 ```
 
 此时会进行两轮评测，第一轮是模型推理得到问题的预测答案，第二轮是JudgeLLM评测预测答案和标准答案的一致性，并打分。

@@ -11,7 +11,7 @@ Intern-S1的模型权重现已开源，请从[Huggingface](https://huggingface.c
 
 ### 模型配置
 
-我们在`opencompass/configs/models/interns1/intern_s1.py`中提供了OpenAISDK形式调用模型的配置示例，请根据你的需求进行相应更改。
+我们在`opencompass/configs/models/intern_s/intern_s1.py`中提供了OpenAISDK形式调用模型的配置示例，请根据你的需求进行相应更改。
 
 ```python
 models = [

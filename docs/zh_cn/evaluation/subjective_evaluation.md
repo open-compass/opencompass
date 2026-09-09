@@ -134,7 +134,7 @@ judgemodel通常被设置为GPT4等强力模型，可以直接按照config文件
 ### 第三步 启动评测并输出评测结果
 
 ```shell
-python run.py examples/eval_subjective.py -r
+opencompass examples/eval_subjective.py -r
 ```
 
 - `-r` 参数支持复用模型推理和评估结果。
