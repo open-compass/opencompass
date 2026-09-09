@@ -364,6 +364,7 @@ class MBPPEvaluator(BaseEvaluator):
             r"\[BEGIN\]\s*'(.*)",
             r'\[BEGIN\](.*)',
             r"'(.*)'\s*\[DONE\]",
+            r"\[BEGIN\]```python\s*(.*)\s*\[DONE\]",
         ]
         for p in patterns:
             try:
