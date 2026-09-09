@@ -568,4 +568,4 @@ class HealthBenchEvaluator(BaseEvaluator):
         metrics = results.metrics | {'score': results.score}
         metrics = dict(sorted(metrics.items()))
         acc = metrics.get('f1_score', metrics.get('score', None))
-        return {'accuracy': acc}
+        return {'accuracy': acc * 100}
