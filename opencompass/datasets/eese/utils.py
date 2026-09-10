@@ -25,7 +25,7 @@ def extract_first_numeric_score(score_text):
 
         if match:
             return int(match.group())
-        return 0
+        return None
 
 
 def process_results(results, overall_avg):
