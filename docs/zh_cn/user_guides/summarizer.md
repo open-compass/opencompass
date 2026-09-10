@@ -39,7 +39,7 @@ summarizer 会以 config 中的 `models`, `datasets` 为全集，去尝试读取
 此外，输出结果是有多列的：
 
 - `dataset` 列与 `summarizer.dataset_abbrs` 配置一一对应
-- `version` 列是这个数据集的 hash 值，该 hash 值会考虑该数据集模板的评测方式、提示词、输出长度限制等信息。用户可通过该列信息确认两份评测结果是否可比
+- `version` 列是数据集 `infer_cfg` 的 SHA-256 哈希（即 prompt hash）的前 6 位，用于标识评测方式、提示词模板、输出长度限制等推理配置。它既不是数据集配置文件名的后缀，也不表示数据集或数据发布版本，因此二者无需一致。用户可通过该列确认两份结果的推理配置和提示词设置是否可比
 - `metric` 列是指这个指标的评测方式，具体说明见 [metrics](./metrics.md)
 - `mode` 列是指这个推理结果的获取方式，可能的值有 `ppl` / `gen`。对于 `summarizer.summary_groups` 的项，若被 `subsets` 的获取方式都一致，则其值也跟 `subsets` 一致，否则即为 `mixed`
 - 其后若干列，一列代表一个模型
