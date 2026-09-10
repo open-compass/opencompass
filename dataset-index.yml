@@ -158,6 +158,12 @@
     paper: https://arxiv.org/abs/2009.13081
     configpath: opencompass/configs/datasets/MedQA/MedQA_gen_3bf756.py
     configpath_llmjudge: opencompass/configs/datasets/MedQA/MedQA_llmjudge_gen_3bf756.py
+- medfailbench:
+    name: MedFailBench
+    category: Safety / Medicine
+    paper: https://github.com/goktugozkanmd/medical-ai-failure-atlas
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/MedFailBench/medfailbench_llmjudge_gen.py
 - MedXpertQA:
     name: MedXpertQA
     category: Knowledge / Medicine
