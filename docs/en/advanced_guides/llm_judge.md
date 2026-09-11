@@ -232,7 +232,23 @@ The GenericLLMEvaluator is designed to use an LLM as a judge for evaluating mode
 3. Customizable evaluation criteria through prompt engineering
 4. Post-processing of judge outputs to extract structured evaluations
 
-**Important Note**: The current generic version of the judge template only supports outputs in the format of "A" (correct) or "B" (incorrect), and does not support other output formats (like "CORRECT" or "INCORRECT"). This is because the post-processing function `generic_llmjudge_postprocess` is specifically designed to parse this format.
+**Important Note**: `generic_llmjudge_postprocess` uses `A` (correct) and
+`B` (incorrect) by default. Its `true_tag` and `false_tag` arguments allow
+other distinct verdict tags. For example, configure a judge to return `X` for
+correct and `Y` for incorrect with:
+
+```python
+dict_postprocessor=dict(
+    type=generic_llmjudge_postprocess,
+    true_tag='X',
+    false_tag='Y',
+)
+```
+
+The judge prompt should instruct the model to return exactly the configured
+tags. For multiple-choice tasks whose option labels overlap with the default
+`A`/`B` verdict labels, consider using disjoint tags such as `X`/`Y` to reduce
+ambiguity.
 
 The evaluator works by:
 
