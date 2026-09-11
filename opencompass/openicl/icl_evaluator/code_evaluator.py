@@ -32,7 +32,7 @@ class CodeEvaluator(BaseEvaluator):
         Args:
             language (str): Programming language of the code to evaluate.
             ip_address (str, optional): IP address of the evaluation service. Defaults to 'localhost'.
-            retry (int, optional): Number of retry attempts for failed connections. Defaults to 3.
+            retry (int, optional): Number of retry attempts for failed connections. Defaults to 5.
         """
         self.language = language
         self.retry = retry
