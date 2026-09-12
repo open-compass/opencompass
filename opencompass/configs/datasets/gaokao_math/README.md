@@ -63,7 +63,7 @@ gaokao_math_eval_cfg = dict(
 ...
 
 ```
-We recommand `Qwen2.5-72B-Instruct` model for evaluation.
+We recommend `Qwen2.5-72B-Instruct` model for evaluation.
 
 
 ### 3. Set Extractor model and run the evaluation
