@@ -4,7 +4,6 @@ import inspect
 import json
 import os
 import os.path as osp
-import re
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from pathlib import Path
@@ -16,6 +15,7 @@ from tqdm import tqdm
 from opencompass.models.base import BaseModel
 from opencompass.registry import ICL_INFERENCERS
 from opencompass.utils import batched
+from opencompass.utils.prompt import compute_origin_prompt_hash
 
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
@@ -144,6 +144,13 @@ class GenInferencer(BaseInferencer):
             else:
                 entry = datum
                 golds = [None for _ in range(len(entry))]
+            if self.enable_origin_prompt_hash:
+                origin_prompt_hashes = [
+                    compute_origin_prompt_hash(e, self.dataset_abbr)
+                    for e in entry
+                ]
+            else:
+                origin_prompt_hashes = [None] * len(entry)
             # 5-1. Inference with local model
             extra_gen_kwargs = {}
             sig = inspect.signature(self.model.generate)
@@ -159,9 +166,11 @@ class GenInferencer(BaseInferencer):
                     os.makedirs(os.path.join(self.dump_only_message_path,
                                              save_path),
                                 exist_ok=True)
-                    save_name = re.sub(r'_(\d+)?(?=\.\w+$)',
-                                       '', output_json_filename).rsplit(
-                                           '.', 1)[0] + '.jsonl'
+                    if self.dataset_abbr:
+                        save_name = f'{self.dataset_abbr}.jsonl'
+                    else:
+                        save_name = Path(output_json_filename).with_suffix(
+                            '.jsonl').name
                     with open(os.path.join(self.dump_only_message_path,
                                            save_path, save_name),
                               'w' if first_dump else 'a',
@@ -228,17 +237,21 @@ class GenInferencer(BaseInferencer):
                         res_length = [
                             self.model.get_token_len(pred) for pred in pred_str
                         ]
-                    output_handler.save_results(prompt,
-                                                prediction,
-                                                index,
-                                                gold=gold,
-                                                res_length=res_length,
-                                                input_length=input_length)
+                    output_handler.save_results(
+                        prompt,
+                        prediction,
+                        index,
+                        gold=gold,
+                        res_length=res_length,
+                        input_length=input_length,
+                        origin_prompt_hash=origin_prompt_hashes[batch_idx])
                 else:
-                    output_handler.save_results(prompt,
-                                                prediction,
-                                                index,
-                                                gold=gold)
+                    output_handler.save_results(
+                        prompt,
+                        prediction,
+                        index,
+                        gold=gold,
+                        origin_prompt_hash=origin_prompt_hashes[batch_idx])
                 index = index + 1
 
             # 5-4. Save intermediate results

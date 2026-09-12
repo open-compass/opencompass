@@ -39,6 +39,8 @@ class BaseInferencer:
         output_json_filepath: Optional[str] = './icl_inference_output',
         output_json_filename: Optional[str] = 'predictions',
         fix_id_list: Optional[List[int]] = None,
+        dataset_abbr: Optional[str] = None,
+        enable_origin_prompt_hash: bool = False,
         **kwargs,
     ) -> None:
 
@@ -53,6 +55,8 @@ class BaseInferencer:
         self.batch_size = batch_size
         self.output_json_filepath = output_json_filepath
         self.output_json_filename = output_json_filename
+        self.dataset_abbr = dataset_abbr
+        self.enable_origin_prompt_hash = enable_origin_prompt_hash
         self.is_main_process = is_main_process()
         os.makedirs(self.output_json_filepath, exist_ok=True)
 
@@ -162,7 +166,8 @@ class GenInferencerOutputHandler:
                      idx,
                      gold=None,
                      res_length=None,
-                     input_length=None):
+                     input_length=None,
+                     origin_prompt_hash=None):
         self.results_dict[str(idx)] = {
             'origin_prompt': origin_prompt,
             'prediction': prediction,
@@ -173,6 +178,9 @@ class GenInferencerOutputHandler:
             self.results_dict[str(idx)]['res_length'] = res_length
         if input_length is not None:
             self.results_dict[str(idx)]['all_input_length'] = input_length
+        if origin_prompt_hash is not None:
+            self.results_dict[str(
+                idx)]['origin_prompt_hash'] = origin_prompt_hash
 
 
 class ChatOutputHandler:

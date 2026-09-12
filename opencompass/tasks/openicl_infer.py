@@ -13,8 +13,9 @@ from opencompass.registry import (ICL_INFERENCERS, ICL_PROMPT_TEMPLATES,
                                   ICL_RETRIEVERS, TASKS)
 from opencompass.tasks.base import BaseTask
 from opencompass.utils import (build_dataset_from_cfg, build_model_from_cfg,
-                               get_infer_output_path, get_logger,
-                               model_abbr_from_cfg, task_abbr_from_cfg)
+                               dataset_abbr_from_cfg, get_infer_output_path,
+                               get_logger, model_abbr_from_cfg,
+                               task_abbr_from_cfg)
 
 
 @TASKS.register_module()
@@ -131,6 +132,9 @@ class OpenICLInferTask(BaseTask):
         inferencer_cfg['max_seq_len'] = self.model_cfg.get('max_seq_len')
         inferencer_cfg['dump_res_length'] = self.dump_res_length
         inferencer_cfg['dump_only_message_path'] = self.dump_only_message_path
+        inferencer_cfg['dataset_abbr'] = self.infer_cfg.get(
+            'origin_dataset_abbr', dataset_abbr_from_cfg(self.dataset_cfg))
+        inferencer_cfg['enable_origin_prompt_hash'] = True
         inferencer = ICL_INFERENCERS.build(inferencer_cfg)
 
         out_path = get_infer_output_path(
