@@ -1,0 +1,216 @@
+# Task Partitioning, Runners, and Task Types
+
+OpenCompass divides inference and evaluation into tasks and gives them to a Runner. The three configuration layers are:
+
+- Partitioner: determines how many tasks are created from model-dataset combinations.
+- Runner: launches tasks locally, on Slurm, or on DLC with a chosen concurrency.
+- Task: performs inference, evaluation, or another concrete operation.
+
+Users control inference and evaluation independently through `infer.partitioner` / `infer.runner` and `eval.partitioner` / `eval.runner`. This page covers Partitioners, Runners, and ordinary task types. For cross-dataset API concurrency internals, see [Cross-Task Concurrent Inference and Evaluation Watching](concurrent_evaluation.md).
+
+## Default Strategy
+
+When `infer`/`eval` are omitted, the CLI generates local defaults: inference uses `NumWorkerPartitioner` and `OpenICLInferTask`, evaluation uses `NaivePartitioner` and `OpenICLEvalTask`, and both stages use `LocalRunner`.
+
+The standard API example in this documentation and the basic tutorial uses `OpenICLInferConcurrentTask` and `OpenICLEvalWatchTask`; CLI-generated defaults still use the ordinary `OpenICLInferTask` and `OpenICLEvalTask`.
+
+```python
+from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
+from opencompass.runners import LocalRunner
+from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
+
+infer = dict(
+    partitioner=dict(type=NumWorkerPartitioner, num_worker=4),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=4,
+        max_workers_per_gpu=1,
+        task=dict(type=OpenICLInferTask),
+    ),
+)
+
+eval = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=4,
+        task=dict(type=OpenICLEvalTask),
+    ),
+)
+```
+
+## Task Partitioning: Three Partitioners
+
+### NaivePartitioner
+
+Treats every “model × dataset” combination as one independent task. It is the simplest strategy and has no additional arguments. It naturally suits evaluation because the prediction file for each combination is already a whole.
+
+![](https://github.com/user-attachments/assets/f92524ea-5451-429d-a446-97bf36d917ea)
+
+```python
+from opencompass.partitioners import NaivePartitioner
+
+infer = dict(
+    partitioner=dict(type=NaivePartitioner),
+    # ...
+)
+```
+
+### NumWorkerPartitioner
+
+The default inference partitioner. It divides each dataset into `num_split` shards, then distributes those shards evenly among `num_worker` tasks, so the expected task count matches the actual worker count.
+
+![](https://github.com/user-attachments/assets/432a6738-3298-4729-8b00-a370ea5053ac)
+![](https://github.com/user-attachments/assets/07fb30fa-eb2d-4f1b-bf7d-c05ebdba518d)
+
+```python
+from opencompass.partitioners import NumWorkerPartitioner
+
+infer = dict(
+    partitioner=dict(
+        type=NumWorkerPartitioner,
+        num_worker=16,    # Number of tasks after partitioning / expected workers
+        num_split=None,   # Shards per dataset; uses num_worker when None
+        min_task_size=16, # Minimum samples in one partition
+    ),
+    # ...
+)
+```
+
+`strategy` can be `heuristic` (default) or `split`; the latter only splits large datasets and does not combine small ones.
+
+```{warning}
+This partitioner is not suitable for the evaluation stage (`OpenICLEvalTask`).
+```
+
+```{warning}
+Do not change `num_split` when resuming inference. If `num_split` is `None`, do not change `num_worker`, or existing prediction shards will no longer align for reuse.
+```
+
+### SizePartitioner
+
+Estimates each dataset's inference cost by multiplying its size by an expansion coefficient, then splits large datasets and combines small datasets to make subtask costs as even as possible.
+
+![](https://github.com/user-attachments/assets/b707c92f-0738-4e9a-a53e-64510c75898b)
+
+```python
+from opencompass.partitioners import SizePartitioner
+
+infer = dict(
+    partitioner=dict(
+        type=SizePartitioner,
+        max_task_size=2000,  # Maximum sample count in one task
+        gen_task_coef=20,    # Expansion coefficient for generative tasks
+    ),
+    # ...
+)
+```
+
+The cost coefficient depends on inference type: a generative task (`GenInferencer`) uses the larger `gen_task_coef`, while a discriminative task (`PPLInferencer`) uses the number of labels in the prompt. This remains a rough estimate and does not precisely reflect the computational difference between the two task types.
+
+```{warning}
+This partitioner is not suitable for the evaluation stage (`OpenICLEvalTask`).
+```
+
+### Partitioning and Resume
+
+Changing partition arguments can make existing prediction files impossible to reuse correctly. Keep model abbreviations, dataset abbreviations, and partitioning strategy stable when resuming. See [Task Recovery, Reuse, and Evaluation-Only Reruns](reuse_and_resume.md).
+
+## Execution Backends: Runner
+
+### LocalRunner
+
+The basic Runner launches tasks in parallel on the local machine:
+
+```python
+from opencompass.runners import LocalRunner
+
+runner=dict(
+    type=LocalRunner,
+    max_num_workers=16,  # Maximum parallel task count; default 16
+    max_workers_per_gpu=1,
+    task=dict(type=OpenICLInferTask),
+)
+```
+
+Actual parallel task count is limited by both available GPU resources and `max_num_workers`.
+
+### SlurmRunner
+
+Submits tasks to a Slurm cluster:
+
+```python
+from opencompass.runners import SlurmRunner
+
+runner=dict(
+    type=SlurmRunner,
+    partition='my-partition',  # Cluster partition
+    quotatype='auto',          # Optional quota type
+    max_num_workers=16,        # Maximum concurrent tasks; default 32
+    retry=2,                   # Retry count after task failure
+    task=dict(type=OpenICLInferTask),
+)
+```
+
+### DLCRunner
+
+Submits tasks to Alibaba Cloud PAI-DLC and requires a preconfigured `dlc` CLI and workspace:
+
+```python
+from opencompass.runners import DLCRunner
+
+runner=dict(
+    type=DLCRunner,
+    max_num_workers=16,
+    retry=2,
+    aliyun_cfg=dict(
+        workspace_id='ws-xxx',               # DLC workspace ID
+        worker_image='xxx',                  # Task image
+        dlc_config_path='/user/.dlc/config', # dlc configuration file
+        conda_env_name='opencompass',        # OpenCompass conda environment
+    ),
+    task=dict(type=OpenICLInferTask),
+)
+```
+
+### RJOBRunner
+
+Submits and tracks tasks through the `rjob` CLI for an rjob-scheduled cluster. Resource requirements are derived automatically from task `num_gpus` (GPU count, memory, and CPU); a GPU-free task can specify `memory` and `cpu` directly in `rjob_cfg`. After submission, the Runner polls `rjob get` until completion:
+
+```python
+from opencompass.runners import RJOBRunner
+
+runner=dict(
+    type=RJOBRunner,
+    max_num_workers=16,
+    retry=2,
+    rjob_cfg=dict(
+        task_id='my-exp',               # Used to generate the task name
+        image='xxx',                    # Task image
+        mount=['/path/to/shared'],      # Mount path, string or list
+        env=dict(HF_HOME='/cache/huggingface'),  # Injected environment variables
+    ),
+    task=dict(type=OpenICLInferTask),
+)
+```
+
+`rjob_cfg` also supports fields including `charged_group`, `private_machine`, `replicas`, `host_network`, and `extra_args`.
+
+CLI `--slurm` / `--dlc` are runtime overrides: even when a configuration defines a Runner, it is replaced by the requested type and an override warning is printed.
+
+## Task Types
+
+A Task is an independent script responsible for compute-intensive operations, with arguments determined by configuration. It can be instantiated and executed with `task.run()`, or produce a complete command through `get_command` for a scheduler, such as `srun {task_cmd}`. Currently supported task types include:
+
+- `OpenICLInferTask`: performs language-model inference through OpenICL.
+- `OpenICLEvalTask`: reads predictions and performs evaluation.
+- `OpenICLInferConcurrentTask`: lets one process advance multiple datasets concurrently for an API model.
+- `OpenICLEvalWatchTask`: watches inference state and evaluates outputs as they complete.
+
+See [Cross-Task Concurrent Inference and Evaluation Watching](concurrent_evaluation.md) for arguments, behavior, and selection guidance for the last two tasks.
+
+## Resource Declarations and Actual Concurrency
+
+Model `run_cfg.num_gpus` declares the number of GPUs occupied by one task; Runner `max_num_workers` limits concurrently running tasks; LocalRunner `max_workers_per_gpu` allows multiple tasks on one GPU. These three arguments jointly determine concurrency and are not interchangeable.
+
+Use `--dry-run` to inspect partitioning first. Before increasing concurrency, also confirm that GPU memory, CPU, file descriptors, API rate limits, and data caches can sustain the corresponding load.

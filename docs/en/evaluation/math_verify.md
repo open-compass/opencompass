@@ -1,4 +1,4 @@
-# General Math Evaluation Guidance
+# Mathematical Capability Evaluation
 
 ## Introduction
 

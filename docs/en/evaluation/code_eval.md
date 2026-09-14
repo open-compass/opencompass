@@ -1,20 +1,120 @@
-# Code Evaluation Docker Tutorial
+# Code Evaluation
 
-To complete the LLM code capability evaluation, we need to build a separate evaluation environment to avoid executing erroneous code in the development environment, which would inevitably cause losses. The code evaluation service currently used by OpenCompass can refer to the [code-evaluator](https://github.com/open-compass/code-evaluator) project. The following will introduce evaluation tutorials around the code evaluation service.
+This page uses `humaneval` and `mbpp` to explain pass@1 / pass@k configuration. When code must actually execute, as with multilingual `humaneval-x` or `DS1000`, use an independent Docker code-evaluation service to avoid running model-generated code in the development environment.
+
+## pass@1
+
+To generate one reply and evaluate pass@1, use [configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) and [configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py), following the general [Quick Start](../get_started/quick_start.md).
+
+For multilingual evaluation, see [Code Execution Service](#code-execution-service) below.
+
+## pass@k
+
+To generate multiple replies per example for pass@k, use one of the following approaches. Both examples generate 10 replies.
+
+### General Case
+
+Most models support the Hugging Face generation argument `num_return_sequences`, which can directly produce multiple replies:
+
+```python
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
+
+with read_base():
+    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
+
+mbpp_datasets[0]['type'] = MBPPDatasetV2
+mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
+mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
+
+datasets = []
+datasets += humaneval_datasets
+datasets += mbpp_datasets
+
+models = [
+    dict(
+        type=HuggingFaceCausalLM,
+        ...,
+        generation_kwargs=dict(
+            num_return_sequences=10,
+            do_sample=True,
+            top_p=0.95,
+            temperature=0.8,
+        ),
+        ...,
+    )
+]
+```
+
+MBPP needs corresponding changes to `type`, `eval_cfg.evaluator.type`, and `reader_cfg.output_column` for the new behavior.
+
+Replies must be stochastic, so set `generation_kwargs`, especially `num_return_sequences`. It must be at least k because pass@k is a probability estimate.
+
+See [examples/eval_code_passk.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk.py) for a concrete configuration.
+
+### Models Without Multiple-Reply Support
+
+For an API or incomplete Hugging Face model that cannot return multiple replies, repeat the dataset instead:
+
+```python
+from opencompass.datasets import MBPPDatasetV2, MBPPPassKEvaluator
+
+with read_base():
+    from .datasets.humaneval.humaneval_gen_8e312c import humaneval_datasets
+    from .datasets.mbpp.deprecated_mbpp_gen_1e1056 import mbpp_datasets
+
+humaneval_datasets[0]['abbr'] = 'openai_humaneval_pass10'
+humaneval_datasets[0]['num_repeats'] = 10
+mbpp_datasets[0]['abbr'] = 'mbpp_pass10'
+mbpp_datasets[0]['num_repeats'] = 10
+mbpp_datasets[0]['type'] = MBPPDatasetV2
+mbpp_datasets[0]['eval_cfg']['evaluator']['type'] = MBPPPassKEvaluator
+mbpp_datasets[0]['reader_cfg']['output_column'] = 'test_column'
+
+datasets = []
+datasets += humaneval_datasets
+datasets += mbpp_datasets
+
+models = [
+    dict(
+        type=HuggingFaceCausalLM,
+        ...,
+        generation_kwargs=dict(
+            do_sample=True,
+            top_p=0.95,
+            temperature=0.8,
+        ),
+        ...,
+    )
+]
+```
+
+Because the dataset prompt does not change, modify these fields to repeat data:
+
+- `num_repeats`: number of dataset repetitions.
+- `abbr`: update the dataset abbreviation with the repeat count because dataset size changes; this prevents mismatches with `.cache/dataset_size.json`.
+
+For MBPP, likewise change `type`, `eval_cfg.evaluator.type`, and `reader_cfg.output_column`. Set stochastic `generation_kwargs` on the model as well.
+
+See [examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk_repeat_dataset.py).
+
+## Code Execution Service
+
+Datasets requiring real code execution are evaluated in an independent Docker service. OpenCompass uses a service built from [code-evaluator](https://github.com/open-compass/code-evaluator).
+
+### Supported Datasets
 
 1. humaneval-x
 
-This is a multi-programming language dataset [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x).
-You can download the dataset from this [download link](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx). Please download the language file (××.jsonl.gz) that needs to be evaluated and place it in the `./data/humanevalx` folder.
+   The multilingual [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x) dataset. Download the required language file (`xx.jsonl.gz`) from its [download location](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx) and place it under `./data/humanevalx`.
 
-The currently supported languages are `python`, `cpp`, `go`, `java`, `js`.
+   Supported languages are `python`, `cpp`, `go`, `java`, and `js`.
 
 2. DS1000
 
-This is a Python multi-algorithm library dataset [ds1000](https://github.com/xlang-ai/DS-1000).
-You can download the dataset from this [download link](https://github.com/xlang-ai/DS-1000/blob/main/ds1000_data.zip).
+   The multi-library Python dataset [DS1000](https://github.com/xlang-ai/DS-1000). Download it from [ds1000_data.zip](https://github.com/xlang-ai/DS-1000/blob/main/ds1000_data.zip).
 
-The currently supported algorithm libraries are `Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, `Matplotlib`.
+   Supported libraries are `Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, and `Matplotlib`.
 
 ## Launching the Code Evaluation Service
 
@@ -108,7 +208,7 @@ humanevalx_datasets = [
 
 ### Task Launch
 
-Refer to the [Quick Start](../get_started.html)
+Refer to the [Five-Minute Quick Start](../get_started/quick_start.md).
 
 ## Remote Code Evaluation
 
@@ -198,7 +298,7 @@ Besides evaluating the supported HUMANEVAList data set, users might also need:
 
 ### Support New Dataset
 
-Please refer to the [tutorial on supporting new datasets](./new_dataset.md).
+See [Adding a Dataset](../extension/new_dataset.md).
 
 ### Modify Post-Processing
 

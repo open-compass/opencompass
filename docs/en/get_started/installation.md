@@ -1,142 +1,73 @@
-# Installation
+# Installation and Environment Setup
 
-## Basic Installation
+OpenCompass requires Python 3.8 or later. Model backends impose their own version constraints on PyTorch, CUDA, and inference frameworks. When preparing a GPU environment, first install a PyTorch build compatible with the model and backend, then install OpenCompass.
 
-1. Prepare the OpenCompass runtime environment using Conda:
+## Creating an Isolated Environment
 
-```conda create --name opencompass python=3.10 -y
-   # conda create --name opencompass_lmdeploy python=3.10 -y
-
-   conda activate opencompass
-```
-
-If you want to customize the PyTorch version or related CUDA version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
-
-2. Install OpenCompass:
-   - pip Installation
-   ```bash
-   # For support of most datasets and models
-   pip install -U opencompass
-
-   # Complete installation (supports more datasets)
-   # pip install "opencompass[full]"
-
-   # API Testing (e.g., OpenAI, Qwen)
-   # pip install "opencompass[api]"
-   ```
-   - Building from Source Code If you want to use the latest features of OpenCompass
-   ```bash
-   git clone https://github.com/open-compass/opencompass opencompass
-   cd opencompass
-   pip install -e .
-   ```
-
-## Other Installations
-
-### Inference Backends
+Python 3.12 is recommended:
 
 ```bash
- # Model inference backends. Since these backends often have dependency conflicts,
- # we recommend using separate virtual environments to manage them.
- pip install "opencompass[lmdeploy]"
- # pip install "opencompass[vllm]"
+conda create -n opencompass python=3.12 -y
+conda activate opencompass
 ```
 
-- LMDeploy
+Both the regular and full OpenCompass installations support Python 3.12. However, code-execution evaluations such as APPS (`apps`, `apps_mini`), TACO, and LiveCodeBench Code Generation depend on `pyext==0.7`. That package is incompatible with Python 3.11 and later, so create a Python 3.10 environment when running these evaluations.
 
-You can check if the inference backend has been installed successfully with the following command. For more information, refer to the [official documentation](https://lmdeploy.readthedocs.io/en/latest/get_started.html)
+LMDeploy and vLLM may require different versions of PyTorch, CUDA, or other dependencies. If you need multiple inference backends, create a separate virtual environment for each backend.
+
+## Choosing an Installation Method
+
+For common language models and datasets, install the base package:
 
 ```bash
-lmdeploy chat internlm/internlm2_5-1_8b-chat --backend turbomind
+pip install -U opencompass
 ```
 
-- vLLM
-
-You can check if the inference backend has been installed successfully with the following command. For more information, refer to the [official documentation](https://docs.vllm.ai/en/latest/getting_started/quickstart.html)
+Install optional dependencies according to the capabilities you need:
 
 ```bash
-vllm serve facebook/opt-125m
+pip install "opencompass[api]"       # OpenAI, Anthropic, and other API models
+pip install "opencompass[full]"      # More datasets and evaluation dependencies
+pip install "opencompass[vlm]"       # Multimodal evaluation
+pip install "opencompass[lmdeploy]"  # LMDeploy backend
+pip install "opencompass[vllm]"      # vLLM backend
 ```
 
-### API
-
-OpenCompass supports different commercial model API calls, which you can install via pip or by referring to the [API dependencies](https://github.com/open-compass/opencompass/blob/main/requirements/api.txt) for specific API model dependencies.
+To use the latest code or contribute to development, install from source:
 
 ```bash
-pip install "opencompass[api]"
-
-# pip install openai # GPT-3.5-Turbo / GPT-4-Turbo / GPT-4 / GPT-4o (API)
-# pip install anthropic # Claude (API)
-# pip install dashscope # Qwen (API)
-# pip install volcengine-python-sdk # ByteDance Volcano Engine (API)
-# ...
-```
-
-### Datasets
-
-The basic installation supports most fundamental datasets. For certain datasets (e.g., Alpaca-eval, Longbench, etc.), additional dependencies need to be installed.
-
-You can install these through pip or refer to the [additional dependencies](<(https://github.com/open-compass/opencompass/blob/main/requirements/extra.txt)>) for specific dependencies.
-
-```bash
-pip install "opencompass[full]"
-```
-
-For HumanEvalX / HumanEval+ / MBPP+, you need to manually clone the Git repository and install it.
-
-```bash
-git clone --recurse-submodules git@github.com:open-compass/human-eval.git
-cd human-eval
+git clone https://github.com/open-compass/opencompass.git
+cd opencompass
 pip install -e .
-pip install -e evalplus
 ```
 
-Some agent evaluations require installing numerous dependencies, which may conflict with existing runtime environments. We recommend creating separate conda environments to manage these.
+A source installation also registers the `opencompass` command. From the repository root, the equivalent `python run.py` entry point is also available.
+
+## Verifying the Installation
+
+The following commands apply to both PyPI and source installations. `which python` confirms the active Python environment; the next command reports the OpenCompass version and actual import path; the final command verifies that the CLI entry point and its dependencies are available.
 
 ```bash
-# T-Eval
-pip install lagent==0.1.2
-# CIBench
-pip install -r requirements/agent.txt
+which python
+python -c "import opencompass; print(opencompass.__version__); print(opencompass.__file__)"
+opencompass --help
 ```
 
-# Dataset Preparation
+## Data Caches
 
-The datasets supported by OpenCompass mainly include three parts:
-
-1. Huggingface datasets: The [Huggingface Datasets](https://huggingface.co/datasets) provide a large number of datasets, which will **automatically download** when running with this option.
-   Translate the paragraph into English:
-
-2. ModelScope Datasets: [ModelScope OpenCompass Dataset](https://modelscope.cn/organization/opencompass) supports automatic downloading of datasets from ModelScope.
-
-   To enable this feature, set the environment variable: `export DATASET_SOURCE=ModelScope`. The available datasets include (sourced from OpenCompassData-core.zip):
-
-   ```plain
-   humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ceval, math, LCSTS, Xsum, winogrande, openbookqa, AGIEval, gsm8k, nq, race, siqa, mbpp, mmlu, hellaswag, ARC, BBH, xstory_cloze, summedits, GAOKAO-BENCH, OCNLI, cmnli
-   ```
-
-3. Custom dataset: OpenCompass also provides some Chinese custom **self-built** datasets. Please run the following command to **manually download and extract** them.
-
-Run the following commands to download and place the datasets in the `${OpenCompass}/data` directory can complete dataset preparation.
+Datasets are normally downloaded on first use. On a shared machine, configure cache directories through these environment variables:
 
 ```bash
-# Run in the OpenCompass directory
-wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
-unzip OpenCompassData-core-20240207.zip
+export HF_DATASETS_CACHE=/path/to/huggingface-cache/datasets
+export COMPASS_DATA_CACHE=/path/to/opencompass-data-cache
 ```
 
-If you need to use the more comprehensive dataset (~500M) provided by OpenCompass, You can download and `unzip` it using the following command:
+`HF_DATASETS_CACHE` manages the Hugging Face dataset cache, while `COMPASS_DATA_CACHE` specifies the OpenCompass data-cache root. Download and loading behavior differs by dataset. See [Data Sources, Caches, and Offline Operation](../user_guides/data_and_cache.md) for detailed rules and offline preparation.
 
-```bash
-# For proxy and resumable downloads, try `aria2c -x16 -s16 -k1M "http://ghfast.top/https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip" `
-wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-complete-20240207.zip
-unzip OpenCompassData-complete-20240207.zip
-cd ./data
-find . -name "*.zip" -exec unzip "{}" \;
-```
+## Checking Models and Inference Backends
 
-The list of datasets included in both `.zip` can be found [here](https://github.com/open-compass/opencompass/releases/tag/0.2.2.rc1)
+Successfully installing LMDeploy or vLLM does not guarantee that the target model is compatible with that backend. First load a small model with the chosen backend, then run a demo dataset through OpenCompass. For an API model, also check the service URL, model name, key environment variable, rate limit, and timeout configuration.
 
-OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
+## Start Evaluating
 
-For next step, please read [Quick Start](./quick_start.md).
+After installation, continue to the [Five-Minute Quick Start](quick_start.md). For dependency, memory, or download issues, see [FAQ and Troubleshooting](../faq/index.md).

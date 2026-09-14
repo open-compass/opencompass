@@ -1,90 +1,52 @@
-# Overview
+# OpenCompass Workflow and Core Concepts
 
-## Evaluation Targets
+An OpenCompass evaluation launches a pipeline that can be partitioned, parallelized, resumed, and reused:
 
-The primary evaluation targets of this algorithm library are large language models. We introduce specific model types for evaluation using the large language model as an example.
+```text
+experiment configuration
+  ├─ models: models under evaluation
+  ├─ datasets: samples, input construction, and evaluation method
+  └─ infer / eval / summarizer: task orchestration and result presentation
+          ↓
+configuration parsing and task partitioning
+          ↓
+inference (written to predictions)
+          ↓
+evaluation (written to results)
+          ↓
+summarization (written to summary)
+```
 
-- base Model: Typically obtained through training on massive textual data in a self-supervised manner (e.g., OpenAI's GPT-3, Meta's LLaMA). These models usually have powerful text continuation capabilities.
+## Evaluation Configuration
 
-- Chat Model: Often built upon the base model and refined through directive fine-tuning or human preference alignment (e.g., OpenAI's ChatGPT, Shanghai AI Lab's Scholar Pu Tongue). These models can understand human instructions and have strong conversational skills.
+The configuration is the single entry point for an experiment. A minimal configuration needs only `models` and `datasets`; OpenCompass fills in the default inference and evaluation tasks required for local execution. A formal experiment usually also specifies `work_dir`, `infer`, `eval`, or `summarizer` to fix its concurrency strategy and aggregation convention.
 
-## Tool Architecture
+Configuration files use Python syntax and reuse repository model, dataset, and summarizer configurations through MMEngine `read_base()`. A configuration is not an arbitrary executable launch script: it declares experiment objects and strategy, while the `opencompass` command performs the actual scheduling.
 
-![framework-en](https://github.com/open-compass/opencompass/assets/17680578/b4d4bf4b-a673-4efe-b522-9337d4f7391a)
+## Models
 
-- Model Layer: This encompasses the primary model categories involved in large model evaluations. OpenCompass focuses on base models and chat models for in-depth evaluations.
-- Capability Layer: OpenCompass evaluates models based on general capabilities and special features. In terms of general capabilities, models are evaluated on language, knowledge, understanding, reasoning, safety, and other dimensions. In terms of special capabilities, evaluations are based on long texts, code, tools, and knowledge enhancement.
-- Method Layer: OpenCompass uses both objective and subjective evaluation methods. Objective evaluations can quickly assess a model's capability in tasks with definite answers (like multiple choice, fill in the blanks, closed-ended questions), while subjective evaluations measure user satisfaction with the model's replies. OpenCompass uses both model-assisted subjective evaluations and human feedback-driven subjective evaluations.
-- Tool Layer: OpenCompass offers extensive functionalities for automated, efficient evaluations of large language models. This includes distributed evaluation techniques, prompt engineering, integration with evaluation databases, leaderboard publishing, report generation, and many more features.
+A model configuration describes how to call the model and the resources needed by one instance. It includes the backend, weights or endpoint, context length, maximum output length, batch size, generation arguments, and `run_cfg`. Common entry points include OpenAI-compatible endpoints, vendor SDKs, and local Hugging Face, LMDeploy, vLLM, and multimodal model classes. API models normally declare `run_cfg.num_gpus=0` and consume no local GPU.
 
-## Capability Dimensions
+See [Model Integration](models.md).
 
-### Design Philosophy
+## Datasets
 
-To accurately, comprehensively, and systematically assess the capabilities of large language models, OpenCompass takes a general AI perspective, integrating cutting-edge academic advancements and industrial best practices to propose an evaluation system tailored for real-world applications. OpenCompass's capability dimensions cover both general capabilities and special features.
+In OpenCompass, a dataset configuration contains more than a data path. It usually also declares:
 
-### General Capabilities
+- `reader_cfg`: input fields, answer fields, and data splits.
+- `infer_cfg`: prompts, example retrievers, and generation or PPL inferencers.
+- `eval_cfg`: answer postprocessing and metric computation.
 
-General capabilities encompass examination, knowledge, language, understanding, reasoning, and safety, forming a comprehensive evaluation system across these six dimensions.
+The same raw data can therefore have multiple configuration variants, for example with different few-shot settings, prompts, or evaluators. See [Dataset Configuration](datasets.md).
 
-#### Examination Capability
+## Inference, Evaluation, and Summarization
 
-This dimension aims to provide evaluation support from the perspective of human development, borrowing the classification logic from pedagogy. The core idea revolves around mandatory education, higher education, and vocational training, creating a comprehensive academic capability evaluation approach.
+During inference, a Partitioner divides “model × dataset” into tasks, a Runner determines how tasks execute locally or in another cluster environment, and a Task performs the actual inference. The API example in the basic tutorial uses `OpenICLInferConcurrentTask` for concurrent inference together with `OpenICLEvalWatchTask` for evaluation as outputs complete; local models still use the ordinary inference and evaluation tasks. Outputs are written to `predictions/`.
 
-#### Knowledge Capability
+The evaluation stage reads predictions, uses the Dataset's Evaluator to compute scores, and writes them to `results/`. A Summarizer then organizes subset results into terminal tables and summary files. Because inference and evaluation results are stored separately, `--reuse` can rerun only a missing stage, while `--mode eval` and `--mode viz` can process existing outputs.
 
-Knowledge capability gauges the model's grasp on various knowledge types, including but not limited to general world knowledge and domain-specific expertise. This capability hopes that the model can answer a wide range of knowledge-based questions accurately and comprehensively.
+## Work Directory and Reproducibility
 
-#### Reasoning Capability
+By default, outputs are written to `outputs/default/<timestamp>/`. Give every experiment a stable `--work-dir` and retain its `configs/` snapshot. Model version, data version, dependency environment, random arguments, and Judge model all affect results; the final score alone is not a sufficient record.
 
-Reasoning is a crucial dimension for general AI. This evaluates the model's reasoning skills, including but not limited to mathematical computation, logical reasoning, causal inference, code generation and modification, and more.
-
-#### Understanding Capability
-
-This dimension evaluates the model's comprehension of text, including:
-
-- Rhetorical techniques understanding and analysis: Grasping various rhetorical techniques used in text and analyzing and interpreting them.
-- Text content summarization: Summarizing and extracting information from given content.
-- Content creation: Open-ended or semi-open-ended content creation based on given themes or requirements.
-
-#### Language Capability
-
-This dimension evaluates the model's prior language knowledge, which includes but is not limited to:
-
-- Word recognition and generation: Understanding language at the word level and tasks like word recognition, classification, definition, and generation.
-- Grammar understanding and correction: Grasping grammar within the text and identifying and correcting grammatical errors.
-- Cross-language translation: Translating given source language into target languages, assessing multilingual capabilities of current large models.
-
-#### Safety Capability
-
-In conjunction with the technical features of large language models, OpenCompass assesses the legality, compliance, and safety of model outputs, aiding the development of safe and responsible large models. This capability includes but is not limited to:
-
-- Fairness
-- Legality
-- Harmlessness
-- Ethical considerations
-- Privacy protection
-
-## Evaluation Methods
-
-OpenCompass adopts a combination of objective and subjective evaluations. For capability dimensions and scenarios with definite answers, a comprehensive assessment of model capabilities is conducted using a well-constructed test set. For open-ended or semi-open-ended questions and model safety issues, a combination of objective and subjective evaluation methods is used.
-
-### Objective Evaluation
-
-For objective questions with standard answers, we can compare the discrepancy between the model's output and the standard answer using quantitative indicators. Given the high freedom in outputs of large language models, during evaluation, it's essential to standardize and design its inputs and outputs to minimize the influence of noisy outputs, ensuring a more comprehensive and objective assessment.
-
-To better elicit the model's abilities in the evaluation domain and guide the model to output answers following specific templates, OpenCompass employs prompt engineering and in-context learning for objective evaluations.
-
-In practice, we usually adopt the following two methods to evaluate model outputs:
-
-- **Discriminative Evaluation**: This approach combines questions with candidate answers, calculates the model's perplexity on all combinations, and selects the answer with the lowest perplexity as the model's final output.
-
-- **Generative Evaluation**: Used for generative tasks like language translation, code generation, logical analysis, etc. The question is used as the model's original input, leaving the answer area blank for the model to fill in. Post-processing of the output is often required to ensure it meets dataset requirements.
-
-### Subjective Evaluation (Upcoming)
-
-Language expression is lively and varied, and many scenarios and capabilities can't be judged solely by objective indicators. For evaluations like model safety and language capabilities, subjective evaluations based on human feelings better reflect the model's actual capabilities and align more with real-world applications.
-
-OpenCompass's subjective evaluation approach relies on test subject's personal judgments to assess chat-capable large language models. In practice, we pre-construct a set of subjective test questions based on model capabilities and present different replies from various models to the same question to subjects, collecting their subjective scores. Given the high cost of subjective testing, this approach also uses high-performing large language models to simulate human subjective scoring. Actual evaluations will combine real human expert subjective evaluations with model-based subjective scores.
-
-In conducting subjective evaluations, OpenCompass uses both **Single Model Reply Satisfaction Statistics** and **Multiple Model Satisfaction** Comparison methods.
+This page provides only a high-level description of each step in the OpenCompass workflow. To launch a complete configuration-based evaluation, see [Running a Complete Evaluation from a Configuration](config_based_evaluation.md).

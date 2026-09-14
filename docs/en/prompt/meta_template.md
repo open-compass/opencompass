@@ -1,23 +1,11 @@
-# Meta Template
+# Model-Side Conversation Template Protocol
 
-## Background
+This chapter explains how to configure the Model-Side Conversation Template Protocol (Meta Template) for language models and API models. Before reading, see the [Traditional Dialogue-Based Prompt](raw_prompt_template.md#dialogue-based-prompt) in the merged template page. The configuration field remains `meta_template`.
 
-In the Supervised Fine-Tuning (SFT) process of Language Model Learning (LLM), we often inject some predefined strings into the conversation according to actual requirements, in order to prompt the model to output content according to certain guidelines. For example, in some `chat` model fine-tuning, we may add system-level instructions at the beginning of each dialogue, and establish a format to represent the conversation between the user and the model. In a conversation, the model may expect the text format to be as follows:
-
-```bash
-Meta instruction: You are now a helpful and harmless AI assistant.
-HUMAN: Hi!<eoh>\n
-Bot: Hello! How may I assist you?<eob>\n
-```
-
-During evaluation, we also need to enter questions according to the agreed format for the model to perform its best.
-
-In addition, similar situations exist in API models. General API dialogue models allow users to pass in historical dialogues when calling, and some models also allow the input of SYSTEM level instructions. To better evaluate the ability of API models, we hope to make the data as close as possible to the multi-round dialogue template of the API model itself during the evaluation, rather than stuffing all the content into an instruction.
-
-Therefore, we need to specify different parsing templates for different models. In OpenCompass, we call this set of parsing templates **Meta Template**. Meta Template is tied to the model's configuration and is combined with the dialogue template of the dataset during runtime to ultimately generate the most suitable prompt for the current model.
+The Model-Side Conversation Template Protocol is tied to the model configuration and combines with the Dataset-side dialogue template at runtime to produce the prompt best suited to the current model:
 
 ```python
-# When specifying, just pass the meta_template field into the model
+# Pass the meta_template field into the model
 models = [
     dict(
         type='AnyModel',
@@ -26,20 +14,17 @@ models = [
 ]
 ```
 
-Next, we will introduce how to configure Meta Template on two types of models.
-You are recommended to read [here](./prompt_template.md#dialogue-prompt) for the basic syntax of the dialogue template before reading this chapter.
-
 ```{note}
-In some cases (such as testing the base station), we don't need to inject any instructions into the normal dialogue, in which case we can leave the meta template empty. In this case, the prompt received by the model is defined only by the dataset configuration and is a regular string. If the dataset configuration uses a dialogue template, speeches from different roles will be concatenated with \n.
+In some cases, such as testing a base model, no instruction needs to be injected into the normal dialogue and the model-side protocol can be empty. The prompt received by the model is then defined only by the dataset configuration and is a regular string. If the dataset configuration uses a dialogue template, turns from different roles are concatenated with \n.
 ```
 
-## Application on Language Models
+## Application to Language Models
 
-The following figure shows several situations where the data is built into a prompt through the prompt template and meta template from the dataset in the case of 2-shot learning. Readers can use this figure as a reference to help understand the following sections.
+The following figure shows several ways data becomes a prompt through the Dataset-side prompt template and Model-Side Conversation Template Protocol in 2-shot learning. Use it as a reference for the following sections.
 
 ![](https://user-images.githubusercontent.com/22607038/251195073-85808807-6359-44df-8a19-9f5d00c591ec.png)
 
-We will explain how to define the meta template with several examples.
+The following examples explain how to define the model-side protocol.
 
 Suppose that according to the dialogue template of the dataset, the following dialogue was produced:
 
@@ -168,7 +153,6 @@ Meta instruction: You are now a helpful and harmless AI assistant.
 We only need to set the `generate` field in BOT's configuration to True, and OpenCompass will automatically leave the last utterance of BOT blank:
 
 ```python
-# model meta template
 meta_template = dict(
     round=[
           dict(role='HUMAN', begin='<HUMAN>: ', end='<eoh>\n'),
@@ -223,7 +207,7 @@ The `round` of the `meta_template` specifies the format of each role's speech in
 
 ## Application to API Models
 
-The meta template of the API model is similar to the meta template of the general model, but the configuration is simpler. Users can, as per their requirements, directly use one of the two configurations below to evaluate the API model in a multi-turn dialogue manner:
+The Model-Side Conversation Template Protocol for an API model is similar to that for a regular model, but simpler. Use one of the following configurations to evaluate an API model in a multi-turn dialogue, as appropriate:
 
 ```bash
 # If the API model does not support system instructions
@@ -260,4 +244,4 @@ In this regard, OpenCompass has preset three `api_role` values for API models: `
 
 ## Debugging
 
-If you need to debug the prompt, it is recommended to use the `tools/prompt_viewer.py` script to preview the actual prompt received by the model after preparing the configuration file. Read [here](../tools.md#prompt-viewer) for more.
+To debug a prompt, prepare the configuration and use `tools/prompt_viewer.py` to preview what the model actually receives. See [Prompt Preview and Debugging](debugging.md) for details.

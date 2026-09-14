@@ -1,49 +1,202 @@
-# Prompt Template
+# Prompt Templates: RawPromptTemplate by Default
 
-## Background
+Prompt configuration determines how one data sample becomes the input actually received by a model. Even with the same model, raw data, and Evaluator, a different prompt, few-shot example set, or model protocol can substantially change the result.
 
-In language model evaluation, we often construct prompts from the original dataset according to certain rules to enable the model to answer questions as required.
-
-Typically, we place instructions at the beginning of the prompt, followed by several in-context examples, and finally, we include the question. For example:
+Evaluation normally places instructions and in-context examples before the question, then chooses generative completion, PPL, or another inference method. OpenCompass therefore defines input construction under `infer_cfg` in the dataset configuration and separates it into two layers:
 
 ```text
-Solve the following questions.
-1+1=?
-2
-3+9=?
-12
-5+6=?
+data sample
+  ↓ dataset-side template (RawPromptTemplate by default / traditional PromptTemplate)
+normalized text or role/content messages
+  ↓ Model-Side Conversation Template Protocol (MetaTemplate) / tokenizer chat template
+input actually received by the model
 ```
 
-Extensive experiments have shown that even with the same original test questions, different ways of constructing the prompt can affect the model's performance. Factors that may influence this include:
+Prefer `RawPromptTemplate` for a new conversational evaluation configuration. It directly represents `role/content` messages and is easy to compare with an API or tokenizer chat template. `PromptTemplate` remains useful for maintaining old configurations, PPL multi-candidate templates, and complex ICE orchestration. Model-specific role markers and special tokens belong in the [Model-Side Conversation Template Protocol](meta_template.md).
 
-- The composition of the prompt itself, including instructions, in-context examples, and the format of the question.
-- The selection of in-context examples, including the number and method of selection.
-- The manner in which the prompt is used. Should the model complete the prompt based on the given context, or should it choose the best prompt among the candidate prompts?
+## RawPromptTemplate (Default)
 
-OpenCompass defines the prompt construction strategy in the `infer_cfg` section of the dataset configuration. A typical `infer_cfg` is shown below:
+## Basic Usage
 
 ```python
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_inferencer import GenInferencer
+
 infer_cfg = dict(
-    ice_template=dict(  # Template used to construct In Context Examples (ice).
-        type=PromptTemplate,
-        template='{question}\n{answer}'
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='system', content='You are a helpful assistant.'),
+            dict(
+                role='user',
+                content=(
+                    '{problem}\n'
+                    'Put the final answer in \\boxed{{}}.'
+                ),
+            ),
+        ],
     ),
-    prompt_template=dict(  # Template used to construct the main prompt.
-        type=PromptTemplate,
-        template='Solve the following questions.\n</E>{question}\n{answer}',
-        ice_token="</E>"
-    ),
-    retriever=dict(type=FixKRetriever, fix_id_list=[0, 1]),  # Definition of how to retrieve in-context examples.
-    inferencer=dict(type=GenInferencer),  # Method used to generate predictions.
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
 )
 ```
 
-In this document, we will mainly introduce the definitions of `ice_template`, `prompt_template`, and `inferencer`. For information on the `retriever`, please refer to other documents.
+`{problem}` comes from a dataset sample field. Rendering produces a message list, which is then passed to the model backend. Confirm that every placeholder appears in `reader_cfg.input_columns` or in a retrieved example.
 
-Let's start by introducing the basic syntax of the prompt.
+## Three Element Types in `messages`
 
-## String-Based Prompt
+The `messages` list accepts three kinds of elements:
+
+| Element | Purpose |
+| --- | --- |
+| `dict(role=..., content=...)` | A normal message; `{field}` in `content` is replaced by the sample field |
+| `dict(expand_column='xxx')` | Reads a message list from sample field `xxx` and expands it in place |
+| `'</E>'` (string) | Insertion point for few-shot examples (ICE), described below |
+
+### `expand_column`: Expanding a Dataset Message Column
+
+When an input is an entire conversation stored in a dataset field rather than one or two messages, insert it as a whole with `expand_column`. For example, a sample's `dialogue` field may be:
+
+```python
+# One row in the dataset
+{
+    'dialogue': [
+        {'role': 'user', 'content': 'Write a product description in no more than 100 words.'},
+        {'role': 'assistant', 'content': ''},
+        {'role': 'user', 'content': 'Rewrite the preceding paragraph in a more formal tone.'},
+        {'role': 'assistant', 'content': ''},
+    ]
+}
+```
+
+Configure it as:
+
+```python
+reader_cfg = dict(input_columns=['dialogue'], output_column='reference')
+
+infer_cfg = dict(
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[{'expand_column': 'dialogue'}],
+        format_variables=False,
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
+```
+
+An `expand_column` element has no `role` or `content`. During rendering, it reads the field and inserts each message in order. `format_variables=False` indicates that these messages are ready-made data and should not undergo placeholder substitution, which is suitable for already rendered conversations and ChatML data.
+
+### Inserting Few-Shot Examples (ICE)
+
+The string `'</E>'` in the main template (the default `ice_token`) marks where few-shot examples are inserted. A separate `ice_template` describes the format of each example. The following configuration comes from `opencompass/configs/datasets/SciReasoner/mol_biotext_rawprompt_gen.py`:
+
+```python
+infer_cfg = dict(
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'system',
+             'content': 'There is a single choice question about chemistry. '
+                        'Answer the question directly.'},
+            '</E>',
+            {'role': 'user', 'content': 'Query: {input}'},
+        ],
+    ),
+    ice_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'user', 'content': 'Query: {input}'},
+            {'role': 'assistant', 'content': '{output}'},
+        ],
+    ),
+    retriever=dict(type=FixKRetriever, fix_id_list=[0]),
+    inferencer=dict(type=GenInferencer),
+)
+```
+
+Rendering works as follows:
+
+- The retriever selects k few-shot examples (`FixKRetriever` uses fixed indices; alternatives include `TopkRetriever` and `RandomRetriever`).
+- `ice_template` renders each example into messages (here, one user question and one assistant answer).
+- All example messages replace `'</E>'` in order. The final input remains one message list: system + k example groups + current question.
+
+## Multi-Turn Input and Inference
+
+A multi-turn evaluation requires the model to answer continuously in one conversation while retaining previous user messages and model replies. A later turn depends on generation from the preceding turn, so tasks cannot be arbitrarily split into independent samples.
+
+The data is normally organized with user turns from the dataset and empty assistant `content` fields as generation slots. The inferencer advances turn by turn, writes each generation into its assistant slot, and accumulates context. The complete `infer_cfg` for the multi-turn instruction-following dataset MultiIF is:
+
+```python
+from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
+
+multiif_infer_cfg = dict(
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[{'expand_column': 'dialogue'}],
+        format_variables=False,
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(
+        type=GenInferencer,
+        multiround=True,
+    ),
+)
+```
+
+`multiround=True` on `GenInferencer` enables turn-by-turn inference. It generates whenever it encounters an empty assistant turn and retains the result in context for later turns. The evaluation configuration must identify which role's output to read; MultiIF uses `eval_cfg=dict(evaluator=..., pred_role='BOT')`. If the model backend automatically inserts a system message or generation prompt, also ensure that it is not duplicated by the dataset template.
+
+## Differences from PromptTemplate
+
+Traditional `PromptTemplate` uses structures such as `begin`, `round`, and `ice_token` to express roles and few-shot concatenation before mapping them into model input. `RawPromptTemplate` makes configuration content correspond directly to the final messages.
+
+Prefer `RawPromptTemplate` when:
+
+- Adding a dataset for a chat model or OpenAI-compatible API.
+- Input is already system/user/assistant messages, or a whole conversation is stored in a dataset field.
+- You want less role mapping and easier message-by-message inspection.
+
+Continue using [PromptTemplate](#prompttemplate-traditional-template) when:
+
+- Maintaining an existing stable configuration.
+- Few-shot orchestration needs more than one `</E>` insertion point.
+- Using a traditional inference method, such as PPL, that needs multiple candidate templates.
+
+## Boundary Between Dataset and Model Templates
+
+The Dataset-side RawPromptTemplate expresses how to ask the question. The model-side [Model-Side Conversation Template Protocol](meta_template.md) or tokenizer chat template expresses how that model encodes roles. Do not write model-specific special tokens on both sides or accidentally append two system prompts.
+
+Some API model configurations can add messages through `meta_template`, for example:
+
+```python
+models = [
+    dict(
+        type=OpenAISDK,
+        abbr='my-api-model',
+        path='my-model',
+        key='ENV',
+        openai_api_base='https://example.com/v1',
+        meta_template=[
+            dict(role='system', content='Additional system instruction.'),
+        ],
+        max_seq_len=32768,
+        max_out_len=4096,
+        batch_size=8,
+        run_cfg=dict(num_gpus=0),
+    )
+]
+```
+
+Before use, inspect how the concrete model class reads `key` and `meta_template`; fields differ between API backends.
+
+## PromptTemplate (Traditional Template)
+
+`PromptTemplate` is the traditional OpenCompass template system. New configurations use RawPromptTemplate by default. The following syntax remains available for maintaining an existing configuration, constructing PPL multi-candidate input, or complex ICE orchestration.
+
+### String-Based Prompt
 
 String-based prompt is a classic form of template. Consider the following template:
 
@@ -76,7 +229,7 @@ Answer:
 
 As you can see, the actual answer for the question, represented by the field `answer`, does not appear in the generated result. This is because OpenCompass will mask fields that are written in `reader_cfg.output_column` to prevent answer leakage. For detailed explanations on `reader_cfg`, please refer to the relevant documentation on dataset configuration.
 
-## Dialogue-Based Prompt
+### Dialogue-Based Prompt
 
 In practical testing, making models perform simple completions may not effectively test the performance of chat-based models. Therefore, we prefer prompts that take the form of dialogues. Additionally, different models have varying definitions of dialogue formats. Hence, we need prompts generated from the dataset to be more versatile, and the specific prompts required by each model can be generated during testing.
 
@@ -214,7 +367,7 @@ Each dictionary has the following parameters:
 
 </details>
 
-## Prompt Templates and `inferencer`
+### Prompt Templates and `inferencer`
 
 Once we understand the basic definition of prompt templates, we also need to organize them according to the type of `inferencer`.
 
@@ -310,7 +463,7 @@ prompt_template=dict(
 
 In this case, the model's inference result will be one of the four keys in the `template` ("A" / "B" / "C" / "UNK").
 
-## `ice_template` and `prompt_template`
+### `ice_template` and `prompt_template`
 
 In OpenCompass, for 0-shot evaluation, we usually only need to define the `prompt_template` field to complete prompt construction. However, for few-shot evaluation, we also need to define the `ice_template` field, which manages the prompt templates corresponding to the in-context examples during context learning.
 
@@ -428,7 +581,7 @@ PromptList([
 
 `````
 
-### Abbreviated Usage
+#### Abbreviated Usage
 
 It is worth noting that, for the sake of simplicity in the configuration file, the `prompt_template` field can be omitted. When the `prompt_template` field is omitted, the `ice_template` will be used as the `prompt_template` as well, to assemble the complete prompt. The following two `infer_cfg` configurations are equivalent:
 
@@ -492,6 +645,22 @@ datasets = [
 ]
 ```
 
-## Usage Suggestion
+### Usage Suggestion
 
-It is suggested to use the [Prompt Viewer](../tools.md) tool to visualize the completed prompts, confirm the correctness of the templates, and ensure that the results meet expectations.
+Use [Prompt Viewer](../tools/index.md) to visualize the assembled prompts, confirm that the template is correct, and verify that the result meets expectations.
+
+## Migrating from the Traditional Template
+
+Check the following in order during migration:
+
+1. Convert system instructions in `begin` into system messages.
+2. Convert each HUMAN/BOT turn into user/assistant messages.
+3. Preserve field placeholders and verify brace escaping.
+4. Preview several final inputs.
+5. Compare predictions before and after migration on a small sample, confirming that few-shot order, stop words, and answer extraction are unchanged.
+
+A more direct template format does not make evaluation semantics automatically equivalent. Migration involving few-shot examples, repeated sampling, or a special model protocol requires sample-by-sample comparison.
+
+## Debugging
+
+After changing a template, preview the final input and inspect role order, few-shot insertion position, special tokens, and truncation. See [Prompt Debugging and Prompt Viewer](debugging.md).
