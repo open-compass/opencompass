@@ -69,14 +69,14 @@ Most requirements—grouping, averaging, and weighting—should be expressed thr
 
 ### Summary Group Fields
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `name` | str | Group name, shown as a row in the summary table |
-| `subsets` | list | Dataset-abbreviation strings or `[abbr, metric]` pairs; **the two forms cannot be mixed** |
-| `metric` | str | Explicit metric name to aggregate |
-| `weights` | dict | `{subset abbr: weight}` enabling weighted average |
-| `std` / `sum` / `harmonic_mean` | bool | Use standard deviation, sum, or harmonic mean, respectively |
-| `transforms` | dict | `{subset abbr: 'expression'}` transforming a score before aggregation; `x` is the original value |
+| Field                           | Type | Description                                                                                      |
+| ------------------------------- | ---- | ------------------------------------------------------------------------------------------------ |
+| `name`                          | str  | Group name, shown as a row in the summary table                                                  |
+| `subsets`                       | list | Dataset-abbreviation strings or `[abbr, metric]` pairs; **the two forms cannot be mixed**        |
+| `metric`                        | str  | Explicit metric name to aggregate                                                                |
+| `weights`                       | dict | `{subset abbr: weight}` enabling weighted average                                                |
+| `std` / `sum` / `harmonic_mean` | bool | Use standard deviation, sum, or harmonic mean, respectively                                      |
+| `transforms`                    | dict | `{subset abbr: 'expression'}` transforming a score before aggregation; `x` is the original value |
 
 Aggregation precedence is: explicit `metric` > the method corresponding to `std` / `sum` / `weights` / `harmonic_mean` > simple average (macro average).
 

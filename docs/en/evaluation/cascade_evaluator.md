@@ -27,12 +27,12 @@ Step 5 checks whether `prediction` / `llm_judge` in judge details equals `"A"` o
 
 `CascadeEvaluator` arguments:
 
-| Argument | Type | Description |
-| --- | --- | --- |
-| `llm_evaluator` | required dict | LLM judge configuration, normally `GenericLLMEvaluator` |
-| `rule_evaluator` | dict | Rule evaluator configuration, such as `MATHVerifyEvaluator` |
-| `sample_score_fn` | Callable | Custom per-sample scoring function returning a dict with `correct`, or a boolean |
-| `parallel` | bool, default `True` | `False` selects cascade mode; `True` selects parallel mode |
+| Argument          | Type                 | Description                                                                      |
+| ----------------- | -------------------- | -------------------------------------------------------------------------------- |
+| `llm_evaluator`   | required dict        | LLM judge configuration, normally `GenericLLMEvaluator`                          |
+| `rule_evaluator`  | dict                 | Rule evaluator configuration, such as `MATHVerifyEvaluator`                      |
+| `sample_score_fn` | Callable             | Custom per-sample scoring function returning a dict with `correct`, or a boolean |
+| `parallel`        | bool, default `True` | `False` selects cascade mode; `True` selects parallel mode                       |
 
 At least one of `rule_evaluator` and `sample_score_fn` must be supplied, otherwise initialization fails. Because the scoring workflow also calls the rule evaluator's `pred_postprocess`, practical configurations should always provide `rule_evaluator`.
 

@@ -55,9 +55,9 @@ To use your own OpenAI-compatible multimodal service, change `path` and `openai_
 
 ## Data Cache and Environment Variable
 
-| Environment variable | Purpose | Default |
-| --- | --- | --- |
-| `LMUData` | VLMEvalKit data-cache root; TSV and images are downloaded here | `data/vlmevalkit` relative to the launch directory |
+| Environment variable | Purpose                                                        | Default                                            |
+| -------------------- | -------------------------------------------------------------- | -------------------------------------------------- |
+| `LMUData`            | VLMEvalKit data-cache root; TSV and images are downloaded here | `data/vlmevalkit` relative to the launch directory |
 
 `LMUData` is VLMEvalKit's own data-directory convention. The dataset configuration reads it as `data_root`; during dataset construction and official scoring, the bridge temporarily points `LMUData` to this directory. Relative paths become absolute and are created automatically, ensuring that download, image reads, and scoring share the same data. On shared storage or in a container, explicitly set and mount it:
 

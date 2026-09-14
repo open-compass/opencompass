@@ -10,10 +10,10 @@
 
 Single-answer multiple choice and some choice-like tasks use `ppl` for base models; multiple-answer and non-choice tasks use `gen`. All tasks use `gen` for chat models because many commercial API models do not expose a `ppl` interface. Exceptions exist—for example, `gen` is also used when a base model should output reasoning such as “Let's think step by step.” The general rule is:
 
-| | ppl | gen |
-| --- | --- | --- |
+|            | ppl      | gen                  |
+| ---------- | -------- | -------------------- |
 | Base model | MCQ only | Tasks other than MCQ |
-| Chat model | None | All tasks |
+| Chat model | None     | All tasks            |
 
 Conditional log probability, `clp`, is closely related to `ppl`: given a context, it computes the probability of the next token. It also applies only to multiple choice and scores only tokens corresponding to option labels, choosing the highest-probability label. `clp` needs only one inference rather than n, but is sensitive to tokenizer behavior; spaces around a label can change its encoding and make results unreliable. OpenCompass therefore uses `clp` rarely.
 
@@ -92,6 +92,7 @@ Set `MKL_SERVICE_FORCE_INTEL=1` to resolve it.
 Because of Hugging Face behavior, OpenCompass needs network access when some datasets and models are first loaded, and connects to Hugging Face during startup. Options are:
 
 - Configure a proxy with `http_proxy` and `https_proxy`.
+
 - Reuse cache files from another machine. Run the experiment on a machine with Hugging Face access, then copy or symlink its cache, normally `~/.cache/huggingface/` ([documentation](https://huggingface.co/docs/datasets/cache#cache-directory)), to the offline machine. With a complete cache, start in offline mode:
 
   ```bash
@@ -99,6 +100,7 @@ Because of Hugging Face behavior, OpenCompass needs network access when some dat
   ```
 
   A missing model or dataset file in the cache still raises an error.
+
 - Use a mirror available in mainland China, such as [hf-mirror](https://hf-mirror.com/):
 
   ```bash

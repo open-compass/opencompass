@@ -4,11 +4,11 @@ OpenCompass does not provide one unified downloader covering every dataset. Actu
 
 ## Common Cache Variables
 
-| Variable | Consumer | Typical purpose |
-| --- | --- | --- |
-| `COMPASS_DATA_CACHE` | OpenCompass `get_data_path()` | Adds a cache root to relative OpenCompass data paths |
-| `HF_DATASETS_CACHE` | Hugging Face `datasets` | Stores downloads and generated Arrow caches from `load_dataset()` |
-| `HF_HOME` | Hugging Face Hub ecosystem | Provides a shared root for model, Hub, and dataset caches |
+| Variable             | Consumer                      | Typical purpose                                                   |
+| -------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `COMPASS_DATA_CACHE` | OpenCompass `get_data_path()` | Adds a cache root to relative OpenCompass data paths              |
+| `HF_DATASETS_CACHE`  | Hugging Face `datasets`       | Stores downloads and generated Arrow caches from `load_dataset()` |
+| `HF_HOME`            | Hugging Face Hub ecosystem    | Provides a shared root for model, Hub, and dataset caches         |
 
 For example, if a configuration passes `./data/fold` and its Dataset class calls `get_data_path()`, setting `COMPASS_DATA_CACHE=/cache/compass` makes it try `/cache/compass/./data/fold`. If the target does not exist, OpenCompass downloads it automatically only when the built-in download mapping recognizes the dataset; otherwise it raises an error.
 

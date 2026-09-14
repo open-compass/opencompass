@@ -66,10 +66,10 @@ CLI conversion covers only some model types and arguments. The repository provid
 The following is a historical reference result for Llama-3-8B-Instruct on one A800 GPU with GSM8K:
 
 | Inference backend | Accuracy | Inference time (min:sec) | Speedup over Hugging Face |
-| --- | ---: | ---: | ---: |
-| Hugging Face | 74.22 | 24:26 | 1.0× |
-| LMDeploy | 73.69 | 11:15 | 2.2× |
-| vLLM | 72.63 | 07:52 | 3.1× |
+| ----------------- | -------: | -----------------------: | ------------------------: |
+| Hugging Face      |    74.22 |                    24:26 |                      1.0× |
+| LMDeploy          |    73.69 |                    11:15 |                      2.2× |
+| vLLM              |    72.63 |                    07:52 |                      3.1× |
 
 Actual speedup depends on model architecture, GPU, dataset, context length, and sampling configuration. Differences between backend sampling implementations can also affect accuracy.
 

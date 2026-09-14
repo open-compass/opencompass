@@ -48,11 +48,11 @@ infer_cfg = dict(
 
 The `messages` list accepts three kinds of elements:
 
-| Element | Purpose |
-| --- | --- |
+| Element                       | Purpose                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------ |
 | `dict(role=..., content=...)` | A normal message; `{field}` in `content` is replaced by the sample field |
-| `dict(expand_column='xxx')` | Reads a message list from sample field `xxx` and expands it in place |
-| `'</E>'` (string) | Insertion point for few-shot examples (ICE), described below |
+| `dict(expand_column='xxx')`   | Reads a message list from sample field `xxx` and expands it in place     |
+| `'</E>'` (string)             | Insertion point for few-shot examples (ICE), described below             |
 
 ### `expand_column`: Expanding a Dataset Message Column
 

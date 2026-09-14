@@ -52,13 +52,13 @@ Within the process:
 
 Constructor arguments belong under `infer.runner.task`:
 
-| Argument | Default | Description |
-| --- | --- | --- |
-| `poll_interval` | 1.0 | Dataset-scheduling poll interval in seconds |
-| `log_interval` | 30.0 | Progress log interval in seconds |
-| `max_workers` | `min(32, CPU core count + 4)` | Request-concurrency semaphore shared by all datasets; the model field takes precedence |
-| `dump_res_length` | False | Write response-length statistics for debugging |
-| `dump_only_message_path` | None | Export final messages without requesting the model |
+| Argument                 | Default                       | Description                                                                            |
+| ------------------------ | ----------------------------- | -------------------------------------------------------------------------------------- |
+| `poll_interval`          | 1.0                           | Dataset-scheduling poll interval in seconds                                            |
+| `log_interval`           | 30.0                          | Progress log interval in seconds                                                       |
+| `max_workers`            | `min(32, CPU core count + 4)` | Request-concurrency semaphore shared by all datasets; the model field takes precedence |
+| `dump_res_length`        | False                         | Write response-length statistics for debugging                                         |
+| `dump_only_message_path` | None                          | Export final messages without requesting the model                                     |
 
 ## Relationship to Parallel Inferencers
 
@@ -66,10 +66,10 @@ Constructor arguments belong under `infer.runner.task`:
 
 The two layers are responsible for:
 
-| Layer | Component | Responsibility |
-| --- | --- | --- |
-| Task | `OpenICLInferConcurrentTask` | Across datasets: one process manages several datasets, shares request budget, and writes status files |
-| Inferencer | `ParallelGenInferencer`, etc. | Within a dataset: sample-level concurrent requests, incremental output, and progress callbacks |
+| Layer      | Component                     | Responsibility                                                                                        |
+| ---------- | ----------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Task       | `OpenICLInferConcurrentTask`  | Across datasets: one process manages several datasets, shares request budget, and writes status files |
+| Inferencer | `ParallelGenInferencer`, etc. | Within a dataset: sample-level concurrent requests, incremental output, and progress callbacks        |
 
 At runtime, the concurrent task **automatically** replaces `GenInferencer`/`ChatInferencer`/`ChatMLInferencer` in dataset configurations with the corresponding Parallel version and passes `max_infer_workers` plus a progress callback. Other inferencers such as `PPLInferencer` and `SCInferencer` are currently unsupported and raise an error.
 
@@ -99,11 +99,11 @@ The heartbeat timeout should cover gaps between inference-task scheduling or res
 
 Constructor arguments belong under `eval.runner.task`:
 
-| Argument | Default | Description |
-| --- | --- | --- |
-| `watch_interval` | 5.0 | Status-file scan interval in seconds |
-| `heartbeat_timeout` | 60.0 | Heartbeat timeout in seconds; skip remaining datasets after timeout |
-| `log_interval` | 30.0 | Log interval for the remaining task count while waiting |
+| Argument            | Default | Description                                                         |
+| ------------------- | ------- | ------------------------------------------------------------------- |
+| `watch_interval`    | 5.0     | Status-file scan interval in seconds                                |
+| `heartbeat_timeout` | 60.0    | Heartbeat timeout in seconds; skip remaining datasets after timeout |
+| `log_interval`      | 30.0    | Log interval for the remaining task count while waiting             |
 
 ## Complete Configuration Example
 
