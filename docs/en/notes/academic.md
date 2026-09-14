@@ -71,7 +71,7 @@ Here are the commonly used parameters for reference.
 ### 2: Verifier Configs
 
 Complete your verifier model information in `judge_cfg`.
-For detailed information about LLM verifiers, please refer to [this document](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/llm_judge.html).
+For detailed information about LLM verifiers, see [LLM as Judge](../evaluation/llm_judge.md).
 At present, CompassAcademic use [CompassVerifier-32B](https://huggingface.co/opencompass/CompassVerifier-32B), here is the config example using OpenAISDK:
 
 ```python

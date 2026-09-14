@@ -154,5 +154,5 @@ Style configurations of yapf and isort can be found in [setup.cfg](https://githu
 - (Optional) If the testing process cannot be achieved simply by concatenating the dataset and model configuration files, a configuration file for conducting the test is also required.
 - (Optional) If necessary, please add a description of the dataset in the relevant documentation sections. This is very necessary to help users understand the testing scheme. You can refer to the following types of documents in OpenCompass:
   - [Circular Evaluation](../advanced_guides/circular_eval.md)
-  - [Code Evaluation](../advanced_guides/code_eval.md)
+  - [Code Evaluation](../evaluation/code_eval.md)
   - [Contamination Assessment](../advanced_guides/contamination_eval.md)

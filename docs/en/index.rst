@@ -1,100 +1,107 @@
-Welcome to OpenCompass' documentation!
-==========================================
+Welcome to the OpenCompass Documentation
+========================================
 
-Getting started with OpenCompass
--------------------------------
+OpenCompass is a one-stop evaluation platform for large language models and
+multimodal models. The documentation is organized so that you first complete
+an evaluation, then understand and extend each component.
 
-To help you quickly familiarized with OpenCompass, we recommend you to walk through the following documents in order:
+If this is your first time using OpenCompass, read `Installation and Environment
+Setup`_, `Five-Minute Quick Start`_, and `Running a Complete Evaluation from a
+Configuration`_ in order. If you already have a model or dataset, you can go
+directly to the corresponding topic.
 
-- First read the GetStarted_ section set up the environment, and run a mini experiment.
-
-- Then learn its basic usage through the UserGuides_.
-
-- If you want to tune the prompts, refer to the Prompt_.
-
-- If you want to customize some modules, like adding a new dataset or model, we have provided the AdvancedGuides_.
-
-- There are more handy tools, such as prompt viewer and lark bot reporter, all presented in Tools_.
-
-We always welcome *PRs* and *Issues* for the betterment of OpenCompass.
-
-.. _GetStarted:
+.. _Installation and Environment Setup:
+.. _Five-Minute Quick Start:
 .. toctree::
    :maxdepth: 1
    :caption: Get Started
 
    get_started/installation.md
    get_started/quick_start.md
-   get_started/faq.md
 
-.. _UserGuides:
+.. _Running a Complete Evaluation from a Configuration:
 .. toctree::
    :maxdepth: 1
-   :caption: User Guides
+   :caption: Basic Tutorials
 
    user_guides/framework_overview.md
+   user_guides/config_based_evaluation.md
    user_guides/config.md
-   user_guides/datasets.md
    user_guides/models.md
-   user_guides/evaluation.md
-   user_guides/experimentation.md
-   user_guides/metrics.md
-   user_guides/deepseek_r1.md
-   user_guides/interns1.md
+   user_guides/datasets.md
+   user_guides/data_and_cache.md
+   user_guides/results_and_summarizer.md
 
-.. _Prompt:
 .. toctree::
    :maxdepth: 1
-   :caption: Prompt
+   :caption: Prompts and Input Construction
 
-   prompt/overview.md
-   prompt/prompt_template.md
+   prompt/raw_prompt_template.md
    prompt/meta_template.md
    prompt/chain_of_thought.md
+   prompt/debugging.md
 
-
-.. _AdvancedGuides:
 .. toctree::
    :maxdepth: 1
-   :caption: Advanced Guides
+   :caption: Execution, Parallelism, and Task Management
 
-   advanced_guides/new_dataset.md
-   advanced_guides/custom_dataset.md
-   advanced_guides/new_model.md
-   advanced_guides/evaluation_lmdeploy.md
-   advanced_guides/accelerator_intro.md
-   advanced_guides/math_verify.md
-   advanced_guides/llm_judge.md
-   advanced_guides/code_eval.md
-   advanced_guides/code_eval_service.md
-   advanced_guides/subjective_evaluation.md
-   advanced_guides/persistence.md
+   execution/tasks_and_runners.md
+   execution/concurrent_evaluation.md
+   execution/reuse_and_resume.md
+   execution/cli_reference.md
 
-.. _Tools:
 .. toctree::
    :maxdepth: 1
-   :caption: Tools
+   :caption: Evaluation Methods
 
-   tools.md
+   evaluation/metrics_and_postprocessing.md
+   evaluation/llm_judge.md
+   evaluation/math_verify.md
+   evaluation/cascade_evaluator.md
+   evaluation/code_eval.md
+   evaluation/subjective_evaluation.md
+   evaluation/repeated_evaluation.md
+   evaluation/vlmevalkit.md
 
-.. _Dataset List:
 .. toctree::
    :maxdepth: 1
-   :caption: Dataset List
+   :caption: Extending OpenCompass
 
-   dataset_statistics.md
+   extension/extension_overview.md
+   extension/new_dataset.md
+   extension/custom_dataset.md
+   extension/new_model.md
+   extension/new_evaluator_and_summarizer.md
+   extension/persistence.md
 
-.. _Notes:
 .. toctree::
    :maxdepth: 1
-   :caption: Notes
+   :caption: Tools and Recovery
+
+   tools/index.md
+   tools/config_discovery.md
+   tools/prediction_analysis.md
+   tools/repeat_and_length.md
+   tools/api_and_message_test.md
+   tools/monitoring.md
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Reproduction, Contribution, and Releases
 
    notes/contribution_guide.md
    notes/academic.md
-   notes/rawprompttemplate.md
 
-Indexes & Tables
-==================
+.. toctree::
+   :maxdepth: 1
+   :caption: Other Documentation
+
+   faq/index.md
+   faq/local_model_one_stop.md
+   faq/long_context.md
+
+Index and Search
+================
 
 * :ref:`genindex`
 * :ref:`search`

@@ -16,7 +16,7 @@ pip install promptbench==0.0.4 textattack==0.3.8 lru-dict
 
 We will use GLUE-wnli dataset as example, most configuration settings can refer to [config.md](../user_guides/config.md) for help.
 
-First we need support the basic dataset config, you can find the existing config files in `configs` or support your own config according to [new-dataset](./new_dataset.md)
+First support the basic dataset configuration. Existing configuration files are under `configs`; to add your own, see [Adding a Dataset](../extension/new_dataset.md).
 
 Take the following `infer_cfg` as example, we need to define the prompt template. `adv_prompt` is the basic prompt placeholder to be attacked in the experiment. `sentence1` and `sentence2` are the input columns of this dataset. The attack will only modify the `adv_prompt` here.
 

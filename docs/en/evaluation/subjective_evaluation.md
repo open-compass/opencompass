@@ -91,23 +91,23 @@ Actually, you can prepare the data in any format you like (csv, json, jsonl, etc
 We provide mini test-set for **Compare Mode** and **Score Mode** as below:
 
 ```python
-###COREV2
+### Compare-Mode Example
 [
     {
-        "question": "如果我在空中垂直抛球，球最初向哪个方向行进？",
-        "capability": "知识-社会常识",
+        "question": "If I throw a ball vertically into the air, which direction does it initially travel?",
+        "capability": "Knowledge - common sense",
         "others": {
-            "question": "如果我在空中垂直抛球，球最初向哪个方向行进？",
+            "question": "If I throw a ball vertically into the air, which direction does it initially travel?",
             "evaluating_guidance": "",
-            "reference_answer": "上"
+            "reference_answer": "Up"
         }
     },...]
 
-###CreationV0.1
+### Score-Mode Dataset Example
 [
     {
-        "question": "请你扮演一个邮件管家，我让你给谁发送什么主题的邮件，你就帮我扩充好邮件正文，并打印在聊天框里。你需要根据我提供的邮件收件人以及邮件主题，来斟酌用词，并使用合适的敬语。现在请给导师发送邮件，询问他是否可以下周三下午15:00进行科研同步会，大约200字。",
-        "capability": "邮件通知",
+        "question": "Act as an email assistant. Draft an approximately 200-word email asking my advisor whether a research sync can be held at 15:00 next Wednesday.",
+        "capability": "Email notification",
         "others": ""
     },
 ```
@@ -133,7 +133,7 @@ Taking Alignbench as an example, `configs/datasets/subjective/alignbench/alignbe
 ### Step-3: Launch the Evaluation
 
 ```shell
-python run.py config/eval_subjective_score.py -r
+opencompass examples/eval_subjective.py -r
 ```
 
 The `-r` parameter allows the reuse of model inference and GPT-4 evaluation results.

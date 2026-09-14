@@ -1,123 +1,58 @@
-# Configure Datasets
+# Dataset Selection and Configuration
 
-This tutorial mainly focuses on selecting datasets supported by OpenCompass and preparing their configs files. Please make sure you have downloaded the datasets following the steps in [Dataset Preparation](../get_started/installation.md#dataset-preparation).
+In OpenCompass, one “dataset configuration” defines data loading, model input, and scoring rules together. A dataset with the same name can have multiple configuration variants, so results cannot be compared by raw dataset name alone.
 
-## Directory Structure of Dataset Configuration Files
+## Finding and Selecting Configurations
 
-First, let's introduce the structure under the `configs/datasets` directory in OpenCompass, as shown below:
-
-```
-configs/datasets/
-├── agieval
-├── apps
-├── ARC_c
-├── ...
-├── CLUE_afqmc  # dataset
-│   ├── CLUE_afqmc_gen_901306.py  # different version of config
-│   ├── CLUE_afqmc_gen.py
-│   ├── CLUE_afqmc_ppl_378c5b.py
-│   ├── CLUE_afqmc_ppl_6507d7.py
-│   ├── CLUE_afqmc_ppl_7b0c1e.py
-│   └── CLUE_afqmc_ppl.py
-├── ...
-├── XLSum
-├── Xsum
-└── z_bench
+```bash
+python tools/list_configs.py mmlu gsm8k
 ```
 
-In the `configs/datasets` directory structure, we flatten all datasets directly, and there are multiple dataset configurations within the corresponding folders for each dataset.
+Configuration files are usually under `opencompass/configs/datasets/<dataset>/`. Components such as `gen`, `ppl`, `rawprompt`, the few-shot count, and a hash in the filename distinguish evaluation protocols. A file without a hash is normally a convenient import entry point, but you should still open it and verify its target and contents.
 
-The naming of the dataset configuration file is made up of `{dataset name}_{evaluation method}_{prompt version number}.py`. For example, `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`, this configuration file is the `CLUE_afqmc` dataset under the Chinese universal ability, the corresponding evaluation method is `gen`, i.e., generative evaluation, and the corresponding prompt version number is `db509b`; similarly, `CLUE_afqmc_ppl_00b348.py` indicates that the evaluation method is `ppl`, i.e., discriminative evaluation, and the prompt version number is `00b348`.
+Run `list_configs.py` without arguments to see every model, dataset, and summarizer configuration discoverable by the installed version:
 
-In addition, files without a version number, such as: `CLUE_afqmc_gen.py`, point to the latest prompt configuration file of that evaluation method, which is usually the most accurate prompt.
+```bash
+python tools/list_configs.py
+```
 
-## Dataset Selection
+Abbreviations in the first output column can be passed directly to `opencompass --datasets ...`. Dataset count and configuration variants change continuously, so this documentation no longer maintains a static list that would quickly become stale. Treat `opencompass/configs/datasets/` and the tool output in the current code as authoritative.
 
-In each dataset configuration file, the dataset will be defined in the `{}_datasets` variable, such as `afqmc_datasets` in `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`.
+Confirm the following before selecting a configuration:
+
+- Data source, version, split, and sample range.
+- Input fields, answer fields, and media resources.
+- Prompt type, few-shot count, and inference method.
+- Evaluator, answer extraction, and postprocessing rules.
+- Dependencies on a Judge, code sandbox, or official evaluation service.
+- Data directories, cache variables, and offline-operation requirements.
+
+## Dataset Configuration Structure
 
 ```python
-afqmc_datasets = [
+datasets = [
     dict(
-        abbr="afqmc-dev",
-        type=AFQMCDatasetV2,
-        path="./data/CLUE/AFQMC/dev.json",
-        reader_cfg=afqmc_reader_cfg,
-        infer_cfg=afqmc_infer_cfg,
-        eval_cfg=afqmc_eval_cfg,
-    ),
-]
-```
-
-And `cmnli_datasets` in `CLUE_cmnli/CLUE_cmnli_ppl_b78ad4.py`.
-
-```python
-cmnli_datasets = [
-    dict(
-        type=HFDataset,
-        abbr='cmnli',
-        path='json',
-        split='train',
-        data_files='./data/CLUE/cmnli/cmnli_public/dev.json',
-        reader_cfg=cmnli_reader_cfg,
-        infer_cfg=cmnli_infer_cfg,
-        eval_cfg=cmnli_eval_cfg)
-]
-```
-
-Take these two datasets as examples. If users want to evaluate these two datasets at the same time, they can create a new configuration file in the `configs` directory. We use the import mechanism in the `mmengine` configuration to build the part of the dataset parameters in the evaluation script, as shown below:
-
-```python
-from mmengine.config import read_base
-
-with read_base():
-    from .datasets.CLUE_afqmc.CLUE_afqmc_gen_db509b import afqmc_datasets
-    from .datasets.CLUE_cmnli.CLUE_cmnli_ppl_b78ad4 import cmnli_datasets
-
-datasets = []
-datasets += afqmc_datasets
-datasets += cmnli_datasets
-```
-
-Users can choose different abilities, different datasets and different evaluation methods configuration files to build the part of the dataset in the evaluation script according to their needs.
-
-For information on how to start an evaluation task and how to evaluate self-built datasets, please refer to the relevant documents.
-
-### Multiple Evaluations on the Dataset
-
-In the dataset configuration, you can set the parameter `n` to perform multiple evaluations on the same dataset and return the average metrics, for example:
-
-```python
-afqmc_datasets = [
-    dict(
-        abbr="afqmc-dev",
-        type=AFQMCDatasetV2,
-        path="./data/CLUE/AFQMC/dev.json",
-        n=10, # Perform 10 evaluations
-        reader_cfg=afqmc_reader_cfg,
-        infer_cfg=afqmc_infer_cfg,
-        eval_cfg=afqmc_eval_cfg,
-    ),
-]
-
-```
-
-Additionally, for binary evaluation metrics (such as accuracy, pass-rate, etc.), you can also set the parameter `k` in conjunction with `n` for [G-Pass@k](http://arxiv.org/abs/2412.13147) evaluation. The formula for G-Pass@k is:
-
-```{math}
-\text{G-Pass@}k_\tau=E_{\text{Data}}\left[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right], 
-```
-
-where $n$ is the number of evaluations, and $c$ is the number of times that passed or were correct out of $n$ runs. An example configuration is as follows:
-
-```python
-aime2024_datasets = [
-    dict(
-        abbr='aime2024',
-        type=Aime2024Dataset,
-        path='opencompass/aime2024',
-        k=[2, 4], # Return results for G-Pass@2 and G-Pass@4
-        n=12, # 12 evaluations
-        ...
+        type=MyDataset,
+        abbr='my-dataset',
+        path='data/or/hub-id',
+        reader_cfg=reader_cfg,
+        infer_cfg=infer_cfg,
+        eval_cfg=eval_cfg,
     )
 ]
 ```
+
+- `type` and `path` determine where and how data is loaded.
+- `reader_cfg` declares input columns, answer columns, split, and sample range.
+- `infer_cfg` declares the prompt, few-shot Retriever, and Gen/PPL Inferencer.
+- `eval_cfg` declares prediction/reference postprocessing and the Evaluator.
+
+For complete customization, see [Adding a Dataset](../extension/new_dataset.md). To quickly evaluate your own JSON, JSONL, or CSV data, see [Quickly Evaluating Your Own Data](../extension/custom_dataset.md).
+
+## Repeated Runs
+
+The CLI option `--dataset-num-runs N` copies dataset configurations and evaluates them multiple times. The configuration fields `n`/`k` are also consumed by some robustness metrics. Repeated runs are meaningful only when generation arguments permit randomness, the service can vary, or the metric explicitly requires multiple samples. Preserve both each run and the aggregation method; do not report only the average.
+
+## Data Locations
+
+Data can come from local files, OpenCompass data packages, Hugging Face, ModelScope, or dataset-specific download logic. See [Data Sources, Caches, and Offline Operation](data_and_cache.md) for caching and offline rules.
