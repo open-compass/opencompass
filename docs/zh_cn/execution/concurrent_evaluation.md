@@ -1,6 +1,6 @@
 # 跨任务并发推理与评测监听
 
-面向大规模 API 模型评测，OpenCompass 提供两个配套组件：**并发推理任务**（`OpenICLInferConcurrentTask`）让一个进程同时推进一个模型的多个数据集；**评测监听任务**（`OpenICLEvalWatchTask`）在推理尚在进行时就开始评分，某个模型—数据集的分片一完成就立即计算指标。二者都只适合大量远端请求的场景，不是本地 GPU 模型的通用加速开关。
+本页是 OpenCompass 标准任务类型参考，并重点介绍大规模 API 评测的编排方式。基础教程默认使用**并发推理任务**（`OpenICLInferConcurrentTask`）让一个进程同时推进一个模型的多个数据集，并以**评测监听任务**（`OpenICLEvalWatchTask`）在推理尚在进行时开始评分。二者都面向大量远端请求，不是本地 GPU 模型的通用加速开关。
 
 ## 运行机制总览
 
@@ -23,6 +23,19 @@
            跳过剩余未完成的数据集并结束
 ```
 
+## 普通推理与评测任务
+
+`OpenICLInferTask` 将一个“模型 × 数据集 × 分片”作为一个任务，并把并行度交给 Partitioner 与 Runner，适合本地 GPU 模型以及 Slurm、DLC 等集群拆分执行。
+
+`OpenICLEvalTask` 在推理结束后读取预测并计算分数。它与 `OpenICLEvalWatchTask` 使用相同的评分逻辑，区别在于普通任务统一启动评分，Watch 任务则随推理分片完成随评，并通过心跳超时避免处理不完整预测。
+
+一般选择如下：
+
+- API 大批量评测：`OpenICLInferConcurrentTask` + `OpenICLEvalWatchTask`；
+- 本地模型或集群拆分：`OpenICLInferTask` + `OpenICLEvalTask`。
+
+Partitioner 与 Runner 的配置参阅[任务划分、执行器与任务类型](tasks_and_runners.md)。
+
 ## OpenICLInferConcurrentTask
 
 普通 `OpenICLInferTask` 中，一个任务只处理“一个模型 × 一个数据集 × 一个分片”，并行度完全交给 Partitioner 和 Runner。并发任务则相反：**一个进程接管一个模型的所有待测数据集**，在进程内部完成调度。因此配置中 `num_worker=1`、`max_num_workers=1` 是有意为之——数据集不应再被切分或复制成多个任务。
@@ -36,6 +49,16 @@
 5. **断点续跑**：prediction 文件已存在的模型—数据集组合直接跳过。
 
 `max_workers` 优先取模型配置中的同名字段，未设置时默认 `min(32, CPU 核数 + 4)`。
+
+构造参数如下，这些参数写在 `infer.runner.task` 中：
+
+| 参数                     | 默认值                  | 说明                                                       |
+| ------------------------ | ----------------------- | ---------------------------------------------------------- |
+| `poll_interval`          | 1.0                     | 数据集调度轮询间隔（秒）                                   |
+| `log_interval`           | 30.0                    | 进度日志间隔（秒）                                         |
+| `max_workers`            | `min(32, CPU 核数 + 4)` | 全部数据集共享的请求并发信号量，优先取模型配置中的同名字段 |
+| `dump_res_length`        | False                   | 调试时落盘响应长度统计                                     |
+| `dump_only_message_path` | None                    | 只导出最终消息而不请求模型                                 |
 
 ## 与 Parallel Inferencer 的关系
 
@@ -73,6 +96,14 @@ infer_cfg = dict(
 4. 等待期间每 `log_interval` 秒（默认 30）打印一次剩余数量。
 
 心跳超时应覆盖“推理任务重启/调度的间隔”；网络文件系统延迟较高时适当调大。推理失败（状态 `fail`）的数据集同样要等到超时才会被跳过，可在 `infer_status/` 中直接查看失败原因。
+
+构造参数写在 `eval.runner.task` 中：
+
+| 参数                | 默认值 | 说明                                     |
+| ------------------- | ------ | ---------------------------------------- |
+| `watch_interval`    | 5.0    | 状态文件扫描间隔（秒）                   |
+| `heartbeat_timeout` | 60.0   | 心跳超时（秒），超时后跳过剩余数据集     |
+| `log_interval`      | 30.0   | 等待期间打印剩余任务数量的日志间隔（秒） |
 
 ## 完整配置示例
 

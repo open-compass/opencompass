@@ -1,8 +1,8 @@
-# Meta Template
+# 模型侧对话模板协议
 
-本章介绍模型侧对话协议 **Meta Template** 在语言模型和 API 模型上的配置方法。为什么需要模型侧协议的背景见[总览](overview.md)，阅读本章前建议先了解[对话式模板](./prompt_template.md#对话式-prompt)的基本语法。
+本章介绍模型侧对话模板协议（Meta Template）在语言模型和 API 模型上的配置方法。阅读本章前建议先了解合并模板页中的[传统对话式 Prompt](raw_prompt_template.md#对话式-prompt)。配置字段名仍为 `meta_template`。
 
-Meta Template 与模型的配置相绑定，在运行时与数据集的对话式模板相结合，最终产生最适合当前模型的 prompt：
+模型侧对话模板协议与模型配置相绑定，在运行时与数据集的对话式模板相结合，最终产生最适合当前模型的 prompt：
 
 ```Python
 # 指定时只需要把 meta_template 字段传入模型
@@ -15,16 +15,16 @@ models = [
 ```
 
 ```{note}
-在某些情况下（例如对基座的测试），我们并不需要在正常对话中注入任何的指令，此时我们可以将 meta template 置空。在这种情况下，模型接收到的 prompt 仅由数据集配置定义，是一个普通的字符串。若数据集配置使用的是对话式模板，不同角色的发言将会由 \n 拼接而成。
+在某些情况下（例如对基座的测试），我们并不需要在正常对话中注入任何的指令，此时可以将模型侧协议置空。在这种情况下，模型接收到的 prompt 仅由数据集配置定义，是一个普通的字符串。若数据集配置使用的是对话式模板，不同角色的发言将会由 \n 拼接而成。
 ```
 
 ## 应用在语言模型上
 
-下图展示了在 2-shot learning 的情况下，数据从数据集中经过 prompt template 和 meta template，最终构建出 prompt 的几种情况。读者可以该图为参考，方便理解后续的章节。
+下图展示了在 2-shot learning 的情况下，数据从数据集侧 Prompt 模板经过模型侧对话模板协议，最终构建出 prompt 的几种情况。读者可以该图为参考，方便理解后续的章节。
 
 ![](https://user-images.githubusercontent.com/22607038/251195073-85808807-6359-44df-8a19-9f5d00c591ec.png)
 
-我们将会结合几个例子讲解 meta template 的定义方式。
+下面结合几个例子讲解模型侧对话模板协议的定义方式。
 
 假设根据数据集的对话式模板，产生了下面的 PromptList：
 
@@ -46,7 +46,7 @@ PromptList([
 <BOT>: 4<eob>
 ```
 
-在 meta template 中，我们只需要把每轮对话的格式抽象为如下配置即可：
+在模型侧对话模板协议中，我们只需要把每轮对话的格式抽象为如下配置即可：
 
 ```Python
 # model meta template
@@ -107,7 +107,7 @@ meta_template = dict(
 end of conversation
 ```
 
-这是因为在 OpenCompass 预定义的数据集中，每个 `SYSTEM` 发言都会有一个 `fallback_role='HUMAN'`，即若 meta template 中的 `SYSTEM` 角色不存在，发言者会被切换至 `HUMAN` 角色。
+这是因为在 OpenCompass 预定义的数据集中，每个 `SYSTEM` 发言都会有一个 `fallback_role='HUMAN'`，即若模型侧协议中的 `SYSTEM` 角色不存在，发言者会被切换至 `HUMAN` 角色。
 
 ______________________________________________________________________
 
@@ -201,13 +201,13 @@ meta_template 的 `round` 指定了一轮对话中每个角色说话的格式，
 
 - `begin`, `end` (str): 指定该角色在说话时的固定开头或结尾。
 
-- `prompt` (str)：角色的 prompt。在 meta template 中允许留空，但此时必须在数据集配置的 prompt 中指定。
+- `prompt` (str)：角色的 prompt。在模型侧协议中允许留空，但此时必须在数据集配置的 prompt 中指定。
 
 - `generate` (bool): 指定为 True 时，该角色即为模型扮演的角色。在生成任务中，模型接收到的 prompt 会截止到该角色的 `begin` 处，剩下的内容由模型补全。
 
 ## 应用在 API 模型上
 
-API 模型的 meta template 与普通模型的 meta template 类似，但配置更为简单。用户可以根据情况，直接使用下面的两种配置之一，即可以多轮对话的方式评测 API 模型：
+API 模型的模型侧对话模板协议与普通模型类似，但配置更为简单。用户可以根据情况，直接使用下面的两种配置之一，即可以多轮对话的方式评测 API 模型：
 
 ```Bash
 # 若 API 模型不支持 system 指令
@@ -240,7 +240,7 @@ meta_template=dict(
 
 - 系统 （可选）
 
-据此 OpenCompass 为 API 模型预设了三个 `api_role`：`HUMAN`, `BOT`, `SYSTEM`，同时约定 API 模型接受的输入除了普通字符串外，还有一种以 `PromptList` 结构表示对话的中间格式。API 模型会将对话重新以多轮对话格式打包，发送至后端。但要激活此功能，需要用户使用上面的 meta template 中把数据集 prompt 模板中的角色 `role` 映射到对应的 `api_role` 中。下图展示了 API 模型接受的输入与 Prompt Template 、Meta Template 之间的关系。
+据此 OpenCompass 为 API 模型预设了三个 `api_role`：`HUMAN`, `BOT`, `SYSTEM`，同时约定 API 模型接受的输入除了普通字符串外，还有一种以 `PromptList` 结构表示对话的中间格式。API 模型会将对话重新以多轮对话格式打包，发送至后端。但要激活此功能，需要在模型侧协议中把数据集 prompt 模板中的角色 `role` 映射到对应的 `api_role`。下图展示了 API 模型接受的输入、数据集侧 PromptTemplate 与模型侧对话模板协议之间的关系。
 
 ![](https://user-images.githubusercontent.com/22607038/251195872-63aa7d30-045a-4837-84b5-11b09f07fb18.png)
 

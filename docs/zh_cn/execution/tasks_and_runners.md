@@ -6,11 +6,13 @@ OpenCompass 把推理和评测拆成任务后交给 Runner 执行。配置中的
 - Runner：在本地、Slurm 或 DLC 上以多少并发启动任务；
 - Task：执行推理、评测或其他具体工作。
 
-大模型推理耗时长、数据集量大，串行运行一次评测的开销往往很大。Partitioner 将大任务按策略切成众多独立的小任务并行运行，是加速评测的主要手段；Runner 决定这些任务在哪里执行。用户通过配置文件中的 `infer.partitioner` / `infer.runner` 和 `eval.partitioner` / `eval.runner` 分别控制推理和评测两个阶段。
+用户通过配置文件中的 `infer.partitioner` / `infer.runner` 和 `eval.partitioner` / `eval.runner` 分别控制推理和评测两个阶段。本页集中说明 Partitioner、Runner 和普通任务类型；API 跨数据集并发的内部机制见[跨任务并发推理与评测监听](concurrent_evaluation.md)。
 
 ## 默认策略
 
 未显式写 `infer`/`eval` 时，CLI 会生成本地默认配置：推理使用 `NumWorkerPartitioner` 和 `OpenICLInferTask`，评测使用 `NaivePartitioner` 和 `OpenICLEvalTask`，两阶段均由 `LocalRunner` 执行。
+
+中文文档与基础教程中的 API 标准示例使用 `OpenICLInferConcurrentTask` 和 `OpenICLEvalWatchTask`；CLI 自动补齐的默认配置仍使用普通 `OpenICLInferTask` 和 `OpenICLEvalTask`。
 
 ```python
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
@@ -201,7 +203,11 @@ runner=dict(
 任务是一个独立脚本，负责计算密集的操作，通过配置文件确定参数。它可以实例化后调用 `task.run()` 执行，也可以通过 `get_command` 生成完整命令（如 `srun {task_cmd}`）交给调度系统。目前支持：
 
 - `OpenICLInferTask`：基于 OpenICL 框架执行语言模型推理；
-- `OpenICLEvalTask`：读取预测结果执行评测计算。
+- `OpenICLEvalTask`：读取预测结果执行评测计算；
+- `OpenICLInferConcurrentTask`：由一个进程并发推进 API 模型的多个数据集；
+- `OpenICLEvalWatchTask`：监听推理状态并随完成随评。
+
+后两个任务的参数、运行机制和选择建议参阅[跨任务并发推理与评测监听](concurrent_evaluation.md)。
 
 ## 资源声明与实际并发
 

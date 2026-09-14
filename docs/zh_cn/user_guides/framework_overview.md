@@ -25,7 +25,7 @@ OpenCompass 评测能够拉起一条可以拆分、并行、恢复和复用的�
 
 ## 模型
 
-模型配置描述“如何调用模型”和“运行一个实例需要多少资源”，包括模型后端、权重或接口地址、上下文长度、最大输出长度、批大小、生成参数以及 `run_cfg`。本地 Hugging Face 权重、OpenAI 兼容接口、LMDeploy、vLLM 和多模态模型会使用不同模型类。
+模型配置描述“如何调用模型”和“运行一个实例需要多少资源”，包括模型后端、权重或接口地址、上下文长度、最大输出长度、批大小、生成参数以及 `run_cfg`。常见入口包括 OpenAI 兼容接口、厂商 SDK，以及本地 Hugging Face、LMDeploy、vLLM 和多模态模型类。API 模型通常声明 `run_cfg.num_gpus=0`，不占用本地 GPU。
 
 详见[模型接入](models.md)。
 
@@ -41,7 +41,7 @@ OpenCompass 中的数据集配置不只包含数据路径。它通常同时声�
 
 ## 推理、评测与汇总
 
-推理阶段由 Partitioner 把“模型 × 数据集”拆成任务，Runner 决定任务在本地、或其他的集群环境中如何执行，Task 完成实际推理任务。输出写入 `predictions/`。
+推理阶段由 Partitioner 把“模型 × 数据集”拆成任务，Runner 决定任务在本地、或其他的集群环境中如何执行，Task 完成实际推理任务。基础教程的 API 示例使用 `OpenICLInferConcurrentTask` 并发推理，配合 `OpenICLEvalWatchTask` 随完成随评；本地模型仍使用普通推理与评测任务。输出写入 `predictions/`。
 
 评测阶段读取预测结果，由数据集的 Evaluator 计算分数并写入 `results/`。Summarizer 再把各子集结果整理为终端表格和汇总文件。推理结果与评测结果分开保存，因此可以通过 `--reuse` 只重做缺失阶段，或使用 `--mode eval`、`--mode viz` 处理已有结果。
 

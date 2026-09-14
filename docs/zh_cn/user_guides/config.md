@@ -32,10 +32,10 @@ from mmengine.config import read_base
 with read_base():
     from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
         gsm8k_datasets
-    from opencompass.configs.models.qwen.hf_qwen2_1_5b_instruct import \
-        models as qwen2_models
+    from opencompass.configs.models.openai.gpt_6_astra import \
+        models as gpt6_models
 
-models = qwen2_models
+models = gpt6_models
 datasets = gsm8k_datasets
 ```
 
@@ -46,7 +46,7 @@ datasets = gsm8k_datasets
 多个模型或数据集可以直接拼接：
 
 ```python
-models = qwen2_models + api_models
+models = gpt6_models + other_api_models
 datasets = gsm8k_datasets + math_datasets
 ```
 
@@ -59,10 +59,9 @@ datasets = gsm8k_datasets + math_datasets
 ```python
 from copy import deepcopy
 
-models = deepcopy(qwen2_models)
-models[0]['batch_size'] = 1
-models[0]['max_out_len'] = 512
-models[0]['run_cfg']['num_gpus'] = 1
+models = deepcopy(gpt6_models)
+models[0]['query_per_second'] = 2
+models[0]['max_workers'] = 16
 ```
 
 常见错误是直接修改共享对象，导致同一文件里另一个实验组也被改变。

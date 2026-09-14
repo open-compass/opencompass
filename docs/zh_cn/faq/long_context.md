@@ -1,8 +1,8 @@
-# 长上下文评测
+# 长文（长上下文）评测话题
 
-长上下文评测的核心不是配置文件名中的 `32k` 或 `128k`，而是模型最终实际接收的 token 数、截断行为和可用输出预算。
+本页汇总长上下文评测的注意事项。NeedleBench、RULER、LongBench 等数据集的具体配置请在 `configs/datasets` 中检索，并审阅对应 README 与 Summarizer。
 
-OpenCompass 已包含 NeedleBench、RULER、LongBench 等长上下文配置。新配置优先选择包含 `rawprompt` 的变体，并审阅对应 README 和 Summarizer。
+长上下文评测的核心不是配置文件名中的 `32k` 或 `128k`，而是模型最终实际接收的 token 数、截断行为和可用输出预算。新配置优先选择包含 `rawprompt` 的变体。
 
 ## 长度预算
 
