@@ -236,7 +236,7 @@ OpenCompass 会默认尝试对输入的数据集文件进行解析，因此在�
 - `infer_method` (str): 推理方法，可选值为 `ppl` 和 `gen`.
 - `human_prompt` (str): 用户提示词模板，用于生成提示词。模板中的变量使用 `{}` 包裹，如 `{question}`，`{opt1}` 等。如存在 `template`，则该字段会被忽略。
 - `bot_prompt` (str): 机器人提示词模板，用于生成提示词。模板中的变量使用 `{}` 包裹，如 `{answer}` 等。如存在 `template`，则该字段会被忽略。
-- `template` (str or dict): 问题模板，用于生成提示词。模板中的变量使用 `{}` 包裹，如 `{question}`，`{opt1}` 等。相关语法见[此处](../prompt/prompt_template.md) 关于 `infer_cfg['prompt_template']['template']` 的内容。
+- `template` (str or dict): 问题模板，用于生成提示词。模板中的变量使用 `{}` 包裹，如 `{question}`，`{opt1}` 等。相关语法见[传统 PromptTemplate](../prompt/raw_prompt_template.md#字符串式-prompt)关于 `infer_cfg['prompt_template']['template']` 的内容。
 - `input_columns` (list): 输入字段列表，用于读入数据。
 - `output_column` (str): 输出字段，用于读入数据。
 - `options` (list): 选项列表，用于读入数据，仅在 `data_type` 为 `mcq` 时有效。

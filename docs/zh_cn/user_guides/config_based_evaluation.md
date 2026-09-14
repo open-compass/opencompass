@@ -1,6 +1,6 @@
 # 使用配置文件完成一次完整评测
 
-本教程从空文件开始，构建一个可解析、可试跑、可复现的评测配置。最终实验通过 vLLM 张量并行加载 Qwen3.5-35B-A3B，评测 64 条 GSM8K 演示样本，并展示如何显式控制任务划分、执行器和结果汇总。
+本教程从空文件开始，构建一个可解析、可试跑、可复现的评测配置。最终实验通过 OpenAI Responses API 调用 gpt-6-astra，评测 64 条 GSM8K 演示样本，并展示如何显式控制任务划分、执行器和结果汇总。
 
 ## 1. 创建配置文件
 
@@ -12,10 +12,10 @@ from mmengine.config import read_base
 with read_base():
     from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
         gsm8k_datasets
-    from opencompass.configs.models.qwen3.vllm_qwen3_5_35b_a3b import \
-        models as qwen3_5_models
+    from opencompass.configs.models.openai.gpt_6_astra import \
+        models as gpt6_models
 
-models = qwen3_5_models
+models = gpt6_models
 datasets = gsm8k_datasets
 ```
 
@@ -29,7 +29,7 @@ datasets = gsm8k_datasets
 
 导入的数据集已经包含 `reader_cfg`、`infer_cfg` 和 `eval_cfg`。它们分别确定读取哪些字段、怎样构造模型输入，以及怎样从输出中计算指标。不要仅凭数据集名称推断评测方法；正式评测时应审阅具体配置文件。
 
-新数据集配置推荐使用 [RawPromptTemplate](../prompt/raw_prompt_template.md) 描述消息。已有的 [PromptTemplate](../prompt/prompt_template.md) 和 [MetaTemplate](../prompt/meta_template.md) 仍然有效，分别负责传统输入拼接与模型对话协议。
+新数据集配置推荐使用 [RawPromptTemplate](../prompt/raw_prompt_template.md) 描述消息。传统的 [PromptTemplate](../prompt/raw_prompt_template.md#prompttemplate传统模板) 仍然有效；模型侧的角色映射由[模型侧对话模板协议](../prompt/meta_template.md)处理。
 
 ## 3. 先使用默认策略执行评测任务
 
@@ -58,15 +58,14 @@ opencompass my_eval.py \
 ```python
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
+from opencompass.tasks import OpenICLEvalWatchTask, OpenICLInferConcurrentTask
 
 infer = dict(
     partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
     runner=dict(
         type=LocalRunner,
         max_num_workers=1,
-        max_workers_per_gpu=1,
-        task=dict(type=OpenICLInferTask),
+        task=dict(type=OpenICLInferConcurrentTask),
     ),
 )
 
@@ -75,7 +74,11 @@ eval = dict(
     runner=dict(
         type=LocalRunner,
         max_num_workers=1,
-        task=dict(type=OpenICLEvalTask),
+        task=dict(
+            type=OpenICLEvalWatchTask,
+            watch_interval=5,
+            heartbeat_timeout=60,
+        ),
     ),
 )
 ```
@@ -86,7 +89,9 @@ eval = dict(
 - Runner 决定任务在哪里、以多少并发执行；
 - Task 决定执行推理还是读取预测进行评测。
 
-命令行的 `--slurm` 或 `--dlc` 会用相应运行后端覆盖配置中的执行器。三类组件的职责与并发资源配置详见[任务划分、执行器与任务类型](../execution/tasks_and_runners.md)；多卡与张量并行的模型侧声明见[模型接入总览](models.md)。
+这里将 `num_worker` 和 `max_num_workers` 都设为 1，是因为并发任务由一个进程接管同一模型的全部数据集，再在进程内部调度请求。`OpenICLInferConcurrentTask` 仅适用于 API 模型；本地 GPU 模型应使用 `OpenICLInferTask` 和 `OpenICLEvalTask`。
+
+命令行的 `--slurm` 或 `--dlc` 会用相应运行后端覆盖配置中的执行器。三类组件的职责与并发资源配置详见[任务划分、执行器与任务类型](../execution/tasks_and_runners.md)，API 并发任务的机制见[跨任务并发推理与评测监听](../execution/concurrent_evaluation.md)；多卡与张量并行的模型侧声明见[模型接入总览](models.md)。
 
 ## 5. 配置结果汇总
 

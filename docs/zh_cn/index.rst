@@ -26,7 +26,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    user_guides/config_based_evaluation.md
    user_guides/config.md
    user_guides/models.md
-   user_guides/accelerator_intro.md
    user_guides/datasets.md
    user_guides/data_and_cache.md
    user_guides/results_and_summarizer.md
@@ -35,9 +34,7 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    :maxdepth: 1
    :caption: 提示词与输入构造
 
-   prompt/overview.md
    prompt/raw_prompt_template.md
-   prompt/prompt_template.md
    prompt/meta_template.md
    prompt/chain_of_thought.md
    prompt/debugging.md
@@ -55,7 +52,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    :maxdepth: 1
    :caption: 评测方法
 
-   evaluation/overview.md
    evaluation/metrics_and_postprocessing.md
    evaluation/llm_judge.md
    evaluation/math_verify.md
@@ -63,7 +59,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    evaluation/code_eval.md
    evaluation/subjective_evaluation.md
    evaluation/repeated_evaluation.md
-   evaluation/long_context.md
    evaluation/vlmevalkit.md
 
 .. toctree::
@@ -97,9 +92,11 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
 
 .. toctree::
    :maxdepth: 1
-   :caption: 常见问题与故障排查
+   :caption: 其他文档
 
    faq/index.md
+   faq/local_model_one_stop.md
+   faq/long_context.md
 
 索引与搜索
 ============

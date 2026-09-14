@@ -37,4 +37,4 @@ opencompass my_eval.py \
 - 生成提示、停止词和答案格式一致；
 - API 和本地模型接收到的语义相同。
 
-RawPromptTemplate 参阅[推荐的消息模板](raw_prompt_template.md)，模型协议参阅[MetaTemplate](meta_template.md)。
+RawPromptTemplate 参阅[提示词模板](raw_prompt_template.md)，模型协议参阅[模型侧对话模板协议](meta_template.md)。

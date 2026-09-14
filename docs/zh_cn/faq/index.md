@@ -1,4 +1,4 @@
-# 常见问题与故障排查
+# 常见问题
 
 ## 通用
 
@@ -21,7 +21,7 @@
 
 在数据集配置文件中，有一个 `retriever` 的字段，该字段表示如何召回数据集中的样本作为上下文样例，其中最常用的是 `FixKRetriever` 表示固定使用某 k 个样本，因此即为 k-shot。另外还有 `ZeroRetriever` 表示不使用任何样本，这在大多数情况下意味着 0-shot。
 
-另一方面，in context 的样本也可以直接在数据集的模板中指定，在该情况下亦会搭配使用 `ZeroRetriever`，但此时的评测并不是 0-shot，而需要根据具体的模板来进行确定。具体请看 [prompt](../prompt/prompt_template.md)
+另一方面，in context 的样本也可以直接在数据集的模板中指定，在该情况下亦会搭配使用 `ZeroRetriever`，但此时的评测并不是 0-shot，而需要根据具体的模板来进行确定。具体请看[提示词模板中的 Few-shot 小节](../prompt/raw_prompt_template.md#few-shot-插入示例ice)。
 
 ### OpenCompass task 的默认划分逻辑是什么样的？
 
