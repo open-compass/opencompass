@@ -663,8 +663,8 @@ def _llm_extraction_regression(output, value_range=None):
             reason = 'no_gold'
         elif pred is None or not math.isfinite(pred):
             reason = 'no_number'
-        elif value_range is not None and not (value_range[0] <= pred
-                                              <= value_range[1]):
+        elif value_range is not None and not (value_range[0] <= pred <=
+                                              value_range[1]):
             reason = 'out_of_range'
         if reason is not None:
             if reason == 'no_number':
@@ -673,10 +673,14 @@ def _llm_extraction_regression(output, value_range=None):
                 out_of_range_count += 1
             if len(invalid_examples) < 20:
                 invalid_examples.append({
-                    'index': int(idx),
-                    'reason': reason,
-                    'judge_prediction': item.get('prediction'),
-                    'answer': gold,
+                    'index':
+                    int(idx),
+                    'reason':
+                    reason,
+                    'judge_prediction':
+                    item.get('prediction'),
+                    'answer':
+                    gold,
                 })
             continue
         y_true.append(gold)

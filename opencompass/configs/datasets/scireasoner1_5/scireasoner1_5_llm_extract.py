@@ -64,7 +64,7 @@ def _make_infer_cfg(output_instruction=None):
 # extracted values are compared against gold by the dict postprocessors
 # registered in opencompass/datasets/SciReasoner1_5.py.
 SCIREASONER15_JUDGE_SYSTEM = (
-    "You are a helpful assistant who extracts the final numeric answer from "
+    'You are a helpful assistant who extracts the final numeric answer from '
     "a candidate model's output.")
 
 SCIREASONER15_MATERIAL_JUDGE_TEMPLATE = """
