@@ -45,7 +45,7 @@ LLM 评判所需的测试集由评测任务自动传入，`llm_evaluator.dataset
 ```python
 from mmengine.config import read_base
 
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import (
@@ -56,23 +56,21 @@ from opencompass.evaluator import (
 from opencompass.datasets import MATHDataset
 
 with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
+    from opencompass.configs.models.openai.gpt_6_astra import (
+        models as gpt_6_astra,
     )
 
 reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
 infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
+            ),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
@@ -89,17 +87,11 @@ JUDGE_TEMPLATE = """请判断下面的预测答案与标准答案是否一致。
 llm_judge_evaluator = dict(
     type=GenericLLMEvaluator,
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="你是一个负责评估模型输出正确性的助手。",
-                )
-            ],
-            round=[dict(role='HUMAN', prompt=JUDGE_TEMPLATE)],
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='system', content='你是一个负责评估模型输出正确性的助手。'),
+            dict(role='user', content=JUDGE_TEMPLATE),
+        ],
     ),
     dataset_cfg=dict(
         type=MATHDataset,
@@ -131,7 +123,7 @@ math_datasets = [
 ]
 
 datasets = math_datasets
-models = lmdeploy_qwen2_5_7b_instruct_model
+models = gpt_6_astra
 
 work_dir = 'math_prm800k_500_cascade_evaluator'
 ```

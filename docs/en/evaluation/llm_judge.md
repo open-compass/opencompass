@@ -225,7 +225,6 @@ Here's how to set up a complete configuration for LLM judge evaluation:
 
 ```python
 from mmengine.config import read_base
-from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.datasets import CustomDataset
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
@@ -233,10 +232,13 @@ from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 
-# Import your judge model configuration
+# Import the judge model and evaluated model configuration
 with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import (
+    from opencompass.configs.models.openai.gpt_6_astra import (
         models as judge_model,
+    )
+    from opencompass.configs.models.openai.gpt_5_6_sol import (
+        models as gpt_5_6_sol,
     )
 
 # Define your judge template
@@ -301,14 +303,7 @@ datasets = [
 ]
 
 # Model configuration for the model being evaluated
-models = [
-    dict(
-        type=TurboMindModelwithChatTemplate,
-        abbr='model-to-evaluate',
-        path='path/to/your/model',
-        # ... other model configurations
-    )
-]
+models = gpt_5_6_sol
 
 # Output directory
 work_dir = './outputs/llm_judge_eval'
@@ -316,7 +311,7 @@ work_dir = './outputs/llm_judge_eval'
 
 ## Example Scripts
 
-For a runnable example of the generic LLM judge evaluator, see `examples/eval_llm_judge.py`. This script uses `CustomDataset` and `GenericLLMEvaluator` to demonstrate inference, judge-model evaluation, and result aggregation on mathematical problems.
+For a runnable example of the generic LLM judge evaluator, see [examples/eval_llm_judge.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_llm_judge.py). This script uses `CustomDataset` and `GenericLLMEvaluator` to demonstrate inference, judge-model evaluation, and result aggregation on mathematical problems.
 
 ## CascadeEvaluator
 

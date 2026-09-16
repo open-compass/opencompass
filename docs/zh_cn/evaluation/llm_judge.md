@@ -224,7 +224,6 @@ problem,answer
 
 ```python
 from mmengine.config import read_base
-from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.datasets import CustomDataset
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
@@ -232,10 +231,13 @@ from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 
-# 导入评判模型配置
+# 导入评判模型和被评测模型配置
 with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import (
+    from opencompass.configs.models.openai.gpt_6_astra import (
         models as judge_model,
+    )
+    from opencompass.configs.models.openai.gpt_5_6_sol import (
+        models as gpt_5_6_sol,
     )
 
 # 定义评判模板
@@ -300,14 +302,7 @@ datasets = [
 ]
 
 # 被评估模型的配置
-models = [
-    dict(
-        type=TurboMindModelwithChatTemplate,
-        abbr='model-to-evaluate',
-        path='path/to/your/model',
-        # ... 其他模型配置
-    )
-]
+models = gpt_5_6_sol
 
 # 输出目录
 work_dir = './outputs/llm_judge_eval'
@@ -315,7 +310,7 @@ work_dir = './outputs/llm_judge_eval'
 
 ## 示例脚本
 
-如果希望查看一份可作为配置运行的通用 LLM 评判器示例，请参考 `examples/eval_llm_judge.py`。该脚本使用 `CustomDataset` 和 `GenericLLMEvaluator` 演示了如何在数学问题上完成推理、调用评判模型并汇总结果。
+如果希望查看一份可作为配置运行的通用 LLM 评判器示例，请参考 [examples/eval_llm_judge.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_llm_judge.py)。该脚本使用 `CustomDataset` 和 `GenericLLMEvaluator` 演示了如何在数学问题上完成推理、调用评判模型并汇总结果。
 
 ## 级联评估器 (CascadeEvaluator)
 

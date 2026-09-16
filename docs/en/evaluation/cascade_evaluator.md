@@ -45,7 +45,7 @@ The following is a complete mathematics example using `MATHVerifyEvaluator` for 
 ```python
 from mmengine.config import read_base
 
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import (
@@ -56,23 +56,21 @@ from opencompass.evaluator import (
 from opencompass.datasets import MATHDataset
 
 with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
+    from opencompass.configs.models.openai.gpt_6_astra import (
+        models as gpt_6_astra,
     )
 
 reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
 infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nReason step by step and put the final answer in \\boxed{}.',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content='{problem}\nReason step by step and put the final answer in \\boxed{}.',
+            ),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
@@ -89,17 +87,14 @@ Reply "A" if they match or "B" if they do not. Output nothing else.""".strip()
 llm_judge_evaluator = dict(
     type=GenericLLMEvaluator,
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are an assistant responsible for judging the correctness of model output.",
-                )
-            ],
-            round=[dict(role='HUMAN', prompt=JUDGE_TEMPLATE)],
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='system',
+                content='You are an assistant responsible for judging the correctness of model output.',
+            ),
+            dict(role='user', content=JUDGE_TEMPLATE),
+        ],
     ),
     dataset_cfg=dict(
         type=MATHDataset,
@@ -131,7 +126,7 @@ math_datasets = [
 ]
 
 datasets = math_datasets
-models = lmdeploy_qwen2_5_7b_instruct_model
+models = gpt_6_astra
 
 work_dir = 'math_prm800k_500_cascade_evaluator'
 ```
