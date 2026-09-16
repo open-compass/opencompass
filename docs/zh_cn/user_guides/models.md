@@ -1,20 +1,117 @@
-# 模型接入总览
+# 模型配置总览
 
-模型配置回答三个问题：调用哪一种模型后端、如何生成回复、运行一个模型实例需要多少资源。先根据部署形态选择入口，再调整参数。
+OpenCompass 的一个标准模型配置将包含下面的信息：模型类别、上下文等模型超参、推理并发数、部署所需资源等等。主要有以下几个模型类别。
 
-| 部署形态                   | 推荐入口                                               | 适用场景                                |
-| -------------------------- | ------------------------------------------------------ | --------------------------------------- |
-| OpenAI 兼容服务            | `OpenAISDK`、`OpenAISDKResponse`                       | OpenAI 官方接口、自建推理服务、中转网关 |
-| 厂商 API                   | `GeminiSDK`、`ClaudeSDK` 等对应模型类                  | 使用厂商原生协议、鉴权和高级能力        |
-| 本地推理引擎加速           | LMDeploy 或 vLLM 模型类                                | 大模型、多卡和批量评测                  |
-| 本地 Hugging Face 原生加载 | `HuggingFacewithChatTemplate` 或 `HuggingFaceCausalLM` | 小规模验证、兼容性基线                  |
-| 仓库尚未支持的后端         | 自定义 `BaseModel` 子类                                | 特殊输入输出或私有运行时                |
+| 部署形态                   | 推荐入口                                                                              | 适用场景                                            |
+| -------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| OpenAI 兼容服务            | `OpenAISDK`、`OpenAISDKStreaming`、`OpenAISDKResponse`                                | OpenAI 官方接口、自建 OpenAI 格式推理服务、中转网关 |
+| 其它厂商 API               | `GeminiSDK`、`ClaudeSDK` 等模型类                                                     | 使用厂商原生协议、鉴权及参数传入                    |
+| 本地推理引擎加速           | `TurboMindModelwithChatTemplate`（LMDeploy）及 `VLLMwithChatTemplate`（vLLM）等模型类 | 一站式部署与评测                                    |
+| 本地 Hugging Face 原生加载 | `HuggingFacewithChatTemplate` 或 `HuggingFaceCausalLM`                                | 一站式部署与评测                                    |
 
-接口模型与本地权重的具体配置见下文[接口与推理服务模型](#接口与推理服务模型)与[本地权重模型](#本地权重模型)；自定义后端参阅[新增模型后端](../extension/new_model.md)。
+下文分别介绍通过 API 调用模型，以及在 OpenCompass 进程中一站式加载本地权重并完成评测的配置方法；自定义后端参阅[新增模型后端](../extension/new_model.md)。
 
-## 所有模型都应关注的字段
+## 1. API 模型
 
-下面使用仓库现有的 gpt-6-astra Responses API 配置说明常用字段：
+API 模型由远端服务完成推理，OpenCompass 负责编排请求并保存结果。配置前应确认服务地址、模型名称、密钥、请求限额和超时设置。API 模型本身通常不占用评测机 GPU，可将 `run_cfg.num_gpus` 设为 `0`。
+
+### 共通参数
+
+常用字段如下。不同模型类支持的参数并不完全相同，应以对应类的构造函数和仓库中的现有配置为准。
+
+| 参数               | 说明                                                                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`             | OpenCompass 使用的模型类，例如 `OpenAISDKResponse`。                                                                                           |
+| `abbr`             | 模型简称，用于输出目录、结果文件和汇总表。                                                                                                     |
+| `path`             | 服务端模型名称；部分模型类使用其他字段，例如 `TurboMindAPIModel` 使用 `model_name`。                                                           |
+| `key`              | API 密钥。可直接传入字符串，也可通过 `os.getenv()` 读取自定义环境变量。                                                                        |
+| `max_seq_len`      | 模型允许的最大序列长度，输入与输出之和不应超过该值。                                                                                           |
+| `max_out_len`      | 单次请求允许生成的最大 token 数。数据集侧 Inferencer 显式设置同名参数时，以数据集配置为准。                                                    |
+| `temperature`      | 采样温度；可用范围和实际语义以服务端实现为准。                                                                                                 |
+| `query_per_second` | 每秒请求数上限。设置过高可能触发服务端限流。                                                                                                   |
+| `batch_size`       | `Inferencer` 推理时的批处理大小。评测使用 `OpenICLInferTask` 时，等效于 API 并发线程数。                                                       |
+| `max_workers`      | API 请求的最大并发线程数，仅适用于声明了该参数的模型类。评测使用 `OpenICLInferConcurrentTask` 时，`max_workers` 成为控制此模型并发的唯一参数。 |
+| `retry`            | 请求失败后的最大重试次数。                                                                                                                     |
+| `tokenizer_path`   | 估算输入长度的 tokenizer 名称或路径。使用中转服务或自定义模型名时通常需要显式指定。                                                            |
+
+### OpenAISDK：Chat Completions
+
+`OpenAISDK` 通过 `client.chat.completions.create` 调用 Chat Completions 接口，适用于 OpenAI 官方服务以及实现了相同接口的兼容服务：
+
+```python
+from opencompass.models import OpenAISDK
+
+models = [
+    dict(
+        type=OpenAISDK,
+        abbr='openai-compatible-model',
+        path='served-model-name',
+        key='ENV',  # OPENAI_API_KEY
+        openai_api_base='https://example.com/v1',
+        tokenizer_path='org/model-tokenizer',
+        max_seq_len=131072,
+        max_out_len=131072,
+        query_per_second=1,
+        max_workers=8,
+        timeout=3600,
+        retry=10,
+        status_code_mappings={
+            400: 'The request was rejected by the service.',
+        },
+        openai_extra_kwargs=dict(top_p=0.95),
+        extra_body=dict(
+            chat_template_kwargs=dict(enable_thinking=True),
+        ),
+        batch_size=8,
+    )
+]
+```
+
+主要参数说明如下：
+
+- `openai_extra_kwargs`：此参数中的字段会直接加入 Chat Completions 请求体。
+- `extra_body`：用于传递兼容服务开放的额外请求体字段。
+- `status_code_mappings`：将指定的 HTTP 错误状态码映射为固定的模型输出。例如，上述配置在服务返回 400 时直接返回映射文本，而不再重试该请求；未配置映射的错误仍按 `retry` 设置进行重试。该参数适合为内容过滤等可预期的服务端拒绝提供占位输出，不应将鉴权失败、限流或服务异常映射为正常输出。
+
+### OpenAISDKStreaming：流式 Chat Completions
+
+`OpenAISDKStreaming` 继承自 `OpenAISDK`，使用 Chat Completions 的流式响应，并在流结束后将完整文本交给评测流程。它适合服务端要求流式调用或生成时间较长的场景：
+
+```python
+import os
+
+from opencompass.models import OpenAISDKStreaming
+
+models = [
+    dict(
+        type=OpenAISDKStreaming,
+        abbr='openai-compatible-streaming',
+        path='served-model-name',
+        key='ENV',  # OPENAI_API_KEY
+        openai_api_base='https://example.com/v1',
+        tokenizer_path='org/model-tokenizer',
+        max_seq_len=131072,
+        max_out_len=131072,
+        query_per_second=1,
+        max_workers=8,
+        timeout=3600,
+        retry=10,
+        stream=True,
+        finish_reason_confirm=True,
+        verbose=True,
+        batch_size=8,
+    )
+]
+```
+
+除 `OpenAISDK` 的参数外，流式模型还提供以下参数：
+
+- `finish_reason_confirm`：是否要求流的最终响应包含 `finish_reason`，默认为 `True`。若流结束时仍未收到该字段，当前响应会被视为不完整并触发重试；设为 `False` 时则返回已经收集到的文本。
+- `verbose`：设为 `True` 时，除记录请求开始、结束原因和耗时等日志外，还会将每个流式响应块中的思考内容与回答文本实时输出到终端。相比之下，普通 `OpenAISDK` 的 `verbose` 仅记录请求及响应处理日志，不会逐块输出生成内容。该选项适合调试长时间生成；并发请求较多时，不同请求的终端输出可能交错。
+
+### OpenAISDKResponse：Responses API
+
+`OpenAISDKResponse` 调用 OpenAI Responses API，即 `client.responses.create`。Responses API 专属参数通过 `openai_extra_kwargs` 传入，具体字段可参阅 [OpenAI Responses API 文档](https://developers.openai.com/api/reference/resources/responses/methods/create/)。配置示例如下：
 
 ```python
 from opencompass.models import OpenAISDKResponse
@@ -26,10 +123,11 @@ models = [
         path='gpt-6-astra',
         key='ENV',  # OPENAI_API_KEY
         openai_api_base='https://api.openai.com/v1',
-        max_seq_len=1000000,
+        max_seq_len=131072,
         max_out_len=131072,
         query_per_second=1,
         max_workers=8,
+        timeout=3600,
         retry=10,
         openai_extra_kwargs=dict(reasoning=dict(effort='max')),
         batch_size=8,
@@ -37,131 +135,66 @@ models = [
 ]
 ```
 
-`type` 选择模型实现，`abbr` 是结果目录和汇总表中的稳定简称，`path` 是服务模型名或本地权重路径。`max_seq_len` 与 `max_out_len` 共同约束输入和生成预算；`batch_size`、`query_per_second`、`max_workers` 和 `retry` 影响吞吐、限流与失败重试。
+### 其他厂商 API
 
-## 模型配置与数据集配置的边界
+厂商原生 SDK 的鉴权方式、模型名称和生成参数差异较大，OpenCompass 仅负责将统一的评测输入转换为相应协议。使用前应查阅对应厂商提供的官方接口文档，并核对当前 SDK 版本与 API 账号权限。下面提供部分主流厂商 SDK 的配置实例：
 
-模型配置负责模型协议、生成参数、资源和接口行为；数据集配置负责题目内容、Prompt 和评分方式。模型专属特殊 token 应由 tokenizer chat template 或[模型侧对话模板协议](../prompt/meta_template.md)管理，通用题目指令优先放在数据集侧的 [RawPromptTemplate](../prompt/raw_prompt_template.md)。
-
-## 选择现有配置
-
-```bash
-python tools/list_configs.py gpt openai
-```
-
-打开命中的配置并核对模型版本、依赖、上下文长度和生成参数。目录中存在配置只表示已提供接入样例，不保证它与当前服务版本、显卡或推理框架版本兼容。
-
-## 接口与推理服务模型
-
-API 模型不占用本地 GPU，但受鉴权、限流、网络、服务端模型版本和费用影响。OpenCompass 提供 OpenAI 及 OpenAI SDK 兼容实现，也包含若干厂商适配器；应优先复用最接近目标协议的现有配置。API 模型通常设置 `run_cfg.num_gpus=0`。
-
-### 常用 API 模型类型
-
-#### OpenAISDK
-
-`OpenAISDK` 通过 OpenAI SDK 调用 Chat Completions，是官方 OpenAI、vLLM/LMDeploy serve、中转网关及其他 OpenAI 兼容 endpoint 的通用入口。
+Gemini SDK 示例：
 
 ```python
-from opencompass.models import OpenAISDK
+import os
 
-model = dict(type=OpenAISDK, abbr='openai-compatible-model',
-             path='served-model-name', key='ENV',
-             openai_api_base='https://api.openai.com/v1',
-             query_per_second=1, retry=3)
-```
-
-重点核对 `key`、`openai_api_base`、`query_per_second`、`retry`、`max_workers` 与 `openai_extra_kwargs`。
-
-#### OpenAISDKStreaming
-
-`OpenAISDKStreaming` 是 `OpenAISDK` 的流式子类，默认设置 `stream=True`，逐 token 接收服务端返回，适合长输出防超时和观察实时生成。
-
-```python
-from opencompass.models import OpenAISDKStreaming
-
-model = dict(type=OpenAISDKStreaming, abbr='openai-compatible-streaming',
-             path='served-model-name', key='ENV',
-             openai_api_base='https://api.openai.com/v1',
-             timeout=3600, retry=3)
-```
-
-除 `OpenAISDK` 的通用参数外，还可关注 `stream`、`timeout`、`finish_reason_confirm` 和 `stream_chunk_size`。
-
-#### GeminiSDK
-
-`GeminiSDK` 使用 Google Gen AI SDK，密钥从 `GOOGLE_API_KEY` 或 `GEMINI_API_KEY` 读取，并支持 Gemini thinking 配置。
-
-```python
 from opencompass.models import GeminiSDK
-
-model = dict(type=GeminiSDK, abbr='gemini-sdk',
-             path='gemini-2.5-flash', key='ENV',
-             thinking=dict(thinking_budget=1024),
-             gemini_extra_kwargs=dict(), retry=3)
-```
-
-私有或代理服务可设置 `base_url`；其他生成参数通过 `thinking`、`gemini_extra_kwargs` 和 `client_extra_kwargs` 传入。
-
-#### ClaudeSDK
-
-`ClaudeSDK` 基于 Anthropic Messages SDK，使用 `ANTHROPIC_API_KEY`，支持 thinking 与 Anthropic SDK 的额外请求参数。
-
-```python
-from opencompass.models import ClaudeSDK
-
-model = dict(type=ClaudeSDK, abbr='claude-sdk', path='claude-opus-5',
-             key='ENV', thinking=dict(type='enabled', budget_tokens=1024),
-             claude_extra_kwargs=dict(), retry=3)
-```
-
-可通过 `base_url`、`extra_headers` 和 `claude_extra_kwargs` 适配 Anthropic 兼容服务；完整示例见 `configs/models/claude/claude_opus_5.py`。
-
-#### OpenAISDKResponse
-
-`OpenAISDKResponse` 调用 OpenAI Responses API（`client.responses.create`），是本轮基础教程中 gpt-6-astra 的默认模型类。`openai_extra_kwargs` 可直接透传 `reasoning` 等 Responses 参数。
-
-```python
-from opencompass.models import OpenAISDKResponse
-
-model = dict(type=OpenAISDKResponse, abbr='gpt-6-astra-response',
-             path='gpt-6-astra', key='ENV',
-             openai_api_base='https://api.openai.com/v1',
-             openai_extra_kwargs=dict(reasoning=dict(effort='max')),
-             retry=10)
-```
-
-Responses API 的请求关键字放入 `openai_extra_kwargs`；也可使用兼容别名 `response_kwargs`。完整配置见 `configs/models/openai/gpt_6_astra.py`。
-
-### OpenAI 兼容配置
-
-自建或第三方服务只要暴露 OpenAI Chat Completions 兼容接口，通常都可以用 `OpenAISDK` 接入：
-
-```python
-from opencompass.models import OpenAISDK
 
 models = [
     dict(
-        type=OpenAISDK,
-        abbr='my-api-model',
-        path='served-model-name',
-        key='ENV',
-        openai_api_base='https://example.com/v1',
+        type=GeminiSDK,
+        abbr='gemini-3.1-pro-preview',
+        path='gemini-3.1-pro-preview',
+        key='GEMINI_API_KEY',
+        max_seq_len=1000000,
+        max_out_len=65536,
         query_per_second=1,
-        max_seq_len=32768,
-        max_out_len=4096,
+        max_workers=8,
+        retry=10,
+        temperature=1.0,
+        thinking=dict(thinking_level='high', include_thoughts=True),
         batch_size=8,
-        run_cfg=dict(num_gpus=0),
     )
 ]
 ```
 
-密钥不要写入提交到 Git 的配置。不同模型类读取的环境变量和 endpoint 字段可能不同，使用前应检查对应类与仓库示例。
+Claude SDK 示例：
 
-### 通过部署推理加速服务来运行
+```python
+import os
 
-当显存或吞吐不足、需要多人共享模型服务，或希望让评测与推理解耦时，可以先用 vLLM 或 LMDeploy 启动 OpenAI 兼容服务，再让 OpenCompass 通过 `OpenAISDK` 请求服务。
+from opencompass.models import ClaudeSDK
 
-下面以 LMDeploy 为例启动服务：
+models = [
+    dict(
+        type=ClaudeSDK,
+        abbr='claude-opus-5',
+        path='claude-opus-5',
+        key='ANTHROPIC_API_KEY',
+        max_seq_len=1000000,
+        max_out_len=131072,
+        query_per_second=1,
+        max_workers=8,
+        retry=10,
+        temperature=1.0,
+        thinking=dict(type='adaptive'),
+        claude_extra_kwargs=dict(
+            output_config=dict(effort='max'),
+        ),
+        batch_size=8,
+    )
+]
+```
+
+### 本地部署推理服务来进行评测
+
+如果拥有本地 GPU 资源，并希望使用 OpenCompass 评测本地部署的模型，建议将模型部署与评测流程解耦：先通过 LMDeploy 等推理后端启动独立服务，再由 OpenCompass 的 API 模型类调用该服务。以下示例使用 LMDeploy 部署模型：
 
 ```bash
 lmdeploy serve api_server Qwen/Qwen3.5-35B-A3B \
@@ -170,47 +203,84 @@ lmdeploy serve api_server Qwen/Qwen3.5-35B-A3B \
     --server-port 23333
 ```
 
-`--tp` 设置张量并行，`--session-len` 设置最大上下文窗口，`--cache-max-entry-count` 调整 k/v cache 的内存使用比例。服务启动后，将模型配置指向该地址：
+确认服务可以正常访问后，根据服务提供的接口和评测方式选择相应的模型类。对于兼容 OpenAI 格式的生成接口，可以使用 `OpenAISDK` 或 `OpenAISDKStreaming`；如果还需要使用新版 LMDeploy 提供的 PPL 接口，则可以使用 `TurboMindAPIModel`。配置示例如下：
 
 ```python
-from opencompass.models import OpenAISDK
+from opencompass.models.turbomind_api import TurboMindAPIModel
 
 models = [
     dict(
-        type=OpenAISDK,
-        abbr='Qwen3.5-35B-A3B-LMDeploy-API',
-        path='Qwen3.5-35B-A3B',
-        key='EMPTY',
-        openai_api_base='http://0.0.0.0:23333/v1',
-        tokenizer_path='Qwen/Qwen3.5-35B-A3B',
-        query_per_second=1,
-        max_out_len=8192,
-        max_seq_len=131072,
-        temperature=0.6,
+        type=TurboMindAPIModel,
+        abbr='qwen3.5-35b-a3b-lmdeploy-api',
+        model_name='Qwen3.5-35B-A3B',
+        api_addr='http://127.0.0.1:23333',
+        api_key='sk-admin',
+        max_seq_len=262144,
+        max_out_len=131072,
         batch_size=8,
-        retry=3,
-        run_cfg=dict(num_gpus=0),
+        max_workers=8,
+        retry=10,
     )
 ]
 ```
 
-新数据集使用 RawPromptTemplate 直接产生 `role/content` 消息时通常不需要额外的 `api_meta_template`；传统 PromptTemplate 需要角色映射时，再配置模型侧对话模板协议。若希望部署与评测在同一次 `opencompass` 运行中完成，参阅[本地模型的一站式部署和评测](../faq/local_model_one_stop.md)。
+模型支持范围、服务接口和启动参数可能随推理后端版本变化，请以实际使用版本的官方文档为准。
 
-### 并发、重试与确定性
+## 2. 一站式部署与评测
 
-`batch_size`、`query_per_second`、`max_workers` 和 Runner worker 数会共同影响请求并发。出现 429、超时或服务端错误时，应先按服务配额降低并发，再调整重试；无限重试可能造成重复费用。
+OpenCompass 也提供一站式部署与评测方案：评测任务直接加载本地模型权重，无需预先启动独立服务，适合快速完成单次评测。由于模型部署与评测任务相互耦合，重复加载、资源复用和故障隔离不如独立服务灵活，因此大规模或重复评测更推荐使用独立推理服务。下面给出三种可选配置；运行前应安装相应后端，并确认模型、后端版本与硬件兼容。
 
-即使 `temperature=0`，服务端升级、路由、推理实现和安全策略也可能改变回复。正式结果应记录服务模型的精确名称或版本、API base、供应方和区域、请求时间、生成参数、重试策略、配置快照及异常请求数量。
+### LMDeploy
 
-### 输入协议
+```python
+from opencompass.models import TurboMindModelwithChatTemplate
 
-新数据集优先使用 [RawPromptTemplate](../prompt/raw_prompt_template.md) 产生 `role/content` 消息。若模型配置还会通过 `meta_template` 追加 system/user 消息，必须预览最终输入，避免重复指令。推理前用极小数据集验证鉴权、消息格式、停止条件和错误处理，再扩大并发。
+models = [
+    dict(
+        type=TurboMindModelwithChatTemplate,
+        abbr='qwen3.5-35b-a3b-lmdeploy',
+        path='Qwen/Qwen3.5-35B-A3B',
+        engine_config=dict(session_len=262144, max_batch_size=8, tp=2),
+        gen_config=dict(do_sample=False),
+        max_seq_len=262144,
+        max_out_len=131072,
+        batch_size=8,
+        run_cfg=dict(num_gpus=2),
+    )
+]
+```
 
-## 本地权重模型
+`engine_config.tp` 是 LMDeploy 实际使用的张量并行度，`run_cfg.num_gpus` 是向 OpenCompass Runner 声明的占卡数，两者应保持一致。
 
-### Transformers 对话模型
+### vLLM
 
-对支持 Hugging Face chat template 的指令模型，优先使用 `HuggingFacewithChatTemplate`：
+```python
+from opencompass.models import VLLMwithChatTemplate
+
+models = [
+    dict(
+        type=VLLMwithChatTemplate,
+        abbr='qwen3.5-35b-a3b-vllm',
+        path='Qwen/Qwen3.5-35B-A3B',
+        model_kwargs=dict(
+            tensor_parallel_size=2,
+            max_model_len=262144,
+            trust_remote_code=True,
+        ),
+        generation_kwargs=dict(temperature=0),
+        max_seq_len=262144,
+        max_out_len=8192,
+        batch_size=8,
+        run_cfg=dict(num_gpus=2),
+    )
+]
+```
+
+`tensor_parallel_size` 与 `run_cfg.num_gpus` 同样应保持一致。
+
+### Hugging Face Transformers
+
+不使用推理加速后端时，可以直接通过 Transformers 加载权重：
 
 ```python
 from opencompass.models import HuggingFacewithChatTemplate
@@ -218,8 +288,8 @@ from opencompass.models import HuggingFacewithChatTemplate
 models = [
     dict(
         type=HuggingFacewithChatTemplate,
-        abbr='qwen2-1.5b-instruct-hf',
-        path='Qwen/Qwen2-1.5B-Instruct',
+        abbr='qwen2-0.5b-instruct-hf',
+        path='Qwen/Qwen2-0.5B-Instruct',
         model_kwargs=dict(device_map='auto'),
         tokenizer_kwargs=dict(padding_side='left', truncation_side='left'),
         generation_kwargs=dict(do_sample=False),
@@ -231,36 +301,4 @@ models = [
 ]
 ```
 
-`path` 可以是 Hub ID，也可以是本地权重目录。需要执行模型仓库自定义代码时才启用 `trust_remote_code=True`，并应固定可信 revision。
-
-### 基座模型与 PPL 评测
-
-基座模型或需要 token 概率的判别式任务可使用 `HuggingFaceCausalLM`。对话模型通常只使用生成式配置；不要用 PPL 配置评价只暴露聊天接口、无法返回 token 概率的模型。
-
-### 长度、批处理与显存
-
-- `max_seq_len` 应覆盖输入和生成预算；截断会改变评测题目。
-- `max_out_len` 过小会截断答案，过大会降低吞吐并增加费用。
-- `batch_size` 是 OpenCompass 送入模型的批大小，不保证后端实际按同一方式批处理。
-- 左填充通常适合 decoder-only 批量生成；是否支持 padding 仍以模型实现为准。
-- `run_cfg.num_gpus` 告诉 Runner 一个任务占几张卡，不会自动让任意模型实现张量并行。
-
-先对演示数据集执行 `--dry-run`，再用少量样本检查 prompt、截断、停止词和生成结果。显存不足时优先减小批量和上下文预算，再考虑量化或高吞吐后端。
-
-### 多卡与并行
-
-单个模型实例拆到多张卡（张量并行）时，并行度在模型配置内部设置，占卡数由 `run_cfg` 向调度声明，两者必须核对一致：
-
-```python
-models = [
-    dict(
-        type=...,                                   # 如 VLLMwithChatTemplate
-        abbr='my-model-tp2',
-        path='org/model',
-        model_kwargs=dict(tensor_parallel_size=2),  # 后端内部张量并行
-        run_cfg=dict(num_gpus=2),                   # 向调度声明的占卡数
-    )
-]
-```
-
-CLI 的 `--accelerator vllm` 或 `--accelerator lmdeploy` 可以在一次 OpenCompass 运行中转换部分 Hugging Face 模型配置。转换能力、限制及完整示例见[本地模型的一站式部署和评测](../faq/local_model_one_stop.md)。
+Hugging Face 方式便于兼容性验证，但大模型或大规模评测通常应优先考虑 [LMDeploy](https://github.com/InternLM/lmdeploy) 或 [vLLM](https://github.com/vllm-project/vllm)。运行前请按照相应后端的官方项目和文档完成安装，并确认模型与后端版本兼容。仓库已有一站式部署配置可通过 `python tools/list_configs.py <模型关键字>` 查询。

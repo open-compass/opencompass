@@ -95,7 +95,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    :caption: 其他文档
 
    faq/index.md
-   faq/local_model_one_stop.md
    faq/long_context.md
 
 索引与搜索

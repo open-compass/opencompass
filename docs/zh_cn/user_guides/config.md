@@ -4,7 +4,7 @@
 
 ## 基本格式
 
-配置文件是 Python 文件，通过顶层变量声明实验。最小评测配置包含两个列表：
+配置文件是 Python 文件，通过顶层变量声明评测配置细节。最小评测配置包含两个列表：
 
 ```python
 models = [dict(type=..., abbr='my-model', ...)]
@@ -54,7 +54,7 @@ datasets = gsm8k_datasets + math_datasets
 
 ## 覆盖导入的配置
 
-导入后可以修改列表中的字典。若同一个基础配置还会被其他变量复用，先深拷贝以避免意外联动：
+导入后可以修改列表中的字典。若同一个基础配置还会被其他变量复用，先深拷贝以避免引起误修改：
 
 ```python
 from copy import deepcopy
@@ -63,8 +63,6 @@ models = deepcopy(gpt6_models)
 models[0]['query_per_second'] = 2
 models[0]['max_workers'] = 16
 ```
-
-常见错误是直接修改共享对象，导致同一文件里另一个实验组也被改变。
 
 ## 配置对象与注册类型
 
@@ -97,20 +95,8 @@ OpenCompass 解析后会通过注册表构建对应组件。配置中的参数�
 python -c "from mmengine.config import Config; Config.fromfile('my_eval.py')"
 ```
 
-检查 OpenCompass 补齐默认项后的配置和任务切分：
+通过 `--dry-run` 检查 OpenCompass 补齐默认项后的配置和任务切分：
 
 ```bash
 opencompass my_eval.py --dry-run --config-verbose
 ```
-
-注意：`--dry-run` 仍会创建实验时间戳目录并保存最终配置快照，但不会执行推理任务。
-
-## 配置文件的维护原则
-
-- 配置名称应表达模型、数据集、提示词与评测方式的关键差异；
-- 正式评测应固定模型修订版本、数据版本及生成参数；
-- 密钥不要写入配置仓库，优先从环境变量读取；
-- 大型配置拆成模型、数据集、汇总器和实验入口，避免复制整份字典；
-- 修改后先解析，再 dry-run，最后用少量样本试跑。
-
-模型字段详见[模型接入](models.md)，数据集结构详见[数据集配置](datasets.md)，提示词优先参考 [RawPromptTemplate](../prompt/raw_prompt_template.md)。

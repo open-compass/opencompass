@@ -55,18 +55,21 @@ opencompass --help
 
 ## 数据缓存
 
-数据集通常会在首次使用时下载。在共享机器上，可以通过以下环境变量指定缓存目录：
+数据集通常会在首次使用时下载。如果已经下载了对应数据，可以通过以下环境变量指定缓存目录：
 
 ```bash
 export HF_DATASETS_CACHE=/path/to/huggingface-cache/datasets
 export COMPASS_DATA_CACHE=/path/to/opencompass-data-cache
+export LMUData=/path/to/mm-data-cache
 ```
 
-其中，`HF_DATASETS_CACHE` 用于管理 Hugging Face 数据集缓存，`COMPASS_DATA_CACHE` 用于指定 OpenCompass 的数据缓存根目录。不同数据集的下载和读取方式可能不同，详细规则及离线环境准备方法请参阅[数据来源、缓存与离线运行](../user_guides/data_and_cache.md)。
+其中，`HF_DATASETS_CACHE` 用于管理 Hugging Face 数据集缓存，`COMPASS_DATA_CACHE` 用于指定 OpenCompass 的数据缓存目录，`LMUData` 用于指定从 VLMEvalKit导入的多模态数据集的缓存目录。不同数据集的下载和读取方式可能不同，详细规则及离线环境准备方法请参阅[数据来源、缓存与离线运行](../user_guides/data_and_cache.md)。
 
 ## 检查模型及推理后端
 
-成功安装 LMDeploy 或 vLLM 并不代表目标模型一定与后端兼容。建议先使用相应后端加载一个小模型，再通过 OpenCompass 运行演示数据集。使用 API 模型时，还应检查服务地址、模型名称、密钥环境变量、限流设置和超时配置。
+完成上述安装和配置后，即可使用 API 模型进行评测。运行前，请确认服务地址、模型名称、API 密钥、限流参数及超时设置均已正确配置。
+
+如需通过 LMDeploy 或 vLLM 部署本地模型并进行一站式评测，还需确认推理后端版本与模型之间的兼容性。建议先验证后端能够正常加载并推理目标模型，再通过 OpenCompass 启动完整评测流程。
 
 ## 开始评测！
 
