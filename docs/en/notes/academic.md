@@ -103,4 +103,4 @@ After completing the above configuration file, you can enter the following conte
   opencompass examples/eval_academic_leaderboard_REALTIME.py
 ```
 
-For more detailed CLI parameters, please refer to [this document](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/experimentation.html)。
+For more detailed CLI parameters, see the [CLI Reference](../execution/cli_reference.md).

@@ -100,4 +100,4 @@ judge_cfg = dict(
   opencompass examples/eval_academic_leaderboard_REALTIME.py
 ```
 
-有关更加详细的命令行评测参数，请参阅[此文档](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/experimentation.html)。
+有关更加详细的命令行评测参数，请参阅[命令行参数参考](../execution/cli_reference.md)。
