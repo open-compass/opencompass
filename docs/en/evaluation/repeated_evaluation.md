@@ -64,4 +64,12 @@ python tools/analyze_repeat.py outputs/my_eval/20260903_120000 \
     --tokenizer gpt-4o
 ```
 
+The analysis report is written under `summary/` and mainly contains:
+
+- sample counts and mean / p75 / p90 token lengths for each benchmark, plus the length threshold used to select long replies for repetition analysis;
+- `repeat_pattern`: periodic repeated fragments, repeat counts, and repeated-fragment ratios, useful for locating loops inside replies;
+- `gzip_high_compression`: samples with abnormally high gzip compression ratios, useful for finding large repeated or highly templated outputs;
+- `missing_prediction_files`: model / dataset combinations present in the configuration but missing prediction files;
+- `abnormal_samples`: the abnormal sample list, including model, benchmark, sample ID, prediction path, triggering metrics, and the original prediction.
+
 This tool detects abnormal repetition patterns within replies; it is not a consistency analysis across repeated evaluations. The tokenizer affects repeated-fragment statistics and should be recorded.
