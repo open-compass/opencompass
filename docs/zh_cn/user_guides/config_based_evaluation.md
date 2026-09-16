@@ -117,7 +117,6 @@ opencompass my_eval.py \
 
 `--mode eval` 和 `--mode viz` 必须配合 `--reuse`，否则 OpenCompass 不知道应读取哪次预测或结果。复用逻辑详见[任务恢复、复用与只重跑评测](../execution/reuse_and_resume.md)，全部命令行参数见[命令行参数参考](../execution/cli_reference.md)。
 
-
 ## 6. 完整配置文件的结构
 
 将前面各部分合并后，完整的 `my_eval.py` 如下：
@@ -220,4 +219,3 @@ for dataset in datasets:
             and 'judge_cfg' in evaluator['llm_evaluator']):
         evaluator['llm_evaluator']['judge_cfg'] = judge_cfg
 ```
-

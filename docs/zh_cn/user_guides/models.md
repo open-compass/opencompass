@@ -2,14 +2,12 @@
 
 OpenCompass 的一个标准模型配置将包含下面的信息：模型类别、上下文等模型超参、推理并发数、部署所需资源等等。主要有以下几个模型类别。
 
-
-| 部署形态                   | 推荐入口                                               | 适用场景                                |
-| -------------------------- | ------------------------------------------------------ | --------------------------------------- |
-| OpenAI 兼容服务            | `OpenAISDK`、`OpenAISDKStreaming`、`OpenAISDKResponse`                       | OpenAI 官方接口、自建 OpenAI 格式推理服务、中转网关 |
-| 其它厂商 API                   | `GeminiSDK`、`ClaudeSDK` 等模型类                  | 使用厂商原生协议、鉴权及参数传入        |
-| 本地推理引擎加速           | `TurboMindModelwithChatTemplate`（LMDeploy）及 `VLLMwithChatTemplate`（vLLM）等模型类                                | 一站式部署与评测                  |
-| 本地 Hugging Face 原生加载 | `HuggingFacewithChatTemplate` 或 `HuggingFaceCausalLM` | 一站式部署与评测                  |
-
+| 部署形态                   | 推荐入口                                                                              | 适用场景                                            |
+| -------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| OpenAI 兼容服务            | `OpenAISDK`、`OpenAISDKStreaming`、`OpenAISDKResponse`                                | OpenAI 官方接口、自建 OpenAI 格式推理服务、中转网关 |
+| 其它厂商 API               | `GeminiSDK`、`ClaudeSDK` 等模型类                                                     | 使用厂商原生协议、鉴权及参数传入                    |
+| 本地推理引擎加速           | `TurboMindModelwithChatTemplate`（LMDeploy）及 `VLLMwithChatTemplate`（vLLM）等模型类 | 一站式部署与评测                                    |
+| 本地 Hugging Face 原生加载 | `HuggingFacewithChatTemplate` 或 `HuggingFaceCausalLM`                                | 一站式部署与评测                                    |
 
 下文分别介绍通过 API 调用模型，以及在 OpenCompass 进程中一站式加载本地权重并完成评测的配置方法；自定义后端参阅[新增模型后端](../extension/new_model.md)。
 
@@ -21,20 +19,20 @@ API 模型由远端服务完成推理，OpenCompass 负责编排请求并保存�
 
 常用字段如下。不同模型类支持的参数并不完全相同，应以对应类的构造函数和仓库中的现有配置为准。
 
-| 参数 | 说明 |
-| ---- | ---- |
-| `type` | OpenCompass 使用的模型类，例如 `OpenAISDKResponse`。 |
-| `abbr` | 模型简称，用于输出目录、结果文件和汇总表。 |
-| `path` | 服务端模型名称；部分模型类使用其他字段，例如 `TurboMindAPIModel` 使用 `model_name`。 |
-| `key` | API 密钥。可直接传入字符串，也可通过 `os.getenv()` 读取自定义环境变量。 |
-| `max_seq_len` | 模型允许的最大序列长度，输入与输出之和不应超过该值。 |
-| `max_out_len` | 单次请求允许生成的最大 token 数。数据集侧 Inferencer 显式设置同名参数时，以数据集配置为准。 |
-| `temperature` | 采样温度；可用范围和实际语义以服务端实现为准。 |
-| `query_per_second` | 每秒请求数上限。设置过高可能触发服务端限流。 |
-| `batch_size` | `Inferencer` 推理时的批处理大小。评测使用 `OpenICLInferTask` 时，等效于 API 并发线程数。 |
-| `max_workers` | API 请求的最大并发线程数，仅适用于声明了该参数的模型类。评测使用 `OpenICLInferConcurrentTask` 时，`max_workers` 成为控制此模型并发的唯一参数。 |
-| `retry` | 请求失败后的最大重试次数。 |
-| `tokenizer_path` | 估算输入长度的 tokenizer 名称或路径。使用中转服务或自定义模型名时通常需要显式指定。 |
+| 参数               | 说明                                                                                                                                           |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`             | OpenCompass 使用的模型类，例如 `OpenAISDKResponse`。                                                                                           |
+| `abbr`             | 模型简称，用于输出目录、结果文件和汇总表。                                                                                                     |
+| `path`             | 服务端模型名称；部分模型类使用其他字段，例如 `TurboMindAPIModel` 使用 `model_name`。                                                           |
+| `key`              | API 密钥。可直接传入字符串，也可通过 `os.getenv()` 读取自定义环境变量。                                                                        |
+| `max_seq_len`      | 模型允许的最大序列长度，输入与输出之和不应超过该值。                                                                                           |
+| `max_out_len`      | 单次请求允许生成的最大 token 数。数据集侧 Inferencer 显式设置同名参数时，以数据集配置为准。                                                    |
+| `temperature`      | 采样温度；可用范围和实际语义以服务端实现为准。                                                                                                 |
+| `query_per_second` | 每秒请求数上限。设置过高可能触发服务端限流。                                                                                                   |
+| `batch_size`       | `Inferencer` 推理时的批处理大小。评测使用 `OpenICLInferTask` 时，等效于 API 并发线程数。                                                       |
+| `max_workers`      | API 请求的最大并发线程数，仅适用于声明了该参数的模型类。评测使用 `OpenICLInferConcurrentTask` 时，`max_workers` 成为控制此模型并发的唯一参数。 |
+| `retry`            | 请求失败后的最大重试次数。                                                                                                                     |
+| `tokenizer_path`   | 估算输入长度的 tokenizer 名称或路径。使用中转服务或自定义模型名时通常需要显式指定。                                                            |
 
 ### OpenAISDK：Chat Completions
 
