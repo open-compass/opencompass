@@ -963,6 +963,94 @@ class OpenAISDK(OpenAI):
 
 
 @MODELS.register_module()
+class OpenAISDKCompletion(OpenAISDK):
+    """OpenAI SDK model wrapper using the legacy completion API.
+
+    The completion endpoint accepts a single text prompt instead of chat
+    messages. It is useful for tasks where applying a chat template would
+    trigger unnecessary reasoning, but does not support multimodal content,
+    function calls, or other role-aware interactions.
+    """
+
+    def _generate(
+        self,
+        input: PromptType,
+        max_out_len: int,
+        temperature: float,
+    ) -> str:
+        from openai import APIStatusError, BadRequestError
+
+        assert isinstance(input, (str, list, PromptList))
+
+        messages, max_out_len = self._preprocess_messages(
+            input, max_out_len, self.max_seq_len, self.mode,
+            self.get_token_len)
+        prompt_parts = []
+        for message in messages:
+            content = message['content']
+            if not isinstance(content, str):
+                raise TypeError(
+                    'OpenAISDKCompletion only supports text prompts.')
+            prompt_parts.append(content)
+        prompt = '\n'.join(prompt_parts)
+
+        num_retries = 0
+        while num_retries < self.retry:
+            query_data = dict(
+                model=self.path,
+                prompt=prompt,
+                max_tokens=max_out_len,
+                n=1,
+                temperature=self.temperature
+                if self.temperature is not None else temperature,
+                extra_body=self.extra_body,
+            )
+            if self.openai_extra_kwargs:
+                query_data.update(self.openai_extra_kwargs)
+
+            self.acquire()
+            try:
+                if self.verbose:
+                    self.logger.info('Start calling OpenAI completion API')
+
+                responses = self.openai_client.completions.create(
+                    **query_data, timeout=self.timeout)
+                if self.verbose:
+                    self.logger.info(
+                        'Successfully get response from OpenAI completion API '
+                        'with query: %s', query_data)
+
+                choice = responses.choices[0] if responses.choices else None
+                content = getattr(choice, 'text', '') if choice else ''
+                if content:
+                    return content
+                if choice and choice.finish_reason in ('stop',
+                                                       'content_filter'):
+                    return ''
+
+                self.logger.error(
+                    'Failed to extract content from the responses. '
+                    'API responses: %s', responses)
+            except (BadRequestError, APIStatusError) as e:
+                status_code = e.status_code
+                if (status_code is not None
+                        and status_code in self.status_code_mappings):
+                    return self.status_code_mappings[status_code]
+                self.logger.error(f'error occurs at {self.openai_api_base}')
+                self.logger.error(e)
+            except Exception as e:
+                self.logger.error(f'error occurs at {self.openai_api_base}')
+                self.logger.error(e)
+            finally:
+                self.release()
+            num_retries += 1
+
+        raise RuntimeError('Calling OpenAI completion API failed after '
+                           f'retrying for {self.retry} times. Check the logs '
+                           'for details.')
+
+
+@MODELS.register_module()
 class OpenAISDKRollout(OpenAI):
 
     def __init__(
