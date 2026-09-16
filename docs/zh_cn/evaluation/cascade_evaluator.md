@@ -15,26 +15,28 @@
 
 评测任务调用 `score()` 后，内部按以下流程执行：
 
-1. **逐样本规则评测**：对每条预测先应用规则评测器的 `pred_postprocess`，再调用规则评测器对单条样本打分，结果记入该样本的 `rule_evaluation`；日志会输出规则准确率（`Rule-based evaluation: ...`）。
-2. **收集待复核样本**：级联模式收集规则判错的样本，并行模式收集全部样本；日志中的 `Samples requiring LLM evaluation (...)` 即待复核数量。
+1. **逐样本初始评测**：如果提供了 `rule_evaluator`，会先应用其 `pred_postprocess`，再调用规则评测器或 `sample_score_fn` 对单条样本打分；如果只提供 `sample_score_fn`，则直接使用原始预测打分。结果记入该样本的 `rule_evaluation`；日志会输出初始评测准确率（`Rule-based evaluation: ...`）。
+2. **收集待复核样本**：级联模式收集初始评测判错的样本，并行模式收集全部样本；日志中的 `Samples requiring LLM evaluation (...)` 即待复核数量。
 3. **构造评判子集**：从原测试集中 `select` 出待复核样本，并附加 `prediction`、`reference` 两列。`llm_evaluator` 的 `dataset_cfg` 会被自动置空，直接使用这个子集，因此 judge 模板可以引用题目、参考答案、模型预测等全部数据列。
 4. **LLM 评判**：调用 `llm_evaluator.score()`——内部就是对 judge 模型的一次完整 `GenInferencer` 推理，结果写入 `<结果目录>_llm_judge_replica<N>.json`（N 为重复运行编号）。
 5. **判定与汇总**：从 judge 明细中提取判定，按模式合并出最终 `accuracy`，并为每条样本写入 `cascade_correct`。
 
-第 2 步的判定口径依次检查 judge 明细中的 `prediction` / `llm_judge` 字段是否为 `"A"` 或以 `"CORRECT"` 开头，其次是 `correct` 布尔值和 `score > 0.5`。因此 **judge 模板必须要求模型只回复 A / B**（或 CORRECT / INCORRECT），与 [LLM 作为评判器](llm_judge.md)中的模板约定一致；judge 输出成段解释文字时会被判为错误。
+第 5 步的判定口径依次检查 judge 明细中的 `prediction` / `llm_judge` 字段是否为 `"A"` 或以 `"CORRECT"` 开头，其次是 `correct` 布尔值和 `score > 0.5`。因此 **judge 模板必须要求模型只回复 A / B**（或 CORRECT / INCORRECT），与 [LLM 作为评判器](llm_judge.md)中的模板约定一致；judge 输出成段解释文字时会被判为错误。
 
 ## 配置说明
 
 `CascadeEvaluator` 的参数：
 
-| 参数              | 类型              | 说明                                                    |
-| ----------------- | ----------------- | ------------------------------------------------------- |
-| `llm_evaluator`   | dict，必填        | LLM 评判器配置，通常是 `GenericLLMEvaluator`            |
-| `rule_evaluator`  | dict              | 规则评测器配置，如 `MATHVerifyEvaluator`                |
-| `sample_score_fn` | Callable          | 自定义单样本打分函数，返回含 `correct` 的 dict 或布尔值 |
-| `parallel`        | bool，默认 `True` | `False` 为级联模式，`True` 为并行模式                   |
+| 参数              | 类型                                      | 说明                                                    |
+| ----------------- | ----------------------------------------- | ------------------------------------------------------- |
+| `llm_evaluator`   | dict，必填                                | LLM 评判器配置，通常是 `GenericLLMEvaluator`            |
+| `rule_evaluator`  | dict                                      | 规则评测器配置，如 `MATHVerifyEvaluator`                |
+| `sample_score_fn` | `Callable[[str, str, Any], dict \| bool]` | 自定义单样本打分函数，返回含 `correct` 的 dict 或布尔值 |
+| `parallel`        | bool，默认 `True`                         | `False` 为级联模式，`True` 为并行模式                   |
 
-`rule_evaluator` 与 `sample_score_fn` 至少提供一个（否则初始化即报错）；但评分流程还会调用规则评测器的 `pred_postprocess`，因此实际使用中应始终提供 `rule_evaluator`。
+`rule_evaluator` 与 `sample_score_fn` 至少提供一个（否则初始化即报错）。若提供 `rule_evaluator`，评分前会先应用其 `pred_postprocess`；若只提供 `sample_score_fn`，则直接使用原始预测调用 `sample_score_fn`。如果同时提供二者，`sample_score_fn` 优先负责单样本打分，且收到的是经过 `rule_evaluator.pred_postprocess` 处理后的预测。
+
+`sample_score_fn` 的调用形式是 `sample_score_fn(prediction, reference, test_item)`：`prediction` 是单条模型预测，`reference` 是对应参考答案，`test_item` 是原始测试样本（没有传入 `test_set` 时为 `None`）。如果返回 dict，至少应包含 `correct` 字段，例如 `{'correct': True, 'pred': prediction, 'answer': reference}`；其他字段会保留在逐样本评测明细中。如果返回非 dict，框架会用 `bool(result)` 转成 `correct`，并自动补充 `pred` 和 `answer`。
 
 LLM 评判所需的测试集由评测任务自动传入，`llm_evaluator.dataset_cfg` 只是为了满足 `GenericLLMEvaluator` 的构造要求，级联评测时会被置空、不会重复加载数据集。judge 模型通过 `judge_cfg` 指定：留空（`dict()`）时读取环境变量 `OC_JUDGE_MODEL` / `OC_JUDGE_API_KEY` / `OC_JUDGE_API_BASE`，也可以填入任意的模型配置（本地或接口模型均可）。
 

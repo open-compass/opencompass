@@ -15,8 +15,8 @@ The `parallel` argument selects one of two modes:
 
 After the evaluation task calls `score()`, the evaluator performs:
 
-1. **Per-sample rule evaluation:** apply the rule evaluator's `pred_postprocess` to each prediction, then score that sample and store the result in `rule_evaluation`. The log prints rule accuracy as `Rule-based evaluation: ...`.
-2. **Collect samples for review:** cascade mode collects rule-incorrect samples; parallel mode collects all samples. `Samples requiring LLM evaluation (...)` in the log reports the count.
+1. **Per-sample initial evaluation:** if `rule_evaluator` is provided, apply its `pred_postprocess` before scoring the sample with the rule evaluator or `sample_score_fn`; if only `sample_score_fn` is provided, score the raw prediction directly. The result is stored in `rule_evaluation`. The log prints the initial evaluation accuracy as `Rule-based evaluation: ...`.
+2. **Collect samples for review:** cascade mode collects samples marked incorrect by the initial evaluation; parallel mode collects all samples. `Samples requiring LLM evaluation (...)` in the log reports the count.
 3. **Build the judging subset:** `select` samples from the original test set and append `prediction` and `reference` columns. The `llm_evaluator`'s `dataset_cfg` is cleared automatically and this subset is used directly, so the judge template can refer to every data column, including the question, reference, and model prediction.
 4. **LLM judging:** call `llm_evaluator.score()`, which performs a complete `GenInferencer` run against the judge model. Results are written to `<result directory>_llm_judge_replica<N>.json`, where N is the repeated-run index.
 5. **Decision and aggregation:** extract decisions from judge details, combine them according to the selected mode into final `accuracy`, and write `cascade_correct` for every sample.
@@ -27,14 +27,16 @@ Step 5 checks whether `prediction` / `llm_judge` in judge details equals `"A"` o
 
 `CascadeEvaluator` arguments:
 
-| Argument          | Type                 | Description                                                                      |
-| ----------------- | -------------------- | -------------------------------------------------------------------------------- |
-| `llm_evaluator`   | required dict        | LLM judge configuration, normally `GenericLLMEvaluator`                          |
-| `rule_evaluator`  | dict                 | Rule evaluator configuration, such as `MATHVerifyEvaluator`                      |
-| `sample_score_fn` | Callable             | Custom per-sample scoring function returning a dict with `correct`, or a boolean |
-| `parallel`        | bool, default `True` | `False` selects cascade mode; `True` selects parallel mode                       |
+| Argument          | Type                                      | Description                                                                      |
+| ----------------- | ----------------------------------------- | -------------------------------------------------------------------------------- |
+| `llm_evaluator`   | required dict                             | LLM judge configuration, normally `GenericLLMEvaluator`                          |
+| `rule_evaluator`  | dict                                      | Rule evaluator configuration, such as `MATHVerifyEvaluator`                      |
+| `sample_score_fn` | `Callable[[str, str, Any], dict \| bool]` | Custom per-sample scoring function returning a dict with `correct`, or a boolean |
+| `parallel`        | bool, default `True`                      | `False` selects cascade mode; `True` selects parallel mode                       |
 
-At least one of `rule_evaluator` and `sample_score_fn` must be supplied, otherwise initialization fails. Because the scoring workflow also calls the rule evaluator's `pred_postprocess`, practical configurations should always provide `rule_evaluator`.
+At least one of `rule_evaluator` and `sample_score_fn` must be supplied, otherwise initialization fails. If `rule_evaluator` is provided, its `pred_postprocess` is applied before scoring; if only `sample_score_fn` is provided, the raw prediction is passed to `sample_score_fn` directly. If both are provided, `sample_score_fn` takes precedence for per-sample scoring and receives the prediction after `rule_evaluator.pred_postprocess`.
+
+`sample_score_fn` is called as `sample_score_fn(prediction, reference, test_item)`: `prediction` is one model prediction, `reference` is the corresponding reference answer, and `test_item` is the original test sample (`None` when no `test_set` is passed). If it returns a dict, the dict should contain at least `correct`, for example `{'correct': True, 'pred': prediction, 'answer': reference}`; extra fields are kept in per-sample evaluation details. If it returns a non-dict value, the framework converts `bool(result)` to `correct` and automatically adds `pred` and `answer`.
 
 The evaluation task supplies the test set required for LLM judging. `llm_evaluator.dataset_cfg` exists only to satisfy construction of `GenericLLMEvaluator`; cascade evaluation clears it and does not load the dataset again. `judge_cfg` specifies the judge model: an empty `dict()` reads `OC_JUDGE_MODEL` / `OC_JUDGE_API_KEY` / `OC_JUDGE_API_BASE`, or it can contain any local or API model configuration.
 
