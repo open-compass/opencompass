@@ -802,6 +802,12 @@ class OpenAISDK(OpenAI):
         # Create fresh client with current key
         http_client_cfg = self.http_client_cfg.copy()
         set_proxy_cfg(http_client_cfg, self.proxy_url)
+        # httpx defaults follow_redirects to False, and openai-python only
+        # applies its own follow_redirects=True when it builds the client
+        # itself -- supplying http_client bypasses that. Without this, any
+        # endpoint that answers with a redirect (common for hosted gateways)
+        # surfaces the raw redirect response as an API error.
+        http_client_cfg.setdefault('follow_redirects', True)
         limits = httpx.Limits(max_keepalive_connections=2048,
                               max_connections=4096)
         http_client = httpx.Client(**http_client_cfg,
@@ -1024,6 +1030,9 @@ class OpenAISDKRollout(OpenAI):
                     'http://': self.proxy_url,
                     'https://': self.proxy_url,
                 }
+            # See the note in OpenAISDK._create_fresh_client: a supplied
+            # http_client loses openai-python's follow_redirects=True default.
+            http_client_cfg.setdefault('follow_redirects', True)
 
         self.openai_client = OpenAI(
             base_url=self.openai_api_base,
