@@ -4,7 +4,7 @@
 
 ## 后处理器
 
-后处理器应是可重复、无副作用的转换，并明确处理空回复、多个答案、格式错误和异常值。配置通常位于 Dataset 的 `eval_cfg`：
+后处理器应是可重复、无副作用的转换，并明确处理空回复、多个答案、格式错误和异常值。普通 Dataset 配置应优先将后处理器放在 `eval_cfg` 顶层：`pred_postprocessor` 在进入 Evaluator 前处理模型预测，`dataset_postprocessor` 处理测试集中的参考答案。
 
 ```python
 eval_cfg = dict(
@@ -13,6 +13,19 @@ eval_cfg = dict(
     evaluator=dict(type=MyEvaluator),
 )
 ```
+
+`pred_postprocessor` 也可以配置在 `eval_cfg.evaluator` 内部。此时 Evaluator 的构造函数必须接收该参数并传给 `BaseEvaluator`，基类会在每份重复运行调用 `score()` 前应用它：
+
+```python
+eval_cfg = dict(
+    evaluator=dict(
+        type=MyEvaluator,
+        pred_postprocessor=dict(type='my_pred_postprocess'),
+    ),
+)
+```
+
+这两种配置位于不同的执行阶段，并且会依次生效，而不是互相覆盖。同一个后处理器不要同时配置在两处，否则预测会被重复处理。除非后处理逻辑需要与特定 Evaluator 绑定，否则推荐使用第一种 Dataset 级配置。
 
 ## Evaluator
 
@@ -43,18 +56,47 @@ class MyEvaluator(BaseEvaluator):
                 'details': details}
 ```
 
-评测任务不直接调用 `score()`，而是经过基类的 `evaluate(k, n, original_dataset, **score_kwargs)`，它依次完成：
+### score() 参数来源
 
-1. 按 `score()` 的函数签名组装参数——`predictions`、`references`、`test_set`，以及测试集中与签名参数同名的其他列（需要题目元信息时直接在签名里声明列名即可）；
-2. 按 `n` 把预测切成 n 份逐份评分，评分前对每份应用 `pred_postprocessor`；
-3. 数值指标跨份取均值，`n > 1` 时指标名追加 `(n runs average)`；
+`score()` 的参数并不限于 `predictions` 和 `references`，但必须是评测任务能够提供的字段。当前 `OpenICLEvalTask` 会先收集预测文件中的字段，再补充或覆盖 `predictions`、`references`、`test_set` 和 `origin_prompt`，最后按照 `score()` 的函数签名选取同名字段传入。
+
+不要在 `score()` 中使用 `**kwargs`。当前实现会将它识别为名为 `kwargs` 的参数，但评测任务没有提供这个字段，因而会在组装参数时出错。也不要直接声明只存在于 Dataset 中的列名；评测任务不会自动展开 Dataset 的任意列，需要题目、选项、测试用例或其他元信息时，应声明 `test_set` 并从中读取。
+
+常用参数如下，其中前四个由评测任务补充或覆盖，其余参数只有在 inferencer 将同名字段写入预测文件时才可使用：
+
+| 参数               | 含义                                                                                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `predictions`      | 模型预测结果列表。生成式任务中，这是经过已配置的模型级、Dataset 级和 Evaluator 级后处理后的结果；一次返回多条候选时也可能是列表的列表。 |
+| `references`       | 参考答案列表，来自 `reader_cfg.output_column` 指定的测试集列；未配置 `output_column` 时为 `None`。                                      |
+| `test_set`         | 当前测试集的 `datasets.Dataset` 对象，已经过可选的 `dataset_postprocessor` 处理。Dataset 中未单独传入的字段应通过该对象读取。           |
+| `origin_prompt`    | 推理阶段写入预测文件的原始 prompt 或 message；预测文件没有该字段时，评测任务会补成与预测数量等长的 `None` 列表。                        |
+| `gold`             | 预测文件中的标准答案字段，通常由部分 inferencer 写入；它不等同于固定提供的 `references`，只有预测文件包含该字段时才能声明。             |
+| `steps`            | 预测文件或自定义推理流程写入的中间步骤信息，常用于同时评估最终答案和推理步骤。                                                          |
+| `res_length`       | 生成结果的长度统计，通常在开启结果长度 dump 时由生成式 inferencer 写入。                                                                |
+| `all_input_length` | 输入 prompt 或 message 的总长度统计，通常与 `res_length` 一起用于分析输入输出长度。                                                     |
+| `ppl`              | PPL/困惑度相关推理结果，通常由 PPL 类 inferencer 或自定义预测文件提供。                                                                 |
+| `token_len`        | 与 `ppl` 配套的 token 数量，用于按 token 数归一化 PPL 等指标。                                                                          |
+| `loss`             | 损失值列表，常用于 BPC 等基于 loss 的指标。                                                                                             |
+| `total_chr_num`    | 与 `loss` 配套的字符数量，常用于计算 bits per character。                                                                               |
+| `mink`             | Min-K 概率类统计值，供对应的 Min-K evaluator 使用。                                                                                     |
+| `prompt`           | 预测文件中的 prompt 字段，部分 PPL/条件概率类推理流程会记录该字段。                                                                     |
+| `choices`          | 条件概率类推理流程写入的候选项列表。                                                                                                    |
+| `pred_label`       | 条件概率类推理流程根据分数选出的预测标签。                                                                                              |
+
+除上述字段外，如果自定义 inferencer 在预测文件中写入了其他键，也可以在 `score()` 中声明同名参数。由于这些字段依赖具体推理流程，使用前应先确认预测文件确实包含它们。
+
+参数组装完成后，评测任务不会直接调用 `score()`，而是调用基类的 `evaluate(k, n, original_dataset, **score_kwargs)`。基类依次完成：
+
+1. 按 `n` 将同一数据集的多轮推理结果划分为独立批次，每批包含一轮完整数据集对应的参数；
+2. 对每份预测应用 Evaluator 内部的 `pred_postprocessor`，再调用 `score()`；
+3. 汇总各份的数值指标，`n > 1` 时计算均值并在指标名后追加 `(n runs average)`；但当前实现只有在 `score()` 每次调用都返回完整且非空的 `details` 时才会返回该聚合结果，否则最终返回最后一份的评分结果；
 4. 弹出并聚合 `details`，跨份按样本分组。
 
 ### score() 方法的格式
 
 - 返回 `dict[指标名, 数值]`，数值必须是 `int` / `float`——汇总阶段只保留数值型结果，其他类型会被静默丢弃；返回含 `'error'` 键时整条结果被跳过并在日志中记录；
 - 指标名要稳定、可读。常见名称（`accuracy`、`exact_match`、`f1`、`rouge1` 等）在汇总表中排序靠前，冷门名称排在白名单之后；
-- 可选返回 `'details'`（`list[dict]`）：基类会跨重复运行聚合并写回结果文件，供 `--dump-eval-details` 逐条复核。每条 detail 若带 `correct` / `is_correct` / `cascade_correct` 布尔字段，在 `n > 1` 且 `k > 1` 时基类还会自动计算 G-Pass@k、mG-Pass@k 等跨次指标；
+- `'details'`（`list[dict]`）在接口形式上可选，但当前实现存在限制：当 `n > 1` 且需要正确返回跨份平均指标时，`score()` 每次调用都必须返回与当前批次样本一一对应的完整且非空 `details`；否则最终只会返回最后一份的评分结果。基类会将 `details` 跨重复运行聚合并写回结果文件，供 `--dump-eval-details` 逐条复核。每条 detail 不必包含正确性字段；只有计算 G-Pass@k、mG-Pass@k 等跨次指标时，才需要提供 `correct` / `is_correct` / `cascade_correct` 布尔字段；
 - 自定义类不应重写 `evaluate()`，除非确有必要改变重复运行的切分语义。
 
 实现时应返回稳定的指标名称，并针对正常、空输入、解析失败、边界值及多参考答案编写测试。若评测器会访问网络、调用 Judge 或执行代码，必须提供超时、错误记录和隔离策略。

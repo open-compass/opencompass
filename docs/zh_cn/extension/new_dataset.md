@@ -22,46 +22,7 @@
            pass
    ```
 
-   - （可选）如果 OpenCompass 已有的评测器不能满足需要，需要用户定义 `MyDatasetEvaluator` 类，实现评分方法 `score`，并注册到 `ICL_EVALUATORS`。`score` 的参数不是固定只有 `predictions` 和 `references`；评测任务会根据 `score` 的函数签名传入可用字段。自定义评测器应按需要显式声明参数，并返回一个包含指标名称和分数的字典。具体示例如下：
-
-   ```python
-   from typing import List
-
-   from opencompass.openicl.icl_evaluator import BaseEvaluator
-   from opencompass.registry import ICL_EVALUATORS
-
-   @ICL_EVALUATORS.register_module()
-   class MyDatasetEvaluator(BaseEvaluator):
-
-       def score(self, predictions: List, references: List, test_set=None) -> dict:
-           pass
-
-   ```
-
-   当前 `OpenICLEvalTask` 会先从预测文件中收集已有字段，再补充或覆盖 `predictions`、`references`、`test_set`、`origin_prompt`，最后按 `score` 的函数签名取同名字段传入。因此，`score` 只能声明当前评测任务能够提供的字段名，不要写 `**kwargs`。在当前实现中，`**kwargs` 会被 `inspect.signature` 视为名为 `kwargs` 的参数，但传参字典中没有 `kwargs` 这个键，过滤参数时会尝试读取 `preds['kwargs']` 并导致错误。
-
-   `score` 中常用和当前已有 evaluator 中出现过的参数如下，其中前四个是评测任务固定补充或覆盖的字段，其余字段需要由 inferencer 或预测文件提供：
-
-   | 参数               | 含义                                                                                                                                                            |
-   | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-   | `predictions`      | 模型预测结果列表。生成式任务中，这是经过 `pred_role` 抽取以及模型级、数据集级 `pred_postprocessor` 处理后的预测文本；如果一次返回多条候选，也可能是列表的列表。 |
-   | `references`       | 参考答案列表，来自 `reader_cfg.output_column` 指定的测试集列；如果没有配置 `output_column`，则为 `None`。                                                       |
-   | `test_set`         | 当前测试集的 `datasets.Dataset` 对象。它已经过可选的 `dataset_postprocessor` 处理，可用于读取除参考答案以外的原始字段，例如题目、选项、测试用例或元信息。       |
-   | `origin_prompt`    | 推理阶段写入预测文件的原始 prompt 或 message。若预测文件中没有该字段，评测任务会补成与预测数量等长的 `None` 列表。                                              |
-   | `gold`             | 预测文件中的标准答案字段，通常由部分 inferencer 写入；它不等同于必然存在的 `references`，只有预测文件含有同名字段时才能声明。                                   |
-   | `steps`            | 预测文件或自定义推理流程写入的中间步骤信息，常用于需要同时评估最终答案和推理步骤的 evaluator。                                                                  |
-   | `res_length`       | 生成结果的长度统计，通常在开启结果长度 dump 时由生成式 inferencer 写入。                                                                                        |
-   | `all_input_length` | 输入 prompt 或 message 的总长度统计，通常与 `res_length` 一起用于分析输入输出长度。                                                                             |
-   | `ppl`              | PPL/困惑度相关推理结果，通常由 PPL 类 inferencer 或自定义预测文件提供。                                                                                         |
-   | `token_len`        | 与 `ppl` 配套的 token 数量，用于按 token 数归一化 PPL 等指标。                                                                                                  |
-   | `loss`             | 损失值列表，常用于 BPC 等基于 loss 的指标。                                                                                                                     |
-   | `total_chr_num`    | 与 `loss` 配套的字符数量，常用于计算 bits per character。                                                                                                       |
-   | `mink`             | Min-K 概率类统计值，供对应的 Min-K evaluator 使用。                                                                                                             |
-   | `prompt`           | 预测文件中的 prompt 字段，部分 PPL/条件概率类推理流程会记录该字段。                                                                                             |
-   | `choices`          | 条件概率类推理流程写入的候选项列表。                                                                                                                            |
-   | `pred_label`       | 条件概率类推理流程根据分数选出的预测标签。                                                                                                                      |
-
-   除上述字段外，如果自定义 inferencer 或预测文件中包含其他键，也可以在 `score` 中声明同名参数；否则不要声明该参数。
+   - （可选）如果 OpenCompass 已有的评测器不能满足需要，可以实现并注册自定义 Evaluator，具体方法参阅[新增评测器、后处理器与汇总器](new_evaluator_and_summarizer.md#evaluator)。
 
    - （可选）如果 OpenCompass 已有的后处理方法不能满足需要，需要用户定义 `mydataset_postprocess` 方法，根据输入的字符串得到相应后处理的结果。如果希望通过注册名复用该后处理器，需要注册到 `TEXT_POSTPROCESSORS`。具体示例如下：
 
