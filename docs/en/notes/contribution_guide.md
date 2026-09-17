@@ -55,7 +55,7 @@ Pull requests let you tell others about changes you have pushed to a branch in a
   Add source repository to upstream
 
   ```bash
-  git remote add upstream git@github.com:InternLM/opencompass.git
+  git remote add upstream git@github.com:open-compass/opencompass.git
   ```
 
 - After your first PR
@@ -137,7 +137,7 @@ We use the following tools for linting and formatting:
 - [mdformat](https://github.com/executablebooks/mdformat): Mdformat is an opinionated Markdown formatter that can be used to enforce a consistent style in Markdown files.
 - [docformatter](https://github.com/myint/docformatter): A formatter to format docstring.
 
-Style configurations of yapf and isort can be found in [setup.cfg](https://github.com/open-mmlab/OpenCompass/blob/main/setup.cfg).
+The yapf and isort pre-commit hook configurations are defined in [`.pre-commit-config.yaml`](https://github.com/open-compass/opencompass/blob/main/.pre-commit-config.yaml). This file specifies tool versions and excluded paths; the repository does not currently provide separate yapf or isort style configuration files.
 
 ## About Contributing Test Datasets
 

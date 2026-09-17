@@ -77,8 +77,6 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 
 We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
-You can also refer to [Guide to Reproducing CompassAcademic Leaderboard Results](https://opencompass.readthedocs.io/zh-cn/latest/academic.html) to quickly reproduce the leaderboard results.
-
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
 ## 🛠️ Installation
