@@ -28,15 +28,17 @@ The `vlm` extra installs libraries needed on the multimodal model side, includin
 
 Configurations are currently provided for MMBench (DEV_EN) and MMMU-Pro (10c), together with complete examples:
 
-- Dataset configurations: `opencompass/configs/datasets/MMBench/MMBench_DEV_EN_vlmevalkit_gen.py` and `opencompass/configs/datasets/MMMU_Pro/MMMU_Pro_10c_vlmevalkit_gen.py`.
+- Dataset configurations: [opencompass/configs/datasets/MMBench/MMBench_DEV_EN_vlmevalkit_gen.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/MMBench/MMBench_DEV_EN_vlmevalkit_gen.py) and [opencompass/configs/datasets/MMMU_Pro/MMMU_Pro_10c_vlmevalkit_gen.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/MMMU_Pro/MMMU_Pro_10c_vlmevalkit_gen.py).
 - End-to-end examples: [examples/eval_mmbench_vlmevalkit.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_mmbench_vlmevalkit.py) and [examples/eval_mmmu_pro_vlmevalkit.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_mmmu_pro_vlmevalkit.py).
 
-For MMBench, run the example directly:
+For MMBench, first replace the example's tested-model endpoint and official-scoring LLM endpoint with usable services, then run:
 
 ```bash
 export OPENAI_API_KEY=sk-xxx
 opencompass examples/eval_mmbench_vlmevalkit.py
 ```
+
+The `https://example.com` URLs in the example are placeholders and cannot be used for formal evaluation as-is.
 
 The complete workflow has four steps:
 
@@ -51,7 +53,7 @@ For a small trial, limit samples through an environment variable:
 MMBENCH_SAMPLE_LIMIT=20 opencompass examples/eval_mmbench_vlmevalkit.py
 ```
 
-To use your own OpenAI-compatible multimodal service, change `path` and `openai_api_base` in the example model configuration and retain image arguments such as `image_format`. A language-model configuration cannot be substituted by changing only `type`; the model must actually accept image input.
+To use your own OpenAI-compatible multimodal service, change `path` and `openai_api_base` in the example model configuration and retain image arguments such as `image_format`. If the dataset's official scoring requires additional LLM calls, such as MMBench choice extraction, also update scoring arguments such as `model` and `api_base` under `eval_cfg.evaluator.eval_kwargs`. A language-model configuration cannot be substituted by changing only `type`; the model must actually accept image input.
 
 ## Data Cache and Environment Variable
 
@@ -67,13 +69,13 @@ export LMUData=/shared/cache/vlmevalkit
 
 ## Reading Results
 
-Assume `work_dir` is `outputs/mmbench_vlmevalkit` and the model abbreviation is `kimi-k2.6-chat-completions`:
+Assume the configured `work_dir` is `outputs/mmbench_vlmevalkit` and the model abbreviation is `kimi-k2.6-chat-completions`. OpenCompass appends a timestamp directory under `work_dir`; below, `<exp_dir>` means the actual experiment directory, for example `outputs/mmbench_vlmevalkit/20260916_120000`:
 
-- **Predictions:** `<work_dir>/predictions/<model abbr>/MMBench_DEV_EN.json`; each record contains original input messages including image references and the model reply.
-- **Scoring artifacts:** `<work_dir>/results/<model abbr>/MMBench_DEV_EN.json` is the standard OpenCompass metric file. The sibling `MMBench_DEV_EN/` directory contains three official-protocol artifacts:
+- **Predictions:** `<exp_dir>/predictions/<model abbr>/MMBench_DEV_EN.json`; each record contains original input messages including image references and the model reply.
+- **Scoring artifacts:** `<exp_dir>/results/<model abbr>/MMBench_DEV_EN.json` is the standard OpenCompass metric file. The sibling `MMBench_DEV_EN/` directory always contains the following bridge artifacts, while official `evaluate()` may generate additional files such as MMBench `_acc.csv`:
   - `MMBench_DEV_EN.xlsx`: complete prediction table aligned to official data, used directly by official scoring.
   - `vlmevalkit_evaluation.json`: snapshot of official scoring arguments including dataset name, data directory, and `eval_kwargs`, for reproduction.
   - `vlmevalkit_metrics.json`: flattened official aggregate metrics and the primary metric.
-- **Summary:** CSV aggregate table under `<work_dir>/summary/`.
+- **Summary:** CSV aggregate table under `<exp_dir>/summary/`.
 
 Metric names follow flattened official VLMEvalKit output, including group columns and Overall, and values are normalized to percentages. Dataset official logic determines the primary metric. Any empty sample prediction makes scoring fail because official scoring requires a complete prediction sequence.
