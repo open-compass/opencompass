@@ -22,7 +22,7 @@
            pass
    ```
 
-   - （可选）如果 OpenCompass 已有的评测器不能满足需要，可以实现并注册自定义 Evaluator，具体方法参阅[新增评测器、后处理器与汇总器](new_evaluator_and_summarizer.md#evaluator)。
+   - （可选）如果 OpenCompass 已有的评测器不能满足需要，可以实现并注册自定义 Evaluator，具体方法参阅[新增后处理器、评测器与汇总器](new_evaluator_and_summarizer.md#evaluator)。
 
    - （可选）如果 OpenCompass 已有的后处理方法不能满足需要，需要用户定义 `mydataset_postprocess` 方法，根据输入的字符串得到相应后处理的结果。如果希望通过注册名复用该后处理器，需要注册到 `TEXT_POSTPROCESSORS`。具体示例如下：
 

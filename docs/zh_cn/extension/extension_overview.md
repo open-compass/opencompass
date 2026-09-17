@@ -15,4 +15,4 @@ OpenCompass 的主要组件通过注册表和配置构建。扩展前先判断�
 
 - 新数据：参阅[新增数据集](new_dataset.md)和[快速评测自有数据](custom_dataset.md)；
 - 新模型：参阅[新增模型后端](new_model.md)；
-- 新评测组件：参阅[新增评测器与汇总器](new_evaluator_and_summarizer.md)。
+- 新评测组件：参阅[新增后处理器、评测器与汇总器](new_evaluator_and_summarizer.md)。

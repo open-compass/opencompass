@@ -15,4 +15,4 @@ Prefer reusing existing components and adding configuration. Add a Python class 
 
 - New data: see [Adding a Dataset](new_dataset.md) and [Quickly Evaluating Your Own Data](custom_dataset.md).
 - New model: see [Adding a Model Backend](new_model.md).
-- New evaluation component: see [Adding an Evaluator and Summarizer](new_evaluator_and_summarizer.md).
+- New evaluation component: see [Adding Postprocessors, Evaluators, and Summarizers](new_evaluator_and_summarizer.md).
