@@ -45,107 +45,78 @@ Example evaluation output:
 
 ## MATHVerifyEvaluator Configuration
 
-OpenCompass already includes configs that use MATHVerifyEvaluator, such as [opencompass/configs/datasets/math/math_500_gen.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L1-L40). The following sections explain the relevant parts of that config.
+OpenCompass already includes configs that use MATHVerifyEvaluator directly, such as the [AIME 2026 MATHVerify config](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py). The following sections explain its main parts.
 
 ### 1. Imports
 
-The [config file](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L1-L5) imports the dataset, inference, and evaluator components:
+The [config file](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L1-L5) imports the dataset, inference, and evaluation components:
 
 ```python
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import CustomDataset
 from opencompass.evaluator import MATHVerifyEvaluator
+from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
 ```
 
 ### 2. Dataset Reader Configuration
 
-[reader_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L7) tells OpenCompass which columns are used in the model prompt and which column is used as the reference answer:
+[reader_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L7) tells OpenCompass which columns are used in the model prompt and which column is used as the reference answer:
 
 ```python
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
+aime2026_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 ```
 
-Here, `problem` is used by the `{problem}` placeholder in the inference prompt, and `solution` is used as the reference answer during evaluation.
+Here, `problem` is used by the `{problem}` placeholder in the inference prompt, and `answer` is used as the reference answer during evaluation.
 
 ### 3. Inference Configuration
 
-[infer_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L9-L23) defines the prompt seen by the model, the retriever, and the inferencer:
+[infer_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L9-L21) defines the prompt seen by the model, the retriever, and the inferencer:
 
 ```python
-math_infer_cfg = dict(
+aime2026_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            {
+                'role': 'user',
+                'content': '{problem}\nRemember to put your final answer within \\boxed{}.',
+            },
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
 ```
 
-The prompt asks the model to reason step by step and place the final answer inside `\boxed{}`. MATHVerifyEvaluator extracts mathematical expressions from the prediction and reference answer, then checks whether they are equivalent.
+This config uses `RawPromptTemplate` to construct the user message directly and asks the model to put its final answer inside `\boxed{}`, making it easier for MATHVerifyEvaluator to extract and verify the answer.
 
-### 4. MATHVerifyEvaluator Configuration Parameters
+### 4. MATHVerifyEvaluator Configuration
 
-In [eval_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L26-L28), only the evaluator type is required:
+[eval_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L23-L25) selects MATHVerifyEvaluator directly:
 
 ```python
-math_eval_cfg = dict(
+aime2026_eval_cfg = dict(
     evaluator=dict(type=MATHVerifyEvaluator),
 )
 ```
 
-The supported parameters when configuring MATHVerifyEvaluator are:
-
-- `type`: required. Specifies `MATHVerifyEvaluator` as the evaluator.
-- `pred_postprocessor`: optional. This generic parameter is inherited from `BaseEvaluator`. When configured inside `evaluator`, it post-processes model predictions before mathematical answer verification, which is useful for removing fixed prefixes or extracting a specific answer span.
-
-For example:
-
-```python
-math_eval_cfg = dict(
-    evaluator=dict(
-        type=MATHVerifyEvaluator,
-        # pred_postprocessor=dict(type=your_postprocess),  # optional
-    ),
-)
-```
-
-MATHVerifyEvaluator currently does not expose additional evaluator-specific config options. Mathematical expression extraction, equivalence verification, and the per-sample 10-second timeout are fixed by the evaluator implementation and cannot be changed directly through extra config parameters.
-
-OpenICL tasks also support placing `pred_postprocessor` at the top level of `eval_cfg`:
-
-```python
-math_eval_cfg = dict(
-    evaluator=dict(type=MATHVerifyEvaluator),
-    pred_postprocessor=dict(type=your_postprocess),
-)
-```
-
-This is generic dataset evaluation post-processing and runs before the evaluator is built and called. If `pred_postprocessor` is configured both at the top level of `eval_cfg` and inside `evaluator`, predictions will be processed twice, which is usually not recommended.
+During evaluation, MATHVerifyEvaluator extracts mathematical expressions from both the model predictions and the `answer` references, then checks whether they are equivalent. It currently exposes no evaluator-specific configuration options; mathematical-expression extraction, equivalence verification, and the per-sample 10-second timeout are fixed in its implementation and cannot be changed through additional config arguments.
 
 ### 5. Dataset Configuration
 
-Finally, [math_datasets](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L30-L40) combines the reader, inference, and evaluation configs:
+Finally, [aime2026_datasets](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L27-L37) combines the reader, inference, and evaluation configs:
 
 ```python
-math_datasets = [
+aime2026_datasets = [
     dict(
         type=CustomDataset,
-        abbr='math-500',
-        path='opencompass/math',
-        file_name='test_prm800k_500.jsonl',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
+        abbr='aime2026',
+        path='opencompass/aime2026',
+        reader_cfg=aime2026_reader_cfg,
+        infer_cfg=aime2026_infer_cfg,
+        eval_cfg=aime2026_eval_cfg,
+        n=1,
     )
 ]
 ```

@@ -1,4 +1,4 @@
-# Metrics, Answer Extraction, and Postprocessing
+# Answer Extraction, Postprocessing, and Evaluator Selection
 
 The evaluation method is determined jointly by the problem format, model capability, and intended use of the result. OpenCompass separates producing predictions from scoring them, so answer extraction or the Evaluator can be changed for the same predictions without requesting the model again.
 

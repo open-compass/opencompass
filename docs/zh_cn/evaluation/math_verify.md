@@ -45,107 +45,78 @@ MATHVerifyEvaluator 具有以下功能：
 
 ## MATHVerifyEvaluator 配置说明
 
-OpenCompass 中已有使用 MATHVerifyEvaluator 的配置，例如 [opencompass/configs/datasets/math/math_500_gen.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L1-L40)。下面按配置文件中的几个部分说明如何配置。
+OpenCompass 中已有直接使用 MATHVerifyEvaluator 的配置，例如 [AIME 2026 MATHVerify 配置](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py)。下面按配置文件中的几个部分说明如何配置。
 
 ### 1. 导入依赖
 
-[配置文件](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L1-L5) 中导入了数据集、推理和评测所需组件：
+[配置文件](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L1-L5) 中导入了数据集、推理和评测所需组件：
 
 ```python
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import CustomDataset
 from opencompass.evaluator import MATHVerifyEvaluator
+from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
 ```
 
 ### 2. 数据集读取配置
 
-[reader_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L7) 负责告诉 OpenCompass 哪些列会进入模型提示词、哪一列作为参考答案：
+[reader_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L7) 负责告诉 OpenCompass 哪些列会进入模型提示词、哪一列作为参考答案：
 
 ```python
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
+aime2026_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 ```
 
-其中 `problem` 会被用于推理模板中的 `{problem}` 占位符，`solution` 会作为评测阶段的参考答案。
+其中 `problem` 会被用于推理模板中的 `{problem}` 占位符，`answer` 会作为评测阶段的参考答案。
 
 ### 3. 推理配置
 
-[infer_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L9-L23) 定义模型看到的提示词、检索器和推理器：
+[infer_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L9-L21) 定义模型看到的提示词、检索器和推理器：
 
 ```python
-math_infer_cfg = dict(
+aime2026_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            {
+                'role': 'user',
+                'content': '{problem}\nRemember to put your final answer within \\boxed{}.',
+            },
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
 ```
 
-这里的提示词要求模型逐步推理，并把最终答案放在 `\boxed{}` 中。MATHVerifyEvaluator 会从预测和参考答案中抽取数学表达式，再判断二者是否等价。
+这里使用 `RawPromptTemplate` 直接构造 user message，并要求模型把最终答案放在 `\boxed{}` 中，便于 MATHVerifyEvaluator 抽取和验证答案。
 
-### 4. MATHVerifyEvaluator 配置参数
+### 4. MATHVerifyEvaluator 配置
 
-[eval_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L26-L28) 中只需要指定评测器类型：
+[eval_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L23-L25) 直接指定 MATHVerifyEvaluator：
 
 ```python
-math_eval_cfg = dict(
+aime2026_eval_cfg = dict(
     evaluator=dict(type=MATHVerifyEvaluator),
 )
 ```
 
-配置 MATHVerifyEvaluator 时支持的参数主要有：
-
-- `type`：必填，指定使用 `MATHVerifyEvaluator`。
-- `pred_postprocessor`：可选，继承自 `BaseEvaluator` 的通用参数。配置在 `evaluator` 内部时，会在数学答案验证前对模型预测结果做文本后处理，适合去掉固定前缀、截取特定答案片段等。
-
-例如：
-
-```python
-math_eval_cfg = dict(
-    evaluator=dict(
-        type=MATHVerifyEvaluator,
-        # pred_postprocessor=dict(type=your_postprocess),  # 可选
-    ),
-)
-```
-
-当前 MATHVerifyEvaluator 没有额外暴露专用配置项。数学表达式抽取、等价性验证和单样本 10 秒超时逻辑由评测器实现固定控制，不能直接在配置文件中通过额外参数修改。
-
-另外，OpenICL 任务也支持把 `pred_postprocessor` 配在 `eval_cfg` 顶层：
-
-```python
-math_eval_cfg = dict(
-    evaluator=dict(type=MATHVerifyEvaluator),
-    pred_postprocessor=dict(type=your_postprocess),
-)
-```
-
-这属于数据集评测配置的通用后处理，会在构造并调用 evaluator 之前执行；如果同时在 `eval_cfg` 顶层和 `evaluator` 内部配置 `pred_postprocessor`，预测结果会被处理两次，一般不建议这样做。
+评测时，MATHVerifyEvaluator 会分别从模型预测和 `answer` 参考答案中抽取数学表达式，再判断二者是否等价。它当前没有额外暴露专用配置项；数学表达式抽取、等价性验证和单样本 10 秒超时逻辑由评测器实现固定控制，不能直接通过额外配置参数修改。
 
 ### 5. 数据集配置
 
-最后在 [math_datasets](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/math/math_500_gen.py#L30-L40) 中把读取、推理和评测配置组合起来：
+最后在 [aime2026_datasets](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L27-L37) 中把读取、推理和评测配置组合起来：
 
 ```python
-math_datasets = [
+aime2026_datasets = [
     dict(
         type=CustomDataset,
-        abbr='math-500',
-        path='opencompass/math',
-        file_name='test_prm800k_500.jsonl',
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
+        abbr='aime2026',
+        path='opencompass/aime2026',
+        reader_cfg=aime2026_reader_cfg,
+        infer_cfg=aime2026_infer_cfg,
+        eval_cfg=aime2026_eval_cfg,
+        n=1,
     )
 ]
 ```
