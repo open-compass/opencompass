@@ -42,7 +42,21 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
+    """Extract the final numeric answer from a GSM8K-style prediction.
+
+    Models often emit thousands separators (``8,000``) or LaTeX forms
+    (``9{,}500``, ``\\boxed{$9{,}500}``). Stripping those before the digit
+    regex avoids silently turning a correct answer into a wrong number
+    (e.g. ``8,000`` → ``000``). See open-compass/opencompass#2647.
+    """
     text = text.split('Question:')[0]
+    # Prefer the last \boxed{...} span when present (common CoT format).
+    boxed = re.findall(r'\\boxed\s*\{((?:[^{}]|\{[^{}]*\})*)\}', text)
+    if boxed:
+        text = boxed[-1]
+    # Normalize thousands separators (LaTeX and ASCII) between digits.
+    text = text.replace('{,}', '')
+    text = re.sub(r'(?<=\d),(?=\d)', '', text)
     numbers = re.findall(r'\-?\d+\.\d+|\-?\d+', text)
     if not numbers:
         return 'NULL'
