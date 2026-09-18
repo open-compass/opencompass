@@ -1,6 +1,6 @@
 # Code Evaluation
 
-This page uses `humaneval` and `mbpp` to explain pass@1 / pass@k configuration. OpenCompass provides built-in evaluators for some code datasets. For multilingual `humaneval-x` and `DS1000` workflows that need an independent execution service, use the Docker code-evaluation service to avoid running model-generated code directly in a normal development environment.
+This page uses `humaneval` and `mbpp` to explain pass@1 / pass@k configuration. OpenCompass provides built-in evaluators for some code datasets. For multilingual `humaneval-x` workflows that need an independent execution service, use the Docker code-evaluation service to avoid running model-generated code directly in a normal development environment.
 
 ## pass@1
 
@@ -85,65 +85,19 @@ See [examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass
 
 ## Code Execution Service
 
-Some code datasets can be evaluated through an independent Docker service. OpenCompass uses a service built from [code-evaluator](https://github.com/open-compass/code-evaluator).
+Some code datasets can be evaluated through an independent service. For installation, deployment, and operation instructions, see the [open-compass/code-evaluator](https://github.com/open-compass/code-evaluator) repository.
 
 ### Supported Datasets
 
-1. humaneval-x
+#### HumanEval-X
 
-   The multilingual [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x) dataset. Download the required language file (`xx.jsonl.gz`) from its [download location](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx) and place it under `./data/humanevalx`.
+The multilingual [humaneval-x](https://huggingface.co/datasets/THUDM/humaneval-x) dataset. Download the required language file (`xx.jsonl.gz`) from its [download location](https://github.com/THUDM/CodeGeeX2/tree/main/benchmark/humanevalx) and place it under `./data/humanevalx`.
 
-   Supported languages are `python`, `cpp`, `go`, `java`, and `js`.
-
-2. DS1000
-
-   The multi-library Python dataset [DS1000](https://github.com/xlang-ai/DS-1000). Download it from [ds1000_data.zip](https://github.com/xlang-ai/DS-1000/blob/main/ds1000_data.zip).
-
-   Supported libraries are `Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, and `Matplotlib`.
-
-### Launching the Code Evaluation Service
-
-1. Ensure you have installed Docker, please refer to [Docker installation document](https://docs.docker.com/engine/install/).
-2. Pull the source code of the code evaluation service project and build the Docker image.
-
-Choose the Dockerfile corresponding to the dataset you need, and replace `humanevalx` or `ds1000` in the command below.
-
-```shell
-git clone https://github.com/open-compass/code-evaluator.git
-docker build -t code-eval-{your-dataset}:latest -f docker/{your-dataset}/Dockerfile .
-```
-
-3. Create a container with the following commands:
-
-```shell
-# Log output format
-docker run -it -p 5000:5000 code-eval-{your-dataset}:latest python server.py
-
-# Run the program in the background
-# docker run -itd -p 5000:5000 code-eval-{your-dataset}:latest python server.py
-
-# Using different ports
-# docker run -itd -p 5001:5001 code-eval-{your-dataset}:latest python server.py --port 5001
-```
-
-**Note:**
-
-- If you encounter a timeout during the evaluation of Go, please use the following command when creating the container.
-
-```shell
-docker run -it -p 5000:5000 -e GO111MODULE=on -e GOPROXY=https://goproxy.io code-eval-{your-dataset}:latest python server.py
-```
-
-4. To ensure you have access to the service, use the following command to check the inference environment and evaluation service connection status. (If both inferences and code evaluations run on the same host, skip this step.)
-
-```shell
-ping your_service_ip_address
-telnet your_service_ip_address your_service_port
-```
+Supported languages are `python`, `cpp`, `go`, `java`, and `js`.
 
 ## Local Code Evaluation
 
-When the model inference environment can access the code-evaluation service directly, set `ip_address` and `port` in the dataset evaluator config so OpenCompass can call the service during evaluation. DS1000 also provides a local execution config, [opencompass/configs/datasets/ds1000/ds1000_rawprompt_gen_8fd2fa.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/ds1000/ds1000_rawprompt_gen_8fd2fa.py), and a service evaluation config, [opencompass/configs/datasets/ds1000/ds1000_service_eval_rawprompt_gen_8fd2fa.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/ds1000/ds1000_service_eval_rawprompt_gen_8fd2fa.py). Local execution runs generated code and test dependencies in the current environment, so use it only in an isolated environment.
+When the model inference environment can access the code-evaluation service directly, set `ip_address` and `port` in the dataset evaluator config so OpenCompass can call the service during evaluation.
 
 ### Configuration File
 
@@ -208,7 +162,7 @@ Refer to the [Five-Minute Quick Start](../get_started/quick_start.md).
 
 Model inference and code evaluation services located in different machines which cannot be accessed directly require prior model inference before collecting the code evaluation results. The configuration file and inference process can be reused from the previous tutorial.
 
-### Collect Inference Results (Only for HumanEval-X)
+### Collect Inference Results
 
 In OpenCompass's tools folder, there is a script called `collect_code_preds.py` provided to process and collect the inference results after providing the task launch configuration file during startup along with specifying the working directory used corresponding to the task.
 It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html#launching-evaluation).
@@ -236,13 +190,9 @@ workdir/humanevalx
 ├── ...
 ```
 
-For DS1000, you only need the corresponding prediction file generated by `opencompass`. You can also use the service evaluation config [opencompass/configs/datasets/ds1000/ds1000_service_eval_rawprompt_gen_8fd2fa.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/ds1000/ds1000_service_eval_rawprompt_gen_8fd2fa.py) and set `ip_address` and `port` in the config.
-
 ### Code Evaluation
 
 Make sure your code evaluation service is started, and use `curl` to request:
-
-#### The Following Only Supports HumanEval-X
 
 ```shell
 curl -X POST -F 'file=@{result_absolute_path}' -F 'dataset={dataset/language}' {your_service_ip_address}:{your_service_port}/evaluate
@@ -266,26 +216,6 @@ Additionally, we provide a `with-prompt` option, which defaults to `True`. Some 
 curl -X POST -F 'file=@./examples/humanevalx/python.json' -F 'dataset=humanevalx/python' -H 'with-prompt: False' localhost:5000/evaluate
 ```
 
-#### The Following Only Supports DS1000
-
-Make sure the code evaluation service is started, then use `curl` to submit a request:
-
-```shell
-curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' localhost:5000/evaluate
-```
-
-DS1000 supports additional debug parameters. Be aware that a large amount of log will be generated when it is turned on:
-
-- `full`: Additional print out of the original prediction for each error sample, post-processing prediction, running program, and final error.
-- `half`: Additional print out of the running program and final error for each error sample.
-- `error`: Additional print out of the final error for each error sample.
-
-```shell
-curl -X POST -F 'file=@./internlm-chat-7b-hf-v11/ds1000_Numpy.json' -F 'debug=error' localhost:5000/evaluate
-```
-
-You can also modify the `num_workers` in the same way to control the degree of parallelism.
-
 ## Advanced Tutorial
 
 Besides evaluating the supported code datasets, users might also need:
@@ -298,21 +228,4 @@ See [Adding a Dataset](../extension/new_dataset.md).
 
 1. For local evaluation, follow the post-processing section in the tutorial on supporting new datasets to modify the post-processing method.
 2. For remote evaluation, please modify the post-processing part in the tool's `collect_code_preds.py`.
-3. Some parts of post-processing could also be modified in the code evaluation service, more information will be available in the next section.
-
-### Debugging Code Evaluation Service
-
-When supporting new datasets or modifying post-processors, it is possible that modifications need to be made to the original code evaluation service. Please make changes based on the following steps:
-
-1. Remove the installation of the `code-evaluator` in `Dockerfile`, mount the `code-evaluator` when starting the container instead:
-
-```shell
-docker run -it -p 5000:5000 -v /local/path/of/code-evaluator:/workspace/code-evaluator code-eval:latest bash
-```
-
-2. Install and start the code evaluation service locally. At this point, any necessary modifications can be made to the local copy of the `code-evaluator`.
-
-```shell
-cd code-evaluator && pip install -r requirements.txt
-python server.py
-```
+3. To modify post-processing in the code-evaluation service, see the [open-compass/code-evaluator](https://github.com/open-compass/code-evaluator) repository.
