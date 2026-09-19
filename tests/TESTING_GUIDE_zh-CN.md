@@ -2,7 +2,7 @@
 
 本文档提供了为 `opencompass/datasets/` 下的数据集实现添加单元测试的指引和规范。
 
-> **English Version**: See [TESTING_GUIDE_EN.md](./TESTING_GUIDE_EN.md) for the English version of this guide.
+> **English Version**: See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for the English version of this guide.
 
 ## 目录结构
 
