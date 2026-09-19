@@ -11,7 +11,7 @@ def normalized_smith_waterman(seq1,
 
     Args:
         seq1, seq2 (str): Protein sequences (uppercase letters)
-        matrix_name (str): Name of substitution matrix (default: BLOSUM62)
+        matrix_name (str): Name of substitution matrix (default: BLOSUM45)
         open_gap (float): Gap opening penalty
         extend_gap (float): Gap extension penalty
 
