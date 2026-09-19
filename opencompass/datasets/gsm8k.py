@@ -45,17 +45,25 @@ def gsm8k_postprocess(text: str) -> str:
     """Extract the final numeric answer from a GSM8K-style prediction.
 
     Models often emit thousands separators (``8,000``) or LaTeX forms
-    (``9{,}500``, ``\\boxed{$9{,}500}``). Stripping those before the digit
-    regex avoids silently turning a correct answer into a wrong number
-    (e.g. ``8,000`` → ``000``). See open-compass/opencompass#2647.
+    (``9{,}500``, ``9\\,500``, ``\\boxed{$9{,}500}``). Stripping those
+    before the digit regex avoids silently turning a correct answer into
+    a wrong number (e.g. ``8,000`` -> ``000``). A ``\\boxed`` span is
+    used only when it contains a digit. See open-compass/opencompass#2647.
     """
     text = text.split('Question:')[0]
-    # Prefer the last \boxed{...} span when present (common CoT format).
-    boxed = re.findall(r'\\boxed\s*\{((?:[^{}]|\{[^{}]*\})*)\}', text)
+    # Prefer the last \boxed{...} that contains a digit. A box with no
+    # number (e.g. \boxed{x}) must not hide a later answer in the text.
+    boxed = [
+        span for span in re.findall(
+            r'\\boxed\s*\{((?:[^{}]|\{[^{}]*\})*)\}', text)
+        if re.search(r'\d', span)
+    ]
     if boxed:
         text = boxed[-1]
-    # Normalize thousands separators (LaTeX and ASCII) between digits.
+    # Normalize thousands separators between digits: LaTeX {,}, \, \; ~,
+    # and ASCII commas. A plain space is left alone (it can be a list).
     text = text.replace('{,}', '')
+    text = re.sub(r'(?<=\d)(?:\\[,;]|~)(?=\d{3})', '', text)
     text = re.sub(r'(?<=\d),(?=\d)', '', text)
     numbers = re.findall(r'\-?\d+\.\d+|\-?\d+', text)
     if not numbers:
