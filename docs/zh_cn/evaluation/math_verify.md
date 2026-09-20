@@ -4,88 +4,6 @@
 
 数学推理能力是大语言模型(LLMs)的一项关键能力。为了评估模型的数学能力，我们需要测试其逐步解决数学问题并提供准确最终答案的能力。OpenCompass 通过 CustomDataset 和 MATHVerifyEvaluator 组件提供了一种便捷的数学推理评测方式。
 
-## 数据集格式
-
-数学评测数据集应该是 JSON Lines (.jsonl) 或 CSV 格式。每个问题至少应包含：
-
-- 问题陈述
-- 解答/答案（通常使用 LaTeX 格式，最终答案需要用 \\boxed{} 括起来）
-
-JSONL 格式示例：
-
-```json
-{"problem": "求解方程 2x + 3 = 7", "solution": "让我们逐步解决：\n2x + 3 = 7\n2x = 7 - 3\n2x = 4\nx = 2\n因此，\\boxed{2}"}
-```
-
-CSV 格式示例：
-
-```csv
-problem,solution
-"求解方程 2x + 3 = 7","让我们逐步解决：\n2x + 3 = 7\n2x = 7 - 3\n2x = 4\nx = 2\n因此，\\boxed{2}"
-```
-
-## 配置说明
-
-要进行数学推理评测，你需要设置三个主要组件：
-
-1. 数据集读取配置
-
-```python
-math_reader_cfg = dict(
-    input_columns=['problem'],  # 问题列的名称
-    output_column='solution'    # 答案列的名称
-)
-```
-
-2. 推理配置
-
-```python
-math_infer_cfg = dict(
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
-                ),
-            ]
-        ),
-    ),
-    retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer),
-)
-```
-
-3. 评测配置
-
-```python
-math_eval_cfg = dict(
-    evaluator=dict(type=MATHVerifyEvaluator),
-)
-```
-
-## 使用 CustomDataset
-
-以下是如何设置完整的数学评测配置：
-
-```python
-from mmengine.config import read_base
-from opencompass.models import TurboMindModelwithChatTemplate
-from opencompass.datasets import CustomDataset
-
-math_datasets = [
-    dict(
-        type=CustomDataset,
-        abbr='my-math-dataset',              # 数据集简称
-        path='path/to/your/dataset',         # 数据集文件路径
-        reader_cfg=math_reader_cfg,
-        infer_cfg=math_infer_cfg,
-        eval_cfg=math_eval_cfg,
-    )
-]
-```
-
 ## MATHVerifyEvaluator
 
 MATHVerifyEvaluator 是专门设计用于评估数学答案的评测器。它基于 math_verify 库进行开发，该库提供了数学表达式解析和验证功能，支持 LaTeX 和一般表达式的提取与等价性验证。
@@ -116,75 +34,213 @@ MATHVerifyEvaluator 具有以下功能：
     'accuracy': 85.0,  # 正确答案的百分比
     'details': [
         {
-            'predictions': 'x = 2',           # 解析后的预测答案
-            'references': 'x = 2',         # 解析后的参考答案
-            'correct': True            # 是否匹配
+            'pred': 'x = 2',     # 解析后的预测答案
+            'answer': 'x = 2',   # 解析后的参考答案
+            'correct': True      # 是否匹配
         },
         # ... 更多结果
     ]
 }
 ```
 
-## 完整示例
+## MATHVerifyEvaluator 配置说明
 
-以下是设置数学评测的完整示例：
+OpenCompass 中已有直接使用 MATHVerifyEvaluator 的配置，例如 [AIME 2026 MATHVerify 配置](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py)。下面按配置文件中的几个部分说明如何配置。
+
+### 1. 导入依赖
+
+[配置文件](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L1-L5) 中导入了数据集、推理和评测所需组件：
 
 ```python
-from mmengine.config import read_base
-from opencompass.models import TurboMindModelwithChatTemplate
 from opencompass.datasets import CustomDataset
 from opencompass.evaluator import MATHVerifyEvaluator
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
+```
 
-# 数据集读取配置
-math_reader_cfg = dict(input_columns=['problem'], output_column='solution')
+### 2. 数据集读取配置
 
-# 推理配置
-math_infer_cfg = dict(
+[reader_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L7) 负责告诉 OpenCompass 哪些列会进入模型提示词、哪一列作为参考答案：
+
+```python
+aime2026_reader_cfg = dict(input_columns=['problem'], output_column='answer')
+```
+
+其中 `problem` 会被用于推理模板中的 `{problem}` 占位符，`answer` 会作为评测阶段的参考答案。
+
+### 3. 推理配置
+
+[infer_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L9-L21) 定义模型看到的提示词、检索器和推理器：
+
+```python
+aime2026_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            {
+                'role': 'user',
+                'content': '{problem}\nRemember to put your final answer within \\boxed{}.',
+            },
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
+```
 
-# 评测配置
+这里使用 `RawPromptTemplate` 直接构造 user message，并要求模型把最终答案放在 `\boxed{}` 中，便于 MATHVerifyEvaluator 抽取和验证答案。
+
+### 4. MATHVerifyEvaluator 配置
+
+[eval_cfg](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L23-L25) 直接指定 MATHVerifyEvaluator：
+
+```python
+aime2026_eval_cfg = dict(
+    evaluator=dict(type=MATHVerifyEvaluator),
+)
+```
+
+评测时，MATHVerifyEvaluator 会分别从模型预测和 `answer` 参考答案中抽取数学表达式，再判断二者是否等价。它当前没有额外暴露专用配置项；数学表达式抽取、等价性验证和单样本 10 秒超时逻辑由评测器实现固定控制，不能直接通过额外配置参数修改。
+
+### 5. 数据集配置
+
+最后在 [aime2026_datasets](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_mathverify_rawprompt_gen_0970dd.py#L27-L37) 中把读取、推理和评测配置组合起来：
+
+```python
+aime2026_datasets = [
+    dict(
+        type=CustomDataset,
+        abbr='aime2026',
+        path='opencompass/aime2026',
+        reader_cfg=aime2026_reader_cfg,
+        infer_cfg=aime2026_infer_cfg,
+        eval_cfg=aime2026_eval_cfg,
+        n=1,
+    )
+]
+```
+
+## 使用 CustomDataset
+
+如果要评测自己的数学数据集，可以使用内置 `CustomDataset` 加载数据，并把它和 MATHVerifyEvaluator 组合起来。`CustomDataset` 当前支持 `.jsonl` 和 `.csv`；每个问题通常至少应包含：
+
+- 问题陈述，例如 `problem`
+- 解答/答案，例如 `solution`（通常使用 LaTeX 格式，最终答案建议用 `\boxed{}` 括起来）
+
+JSONL 格式示例：
+
+```json
+{"problem": "求解方程 2x + 3 = 7", "solution": "让我们逐步解决：\n2x + 3 = 7\n2x = 7 - 3\n2x = 4\nx = 2\n因此，\\boxed{2}"}
+```
+
+CSV 格式示例：
+
+```text
+problem,solution
+"求解方程 2x + 3 = 7","让我们逐步解决：\n2x + 3 = 7\n2x = 7 - 3\n2x = 4\nx = 2\n因此，\\boxed{2}"
+```
+
+### 1. 数据集读取配置
+
+```python
+math_reader_cfg = dict(
+    input_columns=['problem'],
+    output_column='solution',
+)
+```
+
+`input_columns` 指定进入推理模板的字段，所以上面的推理模板可以使用 `{problem}`。`output_column` 指定评测时使用的参考答案字段，这里会把 `solution` 作为 MATHVerifyEvaluator 的 reference。
+
+### 2. 推理配置
+
+```python
+math_infer_cfg = dict(
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
+            ),
+        ],
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
+```
+
+`RawPromptTemplate` 使用 `messages` 直接描述对话消息。这里的 `{problem}` 来自 `reader_cfg.input_columns`，推理时会被替换为样本中的题目内容；提示词要求模型把最终答案放进 `\boxed{}`，便于后续抽取和等价性验证。
+
+### 3. 评测配置
+
+```python
 math_eval_cfg = dict(
     evaluator=dict(type=MATHVerifyEvaluator),
 )
+```
 
-# 数据集配置
+`eval_cfg` 指定使用 MATHVerifyEvaluator 对预测和参考答案做数学等价性验证。如果需要先清理模型输出，可以按前文说明添加 `pred_postprocessor`。
+
+### 4. 数据集配置
+
+```python
 math_datasets = [
     dict(
         type=CustomDataset,
         abbr='my-math-dataset',
-        path='path/to/your/dataset.jsonl',  # 或 .csv
+        path='path/to/your/dataset',
+        file_name='your_dataset.jsonl',
         reader_cfg=math_reader_cfg,
         infer_cfg=math_infer_cfg,
         eval_cfg=math_eval_cfg,
     )
 ]
+```
 
-# 模型配置
-models = [
+`path` 和 `file_name` 指向待评测数据文件，`reader_cfg`、`infer_cfg` 和 `eval_cfg` 分别接入读取、推理和评测流程。
+
+### 完整配置
+
+```python
+from opencompass.openicl.icl_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
+from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import CustomDataset
+from opencompass.evaluator import MATHVerifyEvaluator
+
+math_reader_cfg = dict(
+    input_columns=['problem'],
+    output_column='solution',
+)
+
+math_infer_cfg = dict(
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
+            ),
+        ],
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
+
+math_eval_cfg = dict(
+    evaluator=dict(type=MATHVerifyEvaluator),
+)
+
+math_datasets = [
     dict(
-        type=TurboMindModelwithChatTemplate,
-        abbr='your-model-name',
-        path='your/model/path',
-        # ... 其他模型配置
+        type=CustomDataset,
+        abbr='my-math-dataset',
+        path='path/to/your/dataset',
+        file_name='your_dataset.jsonl',
+        reader_cfg=math_reader_cfg,
+        infer_cfg=math_infer_cfg,
+        eval_cfg=math_eval_cfg,
     )
 ]
-
-# 输出目录
-work_dir = './outputs/math_eval'
 ```

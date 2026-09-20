@@ -70,7 +70,6 @@ directly to the corresponding topic.
    extension/custom_dataset.md
    extension/new_model.md
    extension/new_evaluator_and_summarizer.md
-   extension/persistence.md
 
 .. toctree::
    :maxdepth: 1
@@ -85,15 +84,9 @@ directly to the corresponding topic.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Reproduction, Contribution, and Releases
-
-   notes/contribution_guide.md
-   notes/academic.md
-
-.. toctree::
-   :maxdepth: 1
    :caption: Other Documentation
 
+   notes/contribution_guide.md
    faq/index.md
    faq/circular_eval.md
    faq/compassbench_intro.md

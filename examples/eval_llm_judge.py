@@ -1,15 +1,15 @@
 from mmengine.config import read_base
-from opencompass.models.openai_api import OpenAISDK
 
 # Import pre-configured models from OpenCompass
 with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
+    from opencompass.configs.models.openai.gpt_6_astra import (
+        models as judge_model,
     )
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_14b_instruct import (
-        models as lmdeploy_qwen2_5_14b_instruct_model,
+    from opencompass.configs.models.openai.gpt_5_6_sol import (
+        models as gpt_5_6_sol,
     )
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import GenericLLMEvaluator
@@ -23,15 +23,13 @@ math_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 # Inference configuration
 math_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nRemember to put your final answer within \\boxed{}.',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content='{problem}\nRemember to put your final answer within \\boxed{}.',
+            ),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
@@ -69,19 +67,14 @@ math_eval_cfg = dict(
     evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                    )
-                ],
-                round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
-            ),
+            type=RawPromptTemplate,
+            messages=[
+                dict(
+                    role='system',
+                    content="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
+                ),
+                dict(role='user', content=GRADER_TEMPLATE),
+            ],
         ),
         dataset_cfg=dict(
             type=CustomDataset,
@@ -89,7 +82,7 @@ math_eval_cfg = dict(
             file_name='test_prm800k_500.jsonl',
             reader_cfg=math_reader_cfg,
         ),
-        judge_cfg=lmdeploy_qwen2_5_14b_instruct_model[0],
+        judge_cfg=judge_model[0],
         dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
 )
@@ -107,7 +100,7 @@ datasets = [
 ]
 
 # Model to be evaluated
-models = lmdeploy_qwen2_5_7b_instruct_model
+models = gpt_5_6_sol
 
 # Limiting test to first 8 examples for quick testing
 math_reader_cfg['test_range'] = '[0:8]'

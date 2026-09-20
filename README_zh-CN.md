@@ -65,10 +65,10 @@
 - **\[2026.03.17\]** OpenCompass 新增 `RawPromptTemplate`，可以在不引入非预期格式转换的情况下向模型传递 benchmark 的原始 Prompt 和结构化对话，并支持 API 模型、ChatML 数据集，以及模型侧的额外 Prompt 内容附加。详情请参阅 [RawPromptTemplate 使用指南](docs/zh_cn/notes/rawprompttemplate.md)！
 - **\[2026.02.05\]** OpenCompass 现已支持Intern-S1-Pro相关的通用及科学评测基准，请参阅[Intern-S1-Pro评测示例](examples/eval_intern_s1_pro.py)和[模型信息](https://huggingface.co/internlm/Intern-S1-Pro)了解详情！🔥🔥🔥
 - **\[2025.12.08\]** OpenCompass 现已支持SciReasoner评测，请参阅[SciReasoner评测示例](examples/eval_scireasoner.py)和[原项目地址](https://github.com/InternScience/SciReason)了解详情！🔥🔥🔥
-- **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1评测示例](examples/eval_bench_intern_s1.py)了解详情！🔥🔥🔥
+- **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1评测教程](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/interns1.html)了解详情！🔥🔥🔥
 - **\[2025.04.01\]** OpenCompass 现已支持 `CascadeEvaluator`，允许多个评估器按顺序工作，可以为更复杂的评估场景创建自定义评估流程，查看[文档](docs/zh_cn/evaluation/llm_judge.md)了解具体用法！🔥🔥🔥
 - **\[2025.03.11\]** 现已支持 `SuperGPQA`  覆盖285 个研究生学科的知识能力评测，欢迎尝试！🔥🔥🔥
-- **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了评测示例，请查看 [DeepSeek-R1 评测配置](examples/eval_deepseek_r1.py)了解更多详情！🔥🔥🔥
+- **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了教程，请查看 [评估推理模型](docs/zh_cn/user_guides/deepseek_r1.md) 了解更多详情！🔥🔥🔥
 - **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于 LLM 作为评判器的 `GenericLLMEvaluator` 和用于数学推理评估的 `MATHVerifyEvaluator`。查看 [LLM 评判器](docs/zh_cn/evaluation/llm_judge.md)和[数学能力评测](docs/zh_cn/evaluation/math_verify.md)文档了解更多详情！🔥🔥🔥
 
 > [更多](docs/zh_cn/notes/news.md)
@@ -76,8 +76,6 @@
 ## 📊 性能榜单
 
 我们将陆续提供开源模型和 API 模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
-
-你也可以参考[学术榜单精度复现教程](https://opencompass.readthedocs.io/zh-cn/latest/academic.html)，快速地复现榜单的结果。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 

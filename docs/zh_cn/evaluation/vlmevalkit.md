@@ -28,15 +28,17 @@ pip install "opencompass[vlm]"
 
 当前提供 MMBench（DEV_EN）和 MMMU-Pro（10c）两个数据集配置，以及对应的完整示例：
 
-- 数据集配置：`opencompass/configs/datasets/MMBench/MMBench_DEV_EN_vlmevalkit_gen.py`、`opencompass/configs/datasets/MMMU_Pro/MMMU_Pro_10c_vlmevalkit_gen.py`；
+- 数据集配置：[opencompass/configs/datasets/MMBench/MMBench_DEV_EN_vlmevalkit_gen.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/MMBench/MMBench_DEV_EN_vlmevalkit_gen.py)、[opencompass/configs/datasets/MMMU_Pro/MMMU_Pro_10c_vlmevalkit_gen.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/MMMU_Pro/MMMU_Pro_10c_vlmevalkit_gen.py)；
 - 端到端示例：[examples/eval_mmbench_vlmevalkit.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_mmbench_vlmevalkit.py)、[examples/eval_mmmu_pro_vlmevalkit.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_mmmu_pro_vlmevalkit.py)。
 
-以 MMBench 为例，直接运行示例配置：
+以 MMBench 为例，先把示例中的被测模型 endpoint 和官方评分用的 LLM endpoint 改成可用服务，再运行：
 
 ```bash
 export OPENAI_API_KEY=sk-xxx
 opencompass examples/eval_mmbench_vlmevalkit.py
 ```
+
+示例里的 `https://example.com` 只是占位地址，不能直接用于正式评测。
 
 完整流程分四步：
 
@@ -51,7 +53,7 @@ opencompass examples/eval_mmbench_vlmevalkit.py
 MMBENCH_SAMPLE_LIMIT=20 opencompass examples/eval_mmbench_vlmevalkit.py
 ```
 
-被测模型换成自己的 OpenAI 兼容多模态服务时，参照示例修改模型配置中的 `path`、`openai_api_base`，并保留 `image_format` 等图片参数；不能用语言模型配置直接替换 `type`，模型必须真的接受图片输入。
+被测模型换成自己的 OpenAI 兼容多模态服务时，参照示例修改模型配置中的 `path`、`openai_api_base`，并保留 `image_format` 等图片参数。如果数据集官方评分需要额外的 LLM 调用（如 MMBench 的选项抽取），还要同步修改 `eval_cfg.evaluator.eval_kwargs` 中的 `model`、`api_base` 等评分参数；不能用语言模型配置直接替换 `type`，模型必须真的接受图片输入。
 
 ## 数据缓存与环境变量
 
@@ -67,13 +69,13 @@ export LMUData=/shared/cache/vlmevalkit
 
 ## 结果怎么看
 
-假设 `work_dir` 为 `outputs/mmbench_vlmevalkit`、模型 abbr 为 `kimi-k2.6-chat-completions`：
+假设配置中的 `work_dir` 为 `outputs/mmbench_vlmevalkit`、模型 abbr 为 `kimi-k2.6-chat-completions`。OpenCompass 会在 `work_dir` 下追加时间戳目录；下文用 `<exp_dir>` 表示实际实验目录，例如 `outputs/mmbench_vlmevalkit/20260916_120000`：
 
-- **预测**：`<work_dir>/predictions/<模型 abbr>/MMBench_DEV_EN.json`，每条记录包含原始输入消息（含图片引用）和模型回复；
-- **评分产物**：`<work_dir>/results/<模型 abbr>/MMBench_DEV_EN.json` 是 OpenCompass 的标准指标文件；同名目录 `MMBench_DEV_EN/` 下还有三个官方口径的产物：
+- **预测**：`<exp_dir>/predictions/<模型 abbr>/MMBench_DEV_EN.json`，每条记录包含原始输入消息（含图片引用）和模型回复；
+- **评分产物**：`<exp_dir>/results/<模型 abbr>/MMBench_DEV_EN.json` 是 OpenCompass 的标准指标文件；同名目录 `MMBench_DEV_EN/` 下固定包含以下桥接层产物，官方 `evaluate()` 还可能生成额外文件（如 MMBench 的 `_acc.csv`）：
   - `MMBench_DEV_EN.xlsx`：预测对齐回官方数据表后的完整预测表（官方评分的直接输入）；
   - `vlmevalkit_evaluation.json`：本次官方评分的参数快照（数据集名、数据目录、`eval_kwargs` 等），用于复现评分；
   - `vlmevalkit_metrics.json`：官方汇总指标的展平结果与主指标。
-- **汇总**：`<work_dir>/summary/` 下的 CSV 汇总表。
+- **汇总**：`<exp_dir>/summary/` 下的 CSV 汇总表。
 
 指标名沿用 VLMEvalKit 官方汇总展平后的名称（包含各分组列与 Overall），数值已统一换算为百分制；哪个指标算主指标由数据集官方逻辑决定。任何样本预测为空都会让评分直接报错——官方评分要求完整的预测序列。

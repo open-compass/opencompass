@@ -15,124 +15,125 @@
 
 评测任务调用 `score()` 后，内部按以下流程执行：
 
-1. **逐样本规则评测**：对每条预测先应用规则评测器的 `pred_postprocess`，再调用规则评测器对单条样本打分，结果记入该样本的 `rule_evaluation`；日志会输出规则准确率（`Rule-based evaluation: ...`）。
-2. **收集待复核样本**：级联模式收集规则判错的样本，并行模式收集全部样本；日志中的 `Samples requiring LLM evaluation (...)` 即待复核数量。
+1. **逐样本初始评测**：如果提供了 `rule_evaluator`，会先应用其 `pred_postprocess`，再调用规则评测器或 `sample_score_fn` 对单条样本打分；如果只提供 `sample_score_fn`，则直接使用原始预测打分。结果记入该样本的 `rule_evaluation`；日志会输出初始评测准确率（`Rule-based evaluation: ...`）。
+2. **收集待复核样本**：级联模式收集初始评测判错的样本，并行模式收集全部样本；日志中的 `Samples requiring LLM evaluation (...)` 即待复核数量。
 3. **构造评判子集**：从原测试集中 `select` 出待复核样本，并附加 `prediction`、`reference` 两列。`llm_evaluator` 的 `dataset_cfg` 会被自动置空，直接使用这个子集，因此 judge 模板可以引用题目、参考答案、模型预测等全部数据列。
 4. **LLM 评判**：调用 `llm_evaluator.score()`——内部就是对 judge 模型的一次完整 `GenInferencer` 推理，结果写入 `<结果目录>_llm_judge_replica<N>.json`（N 为重复运行编号）。
 5. **判定与汇总**：从 judge 明细中提取判定，按模式合并出最终 `accuracy`，并为每条样本写入 `cascade_correct`。
 
-第 2 步的判定口径依次检查 judge 明细中的 `prediction` / `llm_judge` 字段是否为 `"A"` 或以 `"CORRECT"` 开头，其次是 `correct` 布尔值和 `score > 0.5`。因此 **judge 模板必须要求模型只回复 A / B**（或 CORRECT / INCORRECT），与 [LLM 作为评判器](llm_judge.md)中的模板约定一致；judge 输出成段解释文字时会被判为错误。
+第 5 步的判定口径依次检查 judge 明细中的 `prediction` / `llm_judge` 字段是否为 `"A"` 或以 `"CORRECT"` 开头，其次是 `correct` 布尔值和 `score > 0.5`。因此 **judge 模板必须要求模型只回复 A / B**（或 CORRECT / INCORRECT），与 [LLM 作为评判器](llm_judge.md)中的模板约定一致；judge 输出成段解释文字时会被判为错误。
 
 ## 配置说明
 
 `CascadeEvaluator` 的参数：
 
-| 参数              | 类型              | 说明                                                    |
-| ----------------- | ----------------- | ------------------------------------------------------- |
-| `llm_evaluator`   | dict，必填        | LLM 评判器配置，通常是 `GenericLLMEvaluator`            |
-| `rule_evaluator`  | dict              | 规则评测器配置，如 `MATHVerifyEvaluator`                |
-| `sample_score_fn` | Callable          | 自定义单样本打分函数，返回含 `correct` 的 dict 或布尔值 |
-| `parallel`        | bool，默认 `True` | `False` 为级联模式，`True` 为并行模式                   |
+| 参数              | 类型                                      | 说明                                                    |
+| ----------------- | ----------------------------------------- | ------------------------------------------------------- |
+| `llm_evaluator`   | dict，必填                                | LLM 评判器配置，通常是 `GenericLLMEvaluator`            |
+| `rule_evaluator`  | dict                                      | 规则评测器配置，如 `MATHVerifyEvaluator`                |
+| `sample_score_fn` | `Callable[[str, str, Any], dict \| bool]` | 自定义单样本打分函数，返回含 `correct` 的 dict 或布尔值 |
+| `parallel`        | bool，默认 `True`                         | `False` 为级联模式，`True` 为并行模式                   |
 
-`rule_evaluator` 与 `sample_score_fn` 至少提供一个（否则初始化即报错）；但评分流程还会调用规则评测器的 `pred_postprocess`，因此实际使用中应始终提供 `rule_evaluator`。
+`rule_evaluator` 与 `sample_score_fn` 至少提供一个（否则初始化即报错）。若提供 `rule_evaluator`，评分前会先应用其 `pred_postprocess`；若只提供 `sample_score_fn`，则直接使用原始预测调用 `sample_score_fn`。如果同时提供二者，`sample_score_fn` 优先负责单样本打分，且收到的是经过 `rule_evaluator.pred_postprocess` 处理后的预测。
+
+`sample_score_fn` 的调用形式是 `sample_score_fn(prediction, reference, test_item)`：`prediction` 是单条模型预测，`reference` 是对应参考答案，`test_item` 是原始测试样本（没有传入 `test_set` 时为 `None`）。如果返回 dict，至少应包含 `correct` 字段，例如 `{'correct': True, 'pred': prediction, 'answer': reference}`；其他字段会保留在逐样本评测明细中。如果返回非 dict，框架会用 `bool(result)` 转成 `correct`，并自动补充 `pred` 和 `answer`。
 
 LLM 评判所需的测试集由评测任务自动传入，`llm_evaluator.dataset_cfg` 只是为了满足 `GenericLLMEvaluator` 的构造要求，级联评测时会被置空、不会重复加载数据集。judge 模型通过 `judge_cfg` 指定：留空（`dict()`）时读取环境变量 `OC_JUDGE_MODEL` / `OC_JUDGE_API_KEY` / `OC_JUDGE_API_BASE`，也可以填入任意的模型配置（本地或接口模型均可）。
 
-以下是一个完整示例（数学数据集，规则层为 `MATHVerifyEvaluator`，judge 走环境变量）：
+仓库中的 [AIME 2026 级联评测配置](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_cascade_eval_rawprompt_gen_0970dd.py) 是一个完整示例：规则层使用 `MATHVerifyEvaluator`，规则判错的样本再由 `GenericLLMEvaluator` 复核，judge 模型通过环境变量配置。
 
 ```python
-from mmengine.config import read_base
-
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.datasets import CustomDataset
+from opencompass.datasets import generic_llmjudge_postprocess
 from opencompass.evaluator import (
     CascadeEvaluator,
     GenericLLMEvaluator,
-    MATHVerifyEvaluator,
+    MATHVerifyEvaluator
 )
-from opencompass.datasets import MATHDataset
 
-with read_base():
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
-    )
+aime2026_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 
-reader_cfg = dict(input_columns=['problem'], output_column='solution')
-
-infer_cfg = dict(
+aime2026_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\n请逐步推理，并将最终答案放在 \\boxed{} 中。',
-                ),
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            {'role': 'user', 'content': '{problem}\nRemember to put your final answer within \\boxed{}.'},
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
 
-# judge 模板：只允许回复 A / B
-JUDGE_TEMPLATE = """请判断下面的预测答案与标准答案是否一致。
-题目：{problem}
-标准答案：{solution}
-预测答案：{prediction}
+GRADER_TEMPLATE = """
+    Please as a grading expert, judge whether the final answers given by the candidates below are consistent with the standard answers, that is, whether the candidates answered correctly.
 
-一致请回复"A"，不一致请回复"B"，不要输出其他内容。""".strip()
+    Here are some evaluation criteria:
+    1. Please refer to the given standard answer. You don't need to re-generate the answer to the question because the standard answer has been given. You only need to judge whether the candidate's answer is consistent with the standard answer according to the form of the question. Don't try to answer the original question. You can assume that the standard answer is definitely correct.
+    2. Because the candidate's answer may be different from the standard answer in the form of expression, before making a judgment, please understand the question and the standard answer first, and then judge whether the candidate's answer is correct, but be careful not to try to answer the original question.
+    3. Some answers may contain multiple items, such as multiple-choice questions, multiple-select questions, fill-in-the-blank questions, etc. As long as the answer is the same as the standard answer, it is enough. For multiple-select questions and multiple-blank fill-in-the-blank questions, the candidate needs to answer all the corresponding options or blanks correctly to be considered correct.
+    4. Some answers may be expressed in different ways, such as some answers may be a mathematical expression, some answers may be a textual description, as long as the meaning expressed is the same. And some formulas are expressed in different ways, but they are equivalent and correct.
+    5. If the prediction is given with \\boxed{}, please ignore the \\boxed{} and only judge whether the candidate's answer is consistent with the standard answer.
 
-llm_judge_evaluator = dict(
-    type=GenericLLMEvaluator,
-    prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="你是一个负责评估模型输出正确性的助手。",
-                )
+    Please judge whether the following answers are consistent with the standard answer based on the above criteria. Grade the predicted answer of this new question as one of:
+    A: CORRECT
+    B: INCORRECT
+    Just return the letters "A" or "B", with no text around it.
+
+    Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+
+
+    <Original Question Begin>: \n{problem}\n<Original Question End>\n\n
+    <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
+    <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n
+
+    Judging the correctness of candidates' answers:
+""".strip()
+
+cascade_evaluator = dict(
+    type=CascadeEvaluator,
+    rule_evaluator=dict(
+        type=MATHVerifyEvaluator,
+    ),
+    llm_evaluator=dict(
+        type=GenericLLMEvaluator,
+        prompt_template=dict(
+            type=RawPromptTemplate,
+            messages=[
+                {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
+                {'role': 'user', 'content': GRADER_TEMPLATE},
             ],
-            round=[dict(role='HUMAN', prompt=JUDGE_TEMPLATE)],
         ),
+        dataset_cfg=dict(
+            type=CustomDataset,
+            path='opencompass/aime2026',
+            reader_cfg=aime2026_reader_cfg,
+        ),
+        judge_cfg=dict(),
+        dict_postprocessor=dict(type=generic_llmjudge_postprocess),
     ),
-    dataset_cfg=dict(
-        type=MATHDataset,
-        path='opencompass/math',
-        file_name='test_prm800k_500.json',
-    ),
-    judge_cfg=dict(),  # 留空则读取 OC_JUDGE_* 环境变量
+    parallel=False,
+)
+aime2026_eval_cfg = dict(
+    evaluator=cascade_evaluator,
 )
 
-eval_cfg = dict(
-    evaluator=dict(
-        type=CascadeEvaluator,
-        llm_evaluator=llm_judge_evaluator,
-        rule_evaluator=dict(type=MATHVerifyEvaluator),
-        parallel=False,  # 级联模式：只把规则判错的样本交给 judge
-    ),
-)
-
-math_datasets = [
+aime2026_datasets = [
     dict(
-        abbr='math_prm800k_500',
-        type=MATHDataset,
-        path='opencompass/math',
-        file_name='test_prm800k_500.json',
-        reader_cfg=reader_cfg,
-        infer_cfg=infer_cfg,
-        eval_cfg=eval_cfg,
+        type=CustomDataset,
+        abbr='aime2026',
+        path='opencompass/aime2026',
+        reader_cfg=aime2026_reader_cfg,
+        infer_cfg=aime2026_infer_cfg,
+        eval_cfg=aime2026_eval_cfg,
+        n=1,
     )
 ]
-
-datasets = math_datasets
-models = lmdeploy_qwen2_5_7b_instruct_model
-
-work_dir = 'math_prm800k_500_cascade_evaluator'
 ```
+
+其中，`aime2026_reader_cfg` 指定题目列 `problem` 和参考答案列 `answer`；`GRADER_TEMPLATE` 将题目、参考答案与预测分别填入 `{problem}`、`{answer}` 和 `{prediction}`，并要求 judge 输出可被判定逻辑识别的 `A` / `B`（同时也接受 `CORRECT` / `INCORRECT`）。`cascade_evaluator` 中的 `rule_evaluator` 是第一层数学等价评测，`llm_evaluator` 是第二层复核；`parallel=False` 表示只复核第一层判错的样本。`dict_postprocessor` 使用 `generic_llmjudge_postprocess` 将 judge 输出整理为评测明细。空的 `judge_cfg` 表示从 `OC_JUDGE_*` 环境变量读取 judge 模型配置。
 
 ## 评估输出
 
@@ -194,4 +195,4 @@ judge 结果保存在 `<结果目录>_llm_judge_replica<N>.json`。再次评测�
 
 ## 完整示例
 
-仓库示例 [examples/eval_cascade_evaluator.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_cascade_evaluator.py) 展示了在 MATH 数据集上使用级联评测器的完整配置。
+完整配置见 [opencompass/configs/datasets/aime2026/aime2026_cascade_eval_rawprompt_gen_0970dd.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/aime2026/aime2026_cascade_eval_rawprompt_gen_0970dd.py)。

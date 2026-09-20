@@ -9,19 +9,27 @@ To explore the model's subjective capabilities, we employ JudgeLLM as a substitu
 A popular evaluation method involves
 
 - Compare Mode: comparing model responses pairwise to calculate their win rate
-- Score Mode: another method involves calculate scores with single model response ([Chatbot Arena](https://chat.lmsys.org/)).
+- Score Mode: another method involves calculate scores with single model response ([Chatbot Arena](https://arena.ai/)).
 
 We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of models based on above methods.
 
 ## Currently Supported Subjective Evaluation Datasets
 
-1. AlignBench Chinese Scoring Dataset (https://github.com/THUDM/AlignBench)
-2. MTBench English Scoring Dataset, two-turn dialogue (https://github.com/lm-sys/FastChat)
-3. MTBench101 English Scoring Dataset, multi-turn dialogue (https://github.com/mtbench101/mt-bench-101)
-4. AlpacaEvalv2 English Compare Dataset (https://github.com/tatsu-lab/alpaca_eval)
-5. ArenaHard English Compare Dataset, mainly focused on coding (https://github.com/lm-sys/arena-hard/tree/main)
-6. Fofo English Scoring Dataset (https://github.com/SalesforceAIResearch/FoFo/)
-7. Wildbench English Score and Compare Dataset（https://github.com/allenai/WildBench）
+01. [AlignBench](https://github.com/THUDM/AlignBench) Chinese Scoring Dataset
+02. [MTBench](https://github.com/lm-sys/FastChat) English Scoring Dataset, two-turn dialogue
+03. [MTBench101](https://github.com/mtbench101/mt-bench-101) English Scoring Dataset, multi-turn dialogue
+04. [AlpacaEvalv2](https://github.com/tatsu-lab/alpaca_eval) English Compare Dataset
+05. [ArenaHard](https://github.com/lm-sys/arena-hard/tree/main) English Compare Dataset, mainly focused on coding
+06. [Fofo](https://github.com/SalesforceAIResearch/FoFo/) English Scoring Dataset
+07. [Wildbench](https://github.com/allenai/WildBench) English Score and Compare Dataset
+08. [CompassArena](https://arena.opencompass.org.cn/) Chinese Compare Dataset
+09. [CompassArena-SubjectiveBench](https://github.com/open-compass/opencompass/tree/main/opencompass/configs/datasets/subjective/compass_arena_subjective_bench) single-turn and multi-turn Compare Dataset with Bradley-Terry summarization
+10. [CompassBench](https://github.com/open-compass/CompassBench) Chinese and English Compare Dataset
+11. [ELBench](https://github.com/ZeroLoss-Lab/ELBench) education-focused evaluation Dataset with LLM-as-a-Judge subjective subsets
+12. [FLAMES](https://github.com/AIFlames/Flames) Chinese Alignment Scoring Dataset
+13. [FollowBench](https://github.com/YJiangcm/FollowBench) Chinese and English Instruction Following Scoring Dataset
+14. [HelloBench](https://github.com/Quehry/HelloBench) Long Text Generation Scoring Dataset
+15. [WritingBench](https://github.com/X-PLUG/WritingBench) Writing Scoring Dataset
 
 ## Initiating Subjective Evaluation
 
@@ -33,42 +41,10 @@ Similar to objective evaluation, import the models and datasets that need to be 
 
 ```
 with read_base():
-    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm_rawprompt import alignbench_datasets
     from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
-    from .models.qwen.hf_qwen_7b import models
+    from .models.openai.gpt_6_astra import models
 ```
-
-It is worth noting that since the model setup parameters for subjective evaluation are often different from those for objective evaluation, it often requires setting up `do_sample` for inference instead of `greedy`. You can modify the relevant parameters in the configuration file as needed, for example:
-
-```
-models = [
-    dict(
-        type=HuggingFaceChatGLM3,
-        abbr='chatglm3-6b-hf2',
-        path='THUDM/chatglm3-6b',
-        tokenizer_path='THUDM/chatglm3-6b',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True,
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-        ),
-        generation_kwargs=dict(
-            do_sample=True,
-        ),
-        meta_template=api_meta_template,
-        max_out_len=2048,
-        max_seq_len=4096,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
-```
-
-The judgemodel is usually set to a powerful model like GPT4, and you can directly enter your API key according to the configuration in the config file, or use a custom model as the judgemodel.
 
 ### Specifying Other Parameters
 
@@ -122,13 +98,13 @@ If you want to modify prompt on each single question, you can full some other in
 
 ### Step-2: Evaluation Configuration(Compare Mode)
 
-Taking Alignbench as an example, `configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm.py`:
+Taking Alignbench as an example, [`configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm_rawprompt.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm_rawprompt.py#L1-L60):
 
 1. First, you need to set `subjective_reader_cfg` to receive the relevant fields returned from the custom Dataset class and specify the output fields when saving files.
 2. Then, you need to specify the root path `data_path` of the dataset and the dataset filename `subjective_all_sets`. If there are multiple sub-files, you can add them to this list.
 3. Specify `subjective_infer_cfg` and `subjective_eval_cfg` to configure the corresponding inference and evaluation prompts.
 4. Specify additional information such as `mode` at the corresponding location. Note that the fields required for different subjective datasets may vary.
-5. Define post-processing and score statistics. For example, the postprocessing function `alignbench_postprocess` located under `opencompass/opencompass/datasets/subjective/alignbench`.
+5. Define post-processing and score statistics. For example, the `alignbench_postprocess` function in [`opencompass/datasets/subjective/alignbench.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/datasets/subjective/alignbench.py#L306-L318).
 
 ### Step-3: Launch the Evaluation
 
@@ -168,4 +144,4 @@ In the multi-turn dialogue evaluation, you need to organize the data format into
 ],
 ```
 
-It's important to note that due to the different question types in MTBench having different temperature settings, we need to divide the original data files into three different subsets according to the temperature for separate inference. For different subsets, we can set different temperatures. For specific settings, please refer to `configs\datasets\subjective\multiround\mtbench_single_judge_diff_temp.py`.
+It's important to note that due to the different question types in MTBench having different temperature settings, we need to divide the original data files into three different subsets according to the temperature for separate inference. For different subsets, we can set different temperatures. For specific settings, please refer to [`configs/datasets/subjective/multiround/mtbench_single_judge_diff_temp_new_dialogue.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/subjective/multiround/mtbench_single_judge_diff_temp_new_dialogue.py#L1-L72).

@@ -64,4 +64,12 @@ python tools/analyze_repeat.py outputs/my_eval/20260903_120000 \
     --tokenizer gpt-4o
 ```
 
+分析报告会写入 `summary/` 目录，主要包含：
+
+- 每个 benchmark 的样本数、平均 / p75 / p90 token 长度，以及用于筛选长回答的重复分析阈值；
+- `repeat_pattern`：周期性重复片段、重复次数和重复片段占比，用于定位回答内部反复循环的内容；
+- `gzip_high_compression`：gzip 压缩率异常高的样本，用于发现大段重复或高度模板化输出；
+- `missing_prediction_files`：配置中存在但未找到 prediction 文件的模型 / 数据集组合；
+- `abnormal_samples`：异常样本清单，包括模型、benchmark、样本 ID、prediction 路径、触发指标和原始 prediction。
+
 该工具分析回复内部异常重复模式，不等同于“多次评测的一致性分析”。tokenizer 会影响重复片段统计，应记录其名称。

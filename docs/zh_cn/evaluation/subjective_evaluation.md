@@ -9,19 +9,27 @@
 流行的评估方法主要有:
 
 - Compare模式：将模型的回答进行两两比较，以计算对战其胜率。
-- Score模式：针对单模型的回答进行打分（例如：[Chatbot Arena](https://chat.lmsys.org/)）。
+- Score模式：针对单模型的回答进行打分（例如：[Chatbot Arena](https://arena.ai/)）。
 
 我们基于以上方法支持了JudgeLLM用于模型的主观能力评估（目前opencompass仓库里支持的所有模型都可以直接作为JudgeLLM进行调用，此外一些专用的JudgeLLM我们也在计划支持中）。
 
 ## 目前已支持的主观评测数据集
 
-1. AlignBench 中文Scoring数据集（https://github.com/THUDM/AlignBench）
-2. MTBench 英文Scoring数据集，两轮对话（https://github.com/lm-sys/FastChat）
-3. MTBench101 英文Scoring数据集，多轮对话（https://github.com/mtbench101/mt-bench-101）
-4. AlpacaEvalv2 英文Compare数据集（https://github.com/tatsu-lab/alpaca_eval）
-5. ArenaHard 英文Compare数据集，主要面向coding(https://github.com/lm-sys/arena-hard/tree/main)
-6. Fofo  英文Socring数据集（https://github.com/SalesforceAIResearch/FoFo/）
-7. Wildbench 英文Score和Compare数据集（https://github.com/allenai/WildBench）
+01. [AlignBench](https://github.com/THUDM/AlignBench) 中文Scoring数据集
+02. [MTBench](https://github.com/lm-sys/FastChat) 英文Scoring数据集，两轮对话
+03. [MTBench101](https://github.com/mtbench101/mt-bench-101) 英文Scoring数据集，多轮对话
+04. [AlpacaEvalv2](https://github.com/tatsu-lab/alpaca_eval) 英文Compare数据集
+05. [ArenaHard](https://github.com/lm-sys/arena-hard/tree/main) 英文Compare数据集，主要面向coding
+06. [Fofo](https://github.com/SalesforceAIResearch/FoFo/) 英文Scoring数据集
+07. [Wildbench](https://github.com/allenai/WildBench) 英文Score和Compare数据集
+08. [CompassArena](https://arena.opencompass.org.cn/) 中文Compare数据集
+09. [CompassArena-SubjectiveBench](https://github.com/open-compass/opencompass/tree/main/opencompass/configs/datasets/subjective/compass_arena_subjective_bench) 单轮/多轮Compare数据集，支持Bradley-Terry汇总
+10. [CompassBench](https://github.com/open-compass/CompassBench) 中英文Compare数据集
+11. [ELBench](https://github.com/ZeroLoss-Lab/ELBench) 教育场景评测数据集，包含LLM-as-a-Judge主观评测子集
+12. [FLAMES](https://github.com/AIFlames/Flames) 中文价值对齐Scoring数据集
+13. [FollowBench](https://github.com/YJiangcm/FollowBench) 中英文Instruction Following Scoring数据集
+14. [HelloBench](https://github.com/Quehry/HelloBench) 长文本生成Scoring数据集
+15. [WritingBench](https://github.com/X-PLUG/WritingBench) 写作能力Scoring数据集
 
 ## 启动主观评测
 
@@ -33,42 +41,10 @@
 
 ```
 with read_base():
-    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm import alignbench_datasets
+    from .datasets.subjective.alignbench.alignbench_judgeby_critiquellm_rawprompt import alignbench_datasets
     from .datasets.subjective.alpaca_eval.alpacav2_judgeby_gpt4 import subjective_datasets as alpacav2
-    from .models.qwen.hf_qwen_7b import models
+    from .models.openai.gpt_6_astra import models
 ```
-
-值得注意的是，由于主观评测的模型设置参数通常与客观评测不同，往往需要设置`do_sample`的方式进行推理而不是`greedy`，故可以在配置文件中自行修改相关参数，例如
-
-```
-models = [
-    dict(
-        type=HuggingFaceChatGLM3,
-        abbr='chatglm3-6b-hf2',
-        path='THUDM/chatglm3-6b',
-        tokenizer_path='THUDM/chatglm3-6b',
-        model_kwargs=dict(
-            device_map='auto',
-            trust_remote_code=True,
-        ),
-        tokenizer_kwargs=dict(
-            padding_side='left',
-            truncation_side='left',
-            trust_remote_code=True,
-        ),
-        generation_kwargs=dict(
-            do_sample=True,
-        ),
-        meta_template=api_meta_template,
-        max_out_len=2048,
-        max_seq_len=4096,
-        batch_size=8,
-        run_cfg=dict(num_gpus=1, num_procs=1),
-    )
-]
-```
-
-judgemodel通常被设置为GPT4等强力模型，可以直接按照config文件中的配置填入自己的API key，或使用自定义的模型作为judgemodel
 
 ### 其他参数的指定
 
@@ -123,13 +99,13 @@ judgemodel通常被设置为GPT4等强力模型，可以直接按照config文件
 
 ### 第二步：构建评测配置
 
-以Alignbench为例`configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm.py`，
+以Alignbench为例，[`configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm_rawprompt.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/subjective/alignbench/alignbench_judgeby_critiquellm_rawprompt.py#L1-L60)，
 
 1. 首先需要设置`subjective_reader_cfg`，用以接收从自定义的Dataset类里return回来的相关字段并指定保存文件时的output字段
 2. 然后需要指定数据集的根路径`data_path`以及数据集的文件名`subjective_all_sets`，如果有多个子文件，在这个list里进行添加即可
 3. 指定`subjective_infer_cfg`和`subjective_eval_cfg`，配置好相应的推理和评测的prompt
 4. 在相应的位置指定`mode`等额外信息，注意，对于不同的主观数据集，所需指定的字段可能不尽相同。
-5. 定义后处理与得分统计。例如opencompass/opencompass/datasets/subjective/alignbench下的alignbench_postprocess处理函数
+5. 定义后处理与得分统计。例如[`opencompass/datasets/subjective/alignbench.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/datasets/subjective/alignbench.py#L306-L318)中的`alignbench_postprocess`处理函数
 
 ### 第三步 启动评测并输出评测结果
 
@@ -169,4 +145,4 @@ JudgeLLM的评测回复会保存在 `output/.../results/timestamp/xxmodel/xxdata
         ],
 ```
 
-值得注意的是，由于MTBench各不同的题目类型设置了不同的温度，因此我们需要将原始数据文件按照温度分成三个不同的子集以分别推理，针对不同的子集我们可以设置不同的温度，具体设置参加`configs\datasets\subjective\multiround\mtbench_single_judge_diff_temp.py`
+值得注意的是，由于MTBench各不同的题目类型设置了不同的温度，因此我们需要将原始数据文件按照温度分成三个不同的子集以分别推理，针对不同的子集我们可以设置不同的温度，具体设置参见[`configs/datasets/subjective/multiround/mtbench_single_judge_diff_temp_new_dialogue.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/subjective/multiround/mtbench_single_judge_diff_temp_new_dialogue.py#L1-L72)。

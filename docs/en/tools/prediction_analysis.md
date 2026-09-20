@@ -6,7 +6,11 @@
 python tools/case_analyzer.py my_eval.py -w outputs/my_eval/<timestamp>
 ```
 
-It reads existing predictions and evaluation results and organizes error cases and fully annotated samples. Before use, confirm that `-w` points to the actual timestamp directory rather than a parent directory containing multiple experiments.
+It reads existing predictions from `<work_dir>/predictions/`, reloads the Dataset to obtain reference answers, and writes samples for inspection and complete samples under `<work_dir>/case_analysis/bad/` and `<work_dir>/case_analysis/all/`, respectively. It does not read evaluation results from `<work_dir>/results/`.
+
+For PPL evaluation, samples whose predictions differ from their references are written to `bad`. For generation evaluation, all samples are currently written to `bad`, so `bad` represents the complete set of samples awaiting manual inspection rather than samples that an Evaluator has determined to be incorrect.
+
+Before use, confirm that `-w` points to the actual timestamp directory rather than a parent directory containing multiple experiments.
 
 ## Merging Sharded Predictions
 

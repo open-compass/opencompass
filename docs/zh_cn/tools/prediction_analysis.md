@@ -6,7 +6,11 @@
 python tools/case_analyzer.py my_eval.py -w outputs/my_eval/<时间戳>
 ```
 
-它读取已有预测和评测结果，整理错误样本及带标注的完整样本。使用前确认 `-w` 指向实际时间戳目录，而不是只指向包含多个实验的上级目录。
+它读取 `<work_dir>/predictions/` 下的已有预测，并重新加载 Dataset 获取参考答案，随后分别在 `<work_dir>/case_analysis/bad/` 和 `<work_dir>/case_analysis/all/` 下生成待检查样本和完整样本。它不会读取 `<work_dir>/results/` 下的评测结果。
+
+PPL 评测会将预测与参考答案不一致的样本写入 `bad`。生成式评测目前会将所有样本都写入 `bad`，因此这里的 `bad` 实际表示待人工检查的样本全集，并不代表 Evaluator 已判定这些样本回答错误。
+
+使用前确认 `-w` 指向实际时间戳目录，而不是只指向包含多个实验的上级目录。
 
 ## 合并分片预测
 

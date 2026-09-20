@@ -68,7 +68,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    extension/custom_dataset.md
    extension/new_model.md
    extension/new_evaluator_and_summarizer.md
-   extension/persistence.md
 
 .. toctree::
    :maxdepth: 1
@@ -83,15 +82,9 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
 
 .. toctree::
    :maxdepth: 1
-   :caption: 复现、贡献与版本说明
-
-   notes/contribution_guide.md
-   notes/academic.md
-
-.. toctree::
-   :maxdepth: 1
    :caption: 其他文档
 
+   notes/contribution_guide.md
    faq/index.md
    faq/circular_eval.md
    faq/compassbench_intro.md

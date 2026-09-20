@@ -55,7 +55,7 @@
   添加原代码库为上游代码库
 
   ```bash
-  git remote add upstream git@github.com:InternLM/opencompass.git
+  git remote add upstream git@github.com:open-compass/opencompass.git
   ```
 
 - 从第二个 PR 起
@@ -86,7 +86,7 @@ git checkout main -b branchname
   对于中国地区的用户，由于网络原因，安装 pre-commit hook 可能会失败。可以尝试以下命令切换为国内镜像源：
   ```bash
   pre-commit install -c .pre-commit-config-zh-cn.yaml
-  pre-commit run –all-files -c .pre-commit-config-zh-cn.yaml
+  pre-commit run --all-files -c .pre-commit-config-zh-cn.yaml
   ```
   ````
 
@@ -146,7 +146,7 @@ git checkout main -b branchname
 - [mdformat](https://github.com/executablebooks/mdformat): mdformat是一个有明确定义的Markdown格式化程序，可以用来在Markdown文件中强制执行一致的样式。
 - [docformatter](https://github.com/myint/docformatter): 一个格式化docstring的工具。
 
-yapf和isort的样式配置可以在[setup.cfg](https://github.com/OpenCompass/blob/main/setup.cfg)中找到。
+yapf 和 isort 的 pre-commit hook 配置可以在 [`.pre-commit-config.yaml`](https://github.com/open-compass/opencompass/blob/main/.pre-commit-config.yaml) 中找到。该文件配置了工具版本和排除路径；当前仓库没有单独提供 yapf 和 isort 的样式配置文件。
 
 ## 关于贡献测试数据集
 
