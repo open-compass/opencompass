@@ -87,14 +87,10 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    notes/contribution_guide.md
    faq/index.md
    faq/circular_eval.md
-   faq/compassbench_intro.md
-   faq/compassbench_v2_0.md
    faq/contamination_eval.md
-   faq/evaluation_lightllm.md
    faq/evaluation_lmdeploy.md
    faq/longeval.md
    faq/needleinahaystack_eval.md
-   faq/objective_judgelm_evaluation.md
    faq/prompt_attack.md
 
 索引与搜索
