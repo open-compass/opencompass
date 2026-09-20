@@ -2,42 +2,11 @@
 
 OpenCompass 把推理和评测拆成任务后交给 Runner 执行。配置中的三个层次分别是：
 
-- Partitioner：把模型和数据集组合拆成多少个任务；
-- Runner：在本地、Slurm 或 DLC 上以多少并发启动任务；
+- Partitioner：把模型和数据集组合按指定策略拆成子任务；
+- Runner：在本地或 Slurm、阿里云、火山引擎等外部环境中以指定配置和并发启动任务；
 - Task：执行推理、评测或其他具体工作。
 
 用户通过配置文件中的 `infer.partitioner` / `infer.runner` 和 `eval.partitioner` / `eval.runner` 分别控制推理和评测两个阶段。本页集中说明 Partitioner、Runner 和普通任务类型；API 跨数据集并发的内部机制见[跨任务并发推理与评测监听](concurrent_evaluation.md)。
-
-## 默认策略
-
-未显式写 `infer`/`eval` 时，CLI 会生成本地默认配置：推理使用 `NumWorkerPartitioner` 和 `OpenICLInferTask`，评测使用 `NaivePartitioner` 和 `OpenICLEvalTask`，两阶段均由 `LocalRunner` 执行。
-
-中文文档与基础教程中的 API 标准示例使用 `OpenICLInferConcurrentTask` 和 `OpenICLEvalWatchTask`；CLI 自动补齐的默认配置仍使用普通 `OpenICLInferTask` 和 `OpenICLEvalTask`。
-
-```python
-from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
-
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=4),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=4,
-        max_workers_per_gpu=1,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
-eval = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=4,
-        task=dict(type=OpenICLEvalTask),
-    ),
-)
-```
 
 ## 任务划分：三种 Partitioner
 
@@ -114,7 +83,7 @@ infer = dict(
 
 ### 切分与断点恢复
 
-改变切分参数可能让已有预测文件无法正确复用。需要断点恢复时，应保持模型简称、数据集简称和切分策略稳定，详见[任务恢复、复用与只重跑评测](reuse_and_resume.md)。
+改变切分参数可能让已有预测文件无法正确复用。需要断点恢复时，应保持模型简称、数据集简称和切分策略稳定，详见[任务恢复、复用与只重跑评测](#任务恢复复用与只重跑评测)。
 
 ## 运行后端：Runner
 
@@ -173,6 +142,32 @@ runner=dict(
 )
 ```
 
+### VOLCRunner
+
+将任务提交到火山引擎机器学习平台运行。使用前需要安装并配置 `volc` 命令行工具，并准备机器学习任务 YAML 配置文件：
+
+```python
+from opencompass.runners import VOLCRunner
+from opencompass.tasks import OpenICLInferTask
+
+runner=dict(
+    type=VOLCRunner,
+    queue_name='your-resource-queue',
+    max_num_workers=16,
+    retry=2,
+    preemptible=False,
+    volcano_cfg=dict(
+        volcano_config_path='/path/to/ml_task.yaml',
+        python_env_path='/path/to/opencompass-env',
+        hf_offline=True,
+        extra_envs=['COMPASS_DATA_CACHE=/path/to/data'],
+    ),
+    task=dict(type=OpenICLInferTask),
+)
+```
+
+`VOLCRunner` 使用 `volc ml_task submit` 提交任务，并通过 `get` 和 `logs` 子命令跟踪状态与日志。它会根据 Task 的 `num_gpus` 修改 YAML 中 `RoleName: worker` 角色的 `Flavor`，因此配置文件必须包含该角色。`python_env_path` 也可替换为 `bashrc_path` 与 `conda_env_name`，以激活指定的 Conda 环境。
+
 ### RJOBRunner
 
 通过 rjob 命令行工具提交并跟踪任务，适用于使用 rjob 调度的集群。资源需求根据任务声明的 `num_gpus` 自动推导（GPU 数、内存和 CPU）；无 GPU 的任务可在 `rjob_cfg` 中直接指定 `memory` 和 `cpu`。提交后 Runner 会轮询 `rjob get` 直到任务结束：
@@ -196,11 +191,11 @@ runner=dict(
 
 `rjob_cfg` 还支持 `charged_group`、`private_machine`、`replicas`、`host_network` 和 `extra_args` 等字段。
 
-命令行的 `--slurm` / `--dlc` 属于运行时覆盖：即使配置已定义执行器，也会把 Runner 替换成对应类型，并给出覆盖警告。
+命令行的 `--slurm` / `--dlc` 属于运行时覆盖：即使配置已定义执行器，也会把 Runner 替换成对应类型，并给出覆盖警告。`VOLCRunner` 没有对应的命令行覆盖参数，需要在配置文件中显式声明。
 
 ## 任务类型（Task）
 
-任务是一个独立脚本，负责计算密集的操作，通过配置文件确定参数。它可以实例化后调用 `task.run()` 执行，也可以通过 `get_command` 生成完整命令（如 `srun {task_cmd}`）交给调度系统。目前支持：
+任务是OpenCompass中实际执行评测的独立脚本，通过配置文件确定参数。它可以实例化后调用 `task.run()` 执行，也可以通过 `get_command` 生成完整命令（如 `srun {task_cmd}`）交给调度系统。目前支持：
 
 - `OpenICLInferTask`：基于 OpenICL 框架执行语言模型推理；
 - `OpenICLEvalTask`：读取预测结果执行评测计算；
@@ -209,8 +204,39 @@ runner=dict(
 
 后两个任务的参数、运行机制和选择建议参阅[跨任务并发推理与评测监听](concurrent_evaluation.md)。
 
-## 资源声明与实际并发
+## 任务恢复、复用与只重跑评测
 
-模型的 `run_cfg.num_gpus` 声明一个任务占用的 GPU 数量；Runner 的 `max_num_workers` 限制同时运行的任务数；LocalRunner 的 `max_workers_per_gpu` 允许一张卡承载几个任务。这三个参数共同决定并发，不能互相替代。
+OpenCompass 将预测、评分与汇总结果分别保存，因此可以复用已完成的阶段。复用时，工作目录、时间戳、模型与数据集简称以及任务切分方式应保持一致。
 
-先用 `--dry-run` 检查切分结果。并发增大前还应确认显存、CPU、文件描述符、API 限流和数据缓存能够承受对应负载。
+本节命令中的 `--reuse`、`--mode` 和 `--work-dir` 可分别简写为 `-r`、`-m` 和 `-w`，长短形式可以混合使用。
+
+### 复用最近一次运行
+
+```bash
+opencompass my_eval.py --work-dir outputs/my_eval --reuse
+```
+
+不指定值时，`--reuse`（或 `-r`）会选择该工作目录下按名称排序的最新时间戳目录。为明确指定复用目标，建议传入具体时间戳：
+
+```bash
+opencompass my_eval.py \
+    -w outputs/my_eval \
+    -r 20260903_120000
+```
+
+### 分阶段执行
+
+```bash
+# 只生成预测
+opencompass my_eval.py -w outputs/my_eval -m infer
+
+# 对已有预测重新评分
+opencompass my_eval.py -w outputs/my_eval \
+    -r 20260903_120000 -m eval
+
+# 对已有结果重新汇总
+opencompass my_eval.py -w outputs/my_eval \
+    -r 20260903_120000 -m viz
+```
+
+使用 `eval` 或 `viz` 模式时，需要通过 `--reuse` 指定已有实验，或使用结果站读取机制。

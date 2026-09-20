@@ -1,10 +1,10 @@
-# Running a Complete Evaluation from a Configuration
+# Running a Complete Evaluation with a Configuration File
 
-This tutorial starts from an empty file and builds an evaluation configuration that can be parsed, tested, and reproduced. The final experiment calls gpt-6-astra through the OpenAI Responses API, evaluates 64 GSM8K demo samples, and demonstrates explicit control over task partitioning, runners, and result summarization.
+This tutorial builds a complete evaluation configuration from an empty file. The final experiment evaluates `gpt-6-astra` through the OpenAI Responses API on 64 GSM8K demonstration samples, explicitly controls task partitioning and execution, and summarizes the evaluation results.
 
 ## 1. Create the Configuration File
 
-Create `my_eval.py` in the repository root. First use `read_base()` to import existing model and dataset configurations:
+Create `my_eval.py` in the repository root. First, use `read_base()` to import the existing model and dataset configurations:
 
 ```python
 from mmengine.config import read_base
@@ -13,35 +13,27 @@ with read_base():
     from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
         gsm8k_datasets
     from opencompass.configs.models.openai.gpt_6_astra import \
-        models as gpt6_models
+        models as gpt6_astra_models
 
-models = gpt6_models
 datasets = gsm8k_datasets
+models = gpt6_astra_models
 ```
 
-Both `models` and `datasets` must be lists. Importing the model variable under an alias makes a configuration combining multiple models easier to read. `demo_gsm8k_chat_gen` selects only 64 test samples and is suitable for environment validation, not for reporting a formal benchmark result.
+Both `models` and `datasets` must be lists. Importing model variables under aliases keeps combinations of multiple model configurations readable. `demo_gsm8k_chat_gen` selects only 64 test samples and is intended for environment verification; it does not represent a formal benchmark result.
 
-- To change local weights, API, or inference backend, see [Model Integration](models.md).
-- To choose a dataset and configuration variant, see [Dataset Configuration](datasets.md).
-- To understand `read_base()`, overrides, and list composition, see [Configuration Syntax and Reuse](config.md).
+- To change local model weights, an API, or an inference backend, see [Model Integration](models.md).
+- To change a dataset or inspect its detailed configuration, see [Dataset Configuration](datasets.md).
+- To understand `read_base()`, overrides, and variable composition, see [Configuration Syntax and Reuse](config.md).
 
-## 2. Understand Input and Scoring in the Dataset
+## 2. Run Evaluation Tasks with the Default Strategy
 
-The imported dataset already contains `reader_cfg`, `infer_cfg`, and `eval_cfg`. They determine which fields are read, how model input is constructed, and how metrics are computed from output. Do not infer the evaluation method from the dataset name alone; inspect the concrete configuration file for a formal evaluation.
-
-New dataset configurations should describe messages with [RawPromptTemplate](../prompt/raw_prompt_template.md). The traditional [PromptTemplate](../prompt/raw_prompt_template.md#prompttemplate-traditional-template) remains supported; model-side role mapping is handled by the [Model-Side Conversation Template Protocol](../prompt/meta_template.md).
-
-## 3. First Run with the Default Strategy
-
-The minimal configuration above is runnable. When `infer` and `eval` are absent, `opencompass` fills in local defaults. First inspect the final configuration and task partitioning:
+The configuration above is already a valid minimal configuration for `opencompass`. If `infer` and `eval` are not specified, `opencompass` supplies local defaults. Use the following command to inspect the effective configuration and task partitioning:
 
 ```bash
 opencompass my_eval.py --dry-run --config-verbose
 ```
 
-`--dry-run` parses the configuration and constructs tasks without loading the model or running inference. It reveals import-path, field-name, and resource-declaration errors early.
-
-Then execute the complete evaluation:
+Then run the complete evaluation:
 
 ```bash
 opencompass my_eval.py \
@@ -49,11 +41,9 @@ opencompass my_eval.py \
     --debug
 ```
 
-Debug mode executes in the current process and displays logs directly. After validation, remove `--debug` and adjust local concurrency with `--max-num-workers` or model-configuration parameters.
+## 3. Configure the Execution Strategy
 
-## 4. Explicitly Fix Task Orchestration in the Configuration
-
-For an experiment committed to version control or reproduced over time, write the default strategy explicitly in `my_eval.py`. Append:
+Set `infer` and `eval` to explicitly specify the task partitioning strategy, execution environment, and task type:
 
 ```python
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
@@ -74,52 +64,49 @@ eval = dict(
     runner=dict(
         type=LocalRunner,
         max_num_workers=1,
-        task=dict(
-            type=OpenICLEvalWatchTask,
-            watch_interval=5,
-            heartbeat_timeout=60,
-        ),
+        task=dict(type=OpenICLEvalWatchTask),
     ),
 )
 ```
 
-This section describes execution and does not change scoring rules in the dataset:
+This section controls execution and does not change the dataset's scoring rules:
 
-- A Partitioner decides how to divide models and datasets into tasks.
-- A Runner decides where and with what concurrency tasks execute.
-- A Task decides whether to run inference or read predictions for evaluation.
+- The Partitioner determines how model-dataset combinations are divided into subtasks. `NumWorkerPartitioner` distributes the datasets under evaluation as evenly as possible among no more than `num_worker` subtasks. With `num_worker=1`, all datasets for the same model are assigned to one subtask.
+- The Runner determines where tasks execute. `LocalRunner` starts tasks on the local machine, and `max_num_workers=1` allows this Runner to execute at most one task at a time. This argument controls task-level concurrency, not API-request concurrency within a task.
+- A Task is the actual execution unit for inference or evaluation and defines the stage entry point and processing logic. `OpenICLInferConcurrentTask` performs inference and uses the model-side `max_workers` setting for concurrency, but it supports API models only. Local models loaded directly in the evaluation process must use `OpenICLInferTask`. `OpenICLEvalWatchTask` performs evaluation and uses monitoring and heartbeat mechanisms to begin scoring a dataset as soon as its inference completes; local models are commonly paired with `OpenICLEvalTask`.
 
-Both `num_worker` and `max_num_workers` are intentionally set to 1 because one concurrent task takes ownership of every dataset for the same model and schedules requests within that process. `OpenICLInferConcurrentTask` supports API models only; local GPU models should use `OpenICLInferTask` and `OpenICLEvalTask`.
+For the responsibilities, primary parameters, and selection of these component types, see [Task Partitioning, Runners, and Task Types](../execution/tasks_and_runners.md) and [Cross-task Concurrent Inference and Evaluation Monitoring](../execution/concurrent_evaluation.md).
 
-CLI `--slurm` or `--dlc` replaces the configured runner with the corresponding execution backend. See [Task Partitioning, Runners, and Task Types](../execution/tasks_and_runners.md) for the responsibilities and concurrent-resource settings of these components, [Cross-Task Concurrent Inference and Evaluation Watching](../execution/concurrent_evaluation.md) for API concurrent-task behavior, and [Model Integration](models.md) for model-side multi-GPU and tensor-parallel declarations.
+## 4. Configure Result Summaries
 
-## 5. Configure Result Summarization
-
-When `summarizer` is absent, the default summarizer is used. To fix display order, grouping, or aggregate metrics, inherit an existing summary configuration or specify one explicitly:
+Use `summarizer` to select the content, metrics, and order in the final summary table:
 
 ```python
-from opencompass.summarizers import DefaultSummarizer
-
-summarizer = dict(type=DefaultSummarizer)
+summarizer = dict(
+    dataset_abbrs=[
+        'All Results',
+        ['demo_gsm8k', 'accuracy'],
+    ],
+)
 ```
 
-The Dataset's Evaluator produces raw metrics, while the Summarizer organizes and presents them. Do not conflate these responsibilities. See [Evaluation Metrics](metrics.md) for metric meanings.
+Items in `dataset_abbrs` appear in list order. A plain string such as `All Results` is displayed as a text row, while `['demo_gsm8k', 'accuracy']` selects a dataset `abbr` and metric. The Summarizer only organizes and presents metrics produced by the Evaluator; it does not change the scoring rules.
 
-## 6. Run, Recover, and Execute by Stage
+## 5. Run, Resume, and Execute Individual Stages
 
-For a formal run:
+Run the evaluation with the following command. You may also place `work_dir` in the configuration file for reuse:
 
 ```bash
 opencompass my_eval.py --work-dir outputs/my_eval
 ```
 
-Every launch creates a timestamp directory under `outputs/my_eval/`. If a run is interrupted, reuse existing artifacts from the most recent experiment:
+Each invocation creates a timestamped directory under `outputs/my_eval/`. If a run is interrupted, reuse the existing artifacts from the latest experiment:
 
 ```bash
 opencompass my_eval.py --work-dir outputs/my_eval --reuse
 ```
 
-You can also specify the timestamp and execute only one stage:
+You can also specify a timestamp and execute only one stage:
 
 ```bash
 opencompass my_eval.py \
@@ -128,30 +115,107 @@ opencompass my_eval.py \
     --mode eval
 ```
 
-`--mode eval` and `--mode viz` require `--reuse`; otherwise OpenCompass does not know which predictions or results to read. See [Task Recovery, Reuse, and Evaluation-Only Reruns](../execution/reuse_and_resume.md) for complete semantics and safety boundaries, and [Command-Line Reference](../execution/cli_reference.md) for all CLI options.
+`--mode eval` and `--mode viz` must be used with `--reuse`; otherwise, OpenCompass cannot determine which predictions or results to read. For reuse behavior, see [Task Recovery, Artifact Reuse, and Evaluation-only Runs](../execution/tasks_and_runners.md#task-recovery-artifact-reuse-and-evaluation-only-runs). For all command-line arguments, see the [CLI Reference](../execution/cli_reference.md).
 
-## 7. Inspect Artifacts
+## 6. Complete Configuration File
 
-A run's timestamp directory contains the following. See [Understanding Outputs and Result Summarization](results_and_summarizer.md) for details of each directory:
+Combining the preceding sections produces the following complete `my_eval.py`:
+
+```python
+from mmengine.config import read_base
+
+from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
+from opencompass.runners import LocalRunner
+from opencompass.tasks import (OpenICLEvalWatchTask,
+                               OpenICLInferConcurrentTask)
+
+with read_base():
+    from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
+        gsm8k_datasets
+    from opencompass.configs.models.openai.gpt_6_astra import \
+        models as gpt6_astra_models
+
+datasets = gsm8k_datasets
+models = gpt6_astra_models
+
+infer = dict(
+    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=1,
+        task=dict(type=OpenICLInferConcurrentTask),
+    ),
+)
+
+eval = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=1,
+        task=dict(type=OpenICLEvalWatchTask),
+    ),
+)
+
+summarizer = dict(
+    dataset_abbrs=[
+        'All Results',
+        ['demo_gsm8k', 'accuracy'],
+    ],
+)
+
+work_dir = 'outputs/my_eval'
+```
+
+A command-line `--work-dir` overrides `work_dir` in the configuration file. After saving the file, run `opencompass my_eval.py --dry-run --config-verbose` to inspect the effective configuration and task partitioning before starting the complete evaluation.
+
+## 7. Inspect the Artifacts
+
+Each timestamped run directory contains the following. For details about the structure of these artifacts, see [Understanding Outputs and Result Summaries](results_and_summarizer.md).
 
 ```text
 outputs/my_eval/<timestamp>/
-├── configs/       # Effective configuration snapshot
-├── logs/          # Task logs outside debug mode
+├── configs/       # Snapshot of the effective configuration
+├── logs/          # Task logs when debug mode is disabled
 ├── predictions/   # Per-sample model outputs
 ├── results/       # Dataset evaluation results and details
-└── summary/       # Summary tables, CSV files, and other exports
+└── summary/       # Summary tables, CSV files, and other formats
 ```
 
-At minimum, acceptance checks should cover the configuration snapshot, failed-task logs, several per-sample inputs and outputs, and final metrics. A score without its configuration, model version, and data version is not a reproducible evaluation record.
+## 8. Extend the Evaluation Configuration
 
-## 8. Extend into a Formal Experiment
-
-When extending this configuration, change only one category of variables at a time:
+A configuration file may combine multiple models and evaluation sets, define a shared Judge model, and apply dataset-side context settings in batches. For example:
 
 ```python
+# Combine model and dataset configurations imported above with read_base().
 models = model_group_a + model_group_b
 datasets = objective_datasets + subjective_datasets
-```
 
-For new or customized datasets, read [Adding a Dataset](../extension/new_dataset.md) and [Quickly Evaluating Your Own Data](../extension/custom_dataset.md). For a new model backend, read [Adding a Model](../extension/new_model.md). Judge-based, mathematical, and code-execution evaluations require additional dependencies and security boundaries; do not run them by merely replacing a data path.
+# The Judge model is used only for scoring and is not part of models above.
+from opencompass.models import OpenAISDK
+judge_cfg = dict(
+    abbr='judge-model',
+    type=OpenAISDK,
+    path='your-judge-model',
+    key='your-judge-key',
+    openai_api_base='your-judge-api',
+    batch_size=64,
+    temperature=0.001,
+    max_out_len=16384,
+    max_seq_len=262144,
+)
+
+for dataset in datasets:
+    # Override the maximum output length for every dataset Inferencer.
+    inferencer = dataset.get('infer_cfg', {}).get('inferencer')
+    if inferencer is not None:
+        inferencer['max_out_len'] = 128000
+
+    # Override Evaluator configurations that use a Judge model directly.
+    evaluator = dataset.get('eval_cfg', {}).get('evaluator', {})
+    if 'judge_cfg' in evaluator:
+        evaluator['judge_cfg'] = judge_cfg
+    # Also support an LLM Evaluator nested inside a cascade Evaluator.
+    if ('llm_evaluator' in evaluator
+            and 'judge_cfg' in evaluator['llm_evaluator']):
+        evaluator['llm_evaluator']['judge_cfg'] = judge_cfg
+```

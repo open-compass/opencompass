@@ -16,4 +16,4 @@ python tools/analyze_repeat.py outputs/my_eval/<时间戳> \
 
 可用 `--think-tag` 分开分析推理内容和最终回复，`--out` 指定输出文件。若提供 Hugging Face tokenizer，工具可能需要联网加载；离线环境应传入本地 tokenizer 路径。
 
-响应长度用于发现截断、空回复和成本异常，不等同于输入 token 统计。长上下文输入检查参阅[长文（长上下文）评测话题](../faq/long_context.md)。
+响应长度用于发现截断、空回复和成本异常，不等同于输入 token 统计。长上下文输入检查参阅[进行长上下文评测时需要注意什么？](../faq/index.md#进行长上下文评测时需要注意什么)。

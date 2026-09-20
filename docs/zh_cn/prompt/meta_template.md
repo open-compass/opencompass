@@ -1,249 +1,176 @@
 # 模型侧对话模板协议
 
-本章介绍模型侧对话模板协议（Meta Template）在语言模型和 API 模型上的配置方法。阅读本章前建议先了解合并模板页中的[传统对话式 Prompt](raw_prompt_template.md#对话式-prompt)。配置字段名仍为 `meta_template`。
+`meta_template` 写在模型配置中，用于在数据集模板生成输入后，补充模型侧的额外指令或适配模型的对话格式。它同时兼容标准对话模版 `RawPromptTemplate` 和传统对话模版 `PromptTemplate`，但两种模板使用的配置结构不同：
 
-模型侧对话模板协议与模型配置相绑定，在运行时与数据集的对话式模板相结合，最终产生最适合当前模型的 prompt：
+| 数据集侧模板        | `meta_template` 结构 | 主要用途                               |
+| ------------------- | -------------------- | -------------------------------------- |
+| `RawPromptTemplate` | `role/content` 列表  | 插入消息，或在已有消息前追加指令       |
+| `PromptTemplate`    | 包含 `round` 的字典  | 映射传统角色，或包装模型专属特殊 token |
 
-```Python
-# 指定时只需要把 meta_template 字段传入模型
+两种结构不能混用。数据集特有的任务指令应优先写入数据集模板；只有希望同一个模型在所有评测中统一携带的内容，才适合写入模型侧 `meta_template`。
+
+## 为标准模板追加内容
+
+[标准提示词模板](raw_prompt_template.md#标准提示词模板)直接生成由 `system`、`user` 和 `assistant` 组成的消息列表。此时，模型配置中的 `meta_template` 也写成 `role/content` 列表：
+
+```python
+from opencompass.models import OpenAISDK
+
 models = [
     dict(
-        type='AnyModel',
-        meta_template = ...,  # meta template
+        type=OpenAISDK,
+        abbr='my-api-model',
+        path='served-model-name',
+        key='ENV',
+        openai_api_base='https://example.com/v1',
+        meta_template=[
+            dict(
+                role='system',
+                content='Answer concisely and put the final answer last.\n',
+            ),
+        ],
+        max_seq_len=32768,
+        max_out_len=4096,
+        batch_size=8,
     )
 ]
 ```
 
-```{note}
-在某些情况下（例如对基座的测试），我们并不需要在正常对话中注入任何的指令，此时可以将模型侧协议置空。在这种情况下，模型接收到的 prompt 仅由数据集配置定义，是一个普通的字符串。若数据集配置使用的是对话式模板，不同角色的发言将会由 \n 拼接而成。
-```
-
-## 应用在语言模型上
-
-下图展示了在 2-shot learning 的情况下，数据从数据集侧 Prompt 模板经过模型侧对话模板协议，最终构建出 prompt 的几种情况。读者可以该图为参考，方便理解后续的章节。
-
-![](https://user-images.githubusercontent.com/22607038/251195073-85808807-6359-44df-8a19-9f5d00c591ec.png)
-
-下面结合几个例子讲解模型侧对话模板协议的定义方式。
-
-假设根据数据集的对话式模板，产生了下面的 PromptList：
+假设数据集侧生成以下消息：
 
 ```python
-PromptList([
-    dict(role='HUMAN', prompt='1+1=?'),
-    dict(role='BOT', prompt='2'),
-    dict(role='HUMAN', prompt='2+2=?'),
-    dict(role='BOT', prompt='4'),
-])
-```
-
-我们希望把这段对话传到一个已经经过 SFT 的模型。模型约定的对话中不同的角色的发言以`<角色名>:`开头，并固定以一个特殊 token 和 \\n 结尾。以下是模型期望接收到的完整字符串：
-
-```Plain
-<HUMAN>: 1+1=?<eoh>
-<BOT>: 2<eob>
-<HUMAN>: 2+2=?<eoh>
-<BOT>: 4<eob>
-```
-
-在模型侧对话模板协议中，我们只需要把每轮对话的格式抽象为如下配置即可：
-
-```Python
-# model meta template
-meta_template = dict(
-    round=[
-          dict(role='HUMAN', begin='<HUMAN>: ', end='<eoh>\n'),
-          dict(role='BOT', begin='<BOT>: ', end='<eob>\n'),
-    ],
- )
-```
-
-______________________________________________________________________
-
-有的数据集中可能会引入 SYSTEM 级别的角色：
-
-```python
-PromptList([
-    dict(role='SYSTEM', fallback_role='HUMAN', prompt='Solve the following math questions'),
-    dict(role='HUMAN', prompt='1+1=?'),
-    dict(role='BOT', prompt='2'),
-    dict(role='HUMAN', prompt='2+2=?'),
-    dict(role='BOT', prompt='4'),
-])
-```
-
-假设模型同样接受 SYSTEM 这个角色，且期望输入为：
-
-```Bash
-<SYSTEM>: Solve the following math questions<eosys>\n
-<HUMAN>: 1+1=?<eoh>\n
-<BOT>: 2<eob>\n
-<HUMAN>: 2+2=?<eoh>\n
-<BOT>: 4<eob>\n
-end of conversation
-```
-
-我们就可以把 SYSTEM 角色的定义放进 `reserved_roles` 中。`reserved_roles` 中的角色不会在常规对话中出现，但允许数据集配置的对话式模板在 `begin` 或者 `end` 中调用。
-
-```Python
-# model meta template
-meta_template = dict(
-    round=[
-          dict(role='HUMAN', begin='<HUMAN>: ', end='<eoh>\n'),
-          dict(role='BOT', begin='<BOT>: ', end='<eob>\n'),
-    ],
-    reserved_roles=[dict(role='SYSTEM', begin='<SYSTEM>: ', end='<eosys>\n'),],
- ),
-```
-
-若模型并不接受 SYSTEM 角色，则**不需要**配置此项，也能正常运行。这种情况下，模型会接收到的字符串变成了：
-
-```Python
-<HUMAN>: Solve the following math questions<eoh>\n
-<HUMAN>: 1+1=?<eoh>\n
-<BOT>: 2<eob>\n
-<HUMAN>: 2+2=?<eoh>\n
-<BOT>: 4<eob>\n
-end of conversation
-```
-
-这是因为在 OpenCompass 预定义的数据集中，每个 `SYSTEM` 发言都会有一个 `fallback_role='HUMAN'`，即若模型侧协议中的 `SYSTEM` 角色不存在，发言者会被切换至 `HUMAN` 角色。
-
-______________________________________________________________________
-
-有的模型还可能需要考虑在对话开始或结束时嵌入其它字符串，如系统指令：
-
-```Bash
-Meta instruction: You are now a helpful and harmless AI assistant.
-<SYSTEM>: Solve the following math questions<eosys>\n
-<HUMAN>: 1+1=?<eoh>\n
-<BOT>: 2<eob>\n
-<HUMAN>: 2+2=?<eoh>\n
-<BOT>: 4<eob>\n
-end of conversation
-```
-
-此时，我们可以通过指定 `begin` 和 `end` 参数指定这些字符串。
-
-```Python
-meta_template = dict(
-    round=[
-          dict(role='HUMAN', begin='<HUMAN>: ', end='<eoh>\n'),
-          dict(role='BOT', begin='<BOT>: ', end='<eob>\n'),
-    ],
-    reserved_roles=[dict(role='SYSTEM', begin='<SYSTEM>: ', end='<eosys>\n'),],
-    begin="Meta instruction: You are now a helpful and harmless AI assistant.",
-    end="end of conversion",
- ),
-```
-
-______________________________________________________________________
-
-在**生成式**的任务评测中，我们也不会将答案直接输入模型，而是通过截断 prompt，在保留上文的同时，把模型输出的答案留空。
-
-```Bash
-Meta instruction: You are now a helpful and harmless AI assistant.
-<SYSTEM>: Solve the following math questions<eosys>\n
-<HUMAN>: 1+1=?<eoh>\n
-<BOT>: 2<eob>\n
-<HUMAN>: 2+2=?<eoh>\n
-<BOT>:
-```
-
-我们只需要把 BOT 的配置中把 `generate` 字段置为 True ，OpenCompass 即会将 BOT 的最后一句话留给模型生成：
-
-```Python
-meta_template = dict(
-    round=[
-          dict(role='HUMAN', begin='<HUMAN>: ', end='<eoh>\n'),
-          dict(role='BOT', begin='<BOT>: ', end='<eob>\n', generate=True),
-    ],
-    reserved_roles=[dict(role='SYSTEM', begin='<SYSTEM>: ', end='<eosys>\n'),],
-    begin="Meta instruction: You are now a helpful and harmless AI assistant.",
-    end="end of conversion",
- ),
-```
-
-需要注意的是，`generate` 仅影响生成式推理。在进行判别式推理时，模型接受到的 prompt 仍然是完整的。
-
-### 全量字段介绍
-
-```Bash
-models = [
-    dict(meta_template = dict(
-            begin="Meta instruction: You are now a helpful and harmless AI assistant.",
-            round=[
-                    dict(role='HUMAN', begin='HUMAN: ', end='<eoh>\n'),  # begin and end can be a list of strings or integers.
-                    dict(role='THOUGHTS', begin='THOUGHTS: ', end='<eot>\n', prompt='None'), # Here we can set the default prompt, which may be overridden by the speicfic dataset
-                    dict(role='BOT', begin='BOT: ', generate=True, end='<eob>\n'),
-            ],
-            end="end of conversion",
-            reserved_roles=[dict(role='SYSTEM', begin='SYSTEM: ', end='\n'),],
-            eos_token_id=10000,
-         ),
-     )
+[
+    {'role': 'system', 'content': 'Solve the following problem.'},
+    {'role': 'user', 'content': 'What is 1 + 1?'},
 ]
 ```
 
-meta_template 是一个字典，该字典可以包含以下数个字段：
+模型侧模板处理后的输入为：
 
-- `begin`，`end` ：(str，可选) prompt 的开头和结尾，通常是一些系统级别的指令。
+```python
+[
+    {
+        'role': 'system',
+        'content': (
+            'Answer concisely and put the final answer last.\n'
+            'Solve the following problem.'
+        ),
+    },
+    {'role': 'user', 'content': 'What is 1 + 1?'},
+]
+```
 
-- `round`：(list) 每一轮对话的模板格式。每轮对话的 prompt 内容由数据集配置的对话式模板控制。
+处理规则如下：
 
-- `reserved_roles`:（list，可选）指定 `round` 中并未出现，但有可能在数据集配置中用到的的预留角色，例如 `SYSTEM` 角色。
+- 当模型侧消息与数据集消息在对应位置具有相同 `role` 时，模型侧 `content` 会添加到数据集消息内容之前；
+- 当后续数据集消息中不存在该 `role` 时，模型侧消息会作为一条新消息插入；
+- 模型侧列表按照声明顺序处理，`role` 只能使用 `system`、`user` 或 `assistant`。
 
-- `eos_token_id`:（int, 可选）：指定了该模型的 eos token 的 id。如果不设置，则默认为 tokenizer 中的 eos token id。它的主要作用是在生成式任务中，截取模型的输出结果，因此一般应该被设置为 generate=True 的项所对应的 end 的第一个 token id。
+这种列表写法不会执行传统模板的角色映射，也不使用 `round`、`api_role`、`begin`、`end` 或 `generate`。它适用于能够直接处理标准消息列表的模型类型，例如 OpenAI 兼容 API 模型；其他模型类型是否支持，应以其模板解析实现为准。
 
-meta_template 的 `round` 指定了一轮对话中每个角色说话的格式，接受一个字典组成的列表，每个字典的关键字如下：
+## 为传统模板适配模型格式
 
-- `role`（str）: 参与对话的角色名，该字符串并不影响实际的 prompt。
+传统 `PromptTemplate` 生成的是由 `SYSTEM`、`HUMAN`、`BOT` 等角色组成的中间结构。此时，`meta_template` 使用字典格式，负责把这些角色转换为 API 消息，或包装成本地语言模型要求的字符串。
 
-- `begin`, `end` (str): 指定该角色在说话时的固定开头或结尾。
+### API 与 Chat Template 模型
 
-- `prompt` (str)：角色的 prompt。在模型侧协议中允许留空，但此时必须在数据集配置的 prompt 中指定。
+对于 API 模型，以及通过 tokenizer chat template 构造输入的模型，只需配置角色映射：
 
-- `generate` (bool): 指定为 True 时，该角色即为模型扮演的角色。在生成任务中，模型接收到的 prompt 会截止到该角色的 `begin` 处，剩下的内容由模型补全。
+```python
+from opencompass.models import OpenAISDK
 
-## 应用在 API 模型上
-
-API 模型的模型侧对话模板协议与普通模型类似，但配置更为简单。用户可以根据情况，直接使用下面的两种配置之一，即可以多轮对话的方式评测 API 模型：
-
-```Bash
-# 若 API 模型不支持 system 指令
-meta_template=dict(
+api_meta_template = dict(
     round=[
-        dict(role='HUMAN', api_role='HUMAN'),
-        dict(role='BOT', api_role='BOT', generate=True)
+        dict(role='HUMAN', api_role='user'),
+        dict(role='BOT', api_role='assistant', generate=True),
+    ],
+    reserved_roles=[
+        dict(role='SYSTEM', api_role='system'),
     ],
 )
 
-# 若 API 模型支持 system 指令
-meta_template=dict(
+models = [
+    dict(
+        type=OpenAISDK,
+        abbr='my-api-model',
+        path='served-model-name',
+        key='ENV',
+        openai_api_base='https://example.com/v1',
+        meta_template=api_meta_template,
+        max_seq_len=32768,
+        max_out_len=4096,
+        batch_size=8,
+    )
+]
+```
+
+- `role` 必须与传统数据集模板中的角色名称一致；
+- `api_role` 指定转换后的消息角色；
+- `generate=True` 表示该角色由模型生成。在生成式推理中，最后一轮对应的 `BOT` 内容不会作为输入发送；PPL 推理仍会保留完整候选内容；
+- `reserved_roles` 声明不会固定出现在每一轮、但可能在 `begin` 或 `end` 中出现的角色，通常用于 `SYSTEM`。
+
+如果传统数据集模板中的 `SYSTEM` 设置了 `fallback_role='HUMAN'`，而模型侧没有声明 `SYSTEM`，该消息会按 `HUMAN` 角色处理。
+
+### 本地一站式评测的语言模型
+
+对于直接接收字符串的本地语言模型，`begin` 和 `end` 用于为各角色添加模型要求的标记：
+
+```python
+lm_meta_template = dict(
+    begin='Meta instruction: You are a helpful assistant.\n',
     round=[
-        dict(role='HUMAN', api_role='HUMAN'),
-        dict(role='BOT', api_role='BOT', generate=True)
+        dict(
+            role='HUMAN',
+            begin='<HUMAN>: ',
+            end='<eoh>\n',
+        ),
+        dict(
+            role='BOT',
+            begin='<BOT>: ',
+            end='<eob>\n',
+            generate=True,
+        ),
     ],
     reserved_roles=[
-        dict(role='SYSTEM', api_role='SYSTEM'),
+        dict(
+            role='SYSTEM',
+            begin='<SYSTEM>: ',
+            end='<eosys>\n',
+        ),
     ],
 )
 ```
 
-### 原理
+这里的 `begin` 和 `end` 是模型协议的一部分，不是任务指令。OpenCompass 会按传统数据集模板中的角色顺序套用这些标记；在生成式推理中，输入会停在 `generate=True` 角色的 `begin` 之后，等待模型继续生成。
 
-尽管不同 API 模型接受的数据结构不一，但总体上不乏共通之处。接受对话历史的接口里通常允许用户传入以下三个角色的 prompt：
+使用 tokenizer chat template 的模型通常只需要前一节的角色映射，不应再手写相同的特殊 token，否则可能造成模板重复。
 
-- 用户
+### 面向传统模板场景的支持字段
 
-- 机器人
+`meta_template` 字典支持以下主要字段：
 
-- 系统 （可选）
+| 字段             | 作用                                                               |
+| ---------------- | ------------------------------------------------------------------ |
+| `round`          | 必填；定义一轮对话中的角色顺序及每个角色的转换规则                 |
+| `reserved_roles` | 可选；声明可能出现在轮次之外的角色                                 |
+| `begin`、`end`   | 可选；为完整输入添加全局开头或结尾，主要用于直接接收字符串的模型   |
+| `eos_token_id`   | 可选；为部分本地模型指定生成终止 token，具体支持情况取决于模型类型 |
 
-据此 OpenCompass 为 API 模型预设了三个 `api_role`：`HUMAN`, `BOT`, `SYSTEM`，同时约定 API 模型接受的输入除了普通字符串外，还有一种以 `PromptList` 结构表示对话的中间格式。API 模型会将对话重新以多轮对话格式打包，发送至后端。但要激活此功能，需要在模型侧协议中把数据集 prompt 模板中的角色 `role` 映射到对应的 `api_role`。下图展示了 API 模型接受的输入、数据集侧 PromptTemplate 与模型侧对话模板协议之间的关系。
+`round` 和 `reserved_roles` 中的角色项支持：
 
-![](https://user-images.githubusercontent.com/22607038/251195872-63aa7d30-045a-4837-84b5-11b09f07fb18.png)
+| 字段           | 作用                                                 |
+| -------------- | ---------------------------------------------------- |
+| `role`         | 与传统 `PromptTemplate` 中的角色名称匹配             |
+| `api_role`     | 将角色映射为 API 或 chat template 使用的角色         |
+| `begin`、`end` | 在直接文本输入中包裹该角色的内容                     |
+| `prompt`       | 可选的默认内容；数据集模板提供同一角色内容时会覆盖它 |
+| `generate`     | 标记由模型生成的角色；通常只为 `BOT` 设置 `True`     |
 
-## 调试
+同一个角色只能在 `round` 和 `reserved_roles` 中声明一次。面向 API 或 chat template 的配置使用 `api_role`；面向直接文本输入的配置使用角色级 `begin` 和 `end`，不应把两套写法混在同一个角色定义中。
 
-如果需要调试 prompt，建议在准备好配置文件后，使用 `tools/prompt_viewer.py` 脚本预览模型实际接收到的 prompt。阅读[这里](../tools/index.md#prompt-viewer)了解更多。
+## 不配置 meta_template 时
+
+- `RawPromptTemplate` 生成的标准消息会保持原样；
+- 传统 `PromptTemplate` 生成的带角色结构会失去角色包装，各项 `prompt` 通常仅按顺序拼接为字符串。
+
+因此，API 和 chat template 评测优先使用 `RawPromptTemplate`；只有兼容传统数据集配置时才需要角色映射。直接加载依赖专用对话格式的本地模型时，应确保模型配置提供了正确的 `meta_template`。

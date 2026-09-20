@@ -242,7 +242,7 @@ Possible fields in this file include:
 - `infer_method` (str): Inference method, options are `ppl` and `gen`.
 - `human_prompt` (str): User prompt template for generating prompts. Variables in the template are enclosed in `{}`, like `{question}`, `{opt1}`, etc. If `template` exists, this field will be ignored.
 - `bot_prompt` (str): Bot prompt template for generating prompts. Variables in the template are enclosed in `{}`, like `{answer}`, etc. If `template` exists, this field will be ignored.
-- `template` (str or dict): Question template for generating prompts. Variables are enclosed in `{}`, such as `{question}` and `{opt1}`. See [Traditional PromptTemplate](../prompt/raw_prompt_template.md#string-based-prompt) for the syntax of `infer_cfg['prompt_template']['template']`.
+- `template` (str or dict): Question template for generating prompts. Variables are enclosed in `{}`, such as `{question}` and `{opt1}`. For the relevant syntax, see [Legacy Prompt Template](../prompt/raw_prompt_template.md#legacy-prompt-template).
 - `input_columns` (list): List of input fields for reading data.
 - `output_column` (str): Output field for reading data.
 - `options` (list): List of options for reading data, valid only when `data_type` is `mcq`.

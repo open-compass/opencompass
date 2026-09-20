@@ -25,7 +25,7 @@ from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import 
 ```
 
 The original example calls an lmdeploy-based model configuration in OpenCompass.
-You can also build your new model configuration based on [this document](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/models.html).
+You can also define a new model configuration by following [Model Integration](../user_guides/models.md).
 An example of a configuration that calls the deployed service of Qwen3-235B-A22B based on OpenAISDK is as follows:
 
 ```python

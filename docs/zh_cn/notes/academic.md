@@ -24,7 +24,7 @@ from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat import 
     models as hf_internlm2_5_7b_chat_model
 ```
 
-原有示例中调用了一个OpenCompass中已集成的lmdeploy型模型配置文件，你也可以基于[此文档](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/models.html)自行定义新的模型配置。一个基于OpenAISDK调用已部署服务评测Qwen3-235B-A22B的配置示例如下：
+原有示例中调用了一个OpenCompass中已集成的lmdeploy型模型配置文件，你也可以参考[模型接入](../user_guides/models.md)自行定义新的模型配置。一个基于OpenAISDK调用已部署服务评测Qwen3-235B-A22B的配置示例如下：
 
 ```python
 from opencompass.models import OpenAISDK
@@ -68,7 +68,7 @@ models = [
 
 ### 2: Verifier配置
 
-接着，在 `judge_cfg` 中补全你的Verifier模型信息。有关于LLM Verifier的详细内容，请参阅[此文档](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/llm_judge.html)。
+接着，在 `judge_cfg` 中补全你的Verifier模型信息。有关于LLM Verifier的详细内容，请参阅[LLM 作为评判器](../evaluation/llm_judge.md)。
 目前，学术榜单使用[CompassVerifier-32B](https://huggingface.co/opencompass/CompassVerifier-32B)，基于OpenAISDK的配置示例如下：
 
 ```python

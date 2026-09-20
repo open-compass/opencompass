@@ -25,7 +25,7 @@ Configuration files use Python syntax and reuse repository model, dataset, and s
 
 ## Models
 
-A model configuration describes how to call the model and the resources needed by one instance. It includes the backend, weights or endpoint, context length, maximum output length, batch size, generation arguments, and `run_cfg`. Common entry points include OpenAI-compatible endpoints, vendor SDKs, and local Hugging Face, LMDeploy, vLLM, and multimodal model classes. API models normally declare `run_cfg.num_gpus=0` and consume no local GPU.
+A model configuration describes how to call the model and the resources required for execution. It includes the model backend, weights or endpoint, context length, maximum output length, concurrency, and model hyperparameters. Common entry points include OpenAI-compatible endpoints, vendor SDKs, and local Hugging Face, LMDeploy, vLLM, and multimodal model classes.
 
 See [Model Integration](models.md).
 
@@ -33,17 +33,17 @@ See [Model Integration](models.md).
 
 In OpenCompass, a dataset configuration contains more than a data path. It usually also declares:
 
-- `reader_cfg`: input fields, answer fields, and data splits.
-- `infer_cfg`: prompts, example retrievers, and generation or PPL inferencers.
-- `eval_cfg`: answer postprocessing and metric computation.
+- `reader_cfg`: input fields, answer fields, and the data-splitting strategy.
+- `infer_cfg`: prompt structure, few-shot configuration, and inference methods such as PPL or Gen.
+- `eval_cfg`: model-output postprocessing and metric computation.
 
 The same raw data can therefore have multiple configuration variants, for example with different few-shot settings, prompts, or evaluators. See [Dataset Configuration](datasets.md).
 
 ## Inference, Evaluation, and Summarization
 
-During inference, a Partitioner divides “model × dataset” into tasks, a Runner determines how tasks execute locally or in another cluster environment, and a Task performs the actual inference. The API example in the basic tutorial uses `OpenICLInferConcurrentTask` for concurrent inference together with `OpenICLEvalWatchTask` for evaluation as outputs complete; local models still use the ordinary inference and evaluation tasks. Outputs are written to `predictions/`.
+When evaluation tasks run, a Partitioner divides “model × dataset” into parallelizable Tasks, a Runner determines whether and how those Tasks execute locally or in another cluster environment, and each Task performs the actual inference or evaluation. For example, the API configuration in the basic tutorial uses `OpenICLInferConcurrentTask` for efficient concurrent inference and `OpenICLEvalWatchTask` to evaluate results as they become available.
 
-The evaluation stage reads predictions, uses the Dataset's Evaluator to compute scores, and writes them to `results/`. A Summarizer then organizes subset results into terminal tables and summary files. Because inference and evaluation results are stored separately, `--reuse` can rerun only a missing stage, while `--mode eval` and `--mode viz` can process existing outputs.
+Inference and evaluation outputs are written to `predictions/` and `results/`, respectively. The Summarizer then organizes subset results into final summary files. Because each stage stores its artifacts separately, an interrupted run can use `--reuse` to continue from the missing stage, or use `--mode eval` and `--mode viz` to process existing artifacts one stage at a time. See [Reuse, Recovery, and Staged Execution](../execution/tasks_and_runners.md#task-recovery-artifact-reuse-and-evaluation-only-runs) and [Understanding Outputs and Result Summaries](results_and_summarizer.md).
 
 ## Work Directory and Reproducibility
 

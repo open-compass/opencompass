@@ -9,7 +9,7 @@
     - [3. Commit your changes](#3-commit-your-changes)
     - [4. Push your changes to the forked repository and create a PR](#4-push-your-changes-to-the-forked-repository-and-create-a-pr)
     - [5. Discuss and review your code](#5-discuss-and-review-your-code)
-    - [6.  Merge your branch to `main` branch and delete the branch](#6--merge-your-branch-to-main-branch-and-delete-the-branch)
+    - [6. Delete the branch after the pull request is merged](#6-delete-the-branch-after-the-pull-request-is-merged)
   - [Code style](#code-style)
     - [Python](#python)
   - [About Contributing Test Datasets](#about-contributing-test-datasets)
@@ -82,6 +82,14 @@ git checkout main -b branchname
   pre-commit install
   ```
 
+  ````{tip}
+  In regions where network access prevents installation of the pre-commit hooks, try the following commands to use the alternative configuration:
+  ```bash
+  pre-commit install -c .pre-commit-config-zh-cn.yaml
+  pre-commit run –all-files -c .pre-commit-config-zh-cn.yaml
+  ```
+  ````
+
 - Commit your changes as usual. Pre-commit hooks will be triggered to stylize your code before each commit.
 
   ```bash
@@ -113,7 +121,7 @@ git checkout main -b branchname
 
 - Modify your codes according to reviewers' suggestions and then push your changes.
 
-### 6. Merge your branch to `main` branch and delete the branch
+### 6. Delete the branch after the pull request is merged
 
 - After the PR is merged by the maintainer, you can delete the branch you created in your forked repository.
 
@@ -153,6 +161,5 @@ Style configurations of yapf and isort can be found in [setup.cfg](https://githu
 - (Optional) Summarizer of the dataset
 - (Optional) If the testing process cannot be achieved simply by concatenating the dataset and model configuration files, a configuration file for conducting the test is also required.
 - (Optional) If necessary, please add a description of the dataset in the relevant documentation sections. This is very necessary to help users understand the testing scheme. You can refer to the following types of documents in OpenCompass:
-  - [Circular Evaluation](../advanced_guides/circular_eval.md)
+  - [Circular Evaluation](../faq/circular_eval.md)
   - [Code Evaluation](../evaluation/code_eval.md)
-  - [Contamination Assessment](../advanced_guides/contamination_eval.md)

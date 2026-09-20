@@ -36,7 +36,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
 
    prompt/raw_prompt_template.md
    prompt/meta_template.md
-   prompt/chain_of_thought.md
    prompt/debugging.md
 
 .. toctree::
@@ -45,7 +44,6 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
 
    execution/tasks_and_runners.md
    execution/concurrent_evaluation.md
-   execution/reuse_and_resume.md
    execution/cli_reference.md
 
 .. toctree::
@@ -95,7 +93,16 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    :caption: 其他文档
 
    faq/index.md
-   faq/long_context.md
+   faq/circular_eval.md
+   faq/compassbench_intro.md
+   faq/compassbench_v2_0.md
+   faq/contamination_eval.md
+   faq/evaluation_lightllm.md
+   faq/evaluation_lmdeploy.md
+   faq/longeval.md
+   faq/needleinahaystack_eval.md
+   faq/objective_judgelm_evaluation.md
+   faq/prompt_attack.md
 
 索引与搜索
 ============

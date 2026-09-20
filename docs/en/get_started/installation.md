@@ -60,13 +60,16 @@ Datasets are normally downloaded on first use. On a shared machine, configure ca
 ```bash
 export HF_DATASETS_CACHE=/path/to/huggingface-cache/datasets
 export COMPASS_DATA_CACHE=/path/to/opencompass-data-cache
+export LMUData=/path/to/mm-data-cache
 ```
 
-`HF_DATASETS_CACHE` manages the Hugging Face dataset cache, while `COMPASS_DATA_CACHE` specifies the OpenCompass data-cache root. Download and loading behavior differs by dataset. See [Data Sources, Caches, and Offline Operation](../user_guides/data_and_cache.md) for detailed rules and offline preparation.
+`HF_DATASETS_CACHE` manages the Hugging Face dataset cache, `COMPASS_DATA_CACHE` specifies the OpenCompass data-cache root, and `LMUData` specifies the cache directory for multimodal datasets imported from VLMEvalKit. Download and loading behavior differs by dataset. See [Dataset Download and Caching](../user_guides/data_and_cache.md) for detailed rules and offline preparation.
 
 ## Checking Models and Inference Backends
 
-Successfully installing LMDeploy or vLLM does not guarantee that the target model is compatible with that backend. First load a small model with the chosen backend, then run a demo dataset through OpenCompass. For an API model, also check the service URL, model name, key environment variable, rate limit, and timeout configuration.
+After completing the installation and configuration above, you can evaluate an API model. Before running an evaluation, verify the service URL, model name, API key, rate-limit parameters, and timeout settings.
+
+To deploy a local model with LMDeploy or vLLM for one-stop evaluation, also verify compatibility between the inference-backend version and the model. First confirm that the backend can load the target model and perform inference, then launch the complete evaluation through OpenCompass.
 
 ## Start Evaluating
 

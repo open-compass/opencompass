@@ -1,6 +1,6 @@
 # Cross-Task Concurrent Inference and Evaluation Watching
 
-This page is a reference for standard OpenCompass task types, with an emphasis on orchestrating large-scale API evaluation. The basic tutorial uses a **concurrent inference task** (`OpenICLInferConcurrentTask`) so one process advances multiple datasets for one model, together with an **evaluation watching task** (`OpenICLEvalWatchTask`) that starts scoring while inference is still running. Both target large numbers of remote requests and are not general acceleration switches for local GPU models.
+This page introduces the standard OpenCompass task types, with an emphasis on task orchestration for large-scale API evaluation. The basic tutorial uses a **concurrent inference task** (`OpenICLInferConcurrentTask`) so that one process concurrently handles multiple datasets for the same model. It also uses an **evaluation watching task** (`OpenICLEvalWatchTask`) to begin evaluating completed datasets before the inference stage has finished in full. Used together, they reduce scheduling overhead and allow inference and evaluation to overlap, making them suitable for API evaluations with large request volumes.
 
 ## Mechanism Overview
 
@@ -23,46 +23,30 @@ main opencompass process
            skip remaining incomplete datasets and exit
 ```
 
-## Ordinary Inference and Evaluation Tasks
-
-`OpenICLInferTask` treats one “model × dataset × shard” as one task and delegates parallelism to the Partitioner and Runner. It suits local GPU models and partitioned execution on Slurm, DLC, and similar clusters.
-
-`OpenICLEvalTask` reads predictions and computes scores after inference. It uses the same scoring logic as `OpenICLEvalWatchTask`; the ordinary task starts scoring as a group, whereas the Watch task scores shards as they complete and uses a heartbeat timeout to avoid incomplete predictions.
-
-General guidance:
-
-- Large-scale API evaluation: `OpenICLInferConcurrentTask` + `OpenICLEvalWatchTask`.
-- Local models or cluster partitioning: `OpenICLInferTask` + `OpenICLEvalTask`.
-
-See [Task Partitioning, Runners, and Task Types](tasks_and_runners.md) for Partitioner and Runner configuration.
-
 ## OpenICLInferConcurrentTask
 
-With ordinary `OpenICLInferTask`, one task handles only one “model × dataset × shard,” and parallelism belongs entirely to the Partitioner and Runner. The concurrent task does the opposite: **one process owns every dataset under evaluation for one model** and schedules them internally. Therefore, `num_worker=1` and `max_num_workers=1` are intentional—datasets should not be split or copied into multiple tasks again.
+`OpenICLInferConcurrentTask` concurrently processes the datasets for the same model assigned to one Task by the Partitioner. It is recommended to set `NumWorkerPartitioner.num_worker` to 1 so that all datasets for each model are assigned to one unsplit Task. `LocalRunner.max_num_workers` sets the maximum number of Tasks that can run at the same time. Use 1 for a single-model evaluation, or increase it as appropriate for multiple models after accounting for available resources and rate limits.
 
-Within the process:
+The internal workflow is:
 
 1. **API-model restriction:** after constructing the model, it checks `model.is_api`; a local GPU model raises an error.
 2. **Dataset scheduling:** a thread pool runs multiple datasets at once, up to `min(dataset count, 32)`, and starts the next dataset early when the remaining samples in running tasks fall below `2 × max_workers`, preventing request starvation.
-3. **Global throttling:** a semaphore with `max_workers` permits is attached to the model. Requests from all datasets share it, so total pressure does not grow with dataset count.
-4. **Status reporting:** each “model × dataset” maintains a JSON file under `infer_status/` (`<dataset>_0.json`, `<dataset>_1.json`, and so on for multiple shards). Status moves through pending → running → done/fail and progress is continuously written for the watching task.
-5. **Resume:** a model-dataset combination whose prediction file already exists is skipped.
+3. **Status reporting:** each model-dataset combination maintains a JSON file under `infer_status/` (`<dataset>_0.json`, `<dataset>_1.json`, and so on for multiple shards). Status moves through pending → running → done/fail, and execution progress is continuously written for the watching task.
+4. **Resume:** a model-dataset combination whose prediction file already exists is skipped.
 
 `max_workers` first uses the same-named field from the model configuration. If absent, it defaults to `min(32, CPU core count + 4)`.
 
-Constructor arguments belong under `infer.runner.task`:
+Concurrency controls and related arguments are:
 
-| Argument                 | Default                       | Description                                                                            |
-| ------------------------ | ----------------------------- | -------------------------------------------------------------------------------------- |
-| `poll_interval`          | 1.0                           | Dataset-scheduling poll interval in seconds                                            |
-| `log_interval`           | 30.0                          | Progress log interval in seconds                                                       |
-| `max_workers`            | `min(32, CPU core count + 4)` | Request-concurrency semaphore shared by all datasets; the model field takes precedence |
-| `dump_res_length`        | False                         | Write response-length statistics for debugging                                         |
-| `dump_only_message_path` | None                          | Export final messages without requesting the model                                     |
+| Argument        | Default                       | Configuration location and description                                                           |
+| --------------- | ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `max_workers`   | `min(32, CPU core count + 4)` | Model configuration field that controls the request-concurrency semaphore shared by all datasets |
+| `poll_interval` | 1.0                           | Top-level Task field specifying the dataset-scheduling poll interval in seconds                  |
+| `log_interval`  | 30.0                          | Top-level Task field specifying the progress-log interval in seconds                             |
 
-## Relationship to Parallel Inferencers
+### Relationship to Parallel Inferencers
 
-`ParallelGenInferencer`, `ParallelChatInferencer`, and `ParallelChatMLInferencer` are concurrent subclasses of their single-dataset counterparts. They fix `batch_size` to 1, use a thread pool to keep multiple requests from the **same dataset** in flight, write each sample incrementally to `tmp_*.jsonl` so a restart continues from completed samples, and report progress through `progress_tracker`.
+`ParallelGenInferencer`, `ParallelChatInferencer`, and `ParallelChatMLInferencer` are concurrent subclasses of their corresponding single-dataset Inferencers. They fix `batch_size` at 1, use a thread pool to process multiple sample requests from the **same dataset** concurrently, write each result incrementally to `tmp_*.jsonl` so that completed samples can be skipped after a restart, and report progress through `progress_tracker`.
 
 The two layers are responsible for:
 
@@ -105,7 +89,7 @@ Constructor arguments belong under `eval.runner.task`:
 | `heartbeat_timeout` | 60.0    | Heartbeat timeout in seconds; skip remaining datasets after timeout |
 | `log_interval`      | 30.0    | Log interval for the remaining task count while waiting             |
 
-## Complete Configuration Example
+## Inference and Evaluation Task Configuration Example
 
 The model declares request concurrency, while `infer` and `eval` use the two tasks:
 
@@ -146,3 +130,14 @@ eval = dict(
 ```
 
 Place `watch_interval`, `heartbeat_timeout`, and `log_interval` inside `eval.runner.task`. The default values of the concurrent inference task's same-named `poll_interval` and `log_interval` suit most cases.
+
+## Ordinary Inference and Evaluation Tasks
+
+`OpenICLInferTask` processes the model-dataset combinations assigned to the same Task by the Partitioner in sequence. It is suitable for one-stop deployment and evaluation of local models. The Partitioner determines the combinations and their partitioning, while the Runner controls the execution environment and number of concurrent Tasks.
+
+`OpenICLEvalTask` reads existing predictions and computes evaluation metrics. It uses the same scoring logic as `OpenICLEvalWatchTask`; the difference is that the ordinary task normally starts after inference has completed, whereas the watching task starts evaluation for each completed dataset according to inference progress.
+
+The usual selections are:
+
+- large-scale API evaluation: `OpenICLInferConcurrentTask` + `OpenICLEvalWatchTask`;
+- local one-stop evaluation: `OpenICLInferTask` + `OpenICLEvalTask`.

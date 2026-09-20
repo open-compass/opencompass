@@ -20,7 +20,7 @@
 [🛠️安装](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html) |
 [🤔报告问题](https://github.com/open-compass/opencompass/issues/new/choose)
 
-[English](/README.md) | 简体中文
+[English](README.md) | 简体中文
 
 [![][github-trending-shield]][github-trending-url]
 
@@ -62,7 +62,7 @@
 - **\[2026.07.27\]** OpenCompass 的 `GenInferencer` 现已支持多轮推理，并新增 Multi-IF 数据集支持，用于评测模型的多轮指令遵循能力。详情请参阅 [Multi-IF 评测配置](opencompass/configs/datasets/MultiIF/MultiIF_gen.py)！🔥🔥🔥
 - **\[2026.05.25\]** OpenCompass 新增重复输出分析工具，支持检测模型生成中的重复内容与循环输出，可用于分析当前评测任务或已有的评测结果。详情请参阅 [重复输出分析工具](tools/analyze_repeat.py)！
 - **\[2026.03.20\]** OpenCompass 现已支持跨任务并发推理与评测监听，可协同监控已完成的推理任务并触发后续评测。并行 Inferencer、任务监控及心跳机制进一步提升了大规模评测效率。详情请参阅 [并发推理实现](opencompass/tasks/openicl_infer_concurrent.py) 和 [评测监听实现](opencompass/tasks/openicl_eval_watch.py)！
-- **\[2026.03.17\]** OpenCompass 新增 `RawPromptTemplate`，可以在不引入非预期格式转换的情况下向模型传递 benchmark 的原始 Prompt 和结构化对话，并支持 API 模型、ChatML 数据集，以及模型侧的额外 Prompt 内容附加。详情请参阅 [RawPromptTemplate 使用指南](docs/zh_cn/notes/rawprompttemplate.md)！
+- **\[2026.03.17\]** OpenCompass 新增 `RawPromptTemplate`，可以在不引入非预期格式转换的情况下向模型传递 benchmark 的原始 Prompt 和结构化对话，并支持 API 模型、ChatML 数据集，以及模型侧的额外 Prompt 内容附加。详情请参阅 [RawPromptTemplate 使用指南](docs/zh_cn/prompt/raw_prompt_template.md)！
 - **\[2026.02.05\]** OpenCompass 现已支持Intern-S1-Pro相关的通用及科学评测基准，请参阅[Intern-S1-Pro评测示例](examples/eval_intern_s1_pro.py)和[模型信息](https://huggingface.co/internlm/Intern-S1-Pro)了解详情！🔥🔥🔥
 - **\[2025.12.08\]** OpenCompass 现已支持SciReasoner评测，请参阅[SciReasoner评测示例](examples/eval_scireasoner.py)和[原项目地址](https://github.com/InternScience/SciReason)了解详情！🔥🔥🔥
 - **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1评测示例](examples/eval_bench_intern_s1.py)了解详情！🔥🔥🔥
@@ -71,13 +71,11 @@
 - **\[2025.02.28\]** 我们为 `DeepSeek-R1` 系列模型添加了评测示例，请查看 [DeepSeek-R1 评测配置](examples/eval_deepseek_r1.py)了解更多详情！🔥🔥🔥
 - **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于 LLM 作为评判器的 `GenericLLMEvaluator` 和用于数学推理评估的 `MATHVerifyEvaluator`。查看 [LLM 评判器](docs/zh_cn/evaluation/llm_judge.md)和[数学能力评测](docs/zh_cn/evaluation/math_verify.md)文档了解更多详情！🔥🔥🔥
 
-> [更多](docs/zh_cn/notes/news.md)
-
 ## 📊 性能榜单
 
 我们将陆续提供开源模型和 API 模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
 
-你也可以参考[学术榜单精度复现教程](https://opencompass.readthedocs.io/zh-cn/latest/academic.html)，快速地复现榜单的结果。
+你也可以参考[学术榜单精度复现教程](https://opencompass.readthedocs.io/zh-cn/latest/notes/academic.html)，快速地复现榜单的结果。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
@@ -148,7 +146,7 @@ unzip OpenCompassData-core-20240207.zip
 
 #### (可选) 使用 ModelScope 自动下载
 
-另外，您还可以使用[ModelScope](www.modelscope.cn)来加载数据集：
+另外，您还可以使用[ModelScope](https://www.modelscope.cn)来加载数据集：
 环境准备：
 
 ```bash
@@ -202,7 +200,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
 - ### 推理后端
 
-  另外，如果您想使用除 HuggingFace 之外的推理后端来进行加速评估，比如 LMDeploy 或 vLLM，可以通过以下命令进行。请确保您已经为所选的后端安装了必要的软件包，并且您的模型支持该后端的加速推理。更多信息，请参阅关于推理加速后端的文档 [这里](docs/zh_cn/user_guides/accelerator_intro.md)。以下是使用 LMDeploy 的示例：
+  另外，如果您想使用除 HuggingFace 之外的推理后端来进行加速评估，比如 LMDeploy 或 vLLM，可以通过以下命令进行。请确保您已经为所选的后端安装了必要的软件包，并且您的模型支持该后端的加速推理。更多信息，请参阅[一站式部署与评测](docs/zh_cn/user_guides/models.md#2-一站式部署与评测)。以下是使用 LMDeploy 的示例：
 
   ```bash
   opencompass --models hf_internlm2_5_1_8b_chat --datasets demo_gsm8k_chat_gen -a lmdeploy
@@ -221,7 +219,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
   #### 支持的模型
 
-  如果模型不在列表中，但支持 Huggingface AutoModel 类或支持针对 OpenAI 接口的推理引擎封装（详见[官方文档](https://opencompass.readthedocs.io/zh-cn/latest/advanced_guides/new_model.html)），您仍然可以使用 OpenCompass 对其进行评估。欢迎您贡献维护 OpenCompass 支持的模型和数据集列表。
+  如果模型不在列表中，但支持 Huggingface AutoModel 类或支持针对 OpenAI 接口的推理引擎封装（详见[官方文档](https://opencompass.readthedocs.io/zh-cn/latest/extension/new_model.html)），您仍然可以使用 OpenCompass 对其进行评估。欢迎您贡献维护 OpenCompass 支持的模型和数据集列表。
 
   ```bash
   opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
@@ -229,7 +227,7 @@ humaneval, triviaqa, commonsenseqa, tydiqa, strategyqa, cmmlu, lambada, piqa, ce
 
   #### 支持的数据集
 
-  目前，OpenCompass针对数据集给出了标准的推荐配置。通常，`_gen.py`或`_llm_judge_gen.py`为结尾的配置文件将指向我们为该数据集提供的推荐配置。您可以参阅[官方文档](https://opencompass.readthedocs.io/zh-cn/latest/dataset_statistics.html) 的数据集统计章节来获取详细信息。
+  目前，OpenCompass针对数据集给出了标准的推荐配置。通常，`_gen.py`或`_llm_judge_gen.py`为结尾的配置文件将指向我们为该数据集提供的推荐配置。您可以参阅[数据集选择与配置](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/datasets.html#数据集统计)来获取详细信息。
 
   ```bash
   # 基于规则的推荐配置
@@ -295,7 +293,7 @@ OpenCompass 是面向大模型评测的一站式平台。其主要特点如下�
 
 您可以通过排序、筛选和搜索等功能从列表中快速找到您需要的数据集。
 
-详情请参阅 [官方文档](https://opencompass.readthedocs.io/zh-cn/latest/dataset_statistics.html) 的数据集统计章节。
+详情请参阅 [数据集选择与配置](https://opencompass.readthedocs.io/zh-cn/latest/user_guides/datasets.html#数据集统计)中的数据集统计章节。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 

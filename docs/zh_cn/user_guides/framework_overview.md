@@ -43,7 +43,7 @@ OpenCompass 中的数据集配置不只包含数据路径。它通常同时声�
 
 评测任务执行时，Partitioner 把“模型 × 数据集”拆成可并行任务 Task ，Runner 决定任务在本地、或其他的集群环境中如何执行，Task 执行实际推理或评测过程。例如基础教程的 API 示例中，使用 `OpenICLInferConcurrentTask` 进行高效并发推理，配合 `OpenICLEvalWatchTask` 完成结果实时评测。
 
-推理步骤和评测步骤的结果会分别写入 `predictions/` 和 `results/`。Summarizer 再把各子集结果整理为最终的结果汇总文件。由于各步骤产出是分开保存的，因此当任务意外中断后，可以通过 `--reuse` 来从任务缺失阶段开始继续执行，或使用 `--mode eval`、`--mode viz` 对已有结果进行单步处理。详见[复用、恢复与分阶段执行](../execution/reuse_and_resume.md)，以及[理解输出与结果汇总](results_and_summarizer.md)。
+推理步骤和评测步骤的结果会分别写入 `predictions/` 和 `results/`。Summarizer 再把各子集结果整理为最终的结果汇总文件。由于各步骤产出是分开保存的，因此当任务意外中断后，可以通过 `--reuse` 来从任务缺失阶段开始继续执行，或使用 `--mode eval`、`--mode viz` 对已有结果进行单步处理。详见[复用、恢复与分阶段执行](../execution/tasks_and_runners.md#任务恢复复用与只重跑评测)，以及[理解输出与结果汇总](results_and_summarizer.md)。
 
 ## 工作目录与可复现性
 

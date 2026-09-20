@@ -1,4 +1,4 @@
-# 配置语法与复用参考
+# 基于MMEngine的配置文件语法
 
 本页是 OpenCompass 配置语法的速查手册。若你还没有完成过一次评测，请先阅读[使用配置文件完成一次完整评测](config_based_evaluation.md)。
 
@@ -66,7 +66,7 @@ models[0]['max_workers'] = 16
 
 ## 配置对象与注册类型
 
-`type` 可以写导入的 Python 类：
+`type` 可以写成导入的 Python 类对象：
 
 ```python
 from opencompass.summarizers import DefaultSummarizer
@@ -74,18 +74,44 @@ from opencompass.summarizers import DefaultSummarizer
 summarizer = dict(type=DefaultSummarizer)
 ```
 
-OpenCompass 解析后会通过注册表构建对应组件。配置中的参数必须与组件构造函数匹配；模型、数据集、Runner 等不同组件不能交换字段。
+对于由 MMEngine Registry 管理的组件，`type` 也可以写成注册名称字符串。例如：
+
+```python
+infer_cfg = dict(
+    prompt_template=dict(
+        type='RawPromptTemplate',
+        messages=[dict(role='user', content='{question}')],
+    ),
+    retriever=dict(type='ZeroRetriever'),
+    inferencer=dict(type='GenInferencer'),
+)
+```
+
+构建组件时，上述三个名称会分别在提示词模板、Retriever 和 Inferencer 对应的 Registry 中查找。OpenCompass 的内置 Registry 配置了模块位置，能够在查找时自动导入相应内置模块，因此通常无需再显式导入这些类。
+
+字符串必须与组件在对应 Registry 中的注册名称完全一致；注册时指定了别名的，应填写别名而不是 Python 类名。自定义组件还必须确保其模块已被导入、注册装饰器已执行。不同 Registry 之间不能混用名称，配置中的其余参数也必须与目标组件的构造函数匹配。请注意，并非所有 `type` 字段都覆盖了 Registry 管理。
+
+仓库目前没有统一列出所有 Registry 的 CLI。可以先触发对应 Registry 的内置模块导入，再查看已注册名称。例如，列出全部 Inferencer：
+
+```bash
+python -c "from opencompass.registry import ICL_INFERENCERS as R; R.import_from_location(); print('\n'.join(sorted(R.module_dict)))"
+```
+
+检查某个名称是否存在时，直接调用 `get()` ：
+
+```bash
+python -c "from opencompass.registry import ICL_INFERENCERS as R; print(R.get('GenInferencer'))"
+```
+
+根据组件类别，可将查询命令中的 `ICL_INFERENCERS` 替换为 `MODELS`、`LOAD_DATASET`、`RUNNERS`、`PARTITIONERS`、`TASKS`、`ICL_RETRIEVERS`、`ICL_PROMPT_TEMPLATES`、`ICL_EVALUATORS`、`TEXT_POSTPROCESSORS` 或 `DICT_POSTPROCESSORS`。
 
 ## 配置与命令行的优先级
 
-一般情况下，配置文件声明实验，命令行控制本次启动。常见覆盖关系包括：
+配置文件与命令行之间不存在统一的“命令行始终优先”规则。当前入口的部分参数情况按以下方式处理：
 
-- `--work-dir` 覆盖配置的 `work_dir`；
-- `--debug` 打开 Runner 的调试模式；
-- `--max-num-workers` 只在 CLI 自动生成默认 Runner 时生效，显式配置的同名字段优先；
-- `--mode`、`--reuse` 控制执行阶段与产物复用。
-
-运行 `opencompass --help` 查看当前版本的完整参数，不要把旧版本文档中的参数直接复制到新环境。
+- 配置文件中的 `models`、`datasets` 和 `summarizer` 优先生效， CLI 中的 `--models`、`--datasets`、`--summarizer` 以及 Hugging Face 快捷参数不会与其合并。
+- `--work-dir` 会覆盖配置中的 `work_dir`；未传入时保留配置值，若配置也未声明则使用 `outputs/default`。
+- `--max-num-workers`、`--max-workers-per-gpu` 和 `--retry` 仅在未指定配置文件时生效；其中 `--max-num-workers` 同时设置 Runner 并发数和 `NumWorkerPartitioner.num_worker`。
 
 ## 解析和检查配置
 

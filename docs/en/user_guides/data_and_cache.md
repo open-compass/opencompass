@@ -1,45 +1,37 @@
-# Data Sources, Caches, and Offline Operation
+# Dataset Download and Caching
 
 OpenCompass does not provide one unified downloader covering every dataset. Actual loading behavior is jointly determined by `type`, `path`, and the Dataset class in the dataset configuration.
 
-## Common Cache Variables
+## Automatic Data Loading
 
-| Variable             | Consumer                      | Typical purpose                                                   |
-| -------------------- | ----------------------------- | ----------------------------------------------------------------- |
-| `COMPASS_DATA_CACHE` | OpenCompass `get_data_path()` | Adds a cache root to relative OpenCompass data paths              |
-| `HF_DATASETS_CACHE`  | Hugging Face `datasets`       | Stores downloads and generated Arrow caches from `load_dataset()` |
-| `HF_HOME`            | Hugging Face Hub ecosystem    | Provides a shared root for model, Hub, and dataset caches         |
+Datasets do not share one download mechanism. Data may come from OpenCompass OSS, Hugging Face, ModelScope, or an official dataset URL, and some datasets require users to prepare local files in advance. The dataset configuration and the Dataset class's `load()` implementation determine the actual behavior.
 
-For example, if a configuration passes `./data/fold` and its Dataset class calls `get_data_path()`, setting `COMPASS_DATA_CACHE=/cache/compass` makes it try `/cache/compass/./data/fold`. If the target does not exist, OpenCompass downloads it automatically only when the built-in download mapping recognizes the dataset; otherwise it raises an error.
+For datasets that call `get_data_path()`, the configured `path` is usually a logical identifier. OpenCompass uses the mapping in `opencompass/utils/datasets_info.py` to resolve it to a local path, a Hugging Face dataset ID, or a ModelScope dataset ID. If a dataset provides only a Hugging Face or ModelScope source, select that route with `DATASET_SOURCE`:
 
-If the Dataset class directly calls:
-
-```python
-from datasets import load_dataset
-
-load_dataset('organization/dataset-name')
+```bash
+export DATASET_SOURCE=HF          # Use Hugging Face
+# or
+export DATASET_SOURCE=ModelScope  # Use ModelScope
 ```
 
-Hugging Face uses `HF_DATASETS_CACHE`/`HF_HOME` according to its own rules. `COMPASS_DATA_CACHE` does not redirect this cache automatically.
+Values are case-sensitive. When `DATASET_SOURCE` is unset, `get_data_path()` resolves to a local path by default. If the file does not exist and an OSS URL is registered for the dataset, OpenCompass attempts to download it from OSS. Not every Dataset class supports every route; check its `load()` implementation and whether the corresponding source ID exists in `datasets_info.py`. Datasets that directly call third-party interfaces such as `load_dataset()` do not use this routing mechanism and do not require a dedicated `DATASET_SOURCE` setting.
 
-## Recommended Directory Settings
+## Data-Cache Environment Variables
 
-In a shared environment, configure them separately:
+The download source and cache directory are separate concepts: `DATASET_SOURCE` determines where data is loaded from, while the following variables determine where data is stored or located.
+
+| Variable             | Purpose                                                                                                                                                                  |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `COMPASS_DATA_CACHE` | Root directory for local OpenCompass data. `get_data_path()` appends the resolved relative local path to this directory; OSS data is also downloaded and extracted here. |
+| `HF_DATASETS_CACHE`  | Cache directory for Hugging Face `datasets`, including downloaded data and generated Arrow files. It does not affect OpenCompass local-data paths.                       |
+| `LMUData`            | VLMEvalKit data root for official TSV files, images, and other multimodal resources. When unset, it defaults to `data/vlmevalkit` relative to the launch directory.      |
+
+In a shared environment, configure the directories separately:
 
 ```bash
 export COMPASS_DATA_CACHE=/shared/opencompass-cache
-export HF_HOME=/shared/huggingface-cache
 export HF_DATASETS_CACHE=/shared/huggingface-cache/datasets
+export LMUData=/shared/vlmevalkit-cache
 ```
 
-Ensure that the runtime user has read/write permission, and avoid letting incompatible versions modify the same cache simultaneously. A read-only cache is suitable for a stable production environment, but generating Arrow files or extracting data for the first time still requires writable space.
-
-## Automatic Data Loading
-
-When local data files are missing, OpenCompass does not uniformly fall back to downloading them. Behavior depends on the dataset loader and falls into three categories:
-
-1. **Automatic download:** An OpenCompass built-in dataset resolves its path through `get_data_path()`. It downloads automatically only if the dataset is present in the internal download mapping; an unlisted dataset raises an error, and the supplied path is not treated as a Hugging Face repository name.
-2. **Delegation to Hugging Face:** A dataset that directly calls `load_dataset('org/name')` delegates download and caching to Hugging Face (`HF_HOME` and `HF_DATASETS_CACHE`) and is unaffected by `COMPASS_DATA_CACHE`.
-3. **Loading failure:** A missing absolute path, or a missing relative path outside the mapping, immediately terminates with an error.
-
-To determine the category of a dataset, inspect the `load()` implementation of its Dataset class. Confirm the effective `path`, which loading path above it follows, what happens when local data is absent, and whether it needs supplementary documents, archives, or official evaluation resources in addition to the main data file.
+`LMUData` applies only to datasets bridged through VLMEvalKit and does not change the paths of other multimodal datasets. See [Using VLMEvalKit Datasets and Official Evaluation](../evaluation/vlmevalkit.md) for details. Ensure that the runtime user can write to directories used for first-time downloads, extraction, or cache generation. Before offline execution, verify that all data files and related resources have been prepared.
