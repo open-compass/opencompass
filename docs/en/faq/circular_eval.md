@@ -84,7 +84,7 @@ from mmengine.config import read_base
 from opencompass.summarizers import CircularSummarizer
 
 with read_base():
-    from ...summarizers.groups.ceval.ceval_summary_groups
+    from ...summarizers.groups.ceval import ceval_summary_groups
 
 new_summary_groups = []
 for item in ceval_summary_groups:

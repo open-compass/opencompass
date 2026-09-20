@@ -86,7 +86,7 @@ directly to the corresponding topic.
    :maxdepth: 1
    :caption: Other Documentation
 
-   notes/contribution_guide.md
+   faq/contribution_guide.md
    faq/index.md
    faq/circular_eval.md
    faq/contamination_eval.md

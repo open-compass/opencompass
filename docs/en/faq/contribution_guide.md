@@ -86,7 +86,7 @@ git checkout main -b branchname
   In regions where network access prevents installation of the pre-commit hooks, try the following commands to use the alternative configuration:
   ```bash
   pre-commit install -c .pre-commit-config-zh-cn.yaml
-  pre-commit run –all-files -c .pre-commit-config-zh-cn.yaml
+  pre-commit run --all-files -c .pre-commit-config-zh-cn.yaml
   ```
   ````
 

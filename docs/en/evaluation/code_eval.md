@@ -79,9 +79,11 @@ The key field for this approach is `num_repeats` in the dataset config. If you m
 - `num_repeats`: number of dataset repetitions.
 - `abbr`: update the dataset abbreviation with the repeat count because dataset size changes; this prevents mismatches with `.cache/dataset_size.json`.
 
-For MBPP / Sanitized MBPP, pass@k requires `eval_cfg.evaluator.type=MBPPPassKEvaluator` and `reader_cfg.output_column='test_column'` so the evaluator can group repeated generations of the same problem by `task_id`. The model side can directly use the imported GPT-6 config; configure backend-supported sampling parameters in the model config when you need more generation diversity, but do not set `num_return_sequences`.
+For MBPP / Sanitized MBPP, pass@k requires `eval_cfg.evaluator.type=MBPPPassKEvaluator` and `reader_cfg.output_column='test_column'` so the evaluator can group repeated generations of the same problem by `task_id`.
 
-See [examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk_repeat_dataset.py).
+The model side can directly use the imported GPT-6 config; configure backend-supported sampling parameters in the model config when you need more generation diversity, but do not set `num_return_sequences`.
+
+For a complete example, see [examples/eval_code_passk_repeat_dataset.py](https://github.com/open-compass/opencompass/blob/main/examples/eval_code_passk_repeat_dataset.py).
 
 ## Code Execution Service
 

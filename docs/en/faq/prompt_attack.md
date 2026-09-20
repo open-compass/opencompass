@@ -50,7 +50,7 @@ Answer:"""),
         adv_key='adv_prompt'))
 ```
 
-### Add a eval config
+### Add an Evaluation Config
 
 We should use `OpenICLAttackTask` here for attack task. Also `NaivePartitioner` should be used because the attack experiment will run the whole dataset repeatedly for nearly hurdurds times to search the best attack, we do not want to split the dataset for convenience.
 
@@ -88,7 +88,7 @@ attack = dict(
 Please use `--mode infer` when running the attack experiment.
 
 ```shell
-python run.py examples/eval_attack.py --mode infer
+opencompass examples/eval_attack.py --mode infer
 ```
 
 All the results will be saved in `attack` folder.

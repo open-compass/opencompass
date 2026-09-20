@@ -48,8 +48,8 @@ When `config` is supplied, OpenCompass reads that file first. Shorthand construc
 | ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `--max-num-workers N`     | `1`     | Set the maximum concurrent task count for a default Runner supplied by the entry point and set `num_worker` for the default inference Partitioner. An explicitly configured stage is normally not overridden. |
 | `--max-workers-per-gpu N` | `1`     | Set the maximum number of concurrent tasks per GPU for an automatically generated `LocalRunner`.                                                                         |
-| `--slurm -p PARTITION`    | `False` | Force `SlurmRunner` and replace existing `infer` and `eval` execution configurations. `-p/--partition` is required. This option is mutually exclusive with `--dlc`.      |
-| `--dlc --aliyun-cfg PATH` | `False` | Force the Alibaba Cloud PAI-DLC Runner and replace existing `infer` and `eval` execution configurations. `--aliyun-cfg` selects the DLC configuration file and defaults to `~/.aliyun.cfg`; the path must exist. This option is mutually exclusive with `--slurm`. |
+| `--slurm -p PARTITION`    | `False` | Force `SlurmRunner` and replace existing `infer` and `eval` execution configurations. `-p/--partition` is required. `-q/--quotatype`, `--qos`, and `--retry` (default: 2) set the quota type, Quality of Service, and retry count. This option is mutually exclusive with `--dlc`. |
+| `--dlc --aliyun-cfg PATH` | `False` | Force the Alibaba Cloud PAI-DLC Runner and replace existing `infer` and `eval` execution configurations. `--aliyun-cfg` selects the DLC configuration file and defaults to `~/.aliyun.cfg`; the path must exist. `--retry` (default: 2) sets the retry count. This option is mutually exclusive with `--slurm`. |
 
 ## Inference, Evaluation, and Analysis Outputs
 

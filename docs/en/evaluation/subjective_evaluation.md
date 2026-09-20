@@ -11,7 +11,7 @@ A popular evaluation method involves
 - Compare Mode: comparing model responses pairwise to calculate their win rate
 - Score Mode: another method involves calculate scores with single model response ([Chatbot Arena](https://arena.ai/)).
 
-We support the use of GPT-4 (or other JudgeLLM) for the subjective evaluation of models based on above methods.
+Based on these methods, OpenCompass supports JudgeLLM-based subjective evaluation. Any model supported by the OpenCompass repository can be used directly as a JudgeLLM, and support for additional specialized JudgeLLMs is also planned.
 
 ## Currently Supported Subjective Evaluation Datasets
 
@@ -94,7 +94,7 @@ The json must includes the following fields:
 - 'capability': The capability dimension of the question.
 - 'others': Other needed information.
 
-If you want to modify prompt on each single question, you can full some other information into 'others' and construct it.
+These three fields are required, and users may add other fields. To customize the prompt for individual questions, add the required information to `others` and expose the corresponding fields in the Dataset class.
 
 ### Step-2: Evaluation Configuration(Compare Mode)
 

@@ -44,11 +44,11 @@ To evaluate the `Qwen2-5-7B` model deployed with `VLLM` on all tasks under Needl
 
 ##### Local Evaluation
 
-If evaluating locally, the command will use all available GPUs. You can control GPU visibility using `CUDA_VISIBLE_DEVICES`:
+If evaluating locally, the command will use all available GPUs. Set `CUDA_VISIBLE_DEVICES` to limit GPU visibility. For example, `CUDA_VISIBLE_DEVICES=0,1,2,3 opencompass ...` exposes only the first four GPUs, so OpenCompass cannot use more than those four simultaneously.
 
 ```bash
 # Local evaluation
-python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k  --summarizer needlebench/needlebench_v2_128k_summarizer
+opencompass --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer
 ```
 
 ##### Evaluation on Slurm Cluster
@@ -57,7 +57,7 @@ For Slurm environments, you can add options like `--slurm -p partition_name -q r
 
 ```bash
 # Slurm evaluation
-python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
 ##### Evaluating Specific Subsets
@@ -65,22 +65,24 @@ python run.py --datasets needlebench_v2_128k --models vllm_qwen2_5_7b_instruct_1
 If you only want to test the original Needle In A Haystack task (e.g., single-needle 128k), adjust the dataset parameter:
 
 ```bash
-python run.py --datasets needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass --datasets needlebench_v2_single_128k --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-To evaluate only Chinese versions, specify the subset dataset after `/`:
+You can further select a subset by changing `--datasets` to `needlebench_v2_single_128k/needlebench_zh_datasets`, which evaluates only the Chinese single-needle task at 128k. The name after `/` identifies the subset; available subset variables are defined in `opencompass/configs/datasets/needlebench_v2/needlebench_v2_128k/needlebench_v2_single_128k.py`:
 
 ```bash
-python run.py --datasets needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass --datasets needlebench_v2_single_128k/needlebench_zh_datasets --models vllm_qwen2_5_7b_instruct_128k --summarizer needlebench/needlebench_v2_128k_summarizer --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-Ensure `VLLM` is installed beforehand:
+Install [vLLM](https://docs.vllm.ai/en/latest/getting_started/installation/gpu.html) before evaluation:
 
 ```bash
 # Install vLLM with CUDA 12.4.
 # For other CUDA versions, please refer to the [official documentation](https://docs.vllm.ai/en/latest/getting_started/installation/gpu.html)
 pip install vllm
 ```
+
+This command starts evaluation with `-p partition_name` selecting the Slurm partition, `-q reserved` selecting the quota type, and `--max-num-workers 16` setting the maximum number of workers.
 
 #### Evaluating Other `Huggingface` Models
 
@@ -89,10 +91,10 @@ For other models, it is recommended to write your own config file (such as `exam
 You can then run evaluation with:
 
 ```bash
-python run.py examples/eval_needlebench_v2.py --slurm -p partition_name -q reserved --max-num-workers 16
+opencompass examples/eval_needlebench_v2.py --slurm -p partition_name -q reserved --max-num-workers 16
 ```
 
-No need to manually specify `--datasets`, `--models`, or `--summarizer` again.
+There is no need to specify `--datasets`, `--models`, or `--summarizer` again because they are already defined in the configuration file. Adjust `--max-num-workers` as needed to control the number of concurrent workers.
 
 ### Visualization
 

@@ -113,7 +113,7 @@ with read_base():
 opencompass examples/eval_subjective.py -r
 ```
 
-- `-r` 参数支持复用模型推理和评估结果。
+`-r` 参数支持复用模型推理和评估结果。
 
 JudgeLLM的评测回复会保存在 `output/.../results/timestamp/xxmodel/xxdataset/.json`
 评测报告则会输出到 `output/.../summary/timestamp/report.csv`。

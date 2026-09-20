@@ -62,7 +62,7 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 - **\[2026.07.27\]** OpenCompass now supports multi-round inference in `GenInferencer` and adds support for the Multi-IF dataset to evaluate multi-turn instruction-following capabilities. Check out the [Multi-IF evaluation configuration](opencompass/configs/datasets/MultiIF/MultiIF_gen.py) for details! 🔥🔥🔥
 - **\[2026.05.25\]** OpenCompass now provides repeat analysis tools for detecting repetitive content and looping model outputs in current evaluation tasks or existing evaluation results. Check out the [repeat analysis tool](tools/analyze_repeat.py) for details!
 - **\[2026.03.20\]** OpenCompass now supports concurrent inference across tasks together with evaluation watching, enabling completed inference tasks to be monitored and subsequent evaluations to be triggered in a coordinated pipeline. Parallel inferencers, task monitoring, and heartbeat mechanisms further improve large-scale evaluation efficiency. Check out the [concurrent inference implementation](opencompass/tasks/openicl_infer_concurrent.py) and [evaluation watcher implementation](opencompass/tasks/openicl_eval_watch.py) for details!
-- **\[2026.03.17\]** OpenCompass introduces `RawPromptTemplate`, allowing original benchmark prompts and structured conversations to be passed to models without unintended formatting transformations. It supports API models, ChatML datasets, and appending additional prompt content on the model side. Check out the [RawPromptTemplate guide](docs/en/notes/rawprompttemplate.md) for details!
+- **\[2026.03.17\]** OpenCompass introduces `RawPromptTemplate`, allowing original benchmark prompts and structured conversations to be passed to models without unintended formatting transformations. It supports API models, ChatML datasets, and appending additional prompt content on the model side. Check out the [RawPromptTemplate guide](docs/en/prompt/raw_prompt_template.md) for details!
 - **\[2026.02.05\]** OpenCompass now supports Intern-S1-Pro related general and scientific evaluation benchmarks. Please check [Example for Evaluating Intern-S1-Pro](examples/eval_intern_s1_pro.py) and [Model Card](https://huggingface.co/internlm/Intern-S1-Pro) for more details! 🔥🔥🔥
 - **\[2025.12.08\]** OpenCompass now supports evaluation for SciReasoner. Please check [Example for Evaluating SciReasoner](examples/eval_scireasoner.py) and [Project GitHub Repo](https://github.com/InternScience/SciReason) for more details! 🔥🔥🔥
 - **\[2025.07.26\]** OpenCompass now supports Intern-S1 related general and scientific evaluation benchmarks. Please check [Tutorial for Evaluating Intern-S1](https://opencompass.readthedocs.io/en/latest/user_guides/interns1.html) for more details! 🔥🔥🔥
@@ -70,8 +70,6 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 - **\[2025.03.11\]** We have supported evaluation for `SuperGPQA` which is a great benchmark for measuring LLM knowledge ability 🔥🔥🔥
 - **\[2025.02.28\]** We have added a tutorial for `DeepSeek-R1` series model, please check [Evaluating Reasoning Model](docs/en/user_guides/deepseek_r1.md) for more details! 🔥🔥🔥
 - **\[2025.02.15\]** We have added two powerful evaluation tools: `GenericLLMEvaluator` for LLM-as-judge evaluations and `MATHVerifyEvaluator` for mathematical reasoning assessments. Check out the documentation for [LLM Judge](docs/en/advanced_guides/llm_judge.md) and [Math Evaluation](docs/en/advanced_guides/math_verify.md) for more details! 🔥🔥🔥
-
-> [More](docs/en/notes/news.md)
 
 ## 📊 Leaderboard
 
@@ -382,7 +380,7 @@ Please refer to the dataset statistics chapter of [docs](https://opencompass.rea
 
 ## 👷‍♂️ Contributing
 
-We appreciate all contributions to improving OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/notes/contribution_guide.html) for the best practice.
+We appreciate all contributions to improving OpenCompass. Please refer to the [contributing guideline](https://opencompass.readthedocs.io/en/latest/faq/contribution_guide.html) for the best practice.
 
 <!-- Copy-paste in your Readme.md file -->
 
