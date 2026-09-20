@@ -1,6 +1,6 @@
 # Prompt Preview and Debugging
 
-Do not immediately run a full benchmark after changing a prompt. First preview the input actually received by the model, then validate generation and answer extraction on a small sample.
+Do not run a complete benchmark immediately after changing a prompt. First inspect the input the model will receive, then validate generation and answer extraction on a small sample.
 
 ## Prompt Viewer
 
@@ -8,33 +8,36 @@ Do not immediately run a full benchmark after changing a prompt. First preview t
 python tools/prompt_viewer.py my_eval.py -n -c 3
 ```
 
-- `-n`: non-interactive mode; select the first model and dataset.
-- `-c`: number of samples to print.
-- `-a`: inspect every model-dataset combination.
-- `-p PATTERN`: select only Datasets whose abbreviation matches the pattern.
+- `-n`: use non-interactive mode and select the first model and dataset;
+- `-c`: set the number of samples to print;
+- `-a`: inspect every model-dataset combination;
+- `-p PATTERN`: select only datasets whose abbreviations match the pattern.
 
-When given a complete experiment configuration, the tool builds the tokenizer, displays input after model-template processing, and reports token counts. When given only a dataset configuration, it normally inspects only the Dataset-side prompt.
+When given a complete experiment configuration, the tool constructs the tokenizer, displays input after model-template processing, and reports the token count. When given only a dataset configuration, it can normally inspect only the dataset-side prompt.
 
-## Exporting Messages Only
+## Export Messages Only
 
-If the evaluation backend or template is unsuitable for Prompt Viewer, make the inference task export messages only:
+If the evaluation backend or template is unsuitable for Prompt Viewer, use `--dump-only-message-path` to export the constructed inputs. This argument currently supports only dataset configurations that use `GenInferencer`. Specify `--mode infer` as well to avoid proceeding to evaluation:
 
 ```bash
 opencompass my_eval.py \
-    --dump-only-message-path /tmp/opencompass-messages \
+    --mode infer \
+    --dump-only-message-path /opencompass-messages \
     --debug
 ```
 
-This mode is for inspecting construction results and must not be treated as formal predictions. Use a dedicated export directory to avoid mixing it with experiment results.
+The export directory is organized by model and dataset `abbr`:
 
-## Checklist
+```text
+/opencompass-messages/
+└── gpt-6-astra-response/
+    └── demo_gsm8k.jsonl
+```
 
-- Every field placeholder has been replaced.
-- System/user/assistant order is as intended.
-- Dataset and model templates do not duplicate instructions.
-- Few-shot examples do not leak test answers.
-- Final input fits the model context, and truncation does not remove the question.
-- Generation prompt, stop words, and answer format agree.
-- API and local models receive the same semantics.
+Each line of the JSONL file corresponds to one sample:
 
-See [Prompt Templates](raw_prompt_template.md) for RawPromptTemplate and [Model-Side Conversation Template Protocol](meta_template.md) for the model protocol.
+```json
+{"message": [{"role": "system", "content": "Answer concisely."}, {"role": "user", "content": "What is 1 + 1?"}], "gold": "2"}
+```
+
+`message` is the result after the dataset template performs field substitution and few-shot composition and after the model `meta_template` is applied. `gold` is the unprocessed reference answer. Export occurs before `model.generate()`, so it does not apply the model's internal tokenizer chat template, tokenization, or API request conversion, and no model generation is performed. The task still initializes the model object and does not produce formal `predictions/` files that can be scored or reused.

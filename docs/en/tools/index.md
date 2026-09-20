@@ -8,4 +8,4 @@ The OpenCompass `tools/` directory provides scripts for configuration discovery,
 - [Testing APIs and Message Formats](api_and_message_test.md)
 - [Notifications and Task Monitoring](monitoring.md)
 
-For the complete prompt preview workflow, see [Prompt Preview and Debugging](../prompt/debugging.md). For handling interrupted tasks, see [Task Recovery and Reuse](../execution/reuse_and_resume.md).
+For the complete prompt preview workflow, see [Prompt Preview and Debugging](../prompt/debugging.md). For handling interrupted tasks, see [Task Recovery and Reuse](../execution/tasks_and_runners.md#task-recovery-artifact-reuse-and-evaluation-only-runs).

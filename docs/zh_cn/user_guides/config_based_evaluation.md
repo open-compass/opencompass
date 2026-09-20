@@ -1,6 +1,6 @@
 # 使用配置文件完成一次完整评测
 
-本教程从空文件开始，构建一个可解析、可试跑、可复现的评测配置。最终实验通过 OpenAI Responses API 调用 gpt-6-astra，评测 64 条 GSM8K 演示样本，并展示如何显式控制任务划分、执行器和结果汇总。
+本教程从空文件开始构建一个完整评测配置。最终实验通过 OpenAI Responses API 调用 gpt-6-astra，评测 64 条 GSM8K 演示样本，并展示如何显式控制任务划分、执行策略，并汇总最终评测结果。
 
 ## 1. 创建配置文件
 
@@ -13,33 +13,25 @@ with read_base():
     from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
         gsm8k_datasets
     from opencompass.configs.models.openai.gpt_6_astra import \
-        models as gpt6_models
+        models as gpt6_astra_models
 
-models = gpt6_models
 datasets = gsm8k_datasets
+models = gpt6_astra_models
 ```
 
 `models` 和 `datasets` 都必须是列表。通过别名导入模型变量，可以让多个模型配置组合时更易读。`demo_gsm8k_chat_gen` 只选取 64 条测试样本，适合验证环境，不代表正式基准结果。
 
-- 更换本地权重、API 或推理后端：参阅[模型接入](models.md)；
-- 选择数据集和配置变体：参阅[数据集配置](datasets.md)；
+- 更换本地模型权重、API 或推理后端：参阅[模型接入](models.md)；
+- 更换数据集、检查数据集的详细配置情况：参阅[数据集配置](datasets.md)；
 - 理解 `read_base()`、覆盖和变量拼接：参阅[配置语法与复用参考](config.md)。
 
-## 2. 理解数据集中的输入与评分配置
+## 2. 使用默认策略执行评测任务
 
-导入的数据集已经包含 `reader_cfg`、`infer_cfg` 和 `eval_cfg`。它们分别确定读取哪些字段、怎样构造模型输入，以及怎样从输出中计算指标。不要仅凭数据集名称推断评测方法；正式评测时应审阅具体配置文件。
-
-新数据集配置推荐使用 [RawPromptTemplate](../prompt/raw_prompt_template.md) 描述消息。传统的 [PromptTemplate](../prompt/raw_prompt_template.md#prompttemplate传统模板) 仍然有效；模型侧的角色映射由[模型侧对话模板协议](../prompt/meta_template.md)处理。
-
-## 3. 先使用默认策略执行评测任务
-
-上面的最小配置已经能运行：当配置中没有 `infer` 和 `eval` 时，`opencompass` 会补齐本地默认值。先检查最终配置和任务切分：
+上文提供的示例已经能够作为 `opencompass` 的最小合法配置运行。当配置中没有显式指定 `infer` 和 `eval` 字段时，`opencompass` 会补齐本地默认值。使用如下指令来检查最终配置和任务切分策略：
 
 ```bash
 opencompass my_eval.py --dry-run --config-verbose
 ```
-
-`--dry-run` 会解析配置并构造任务，但不会加载模型执行推理。它能尽早发现导入路径、字段名称和资源声明错误。
 
 然后执行完整评测：
 
@@ -49,11 +41,9 @@ opencompass my_eval.py \
     --debug
 ```
 
-调试模式在当前进程中执行并直接显示日志。完成验证后，可去掉 `--debug`，通过 `--max-num-workers` 或者模型配置文件中的参数来调整本地并发。
+## 3. 配置执行策略
 
-## 4. 在配置中显式固定任务编排
-
-如果实验需要提交到版本库或长期复现，可以把默认策略明确写入 `my_eval.py`。在文件末尾加入：
+你可以通过配置 `infer` 和 `eval` 字段，显式指定评测任务的切分策略、运行环境和任务类型。示例如下：
 
 ```python
 from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
@@ -74,40 +64,37 @@ eval = dict(
     runner=dict(
         type=LocalRunner,
         max_num_workers=1,
-        task=dict(
-            type=OpenICLEvalWatchTask,
-            watch_interval=5,
-            heartbeat_timeout=60,
-        ),
+        task=dict(type=OpenICLEvalWatchTask),
     ),
 )
 ```
 
 这部分描述的是执行方式，不改变数据集中的评分规则：
 
-- Partitioner 决定怎样把模型与数据集拆成任务；
-- Runner 决定任务在哪里、以多少并发执行；
-- Task 决定执行推理还是读取预测进行评测。
+- Partitioner 决定按何种策略把模型与数据集组合划分为子任务。`NumWorkerPartitioner` 将待测数据集尽量均匀地分配给不超过 `num_worker` 个子任务；设为 `num_worker=1` 时，同一模型的所有待测数据集会交给一个子任务处理。
+- Runner 决定任务在何种环境中运行。`LocalRunner` 在本机启动任务，`max_num_workers=1` 表示该 Runner 同一时间最多运行一个任务。该参数控制任务级并发，不控制单个任务内部的 API 请求并发。
+- Task 是推理或评测阶段的实际执行单元，定义该阶段的任务入口与处理逻辑。`OpenICLInferConcurrentTask` 是执行推理的任务实例，通过模型侧的 `max_workers` 控制并发数，但仅适用于 API 模型；直接在评测进程中加载的本地模型应使用 `OpenICLInferTask`。`OpenICLEvalWatchTask` 是执行评测的任务示例，通过监听与心跳机制实现数据集推理完成后的实时评测；本地模型通常与 `OpenICLEvalTask` 搭配使用。
 
-这里将 `num_worker` 和 `max_num_workers` 都设为 1，是因为并发任务由一个进程接管同一模型的全部数据集，再在进程内部调度请求。`OpenICLInferConcurrentTask` 仅适用于 API 模型；本地 GPU 模型应使用 `OpenICLInferTask` 和 `OpenICLEvalTask`。
+三类组件的职责、主要参数和选择方法详见[任务划分、执行器与任务类型](../execution/tasks_and_runners.md)，以及[跨任务并发推理与评测监听](../execution/concurrent_evaluation.md)。
 
-命令行的 `--slurm` 或 `--dlc` 会用相应运行后端覆盖配置中的执行器。三类组件的职责与并发资源配置详见[任务划分、执行器与任务类型](../execution/tasks_and_runners.md)，API 并发任务的机制见[跨任务并发推理与评测监听](../execution/concurrent_evaluation.md)；多卡与张量并行的模型侧声明见[模型接入总览](models.md)。
+## 4. 配置结果汇总
 
-## 5. 配置结果汇总
-
-不写 `summarizer` 时会使用默认汇总器。需要固定展示顺序、分组或综合指标时，可以继承已有汇总配置，或显式指定：
+通过 `summarizer` 可以指定最终汇总表中的展示内容、指标和顺序。示例如下：
 
 ```python
-from opencompass.summarizers import DefaultSummarizer
-
-summarizer = dict(type=DefaultSummarizer)
+summarizer = dict(
+    dataset_abbrs=[
+        'All Results',
+        ['demo_gsm8k', 'accuracy'],
+    ],
+)
 ```
 
-数据集自身的 Evaluator 负责产生原始指标，Summarizer 负责组织和展示这些指标；二者不要混为一谈。指标含义参阅[评测指标](metrics.md)。
+`dataset_abbrs` 中的各项会按列表顺序显示：支持显示类似 `All Results` 的纯文本行，`['demo_gsm8k', 'accuracy']` 指定要展示的数据集 `abbr` 及其指标。Summarizer 只负责组织和展示 Evaluator 产出的指标，不会改变评分规则。
 
-## 6. 运行、恢复与分阶段执行
+## 5. 运行、恢复与分阶段执行
 
-正式运行：
+正式运行命令如下（也可将 `work_dir` 写入配置文件以便复用）：
 
 ```bash
 opencompass my_eval.py --work-dir outputs/my_eval
@@ -128,7 +115,58 @@ opencompass my_eval.py \
     --mode eval
 ```
 
-`--mode eval` 和 `--mode viz` 必须配合 `--reuse`，否则 OpenCompass 不知道应读取哪次预测或结果。复用的完整语义与安全边界见[任务恢复、复用与只重跑评测](../execution/reuse_and_resume.md)，全部命令行参数见[命令行参数参考](../execution/cli_reference.md)。
+`--mode eval` 和 `--mode viz` 必须配合 `--reuse`，否则 OpenCompass 不知道应读取哪次预测或结果。复用逻辑详见[任务恢复、复用与只重跑评测](../execution/tasks_and_runners.md#任务恢复复用与只重跑评测)，全部命令行参数见[命令行参数参考](../execution/cli_reference.md)。
+
+## 6. 完整配置文件的结构
+
+将前面各部分合并后，完整的 `my_eval.py` 如下：
+
+```python
+from mmengine.config import read_base
+
+from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
+from opencompass.runners import LocalRunner
+from opencompass.tasks import (OpenICLEvalWatchTask,
+                               OpenICLInferConcurrentTask)
+
+with read_base():
+    from opencompass.configs.datasets.demo.demo_gsm8k_chat_gen import \
+        gsm8k_datasets
+    from opencompass.configs.models.openai.gpt_6_astra import \
+        models as gpt6_astra_models
+
+datasets = gsm8k_datasets
+models = gpt6_astra_models
+
+infer = dict(
+    partitioner=dict(type=NumWorkerPartitioner, num_worker=1),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=1,
+        task=dict(type=OpenICLInferConcurrentTask),
+    ),
+)
+
+eval = dict(
+    partitioner=dict(type=NaivePartitioner),
+    runner=dict(
+        type=LocalRunner,
+        max_num_workers=1,
+        task=dict(type=OpenICLEvalWatchTask),
+    ),
+)
+
+summarizer = dict(
+    dataset_abbrs=[
+        'All Results',
+        ['demo_gsm8k', 'accuracy'],
+    ],
+)
+
+work_dir = 'outputs/my_eval'
+```
+
+其中，命令行传入的 `--work-dir` 会覆盖配置文件中的 `work_dir`。保存文件后，可以先运行 `opencompass my_eval.py --dry-run --config-verbose` 检查最终配置和任务划分，再启动完整评测。
 
 ## 7. 检查产物
 
@@ -143,15 +181,41 @@ outputs/my_eval/<时间戳>/
 └── summary/       # 汇总表格和 CSV 等文件
 ```
 
-验收时至少检查配置快照、失败任务日志、若干条逐样本输入输出和最终指标。只有分数而没有配置、模型版本与数据版本，不能构成可复现的评测记录。
+## 8. 扩展评测配置
 
-## 8. 扩展为正式实验
-
-在这个配置上继续扩展时，建议每次只改变一类变量：
+你可以在配置文件中写入多模型、多评测集、统一配置 Judge 模型、批量化设置上下文等多项扩展方案。例如：
 
 ```python
+# 合并前面通过 read_base() 导入的模型和数据集配置
 models = model_group_a + model_group_b
 datasets = objective_datasets + subjective_datasets
-```
 
-新增或自定义数据集请阅读[新增数据集](../extension/new_dataset.md)与[快速评测自有数据](../extension/custom_dataset.md)；新增模型后端请阅读[新增模型](../extension/new_model.md)。涉及 Judge、数学或代码执行的评测还需要额外依赖和安全边界，不应只替换数据路径后直接运行。
+# Judge 模型仅用于评分，不属于上面的被测模型列表
+from opencompass.models import OpenAISDK
+judge_cfg = dict(
+    abbr='judge-model',
+    type=OpenAISDK,
+    path='your-judge-model',
+    key='your-judge-key',
+    openai_api_base='your-judge-api',
+    batch_size=64,
+    temperature=0.001,
+    max_out_len=16384,
+    max_seq_len=262144,
+)
+
+for dataset in datasets:
+    # 统一覆盖数据集推理器的最大输出长度
+    inferencer = dataset.get('infer_cfg', {}).get('inferencer')
+    if inferencer is not None:
+        inferencer['max_out_len'] = 128000
+
+    # 覆盖直接使用 Judge 模型的 Evaluator 配置
+    evaluator = dataset.get('eval_cfg', {}).get('evaluator', {})
+    if 'judge_cfg' in evaluator:
+        evaluator['judge_cfg'] = judge_cfg
+    # 兼容在级联评测器中嵌套的 LLM Evaluator
+    if ('llm_evaluator' in evaluator
+            and 'judge_cfg' in evaluator['llm_evaluator']):
+        evaluator['llm_evaluator']['judge_cfg'] = judge_cfg
+```

@@ -21,7 +21,7 @@ Conditional log probability, `clp`, is closely related to `ppl`: given a context
 
 A dataset configuration has a `retriever` field describing how dataset samples are selected as context examples. The common `FixKRetriever` uses fixed k samples and therefore performs k-shot evaluation. `ZeroRetriever` uses no retrieved sample and usually means 0-shot.
 
-However, in-context examples can also be written directly in the dataset template. Such a configuration also uses `ZeroRetriever`, but is not necessarily 0-shot; determine it from the actual template. See [Few-Shot Example Insertion in Prompt Templates](../prompt/raw_prompt_template.md#inserting-few-shot-examples-ice).
+However, in-context examples can also be written directly in the dataset template. Such a configuration also uses `ZeroRetriever`, but is not necessarily 0-shot; determine it from the actual template. See [Few-Shot Example Insertion in Prompt Templates](../prompt/raw_prompt_template.md#insert-few-shot-examples-ice).
 
 ### What is the default OpenCompass task-partitioning logic?
 
@@ -112,6 +112,12 @@ Because of Hugging Face behavior, OpenCompass needs network access when some dat
 As described in the preceding network question, prepare cache files on another machine and copy them to this server.
 
 ## Efficiency
+
+### What should I consider when running long-context evaluation?
+
+Long-context evaluation must be based on the token count of the final input received by the model, not merely on a `32k` or `128k` identifier in a configuration filename. The final input includes the system prompt, few-shot examples, question, conversation history, and generation prompt. The usable input length is normally no greater than `max_seq_len - max_out_len`. Because tokenizers encode the same text differently, use the evaluated model's tokenizer to inspect the actual input length; character count and file size are only estimates.
+
+Common issues include silent truncation by the inference backend, a service-side context limit below the model configuration, an excessive output budget, additional tokens introduced by a chat template or multimodal content, and out-of-memory errors or request timeouts caused by very long samples. Before a full evaluation, use [Prompt Viewer](../prompt/debugging.md) to inspect the final messages, token count, and truncation behavior, then run a small test by length range. Do not directly reuse old predictions after changing the prompt, sample range, or task partitioning. Configurations for NeedleBench, RULER, LongBench, and similar datasets can be found under `configs/datasets`; for new chat evaluations, prefer their `rawprompt` variants where available.
 
 ### Why does OpenCompass split an evaluation request into tasks?
 

@@ -106,9 +106,15 @@ Error: mkl-service + Intel(R) MKL: MKL_THREADING_LAYER=INTEL is incompatible wit
 
 ### 我的服务器无法连接到互联网，我如何使用 OpenCompass？
 
-如 [网络-Q1](#运行报错Connection-aborted-ConnectionResetError104-Connection-reset-by-peer-或-urllib3exceptionsMaxRetryError-HTTPSConnectionPoolhostcdn-lfshuggingfaceco-port443) 所述，使用其他机器的缓存文件。
+可按上一问的方法，使用其他机器的缓存文件。
 
 ## 效率
+
+### 进行长上下文评测时需要注意什么？
+
+长上下文评测应以模型最终接收的 token 数为准，而不能仅依据配置文件名中的 `32k` 或 `128k`。最终输入包括 system prompt、few-shot 示例、题目正文、历史消息和 generation prompt，可用输入长度通常不超过 `max_seq_len - max_out_len`。不同 tokenizer 对同一文本的编码结果不同，因此应使用被评测模型的 tokenizer 检查实际输入长度；字符数和文件大小只能作为估算依据。
+
+常见问题包括推理后端静默截断、服务端实际上下文上限低于模型配置、输出预算过大、chat template 或多模态内容引入额外 token，以及超长样本导致显存不足或请求超时。正式评测前，建议先通过 [Prompt Viewer](../prompt/debugging.md) 检查最终消息、token 数和截断情况，再按长度区间进行小规模试跑。修改提示词、样本范围或任务切分方式后，不应直接复用旧预测。NeedleBench、RULER、LongBench 等数据集的具体配置可在 `configs/datasets` 中检索，新建对话评测配置时可优先参考 `rawprompt` 变体。
 
 ### 为什么 OpenCompass 将每个评估请求分割成任务？
 

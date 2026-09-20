@@ -1,51 +1,105 @@
 # Command-Line Reference
 
-The final authority for the installed version is:
+The basic form of the `opencompass` command is:
+
+```bash
+opencompass [config] [options]
+```
+
+This page reflects the current implementation in `opencompass/cli/main.py`. If the code changes, treat the output of the following command as authoritative:
 
 ```bash
 opencompass --help
 ```
 
-## Experiment Entry Point
+## Configuration Entry Points and Lookup
 
-| Argument       | Meaning                                                |
-| -------------- | ------------------------------------------------------ |
-| `config`       | Python experiment configuration file; optional         |
-| `--models`     | Select models by name from configuration directories   |
-| `--datasets`   | Select datasets by name from configuration directories |
-| `--summarizer` | Select a summarizer configuration by name              |
-| `--config-dir` | Additional configuration search directory              |
+| Argument                           | Default   | Description                                                                                                                                                   |
+| ---------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config`                           | None      | Optional positional argument specifying the path to a Python configuration file.                                                                              |
+| `-h`, `--help`                     | —         | Display help information.                                                                                                                                     |
+| `--models MODEL [MODEL ...]`       | None      | Find and load one or more model configurations by name.                                                                                                       |
+| `--datasets DATASET [DATASET ...]` | None      | Find and load one or more dataset configurations by name.                                                                                                     |
+| `--summarizer SUMMARIZER`          | `example` | Select a result-summary configuration in shorthand configuration mode. Use `filename/config_key` to select a specific configuration object.                   |
+| `--config-dir DIR`                 | `configs` | Specify a custom configuration root. OpenCompass searches its `models/`, `datasets/`, `dataset_collections/`, and `summarizers/` subdirectories while retaining the built-in search paths. |
 
-Without a configuration file, provide `--models` together with `--datasets`, or construct a Hugging Face model with `--hf-path` and select a dataset.
+When `config` is supplied, OpenCompass reads that file first. Shorthand construction arguments such as `--models`, `--datasets`, `--summarizer`, `--hf-*`, and `--custom-dataset-*` do not replace its model or dataset configurations. Without a configuration file, use one of these entry points:
 
-## Execution and Output
+- load existing configurations with `--models` and `--datasets`;
+- construct a Hugging Face model with `--hf-path` and select datasets with `--datasets`;
+- select a model with `--models` or `--hf-path` and construct a custom dataset with `--custom-dataset-path`.
 
-| Argument                      | Meaning                                                             |
-| ----------------------------- | ------------------------------------------------------------------- |
-| `--dry-run`                   | Parse configuration and partition tasks without running inference   |
-| `--debug`                     | Run in one process and display logs in the terminal                 |
-| `--mode {all,infer,eval,viz}` | Select execution stage                                              |
-| `--reuse [TIMESTAMP]`         | Reuse a selected or latest timestamp directory                      |
-| `--work-dir`                  | Output root                                                         |
-| `--config-verbose`            | Print the final configuration                                       |
-| `--dump-eval-details False`   | Disable per-sample evaluation details, which are enabled by default |
-| `--dump-res-length`           | Record response lengths                                             |
-| `--analysis-repeat`           | Analyze repeated predictions during summarization                   |
-| `--dump-extract-rate`         | Report answer extraction rate                                       |
+## Execution Stages and Working Directory
 
-## Concurrency and Backends
+| Argument                              | Default           | Description                                                                                                                                        |
+| ------------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-m`, `--mode {all,infer,eval,viz}`   | `all`             | Select the execution stage: `all` runs the complete workflow, `infer` runs inference only, `eval` runs scoring only, and `viz` runs summarization only. |
+| `-r`, `--reuse [TIMESTAMP]`           | None              | Reuse an experiment directory for the specified timestamp. If the timestamp is omitted, use the last directory by name in the working directory.   |
+| `-w`, `--work-dir DIR`                | `outputs/default` | Set the experiment output root. Artifacts are stored in its timestamped subdirectory.                                                              |
+| `--debug`                             | `False`           | Enable debug mode. The Runner executes tasks sequentially and displays logs directly, which is useful for diagnosing a first run.                  |
+| `--dry-run`                           | `False`           | Parse the configuration and partition tasks without starting inference or evaluation. This also enables debug-level logging.                       |
+| `-a`, `--accelerator {vllm,lmdeploy}` | None              | Attempt to convert supported local Hugging Face model configurations to vLLM or LMDeploy for one-stop deployment and evaluation. Unsupported model types remain unchanged and produce a warning. |
+| `--config-verbose`                    | `False`           | Print the loaded and processed experiment configuration.                                                                                           |
+| `-l`, `--lark`                        | `False`           | Enable Lark bot task notifications. The configuration must also provide `lark_bot_url`.                                                            |
 
-| Argument                        | Meaning                                               |
-| ------------------------------- | ----------------------------------------------------- |
-| `--max-num-workers`             | Maximum concurrent tasks for the default Runner       |
-| `--max-workers-per-gpu`         | Maximum LocalRunner tasks per GPU                     |
-| `--slurm -p PARTITION`          | Use Slurm                                             |
-| `--dlc --aliyun-cfg PATH`       | Use DLC                                               |
-| `--accelerator {vllm,lmdeploy}` | Attempt to convert a supported HF model configuration |
-| `--retry`                       | Failure retry count for the default Slurm/DLC Runner  |
+## Task Partitioning and Runner
+
+| Argument                  | Default | Description                                                                                                                                                              |
+| ------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--max-num-workers N`     | `1`     | Set the maximum concurrent task count for a default Runner supplied by the entry point and set `num_worker` for the default inference Partitioner. An explicitly configured stage is normally not overridden. |
+| `--max-workers-per-gpu N` | `1`     | Set the maximum number of concurrent tasks per GPU for an automatically generated `LocalRunner`.                                                                         |
+| `--slurm -p PARTITION`    | `False` | Force `SlurmRunner` and replace existing `infer` and `eval` execution configurations. `-p/--partition` is required. This option is mutually exclusive with `--dlc`.      |
+| `--dlc --aliyun-cfg PATH` | `False` | Force the Alibaba Cloud PAI-DLC Runner and replace existing `infer` and `eval` execution configurations. `--aliyun-cfg` selects the DLC configuration file and defaults to `~/.aliyun.cfg`; the path must exist. This option is mutually exclusive with `--slurm`. |
+
+## Inference, Evaluation, and Analysis Outputs
+
+| Argument                       | Default | Description                                                                                                                                                         |
+| ------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--dump-eval-details [BOOL]`   | `True`  | Save per-sample evaluation details. Use `--dump-eval-details False` to disable them; omitting the value keeps it `True`.                                            |
+| `--dump-res-length`            | `False` | Pass the response-length statistics flag to inference tasks. Support depends on the Inferencer.                                                                     |
+| `--dump-only-message-path DIR` | None    | Export constructed messages without requesting the model. Currently supported only by `GenInferencer`.                                                              |
+| `--dump-extract-rate`          | `False` | Instruct evaluation tasks to calculate and save the answer extraction rate.                                                                                         |
+| `--analysis-repeat`            | `False` | Analyze repeated predictions during summarization and write a repeated-output analysis file.                                                                        |
+| `--dataset-num-runs N`         | `1`     | In shorthand CLI configuration mode, set `n` and `k` to `N` in every loaded dataset configuration. This argument is not applied when an explicit configuration file is supplied. |
 
 ## Quickly Constructing a Hugging Face Model
 
-Common arguments include `--hf-type`, `--hf-path`, `--tokenizer-path`, `--model-kwargs`, `--tokenizer-kwargs`, `--generation-kwargs`, `--max-seq-len`, `--max-out-len`, `--batch-size`, and `--hf-num-gpus`. Put complex or reproducibility-critical model settings in a configuration file.
+The following arguments apply only when neither `config` nor `--models` supplies a model and `--hf-path` is used to construct one:
 
-`--dataset-num-runs N` copies every dataset configuration and runs it N times. When generation is stochastic, record each result and the aggregation method.
+| Argument                                        | Default            | Description                                                                                                  |
+| ----------------------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `--hf-type {base,chat}`                         | `chat`             | Select the base-model or chat-model wrapper.                                                                 |
+| `--hf-path PATH`                                | None               | Specify a Hugging Face model path or repository ID.                                                          |
+| `--model-kwargs KEY=VALUE [KEY=VALUE ...]`      | `{}`               | Pass model-loading arguments.                                                                                |
+| `--tokenizer-path PATH`                         | Same as model path | Specify a tokenizer path or repository ID.                                                                   |
+| `--tokenizer-kwargs KEY=VALUE [KEY=VALUE ...]`  | `{}`               | Pass tokenizer-loading arguments.                                                                            |
+| `--peft-path PATH`                              | None               | Specify a PEFT weights path.                                                                                 |
+| `--peft-kwargs KEY=VALUE [KEY=VALUE ...]`       | `{}`               | Pass PEFT-loading arguments.                                                                                 |
+| `--generation-kwargs KEY=VALUE [KEY=VALUE ...]` | `{}`               | Pass generation arguments.                                                                                   |
+| `--max-seq-len N`                               | None               | Set the maximum sequence length supported by the model.                                                      |
+| `--max-out-len N`                               | `256`              | Set the maximum output length.                                                                               |
+| `--min-out-len N`                               | `1`                | Set the minimum output length.                                                                               |
+| `--batch-size N`                                | `8`                | Set the inference batch size.                                                                                |
+| `--hf-num-gpus N`                               | `1`                | Set the number of GPUs used by a Hugging Face model task.                                                    |
+| `--pad-token-id N`                              | None               | Specify the padding token ID.                                                                                |
+| `--stop-words WORD [WORD ...]`                  | Empty list         | Specify one or more stop words.                                                                              |
+| `--num-gpus N`                                  | —                  | Deprecated. The current version raises an error when this argument is supplied; use `--hf-num-gpus` instead. |
+
+## Quickly Constructing a Custom Dataset
+
+The following arguments generate a dataset configuration from a local file:
+
+| Argument                                  | Default       | Description                                                                                 |
+| ----------------------------------------- | ------------- | ------------------------------------------------------------------------------------------- |
+| `--custom-dataset-path PATH`              | None          | Specify a custom dataset file. Required when neither `config` nor `--datasets` is supplied. |
+| `--custom-dataset-meta-path PATH`         | None          | Specify the metadata file for the custom dataset.                                           |
+| `--custom-dataset-data-type {mcq,qa}`     | Auto-detected | Select multiple-choice or question-answer data.                                             |
+| `--custom-dataset-infer-method {gen,ppl}` | Auto-detected | Select generative or PPL inference.                                                         |
+
+## Result Persistence Arguments
+
+| Argument                    | Default | Description                                                                                                                                                            |
+| --------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-sp`, `--station-path DIR` | None    | Specify a shared result directory. When this argument or `station_path` in the configuration is set, results are saved to the shared directory after the run.          |
+| `--read-from-station`       | `False` | Read existing results from the shared directory before execution, write them into the current experiment's `results/`, and skip model-dataset combinations whose results already exist. |
+| `--station-overwrite`       | `False` | Allow existing files to be overwritten when saving results to the shared directory.                                                                                    |

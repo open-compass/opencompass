@@ -8,4 +8,4 @@ OpenCompass 的 `tools/` 目录提供配置发现、Prompt 预览、预测检查
 - [接口与消息格式测试](api_and_message_test.md)
 - [通知与任务监控](monitoring.md)
 
-Prompt 预览的完整流程参阅[提示词预览与调试](../prompt/debugging.md)，任务中断后的处理参阅[任务恢复与复用](../execution/reuse_and_resume.md)。
+Prompt 预览的完整流程参阅[提示词预览与调试](../prompt/debugging.md)，任务中断后的处理参阅[任务恢复与复用](../execution/tasks_and_runners.md#任务恢复复用与只重跑评测)。

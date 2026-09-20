@@ -38,7 +38,6 @@ directly to the corresponding topic.
 
    prompt/raw_prompt_template.md
    prompt/meta_template.md
-   prompt/chain_of_thought.md
    prompt/debugging.md
 
 .. toctree::
@@ -47,7 +46,6 @@ directly to the corresponding topic.
 
    execution/tasks_and_runners.md
    execution/concurrent_evaluation.md
-   execution/reuse_and_resume.md
    execution/cli_reference.md
 
 .. toctree::
@@ -90,8 +88,12 @@ directly to the corresponding topic.
 
    notes/contribution_guide.md
    faq/index.md
-   faq/local_model_one_stop.md
-   faq/long_context.md
+   faq/circular_eval.md
+   faq/contamination_eval.md
+   faq/evaluation_lmdeploy.md
+   faq/longeval.md
+   faq/needleinahaystack_eval.md
+   faq/prompt_attack.md
 
 Index and Search
 ================

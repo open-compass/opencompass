@@ -3,41 +3,10 @@
 OpenCompass divides inference and evaluation into tasks and gives them to a Runner. The three configuration layers are:
 
 - Partitioner: determines how many tasks are created from model-dataset combinations.
-- Runner: launches tasks locally, on Slurm, or on DLC with a chosen concurrency.
+- Runner: launches tasks locally or in external environments such as Slurm, Alibaba Cloud, or Volcano Engine with the specified configuration and concurrency.
 - Task: performs inference, evaluation, or another concrete operation.
 
 Users control inference and evaluation independently through `infer.partitioner` / `infer.runner` and `eval.partitioner` / `eval.runner`. This page covers Partitioners, Runners, and ordinary task types. For cross-dataset API concurrency internals, see [Cross-Task Concurrent Inference and Evaluation Watching](concurrent_evaluation.md).
-
-## Default Strategy
-
-When `infer`/`eval` are omitted, the CLI generates local defaults: inference uses `NumWorkerPartitioner` and `OpenICLInferTask`, evaluation uses `NaivePartitioner` and `OpenICLEvalTask`, and both stages use `LocalRunner`.
-
-The standard API example in this documentation and the basic tutorial uses `OpenICLInferConcurrentTask` and `OpenICLEvalWatchTask`; CLI-generated defaults still use the ordinary `OpenICLInferTask` and `OpenICLEvalTask`.
-
-```python
-from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
-from opencompass.runners import LocalRunner
-from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
-
-infer = dict(
-    partitioner=dict(type=NumWorkerPartitioner, num_worker=4),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=4,
-        max_workers_per_gpu=1,
-        task=dict(type=OpenICLInferTask),
-    ),
-)
-
-eval = dict(
-    partitioner=dict(type=NaivePartitioner),
-    runner=dict(
-        type=LocalRunner,
-        max_num_workers=4,
-        task=dict(type=OpenICLEvalTask),
-    ),
-)
-```
 
 ## Task Partitioning: Three Partitioners
 
@@ -112,9 +81,9 @@ The cost coefficient depends on inference type: a generative task (`GenInference
 This partitioner is not suitable for the evaluation stage (`OpenICLEvalTask`).
 ```
 
-### Partitioning and Resume
+### Partitioning and Recovery
 
-Changing partition arguments can make existing prediction files impossible to reuse correctly. Keep model abbreviations, dataset abbreviations, and partitioning strategy stable when resuming. See [Task Recovery, Reuse, and Evaluation-Only Reruns](reuse_and_resume.md).
+Changing partition arguments can make existing prediction files impossible to reuse correctly. Keep model abbreviations, dataset abbreviations, and partitioning strategy stable when resuming. See [Task Recovery, Artifact Reuse, and Evaluation-only Runs](#task-recovery-artifact-reuse-and-evaluation-only-runs).
 
 ## Execution Backends: Runner
 
@@ -173,6 +142,32 @@ runner=dict(
 )
 ```
 
+### VOLCRunner
+
+Submits tasks to the Volcano Engine Machine Learning Platform. Install and configure the `volc` CLI and prepare a machine-learning task YAML file before use:
+
+```python
+from opencompass.runners import VOLCRunner
+from opencompass.tasks import OpenICLInferTask
+
+runner=dict(
+    type=VOLCRunner,
+    queue_name='your-resource-queue',
+    max_num_workers=16,
+    retry=2,
+    preemptible=False,
+    volcano_cfg=dict(
+        volcano_config_path='/path/to/ml_task.yaml',
+        python_env_path='/path/to/opencompass-env',
+        hf_offline=True,
+        extra_envs=['COMPASS_DATA_CACHE=/path/to/data'],
+    ),
+    task=dict(type=OpenICLInferTask),
+)
+```
+
+`VOLCRunner` submits tasks with `volc ml_task submit` and tracks their status and logs through the `get` and `logs` subcommands. It modifies the `Flavor` of the `RoleName: worker` role in the YAML according to the Task's `num_gpus`, so that role must be present. `python_env_path` may instead be replaced by `bashrc_path` and `conda_env_name` to activate a specific Conda environment.
+
 ### RJOBRunner
 
 Submits and tracks tasks through the `rjob` CLI for an rjob-scheduled cluster. Resource requirements are derived automatically from task `num_gpus` (GPU count, memory, and CPU); a GPU-free task can specify `memory` and `cpu` directly in `rjob_cfg`. After submission, the Runner polls `rjob get` until completion:
@@ -196,7 +191,7 @@ runner=dict(
 
 `rjob_cfg` also supports fields including `charged_group`, `private_machine`, `replicas`, `host_network`, and `extra_args`.
 
-CLI `--slurm` / `--dlc` are runtime overrides: even when a configuration defines a Runner, it is replaced by the requested type and an override warning is printed.
+CLI `--slurm` / `--dlc` are runtime overrides: even when a configuration defines a Runner, it is replaced by the requested type and an override warning is printed. `VOLCRunner` has no corresponding CLI override and must be declared explicitly in the configuration file.
 
 ## Task Types
 
@@ -209,8 +204,39 @@ A Task is an independent script responsible for compute-intensive operations, wi
 
 See [Cross-Task Concurrent Inference and Evaluation Watching](concurrent_evaluation.md) for arguments, behavior, and selection guidance for the last two tasks.
 
-## Resource Declarations and Actual Concurrency
+## Task Recovery, Artifact Reuse, and Evaluation-only Runs
 
-Model `run_cfg.num_gpus` declares the number of GPUs occupied by one task; Runner `max_num_workers` limits concurrently running tasks; LocalRunner `max_workers_per_gpu` allows multiple tasks on one GPU. These three arguments jointly determine concurrency and are not interchangeable.
+OpenCompass stores predictions, scores, and summaries separately, so completed stages can be reused. The working directory, timestamp, model and dataset abbreviations, and task partitioning must remain consistent when artifacts are reused.
 
-Use `--dry-run` to inspect partitioning first. Before increasing concurrency, also confirm that GPU memory, CPU, file descriptors, API rate limits, and data caches can sustain the corresponding load.
+In the commands below, `--reuse`, `--mode`, and `--work-dir` may be abbreviated as `-r`, `-m`, and `-w`, respectively. Long and short forms may be combined.
+
+### Reuse the Most Recent Run
+
+```bash
+opencompass my_eval.py --work-dir outputs/my_eval --reuse
+```
+
+Without a value, `--reuse` (or `-r`) selects the last timestamped directory by name under the working directory. To identify the reuse target unambiguously, specify its timestamp:
+
+```bash
+opencompass my_eval.py \
+    -w outputs/my_eval \
+    -r 20260903_120000
+```
+
+### Execute Individual Stages
+
+```bash
+# Generate predictions only
+opencompass my_eval.py -w outputs/my_eval -m infer
+
+# Rescore existing predictions
+opencompass my_eval.py -w outputs/my_eval \
+    -r 20260903_120000 -m eval
+
+# Regenerate the summary from existing results
+opencompass my_eval.py -w outputs/my_eval \
+    -r 20260903_120000 -m viz
+```
+
+When using `eval` or `viz` mode, specify an existing experiment through `--reuse` or use the result-station read mechanism.

@@ -16,4 +16,4 @@ python tools/analyze_repeat.py outputs/my_eval/<timestamp> \
 
 Use `--think-tag` to analyze reasoning content and final replies separately, and `--out` to choose an output file. When a Hugging Face tokenizer is supplied, the tool may need network access to load it; in an offline environment, pass a local tokenizer path.
 
-Response length helps reveal truncation, empty replies, and anomalous cost, but it is not the same as input-token statistics. For long-context input checks, see [Long-Context Evaluation](../faq/long_context.md).
+Response length helps reveal truncation, empty replies, and anomalous cost, but it is not the same as input-token statistics. For long-context input checks, see [What should I consider when running long-context evaluation?](../faq/index.md#what-should-i-consider-when-running-long-context-evaluation).
