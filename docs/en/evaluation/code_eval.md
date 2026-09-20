@@ -4,7 +4,7 @@ This page uses `humaneval` and `mbpp` to explain pass@1 / pass@k configuration. 
 
 ## pass@1
 
-To generate one reply and evaluate pass@1, use [opencompass/configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/humaneval/humaneval_gen_8e312c.py) and [opencompass/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py), following the general [Quick Start](../get_started/quick_start.md).
+To generate one reply and evaluate pass@1, use [configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) and [configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py), following the general [Quick Start](../get_started/quick_start.md).
 
 For multilingual evaluation, see [Code Execution Service](#code-execution-service) below.
 
@@ -116,7 +116,7 @@ Datasets requiring real code execution are evaluated in an independent Docker se
 
    Supported libraries are `Pandas`, `Numpy`, `Tensorflow`, `Scipy`, `Sklearn`, `Pytorch`, and `Matplotlib`.
 
-### Launching the Code Evaluation Service
+## Launching the Code Evaluation Service
 
 1. Ensure you have installed Docker, please refer to [Docker installation document](https://docs.docker.com/engine/install/).
 2. Pull the source code of the code evaluation service project and build the Docker image.
@@ -164,7 +164,7 @@ When the model inference and code evaluation services are running on the same ho
 
 We provide [the configuration file](https://github.com/open-compass/opencompass/blob/main/examples/eval_codegeex2.py) of using `humanevalx` for evaluation on `codegeex2` as reference.
 
-The dataset and related post-processing configuration files are available at this [link](https://github.com/open-compass/opencompass/tree/main/opencompass/configs/datasets/humanevalx). Note the `evaluator` field in `humanevalx_eval_cfg_dict`.
+The dataset and related post-processing configurations files can be found at this [link](https://github.com/open-compass/opencompass/tree/main/configs/datasets/humanevalx) with attention paid to the `evaluator` field in the humanevalx_eval_cfg_dict.
 
 ```python
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -216,7 +216,7 @@ Model inference and code evaluation services located in different machines which
 
 ### Collect Inference Results(Only for Humanevalx)
 
-OpenCompass provides `tools/collect_code_preds.py` to post-process and collect inference results. Supply the configuration used to launch the task and the working directory to reuse. Its reuse argument follows the same semantics as `opencompass --reuse`; see [Task Recovery, Artifact Reuse, and Evaluation-only Runs](../execution/tasks_and_runners.md#task-recovery-artifact-reuse-and-evaluation-only-runs).
+In OpenCompass's tools folder, there is a script called `collect_code_preds.py` provided to process and collect the inference results after providing the task launch configuration file during startup along with specifying the working directory used corresponding to the task.
 It is the same with `-r` option in `run.py`. More details can be referred through the [documentation](https://opencompass.readthedocs.io/en/latest/get_started/quick_start.html#launching-evaluation).
 
 ```shell

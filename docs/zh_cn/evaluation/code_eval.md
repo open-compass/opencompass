@@ -4,7 +4,7 @@
 
 ## pass@1
 
-如果只需要生成单条回复来评测pass@1的性能，可以直接使用[opencompass/configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/humaneval/humaneval_gen_8e312c.py) 和 [opencompass/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py) 并参考通用的[快速上手教程](../get_started/quick_start.md)即可。
+如果只需要生成单条回复来评测pass@1的性能，可以直接使用[configs/datasets/humaneval/humaneval_gen_8e312c.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/humaneval/humaneval_gen_8e312c.py) 和 [configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py](https://github.com/open-compass/opencompass/blob/main/configs/datasets/mbpp/deprecated_mbpp_gen_1e1056.py) 并参考通用的[快速上手教程](../get_started/quick_start.md)即可。
 
 如果要进行多语言评测，可以参考本文[代码执行服务](#代码执行服务)一节。
 
@@ -172,7 +172,7 @@ telnet your_service_ip_address your_service_port
 ### 配置文件
 
 我们已经提供了 humaneval-x 在 codegeex2 上评估的[配置文件](https://github.com/open-compass/opencompass/blob/main/examples/eval_codegeex2.py)作为参考。
-其中数据集以及相关后处理的配置文件为这个[链接](https://github.com/open-compass/opencompass/tree/main/opencompass/configs/datasets/humanevalx)， 需要注意 humanevalx_eval_cfg_dict 中的evaluator 字段。
+其中数据集以及相关后处理的配置文件为这个[链接](https://github.com/open-compass/opencompass/tree/main/configs/datasets/humanevalx)， 需要注意 humanevalx_eval_cfg_dict 中的evaluator 字段。
 
 ```python
 from opencompass.openicl.icl_prompt_template import PromptTemplate
@@ -224,7 +224,7 @@ humanevalx_datasets = [
 
 ### 收集推理结果（仅针对Humanevalx）
 
-OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其参数含义与 `opencompass` 的 `--reuse` 一致，细节参阅[任务恢复、复用与只重跑评测](../execution/tasks_and_runners.md#任务恢复复用与只重跑评测)。
+OpenCompass 在 `tools` 中提供了 `collect_code_preds.py` 脚本对推理结果进行后处理并收集，我们只需要提供启动任务时的配置文件，以及指定复用对应任务的工作目录，其参数含义与 `opencompass` 的 `--reuse` 一致，细节可参考[文档](https://opencompass.readthedocs.io/zh-cn/latest/get_started/quick_start.html#id4)。
 
 ```shell
 python tools/collect_code_preds.py [config] [-r latest]

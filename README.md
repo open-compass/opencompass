@@ -62,20 +62,22 @@ Just like a compass guides us on our journey, OpenCompass will guide you through
 - **\[2026.07.27\]** OpenCompass now supports multi-round inference in `GenInferencer` and adds support for the Multi-IF dataset to evaluate multi-turn instruction-following capabilities. Check out the [Multi-IF evaluation configuration](opencompass/configs/datasets/MultiIF/MultiIF_gen.py) for details! 🔥🔥🔥
 - **\[2026.05.25\]** OpenCompass now provides repeat analysis tools for detecting repetitive content and looping model outputs in current evaluation tasks or existing evaluation results. Check out the [repeat analysis tool](tools/analyze_repeat.py) for details!
 - **\[2026.03.20\]** OpenCompass now supports concurrent inference across tasks together with evaluation watching, enabling completed inference tasks to be monitored and subsequent evaluations to be triggered in a coordinated pipeline. Parallel inferencers, task monitoring, and heartbeat mechanisms further improve large-scale evaluation efficiency. Check out the [concurrent inference implementation](opencompass/tasks/openicl_infer_concurrent.py) and [evaluation watcher implementation](opencompass/tasks/openicl_eval_watch.py) for details!
-- **\[2026.03.17\]** OpenCompass introduces `RawPromptTemplate`, allowing original benchmark prompts and structured conversations to be passed to models without unintended formatting transformations. It supports API models, ChatML datasets, and appending additional prompt content on the model side. Check out the [RawPromptTemplate guide](docs/en/prompt/raw_prompt_template.md) for details!
+- **\[2026.03.17\]** OpenCompass introduces `RawPromptTemplate`, allowing original benchmark prompts and structured conversations to be passed to models without unintended formatting transformations. It supports API models, ChatML datasets, and appending additional prompt content on the model side. Check out the [RawPromptTemplate guide](docs/en/notes/rawprompttemplate.md) for details!
 - **\[2026.02.05\]** OpenCompass now supports Intern-S1-Pro related general and scientific evaluation benchmarks. Please check [Example for Evaluating Intern-S1-Pro](examples/eval_intern_s1_pro.py) and [Model Card](https://huggingface.co/internlm/Intern-S1-Pro) for more details! 🔥🔥🔥
 - **\[2025.12.08\]** OpenCompass now supports evaluation for SciReasoner. Please check [Example for Evaluating SciReasoner](examples/eval_scireasoner.py) and [Project GitHub Repo](https://github.com/InternScience/SciReason) for more details! 🔥🔥🔥
-- **\[2025.07.26\]** OpenCompass now supports Intern-S1 related general and scientific evaluation benchmarks. Please check the [Intern-S1 evaluation example](examples/eval_bench_intern_s1.py) for more details! 🔥🔥🔥
-- **\[2025.04.01\]** OpenCompass now supports `CascadeEvaluator`, a flexible evaluation mechanism that allows multiple evaluators to work in sequence. This enables creating customized evaluation pipelines for complex assessment scenarios. Check out the [documentation](docs/en/evaluation/llm_judge.md) for more details! 🔥🔥🔥
+- **\[2025.07.26\]** OpenCompass now supports Intern-S1 related general and scientific evaluation benchmarks. Please check [Tutorial for Evaluating Intern-S1](https://opencompass.readthedocs.io/en/latest/user_guides/interns1.html) for more details! 🔥🔥🔥
+- **\[2025.04.01\]** OpenCompass now supports `CascadeEvaluator`, a flexible evaluation mechanism that allows multiple evaluators to work in sequence. This enables creating customized evaluation pipelines for complex assessment scenarios. Check out the [documentation](docs/en/advanced_guides/llm_judge.md) for more details! 🔥🔥🔥
 - **\[2025.03.11\]** We have supported evaluation for `SuperGPQA` which is a great benchmark for measuring LLM knowledge ability 🔥🔥🔥
-- **\[2025.02.28\]** We have added an evaluation example for the `DeepSeek-R1` series. See the [DeepSeek-R1 evaluation configuration](examples/eval_deepseek_r1.py) for details! 🔥🔥🔥
-- **\[2025.02.15\]** We have added two powerful evaluation tools: `GenericLLMEvaluator` for LLM-as-judge evaluations and `MATHVerifyEvaluator` for mathematical reasoning assessments. Check out the documentation for [LLM Judge](docs/en/evaluation/llm_judge.md) and [Math Evaluation](docs/en/evaluation/math_verify.md) for more details! 🔥🔥🔥
+- **\[2025.02.28\]** We have added a tutorial for `DeepSeek-R1` series model, please check [Evaluating Reasoning Model](docs/en/user_guides/deepseek_r1.md) for more details! 🔥🔥🔥
+- **\[2025.02.15\]** We have added two powerful evaluation tools: `GenericLLMEvaluator` for LLM-as-judge evaluations and `MATHVerifyEvaluator` for mathematical reasoning assessments. Check out the documentation for [LLM Judge](docs/en/advanced_guides/llm_judge.md) and [Math Evaluation](docs/en/advanced_guides/math_verify.md) for more details! 🔥🔥🔥
+
+> [More](docs/en/notes/news.md)
 
 ## 📊 Leaderboard
 
 We provide [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) for the community to rank all public models and API models. If you would like to join the evaluation, please provide the model repository URL or a standard API interface to the email address `opencompass@pjlab.org.cn`.
 
-You can also refer to [Guide to Reproducing CompassAcademic Leaderboard Results](https://opencompass.readthedocs.io/zh-cn/latest/notes/academic.html) to quickly reproduce the leaderboard results.
+You can also refer to [Guide to Reproducing CompassAcademic Leaderboard Results](https://opencompass.readthedocs.io/zh-cn/latest/academic.html) to quickly reproduce the leaderboard results.
 
 <p align="right"><a href="#top">🔝Back to top</a></p>
 
@@ -151,7 +153,7 @@ Currently, the supported datasets are listed in [here](https://github.com/open-c
 
 #### (Optional) Automatic Download with ModelScope
 
-You can also use [ModelScope](https://www.modelscope.cn) to load datasets on demand.
+Also you can use the [ModelScope](www.modelscope.cn) to load the datasets on demand.
 
 Installation:
 
@@ -205,7 +207,7 @@ opencompass examples/eval_api_demo.py
 
 ### Accelerated Evaluation
 
-Additionally, if you want to use an inference backend other than Hugging Face for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Ensure that you have installed the required package and that the model is compatible with the selected backend. For details, see [One-stop Deployment and Evaluation](docs/en/user_guides/models.md#2-one-stop-deployment-and-evaluation). The following example uses LMDeploy:
+Additionally, if you want to use an inference backend other than HuggingFace for accelerated evaluation, such as LMDeploy or vLLM, you can do so with the command below. Please ensure that you have installed the necessary packages for the chosen backend and that your model supports accelerated inference with it. For more information, see the documentation on inference acceleration backends [here](docs/en/advanced_guides/accelerator_intro.md). Below is an example using LMDeploy:
 
 ```bash
 # CLI
@@ -217,7 +219,7 @@ opencompass examples/eval_lmdeploy_demo.py
 
 ### Supported Models and Datasets
 
-OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [configuration discovery tool](docs/en/tools/config_discovery.md).
+OpenCompass has predefined configurations for many models and datasets. You can list all available model and dataset configurations using the [tools](./docs/en/tools.md#list-configs).
 
 ```bash
 # List all configurations
@@ -228,7 +230,7 @@ python tools/list_configs.py llama mmlu
 
 #### Supported Models
 
-If the model is not on the list but is supported by the Hugging Face AutoModel classes or by an inference-engine wrapper compatible with the OpenAI interface, you can still evaluate it with OpenCompass. See [Adding a Model](docs/en/extension/new_model.md) for details. Contributions that maintain the supported model and dataset lists are welcome.
+If the model is not on the list but supported by Huggingface AutoModel class or encapsulation of inference engine based on OpenAI interface (see [docs](https://opencompass.readthedocs.io/en/latest/advanced_guides/new_model.html) for details), you can also evaluate it with OpenCompass. You are welcome to contribute to the maintenance of the OpenCompass supported model and dataset lists.
 
 ```bash
 opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/internlm2_5-1_8b-chat
@@ -236,7 +238,7 @@ opencompass --datasets demo_gsm8k_chat_gen --hf-type chat --hf-path internlm/int
 
 #### Supported Datasets
 
-OpenCompass provides recommended standard configurations for datasets. Configuration files ending in `_gen.py` or `_llm_judge_gen.py` generally correspond to the recommended configuration for a dataset. See [Dataset Selection and Configuration](docs/en/user_guides/datasets.md#dataset-statistics) for details.
+Currently, OpenCompass have provided standard recommended configurations for datasets. Generally, config files ending with `_gen.py` or `_llm_judge_gen.py` will point to the recommended config we provide for this dataset. You can refer to [docs](https://opencompass.readthedocs.io/en/latest/dataset_statistics.html) for more details.
 
 ```bash
 # Recommended Evaluation Config based on Rules
