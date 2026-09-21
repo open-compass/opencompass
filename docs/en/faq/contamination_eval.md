@@ -66,9 +66,7 @@ Thanks to [Contamination_Detector](https://github.com/liyucheng09/Contamination_
 
 In this method, the authors search the test datasets (such as C-Eval, ARC, HellaSwag, etc.) using the Common Crawl database and Bing search engine, then mark each test sample as clean / question contaminated / both question and answer contaminated.
 
-During testing, OpenCompass
-
-will report the accuracy or perplexity of ceval on subsets composed of these three labels. Generally, the accuracy ranges from low to high: clean, question contaminated, both question and answer contaminated subsets. The authors believe:
+During testing, OpenCompass will report the accuracy or perplexity of ceval on subsets composed of these three labels. Generally, the accuracy ranges from low to high: clean, question contaminated, both question and answer contaminated subsets. The authors believe:
 
 - If the performance of the three is relatively close, the contamination level of the model on that test set is light; otherwise, it is heavy.
 

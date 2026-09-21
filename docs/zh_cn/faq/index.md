@@ -93,14 +93,19 @@ Error: mkl-service + Intel(R) MKL: MKL_THREADING_LAYER=INTEL is incompatible wit
 
 由于 HuggingFace 的实现，OpenCompass 在首次加载某些数据集和模型时需要网络（尤其是与 HuggingFace 的连接）。此外，每次启动时都会连接到 HuggingFace。为了成功运行，您可以：
 
-- 通过指定环境变量 `http_proxy` 和 `https_proxy`，挂上代理；
+- 通过指定环境变量 `http_proxy` 和 `https_proxy`，挂上代理。
+
 - 使用其他机器的缓存文件。首先在有 HuggingFace 访问权限的机器上运行实验，然后将缓存文件复制 / 软链到离线的机器上。缓存文件默认位于 `~/.cache/huggingface/`（[文档](https://huggingface.co/docs/datasets/cache#cache-directory)）。当缓存文件准备好时，您可以在离线模式下启动评估：
-  ```python
+
+  ```bash
   HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 HF_EVALUATE_OFFLINE=1 HF_HUB_OFFLINE=1 opencompass ...
   ```
+
   这样，评估不再需要网络连接。但是，如果缓存中缺少任何数据集或模型的文件，仍然会引发错误。
-- 使用中国大陆内的镜像源，例如 [hf-mirror](https://hf-mirror.com/)
-  ```python
+
+- 使用中国大陆内的镜像源，例如 [hf-mirror](https://hf-mirror.com/)：
+
+  ```bash
   HF_ENDPOINT=https://hf-mirror.com opencompass ...
   ```
 

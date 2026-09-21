@@ -104,6 +104,7 @@ models = gpt_6_astra
 ### 配置文件
 
 我们已经提供了 humaneval-x 在 GPT-6 上评估的[配置文件](https://github.com/open-compass/opencompass/blob/main/examples/eval_humanevalx_gpt6.py)作为参考。
+
 其中数据集以及相关后处理的配置文件可以参考 [opencompass/configs/datasets/humanevalx/humanevalx_rawprompt_gen_386eb8.py](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/humanevalx/humanevalx_rawprompt_gen_386eb8.py)，需要注意 `humanevalx_eval_cfg_dict` 中的 `evaluator` 字段。
 
 ```python

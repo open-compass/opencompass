@@ -84,7 +84,7 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    :maxdepth: 1
    :caption: 其他文档
 
-   notes/contribution_guide.md
+   faq/contribution_guide.md
    faq/index.md
    faq/circular_eval.md
    faq/contamination_eval.md
