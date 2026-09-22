@@ -48,7 +48,8 @@ class TurboMindAPIModel(BaseModel):
         gen_config (Dict, optional): Extra generation parameters passed to
             lmdeploy's completion API, such as ``random_seed``. Values in
             ``gen_config`` override ``top_p`` and ``top_k`` defaults.
-        retry (int): Number of attempts if an API call fails. Defaults to 10.
+        retry (int): Number of attempts if an API call (completion, encode
+            or ppl request) fails. Defaults to 10.
         verbose (bool): Whether to log API request and response details.
             Defaults to False.
     """
@@ -140,16 +141,45 @@ class TurboMindAPIModel(BaseModel):
                 all_ids.append(ids)
                 all_lens.append(lens)
             return all_ids, all_lens
-        resp = requests.post(self.encode_addr,
-                             headers=self.chatbot.headers,
-                             json={
-                                 'input': text,
-                                 'do_preprocess': False,
-                                 'add_bos': True,
-                                 'model': self.model_name
-                             })
-        output = resp.json()
-        return output['input_ids'], output['length']
+
+        num_retries = 0
+        last_error = None
+        while num_retries < self.retry:
+            try:
+                resp = requests.post(self.encode_addr,
+                                     headers=self.chatbot.headers,
+                                     json={
+                                         'input': text,
+                                         'do_preprocess': False,
+                                         'add_bos': True,
+                                         'model': self.model_name
+                                     })
+                if not resp.ok:
+                    raise RuntimeError(
+                        'Calling TurboMindAPIModel /v1/encode failed for '
+                        f'{self.encode_addr}: status code '
+                        f'{resp.status_code}, response {resp.text}')
+                output = resp.json()
+                if 'input_ids' not in output or 'length' not in output:
+                    raise RuntimeError(
+                        'Calling TurboMindAPIModel /v1/encode got '
+                        f'unexpected response from {self.encode_addr}: '
+                        f'{str(output)[:500]}')
+                if self.verbose:
+                    self.logger.info(
+                        'TurboMind API /v1/encode ok: '
+                        'input=%s, token_len=%d', repr(text), output['length'])
+                return output['input_ids'], output['length']
+            except Exception as e:
+                last_error = e
+                num_retries += 1
+                self.logger.error(
+                    'Error calling TurboMind API /v1/encode '
+                    '(attempt %d/%d): %s', num_retries, self.retry, e)
+
+        raise RuntimeError(
+            'Calling TurboMind API /v1/encode failed after retrying for '
+            f'{self.retry} times. Check the logs for details.') from last_error
 
     def get_token_len(self, prompt: str) -> int:
         _, length = self._encode(prompt)
@@ -258,22 +288,48 @@ class TurboMindAPIModel(BaseModel):
             and all(type(token_id) is int for token_id in prompt)
         ), 'We only support string or token ids for TurboMind RPC API'
 
-        raw_response = requests.post(self.ppl_addr,
-                                     headers=self.chatbot.headers,
-                                     json={
-                                         'input': prompt,
-                                         'model': self.model_name
-                                     },
-                                     stream=False)
+        num_retries = 0
+        last_error = None
+        while num_retries < self.retry:
+            try:
+                raw_response = requests.post(self.ppl_addr,
+                                             headers=self.chatbot.headers,
+                                             json={
+                                                 'input': prompt,
+                                                 'model': self.model_name
+                                             },
+                                             stream=False)
+                if not raw_response.ok:
+                    raise RuntimeError(
+                        'Calling TurboMindAPIModel /get_ppl failed '
+                        f'for {self.ppl_addr}: status code '
+                        f'{raw_response.status_code}, response '
+                        f'{raw_response.text}')
+                response = raw_response.json()
+                if 'ppl' not in response:
+                    raise RuntimeError(
+                        'Calling TurboMindAPIModel /get_ppl got '
+                        f'unexpected response from {self.ppl_addr}: '
+                        f'{str(response)[:500]}')
+                if self.verbose:
+                    if isinstance(prompt, str):
+                        head = repr(prompt)
+                    else:
+                        head = f'{len(prompt)} token ids: {prompt}'
+                    self.logger.info(
+                        'TurboMind API /get_ppl ok: input=%s, ppl=%s', head,
+                        response['ppl'])
+                return float(response['ppl'])
+            except Exception as e:
+                last_error = e
+                num_retries += 1
+                self.logger.error(
+                    'Error calling TurboMind API /get_ppl '
+                    '(attempt %d/%d): %s', num_retries, self.retry, e)
 
-        if not raw_response.ok:
-            raise RuntimeError('Calling TurboMindAPIModel /get_ppl failed '
-                               f'for {self.ppl_addr}: status code '
-                               f'{raw_response.status_code}, response '
-                               f'{raw_response.text}')
-
-        response = raw_response.json()
-        return float(response['ppl'])
+        raise RuntimeError(
+            'Calling TurboMind API /get_ppl failed after retrying for '
+            f'{self.retry} times. Check the logs for details.') from last_error
 
     def get_loglikelihood(
             self,
