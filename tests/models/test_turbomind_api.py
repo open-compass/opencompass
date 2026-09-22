@@ -17,6 +17,20 @@ class FakeAPIClient:
         yield {'choices': [{'text': 'OK'}]}
 
 
+class RetryAPIClient(FakeAPIClient):
+
+    def __init__(self, failures):
+        super().__init__()
+        self.failures = failures
+
+    def completions_v1(self, **kwargs):
+        self.calls.append(kwargs)
+        if len(self.calls) <= self.failures:
+            yield {'choices': [{'text': 'partial'}]}
+            raise ConnectionError('temporary connection error')
+        yield {'choices': [{'text': 'OK'}]}
+
+
 def make_turbomind_api_model(client, **kwargs):
     api_client_cls = MagicMock(return_value=client)
     fake_lmdeploy = SimpleNamespace()
@@ -88,6 +102,49 @@ class TestTurboMindAPIModel(unittest.TestCase):
         self.assertEqual(result, 'OK')
         self.assertEqual(client.calls[0]['top_p'], 1.0)
         self.assertEqual(client.calls[0]['top_k'], 1)
+
+    def test_generate_retries_and_discards_partial_response(self):
+        client = RetryAPIClient(failures=1)
+        model = make_turbomind_api_model(client, retry=2)
+
+        result = model._generate('Hello', max_out_len=16, temperature=0.7,
+                                 end_str=None)
+
+        self.assertEqual(result, 'OK')
+        self.assertEqual(len(client.calls), 2)
+
+    def test_generate_raises_after_retry_exhausted(self):
+        client = RetryAPIClient(failures=2)
+        model = make_turbomind_api_model(client, retry=2)
+
+        with self.assertRaisesRegex(RuntimeError,
+                                    r'after retrying for 2 times'):
+            model._generate('Hello', max_out_len=16, temperature=0.7,
+                            end_str=None)
+
+        self.assertEqual(len(client.calls), 2)
+
+    def test_verbose_logs_each_api_output(self):
+        client = FakeAPIClient()
+        model = make_turbomind_api_model(client, verbose=True)
+        model.logger = MagicMock()
+
+        model._generate('Hello', max_out_len=16, temperature=0.7,
+                        end_str=None)
+
+        model.logger.info.assert_any_call('Start calling TurboMind API')
+        model.logger.info.assert_any_call('TurboMind API output: %s',
+                                          {'choices': [{'text': 'OK'}]})
+
+    def test_verbose_disabled_does_not_log_api_output(self):
+        client = FakeAPIClient()
+        model = make_turbomind_api_model(client)
+        model.logger = MagicMock()
+
+        model._generate('Hello', max_out_len=16, temperature=0.7,
+                        end_str=None)
+
+        model.logger.info.assert_not_called()
 
 
 if __name__ == '__main__':
