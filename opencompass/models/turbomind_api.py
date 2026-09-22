@@ -48,6 +48,9 @@ class TurboMindAPIModel(BaseModel):
         gen_config (Dict, optional): Extra generation parameters passed to
             lmdeploy's completion API, such as ``random_seed``. Values in
             ``gen_config`` override ``top_p`` and ``top_k`` defaults.
+        retry (int): Number of attempts if an API call fails. Defaults to 10.
+        verbose (bool): Whether to log API request and response details.
+            Defaults to False.
     """
 
     is_api: bool = True
@@ -63,6 +66,8 @@ class TurboMindAPIModel(BaseModel):
                  top_p: Optional[float] = 0.8,
                  top_k: Optional[int] = 50,
                  gen_config: Optional[Dict] = None,
+                 retry: int = 10,
+                 verbose: bool = False,
                  **kwargs):
         super().__init__(path='',
                          max_seq_len=max_seq_len,
@@ -83,6 +88,8 @@ class TurboMindAPIModel(BaseModel):
         self.top_p = top_p
         self.top_k = top_k
         self.gen_config = dict(gen_config or {})
+        self.retry = retry
+        self.verbose = verbose
 
     def generate(
         self,
@@ -188,21 +195,39 @@ class TurboMindAPIModel(BaseModel):
         assert type(
             prompt) is str, 'We only support string for TurboMind RPC API'
 
-        max_tokens, gen_kwargs = self._get_generation_kwargs(
-            max_out_len, temperature)
-        response = ''
-        for output in self.chatbot.completions_v1(
-                prompt=prompt,
-                model=self.model_name,
-                max_tokens=max_tokens,
-                max_completion_tokens=max_tokens,
-                **gen_kwargs,
-        ):
-            response += output['choices'][0]['text']
-        response = valid_str(response)
-        if end_str:
-            response = response.split(end_str)[0]
-        return response
+        num_retries = 0
+        last_error = None
+        while num_retries < self.retry:
+            max_tokens, gen_kwargs = self._get_generation_kwargs(
+                max_out_len, temperature)
+            response = ''
+            try:
+                if self.verbose:
+                    self.logger.info('Start calling TurboMind API')
+                for output in self.chatbot.completions_v1(
+                        prompt=prompt,
+                        model=self.model_name,
+                        max_tokens=max_tokens,
+                        max_completion_tokens=max_tokens,
+                        **gen_kwargs,
+                ):
+                    if self.verbose:
+                        self.logger.info('TurboMind API output: %s', output)
+                    response += output['choices'][0]['text']
+                response = valid_str(response)
+                if end_str:
+                    response = response.split(end_str)[0]
+                return response
+            except Exception as e:
+                last_error = e
+                num_retries += 1
+                self.logger.error(
+                    'Error calling TurboMind API (attempt %d/%d): %s',
+                    num_retries, self.retry, e)
+
+        raise RuntimeError(
+            'Calling TurboMind API failed after retrying for '
+            f'{self.retry} times. Check the logs for details.') from last_error
 
     def get_ppl(self,
                 inputs: List[str],
