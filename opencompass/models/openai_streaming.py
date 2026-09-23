@@ -5,7 +5,7 @@ from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
 
 from .openai_api import (OAI_REASONING_MODEL_LIST, OPENAISDK_API_BASE,
-                         OpenAISDK, PromptType)
+                         OpenAISDK, PromptType, _extract_reasoning_content)
 
 
 @MODELS.register_module()
@@ -237,13 +237,13 @@ class OpenAISDKStreaming(OpenAISDK):
                 delta = chunk.choices[0].delta
 
                 # Handle reasoning content if present
-                if (hasattr(delta, 'reasoning_content')
-                        and delta.reasoning_content):
-                    reasoning_content += delta.reasoning_content
+                chunk_reasoning = _extract_reasoning_content(delta)
+                if chunk_reasoning:
+                    reasoning_content += chunk_reasoning
                     if self.verbose:
                         # Print streaming output in real-time with complete
                         # content
-                        print(delta.reasoning_content, end='', flush=True)
+                        print(chunk_reasoning, end='', flush=True)
 
                 # Handle regular content
                 if delta.content:
