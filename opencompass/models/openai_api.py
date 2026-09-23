@@ -58,6 +58,18 @@ def set_proxy_cfg(http_client_cfg: Dict,
         }
 
 
+def _extract_reasoning_content(message: Any) -> str:
+    """Extract reasoning text from old and new compatible API fields."""
+    for field in ('reasoning_content', 'reasoning'):
+        if isinstance(message, dict):
+            value = message.get(field)
+        else:
+            value = getattr(message, field, None)
+        if isinstance(value, str) and value:
+            return value
+    return ''
+
+
 @MODELS.register_module()
 class OpenAI(BaseAPIModel):
     """Model wrapper around OpenAI's models.
@@ -368,8 +380,7 @@ class OpenAI(BaseAPIModel):
                     # Extract content and reasoning_content from response
                     message = response['choices'][0]['message']
                     content = message.get('content', '') or ''
-                    reasoning_content = message.get('reasoning_content',
-                                                    '') or ''
+                    reasoning_content = _extract_reasoning_content(message)
 
                     # Handle reasoning_content similar to OpenAISDK
                     if reasoning_content:
@@ -884,8 +895,7 @@ class OpenAISDK(OpenAI):
                 choice = responses.choices[0] if responses.choices else None
                 message = choice.message if choice else None
                 content = getattr(message, 'content', '') or ''
-                reasoning_content = getattr(message, 'reasoning_content',
-                                            '') or ''
+                reasoning_content = _extract_reasoning_content(message)
                 has_content = content or reasoning_content
                 if not message or not has_content:
                     # There is case that server does not return any content
