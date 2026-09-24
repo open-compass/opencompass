@@ -126,6 +126,9 @@ class TestHuggingFacewithChatTemplate(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
         mock_model.generate.assert_called_once()
+        self.assertFalse(
+            mock_tokenizer.batch_encode_plus.call_args.kwargs[
+                'return_token_type_ids'])
 
     @patch('transformers.AutoTokenizer')
     @patch(
@@ -243,6 +246,9 @@ class TestHuggingFaceBaseModel(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
         mock_model.generate.assert_called_once()
+        self.assertFalse(
+            mock_tokenizer.batch_encode_plus.call_args.kwargs[
+                'return_token_type_ids'])
 
     @patch('transformers.AutoTokenizer')
     @patch(
