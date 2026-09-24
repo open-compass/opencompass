@@ -9,6 +9,12 @@ from unittest.mock import patch
 from opencompass.datasets.livecodebench import evaluator, testing_util
 
 
+def _record_spawn_result(sample, generation, debug, result, metadata_list,
+                         timeout, memory_limit_bytes):
+    result.append([True])
+    metadata_list.append({'start_method': 'spawn'})
+
+
 def _run_non_linux_reliability_guard(result_queue):
     import warnings
 
@@ -60,6 +66,8 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         mock_reliability_guard.assert_called_once_with(
             maximum_memory_bytes=123456)
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
     def test_codegen_check_correctness_passes_memory_limit_to_worker(self):
 
         def fake_run_test(sample,
@@ -78,7 +86,9 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
-        with patch.object(testing_util, 'run_test', fake_run_test):
+        fork_process = multiprocessing.get_context('fork').Process
+        with patch.object(testing_util, 'run_test', fake_run_test), patch.object(
+                evaluator.multiprocessing, 'Process', fork_process):
             result, metadata = evaluator.codegen_check_correctness(
                 sample,
                 'unused generation',
@@ -89,6 +99,10 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertEqual(result, [True])
         self.assertEqual(metadata['memory_limit_bytes'], 123456)
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
+    @unittest.skipIf(sys.platform == 'darwin',
+                     'macOS rejects limits below current virtual memory')
     def test_reliability_guard_adds_memory_limit_to_current_vmsize(self):
         child_memory_limit = 256 * 1024 * 1024
         baseline_vmsize_bytes = 64 * 1024 * 1024 * 1024
@@ -122,16 +136,19 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
+        fork_process = multiprocessing.get_context('fork').Process
         with patch.object(testing_util,
                           '_get_current_vmsize_bytes',
-                          return_value=baseline_vmsize_bytes), patch.object(
-                              testing_util, 'run_test', fake_run_test):
-            result, metadata = evaluator.codegen_check_correctness(
-                sample,
-                'unused generation',
-                timeout=1,
-                debug=False,
-                memory_limit_bytes=child_memory_limit)
+                          return_value=baseline_vmsize_bytes):
+            with patch.object(testing_util, 'run_test', fake_run_test), \
+                    patch.object(evaluator.multiprocessing, 'Process',
+                                 fork_process):
+                result, metadata = evaluator.codegen_check_correctness(
+                    sample,
+                    'unused generation',
+                    timeout=1,
+                    debug=False,
+                    memory_limit_bytes=child_memory_limit)
 
         self.assertEqual(result, [True])
         effective_limit = (metadata['baseline_vmsize_bytes'] +
@@ -141,9 +158,11 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertTrue(metadata['rlimit_data_unchanged'])
         self.assertTrue(metadata['rlimit_stack_unchanged'])
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
     def test_reliability_guard_skips_memory_limit_on_non_linux(self):
         result_queue = multiprocessing.Queue()
-        process = multiprocessing.Process(
+        process = multiprocessing.get_context('fork').Process(
             target=_run_non_linux_reliability_guard, args=(result_queue, ))
         process.start()
         process.join(timeout=5)
@@ -157,6 +176,8 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertIn('only supported on Linux', result['warning_message'])
         self.assertEqual(result['setrlimit_calls'], [])
 
+    @unittest.skipUnless('fork' in multiprocessing.get_all_start_methods(),
+                         'requires the fork start method')
     def test_codegen_check_correctness_returns_metadata_when_worker_exits(
             self):
 
@@ -176,7 +197,9 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
             })
         }
 
-        with patch.object(testing_util, 'run_test', fake_run_test):
+        fork_process = multiprocessing.get_context('fork').Process
+        with patch.object(testing_util, 'run_test', fake_run_test), patch.object(
+                evaluator.multiprocessing, 'Process', fork_process):
             result, metadata = evaluator.codegen_check_correctness(
                 sample,
                 'unused generation',
@@ -187,6 +210,31 @@ class TestLiveCodeBenchMemoryLimit(unittest.TestCase):
         self.assertEqual(result, [-1])
         self.assertEqual(metadata['error_message'],
                          'Global Timeout or Memory Limit Exceeded')
+
+    def test_codegen_check_correctness_supports_spawn_workers(self):
+        sample = {
+            'input_output':
+            json.dumps({
+                'inputs': ['1'],
+                'outputs': ['1'],
+                'fn_name': 'identity',
+            })
+        }
+
+        spawn_process = multiprocessing.get_context('spawn').Process
+        with patch.object(evaluator, '_run_test_in_subprocess',
+                          _record_spawn_result), patch.object(
+                              evaluator.multiprocessing, 'Process',
+                              spawn_process):
+            result, metadata = evaluator.codegen_check_correctness(
+                sample,
+                'unused generation',
+                timeout=20,
+                debug=False,
+                memory_limit_bytes=None)
+
+        self.assertEqual(result, [True])
+        self.assertEqual(metadata['start_method'], 'spawn')
 
 
 if __name__ == '__main__':
