@@ -4,7 +4,8 @@ import sys
 import unittest
 from unittest.mock import MagicMock, patch
 
-from opencompass.models.openai_api import OpenAI, OpenAISDK
+from opencompass.models.openai_api import (OpenAI, OpenAISDK,
+                                           OpenAISDKCompletion)
 
 
 def setup_tiktoken_mock(mock_tiktoken):
@@ -463,6 +464,101 @@ class TestOpenAISDK(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
         self.assertEqual(mock_client.chat.completions.create.call_count, 2)
+
+
+class TestOpenAISDKCompletion(unittest.TestCase):
+    """Test cases for OpenAISDKCompletion."""
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_uses_completion_api(self, mock_httpx_client,
+                                          mock_openai_class, mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock(text='Generated response')]
+        mock_client.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDKCompletion(path='gpt-3.5-turbo')
+
+        results = model.generate(['Hello'], max_out_len=100, temperature=0.2)
+
+        self.assertEqual(results, ['Generated response'])
+        mock_client.completions.create.assert_called_once_with(
+            model='gpt-3.5-turbo',
+            prompt='Hello',
+            max_tokens=100,
+            n=1,
+            temperature=0.2,
+            extra_body=None,
+            timeout=3600,
+        )
+        mock_client.chat.completions.create.assert_not_called()
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_prompt_list_is_converted_to_text(self, mock_httpx_client,
+                                              mock_openai_class,
+                                              mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock(text='A')]
+        mock_client.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDKCompletion(path='gpt-3.5-turbo')
+        model.generate([[{
+            'role': 'HUMAN',
+            'prompt': 'Question'
+        }, {
+            'role': 'BOT',
+            'prompt': 'Answer:'
+        }]],
+                       max_out_len=10)
+
+        self.assertEqual(
+            mock_client.completions.create.call_args.kwargs['prompt'],
+            'Question\nAnswer:')
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_retries_completion_request(self, mock_httpx_client,
+                                                 mock_openai_class,
+                                                 mock_tiktoken):
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock(text='Generated response')]
+        mock_client.completions.create.side_effect = [
+            RuntimeError('temporary failure'), mock_response
+        ]
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDKCompletion(path='gpt-3.5-turbo', retry=2)
+
+        self.assertEqual(model.generate(['Hello'], max_out_len=100),
+                         ['Generated response'])
+        self.assertEqual(mock_client.completions.create.call_count, 2)
 
 
 if __name__ == '__main__':

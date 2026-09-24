@@ -36,6 +36,7 @@ from .moonshot_api import MoonShot  # noqa: F401
 from .nanbeige_api import Nanbeige  # noqa: F401
 from .openai_api import OpenAI  # noqa: F401
 from .openai_api import OpenAISDK  # noqa: F401
+from .openai_api import OpenAISDKCompletion  # noqa: F401
 from .openai_api import OpenAISDKRollout  # noqa: F401
 from .openai_response import OpenAISDKResponse  # noqa: F401
 from .openai_streaming import OpenAISDKStreaming  # noqa: F401
