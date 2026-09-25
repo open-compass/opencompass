@@ -230,8 +230,14 @@ class BaseEvaluator:
                 detail.pop('predictions')
             return eval_results
 
-        # If there are no details, return results
-        return results
+        # Preserve the existing result shape for a single replica and for
+        # non-numeric fields, while returning averaged metrics across runs.
+        if n == 1:
+            return results
+        for key, value in results.items():
+            if not isinstance(value, (float, int)):
+                eval_results[key] = value
+        return eval_results
 
     def score(self):
         raise NotImplementedError("Method hasn't been implemented yet")
