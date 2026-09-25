@@ -1,4 +1,5 @@
 # flake8: noqa
+import ast
 import json
 import os.path as osp
 import re
@@ -61,7 +62,9 @@ def post_process_followbench(item):
         else:
             satisfy_list = re.search(r'\[.*\]', satisfy)
             if satisfy_list:
-                satisfy_list = eval(satisfy_list.group())
+                # ``satisfy_list`` comes from model output; parse it as a
+                # literal so a crafted completion cannot execute code.
+                satisfy_list = ast.literal_eval(satisfy_list.group())
                 if len(satisfy_list) == level:
                     num_true = 0
                     for i in satisfy_list:
