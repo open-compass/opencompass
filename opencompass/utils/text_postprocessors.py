@@ -89,7 +89,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案为\s*([{options}])',
         f'答案选\s*([{options}])',
         f'选择?\s*([{options}])',
-        f'故选?\s*([{options}])'
+        f'故选?\s*([{options}])',
         f'只有选?项?\s?([{options}])\s?是?对',
         f'只有选?项?\s?([{options}])\s?是?错',
         f'只有选?项?\s?([{options}])\s?不?正确',
@@ -124,7 +124,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'[Tt]he answer to the question is:?\s+\(?([{options}])\)?',
         f'^选项\s?([{options}])',
         f'^([{options}])\s?选?项',
-        f'(\s|^)[{options}][\s。，,：:\.$]',
+        rf'(?:\s|^)([{options}])(?:[\s。，,：:.]|$)',
         f'1.\s?(.*?)$',
         f'1.\s?([{options}])[.。$]?$',
     ]
