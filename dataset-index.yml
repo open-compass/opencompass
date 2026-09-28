@@ -476,7 +476,9 @@
     name: CivilComments
     category: Safety
     paper: https://arxiv.org/pdf/1903.04561
-    configpath: opencompass/configs/datasets/civilcomments/civilcomments_clp.py
+    configpath:
+      - opencompass/configs/datasets/civilcomments/civilcomments_clp.py
+      - opencompass/configs/datasets/civilcomments/civilcomments_gen.py
     configpath_llmjudge: ''
 - clozeTest_maxmin:
     name: Cloze Test-max/min
