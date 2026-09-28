@@ -39,7 +39,7 @@ The summarizer tries to read the evaluation scores from the `{work_dir}/results/
 In addition, the output consists of multiple columns:
 
 - The `dataset` column corresponds to the `summarizer.dataset_abbrs` configuration.
-- The `version` column is the hash value of the dataset, which considers the dataset's evaluation method, prompt words, output length limit, etc. Users can verify whether two evaluation results are comparable using this column.
+- The `version` column is the first six characters of the SHA-256 hash of the dataset's `infer_cfg` (the prompt hash). It identifies inference settings such as the evaluation method, prompt template, and output length limit. It is not the suffix of the dataset config filename and does not represent the dataset or data release version. Consequently, the two values need not match. Use this column to check whether results were produced with comparable inference and prompt settings.
 - The `metric` column indicates the evaluation method of this metric. For specific details, [metrics](./metrics.md).
 - The `mode` column indicates how the inference result is obtained. Possible values are `ppl` / `gen`. For items in `summarizer.summary_groups`, if the methods of obtaining `subsets` are consistent, its value will be the same as subsets, otherwise it will be `mixed`.
 - The subsequent columns represent different models.

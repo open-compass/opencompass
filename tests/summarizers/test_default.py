@@ -56,6 +56,45 @@ class TestDefaultSummarizer(unittest.TestCase):
             # Should log a warning about prompt_db being deprecated
             mock_log.warning.assert_called()
 
+    def test_summary_version_is_prompt_hash_prefix(self):
+        """Test the version column keeps reporting the prompt hash prefix."""
+        dataset = ConfigDict({
+            'abbr': 'race-middle_5831a0',
+            'version': 'data-v2',
+            'infer_cfg': {
+                'retriever': {
+                    'type': 'ZeroRetriever'
+                },
+                'inferencer': {
+                    'type': 'GenInferencer'
+                },
+                'prompt_template': {
+                    'type': 'PromptTemplate',
+                    'template': 'Question: {question}'
+                }
+            }
+        })
+        self.config.datasets = [dataset]
+        summarizer = DefaultSummarizer(config=self.config)
+
+        table = summarizer._format_table(
+            parsed_results={
+                'test_model': {
+                    'race-middle_5831a0': {
+                        'accuracy': 88.5
+                    }
+                }
+            },
+            dataset_metrics={'race-middle_5831a0': ['accuracy']},
+            dataset_eval_mode={'race-middle_5831a0': 'gen'})
+
+        self.assertEqual(
+            table,
+            [['dataset', 'version', 'metric', 'mode', 'test_model'],
+             ['race-middle_5831a0', '6b938f', 'accuracy', 'gen', '88.50']])
+        self.assertNotEqual(table[1][1], '5831a0')
+        self.assertNotEqual(table[1][1], dataset.version)
+
 
 if __name__ == '__main__':
     unittest.main()
