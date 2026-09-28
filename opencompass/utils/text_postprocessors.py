@@ -280,7 +280,8 @@ def extract_non_reasoning_content(
         return text.split(think_end_token)[-1].strip()
 
     # Original behavior for complete tag pairs
-    reasoning_regex = re.compile(rf'{think_start_token}(.*?){think_end_token}',
-                                 re.DOTALL)
+    reasoning_regex = re.compile(
+        rf'{re.escape(think_start_token)}(.*?){re.escape(think_end_token)}',
+        re.DOTALL)
     non_reasoning_content = reasoning_regex.sub('', text).strip()
     return non_reasoning_content
