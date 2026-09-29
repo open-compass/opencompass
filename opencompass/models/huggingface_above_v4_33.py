@@ -296,6 +296,7 @@ class HuggingFacewithChatTemplate(BaseModel):
             padding=True,
             truncation=True,
             add_special_tokens=True,
+            return_token_type_ids=False,
             max_length=self.max_seq_len,
         )
 
@@ -462,6 +463,7 @@ class HuggingFacewithChatTemplate(BaseModel):
             padding=True,
             truncation=True,
             add_special_tokens=True,
+            return_token_type_ids=False,
             max_length=self.max_seq_len
         )
         if self.fastchat_template:
@@ -581,6 +583,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             padding=True,
             truncation=True,
             add_special_tokens=True,
+            return_token_type_ids=False,
             max_length=self.max_seq_len
         )
 
@@ -643,6 +646,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             padding=True,
             truncation=True,
             add_special_tokens=True,
+            return_token_type_ids=False,
             max_length=self.max_seq_len
         )
 
