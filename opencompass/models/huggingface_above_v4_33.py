@@ -302,7 +302,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         self.tokenizer.padding_side = 'right'
         self.tokenizer.truncation_side = 'right'
 
-        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+        tokens = self.tokenizer(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
         outputs = self.model(**tokens)[0]
@@ -466,11 +466,11 @@ class HuggingFacewithChatTemplate(BaseModel):
         )
         if self.fastchat_template:
             messages = _format_with_fast_chat_template(messages, self.fastchat_template)
-            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+            tokens = self.tokenizer(messages, **tokenize_kwargs)
         else:
             messages = [self.tokenizer.apply_chat_template(m, add_generation_prompt=True, tokenize=False) for m in messages]
             tokenize_kwargs['add_special_tokens'] = False
-            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+            tokens = self.tokenizer(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
 
@@ -592,7 +592,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
                 input_ids = torch.cat([input_ids[:, : self.max_seq_len // 2], input_ids[:, - self.max_seq_len // 2:]], dim=-1)
             tokens = {'input_ids': input_ids, }
         else:
-            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+            tokens = self.tokenizer(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
 
@@ -654,7 +654,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
                 input_ids = torch.cat([input_ids[:, : self.max_seq_len // 2], input_ids[:, - self.max_seq_len // 2:]], dim=-1)
             tokens = {'input_ids': input_ids, }
         else:
-            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+            tokens = self.tokenizer(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
         outputs = self.model(**tokens)[0]
