@@ -186,7 +186,7 @@ datasets = [*siqa_datasets, *winograd_datasets]       # The final config needs t
 
 Dataset configurations are typically of two types: 'ppl' and 'gen', indicating the evaluation method used. Where `ppl` means discriminative evaluation and `gen` means generative evaluation.
 
-Moreover, [configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/configs/datasets/collections) houses various dataset collections, making it convenient for comprehensive evaluations. OpenCompass often uses [`base_medium.py`](/configs/datasets/collections/base_medium.py) for full-scale model testing. To replicate results, simply import that file, for example:
+Moreover, [configs/datasets/collections](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/collections) houses various dataset collections, making it convenient for comprehensive evaluations. OpenCompass often uses [`base_medium.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/datasets/collections/base_medium.py) for full-scale model testing. To replicate results, simply import that file, for example:
 
 ```bash
 python run.py --models hf_llama_7b --datasets base_medium
