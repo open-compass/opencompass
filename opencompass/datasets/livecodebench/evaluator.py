@@ -13,6 +13,9 @@ from opencompass.utils import get_logger
 from opencompass.utils.code_execution import TYPE_AWARE_EQUAL_NAME
 
 from .execute_utils import BASE_IMPORTS, codeexecute_check_correctness
+from .executor_gate import (LCBExecutorGateError,
+                            assert_lcb_infra_exceptions_within_budget,
+                            check_lcb_io_executor)
 from .extract_utils import (extract_code_execution, extract_code_generation,
                             extract_code_generation_v2,
                             extract_test_output_code)
@@ -207,6 +210,10 @@ def codegen_metrics(
     memory_limit_bytes=DEFAULT_MEMORY_LIMIT_BYTES,
 ):
     logger = get_logger()
+    provenance = check_lcb_io_executor()
+    logger.info('LCB executor gate passed: '
+                f'{provenance["testing_util_sha256"][:12]} '
+                f'(gate v{provenance["io_gate_version"]})')
 
     samples_linear = []
     generations_linear = []
@@ -255,6 +262,10 @@ def codegen_metrics(
         assert len(final_metadata[i]) == len(generations_list[0]), (
             f'len(final_metadata[i]) = {len(final_metadata[i])}')
 
+    infra_stats = assert_lcb_infra_exceptions_within_budget(final_metadata)
+    provenance.update(infra_stats)
+    metrics['lcb_executor'] = provenance
+
     return [metrics, results, final_metadata]
 
 
@@ -299,9 +310,16 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
             detail['correct'] = bool(r[i] == 100.0) if i < len(r) else False
             details.append(detail)
         results['details'] = details
+        if 'lcb_executor' in metrics:
+            results['lcb_executor'] = metrics['lcb_executor']
         return results
 
     def score(self, predictions, references):
+        try:
+            check_lcb_io_executor()
+        except LCBExecutorGateError as exc:
+            return {'error': str(exc)}
+
         if len(predictions) != len(references):
             return {
                 'error':
@@ -341,19 +359,17 @@ class LCBCodeGenerationEvaluator(BaseEvaluator):
         for idx, content in enumerate(filtered_predictions):
             extracted_predictions[idx] = content
 
-        metrics, eval_results, final_metadata = codegen_metrics(
-            filtered_references,
-            filtered_predictions,
-            k_list=[1],
-            num_process_evaluate=self.num_process_evaluate,
-            timeout=self.timeout,
-            memory_limit_bytes=self.memory_limit_bytes,
-        )
-        # results = {
-        #     'extracted_predictions': extracted_predictions,
-        #     'eval_results': eval_results
-        # }
-        # results.update(metrics)
+        try:
+            metrics, eval_results, final_metadata = codegen_metrics(
+                filtered_references,
+                filtered_predictions,
+                k_list=[1],
+                num_process_evaluate=self.num_process_evaluate,
+                timeout=self.timeout,
+                memory_limit_bytes=self.memory_limit_bytes,
+            )
+        except LCBExecutorGateError as exc:
+            return {'error': str(exc)}
 
         return self._build_results(extracted_predictions, metrics,
                                    eval_results, final_metadata)

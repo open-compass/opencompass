@@ -50,9 +50,44 @@ def timeout_handler(signum, frame):
     raise TimeoutException
 
 
-signal.signal(signal.SIGALRM, timeout_handler)
+if hasattr(signal, 'SIGALRM'):
+    signal.signal(signal.SIGALRM, timeout_handler)
 
 # timeout = 6  # seconds
+
+
+class _StdoutBuffer:
+    """Binary stdout.buffer that decodes into the captured StringIO."""
+
+    def __init__(self, stringio):
+        self._stringio = stringio
+
+    def write(self, data):
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
+        return self._stringio.write(data)
+
+    def flush(self):
+        return self._stringio.flush()
+
+
+class _StdoutWithBuffer:
+    """Text stdout mock that also provides ``.buffer.write`` for contest code."""
+
+    def __init__(self, stringio):
+        self._stringio = stringio
+        self.buffer = _StdoutBuffer(stringio)
+
+    def write(self, data):
+        if isinstance(data, bytes):
+            data = data.decode('utf-8')
+        return self._stringio.write(data)
+
+    def flush(self):
+        return self._stringio.flush()
+
+    def __getattr__(self, name):
+        return getattr(self._stringio, name)
 
 
 # used to capture stdout as a list
@@ -62,9 +97,10 @@ class Capturing(list):
 
     def __enter__(self):
         self._stdout = sys.stdout
-        sys.stdout = self._stringio = StringIO()
+        self._stringio = StringIO()
         # Make closing the StringIO a no-op
         self._stringio.close = lambda x: 1
+        sys.stdout = _StdoutWithBuffer(self._stringio)
         return self
 
     def __exit__(self, *args):
@@ -666,6 +702,8 @@ def stripped_string_compare(s1, s2):
 
 
 class MockStdinWithBuffer:
+    """Do not replace with plain StringIO — LCB scoring refuses to emit pass@1
+    unless contest code can use ``sys.stdin.buffer``. See executor_gate.py."""
 
     def __init__(self, inputs: str):
         self.inputs = inputs
@@ -687,16 +725,32 @@ class MockStdinWithBuffer:
 
 
 class MockBuffer:
+    """Byte stdin.buffer with consuming read/readline, matching contest code."""
 
     def __init__(self, inputs: str):
-        self.inputs = inputs.encode('utf-8')  # Convert to bytes
+        self.inputs = inputs.encode('utf-8')
+        self._offset = 0
 
-    def read(self, *args):
-        # Return as byte strings that can be split
-        return self.inputs
+    def read(self, n=-1):
+        if n is None or n < 0:
+            data = self.inputs[self._offset:]
+            self._offset = len(self.inputs)
+            return data
+        data = self.inputs[self._offset:self._offset + n]
+        self._offset += len(data)
+        return data
 
     def readline(self, *args):
-        return self.inputs.split(b'\n')[0] + b'\n'
+        if self._offset >= len(self.inputs):
+            return b''
+        newline = self.inputs.find(b'\n', self._offset)
+        if newline < 0:
+            data = self.inputs[self._offset:]
+            self._offset = len(self.inputs)
+            return data
+        data = self.inputs[self._offset:newline + 1]
+        self._offset = newline + 1
+        return data
 
 
 def call_method(method, inputs):
