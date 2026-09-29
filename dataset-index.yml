@@ -58,6 +58,12 @@
     paper: https://arxiv.org/pdf/2406.15877
     configpath: opencompass/configs/datasets/bigcodebench/bigcodebench_gen.py
     configpath_llmjudge: ''
+- bfcl:
+    name: BFCL
+    category: Reasoning/Code/Agent
+    paper: https://arxiv.org/abs/2402.04653
+    configpath: opencompass/configs/datasets/bfcl/bfcl_gen.py
+    configpath_llmjudge: ''
 - calm:
     name: CaLM
     category: Reasoning
