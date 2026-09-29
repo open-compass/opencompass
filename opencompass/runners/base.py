@@ -37,7 +37,11 @@ class BaseRunner:
         """
         status = self.launch(tasks)
         status_list = list(status)  # change into list format
-        self.summarize(status_list)
+        failed_tasks = self.summarize(status_list)
+        if failed_tasks:
+            raise RuntimeError(
+                f'{len(failed_tasks)} task(s) failed: '
+                f'{", ".join(failed_tasks)}')
 
     @abstractmethod
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
@@ -51,7 +55,7 @@ class BaseRunner:
             list[tuple[str, int]]: A list of (task name, exit code).
         """
 
-    def summarize(self, status: List[Tuple[str, int]]) -> None:
+    def summarize(self, status: List[Tuple[str, int]]) -> List[str]:
         """Summarize the results of the tasks.
 
         Args:
@@ -82,3 +86,4 @@ class BaseRunner:
                 self.lark_reporter.post(title='Great news: all tasks '
                                         'finished!',
                                         content=content)
+        return failed_logs
