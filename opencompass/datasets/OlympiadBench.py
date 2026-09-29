@@ -390,7 +390,7 @@ class MathJudger:
                 if self.interval_equal(expression1, expression2):
                     return True
             except Exception:  # 处理具体异常
-                return False
+                pass
 
         # 再判断是否在数值上相等
         try:
