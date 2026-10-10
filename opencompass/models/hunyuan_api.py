@@ -141,7 +141,8 @@ class Hunyuan(BaseAPIModel):
                     time.sleep(5)
                     continue
                 else:
-                    self.logger.error(f'Unhandled TencentCloudSDKException: {e}')
+                    self.logger.error(
+                        f'Unhandled TencentCloudSDKException: {e}')
                     retry_counter += 1
                     continue
 
@@ -149,7 +150,7 @@ class Hunyuan(BaseAPIModel):
                 self.logger.error(f'Response parsing error: {e}')
                 retry_counter += 1
                 continue
-            
+
             except Exception as e:
                 self.logger.error(f'Unexpected error in Hunyuan API call: {e}')
                 retry_counter += 1
