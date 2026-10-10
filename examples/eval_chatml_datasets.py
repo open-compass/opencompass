@@ -22,6 +22,8 @@ with read_base():
 
 models = sum([v for k, v in locals().items() if k.endswith('_model')], [])
 
+datasets = []
+
 chatml_datasets = sum(
     (v for k, v in locals().items() if k.endswith('_chatml')),
     [],

@@ -1,123 +1,151 @@
-# Configure Datasets
+# Dataset Selection and Configuration
 
-This tutorial mainly focuses on selecting datasets supported by OpenCompass and preparing their configs files. Please make sure you have downloaded the datasets following the steps in [Dataset Preparation](../get_started/installation.md#dataset-preparation).
+An OpenCompass dataset configuration defines data loading, model input construction, and scoring rules together. The same dataset may have multiple configuration variants, and different evaluation protocols may produce different results.
 
-## Directory Structure of Dataset Configuration Files
+## Selecting a Configuration
 
-First, let's introduce the structure under the `configs/datasets` directory in OpenCompass, as shown below:
-
-```
-configs/datasets/
-├── agieval
-├── apps
-├── ARC_c
-├── ...
-├── CLUE_afqmc  # dataset
-│   ├── CLUE_afqmc_gen_901306.py  # different version of config
-│   ├── CLUE_afqmc_gen.py
-│   ├── CLUE_afqmc_ppl_378c5b.py
-│   ├── CLUE_afqmc_ppl_6507d7.py
-│   ├── CLUE_afqmc_ppl_7b0c1e.py
-│   └── CLUE_afqmc_ppl.py
-├── ...
-├── XLSum
-├── Xsum
-└── z_bench
+```bash
+python tools/list_configs.py mmlu gsm8k  # Find configurations related to MMLU and GSM8K
 ```
 
-In the `configs/datasets` directory structure, we flatten all datasets directly, and there are multiple dataset configurations within the corresponding folders for each dataset.
+Dataset configuration files are usually located under `opencompass/configs/datasets/<dataset>/`. Their filenames commonly include identifiers such as `gen`, `ppl`, `rawprompt`, the number of few-shot examples, and a hash to distinguish evaluation protocols.
 
-The naming of the dataset configuration file is made up of `{dataset name}_{evaluation method}_{prompt version number}.py`. For example, `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`, this configuration file is the `CLUE_afqmc` dataset under the Chinese universal ability, the corresponding evaluation method is `gen`, i.e., generative evaluation, and the corresponding prompt version number is `db509b`; similarly, `CLUE_afqmc_ppl_00b348.py` indicates that the evaluation method is `ppl`, i.e., discriminative evaluation, and the prompt version number is `00b348`.
+Before selecting a configuration, verify the following:
 
-In addition, files without a version number, such as: `CLUE_afqmc_gen.py`, point to the latest prompt configuration file of that evaluation method, which is usually the most accurate prompt.
+- data source, version, split, and sample range;
+- input fields, answer field, and any multimodal input;
+- prompt type, number of few-shot examples, and inference method;
+- Evaluator and post-processing rules, including any dependency on a Judge model or an external evaluation service.
 
-## Dataset Selection
+## Dataset Configuration Structure
 
-In each dataset configuration file, the dataset will be defined in the `{}_datasets` variable, such as `afqmc_datasets` in `CLUE_afqmc/CLUE_afqmc_gen_db509b.py`.
+A dataset configuration consists of data-loading arguments and three sections: `reader_cfg`, `infer_cfg`, and `eval_cfg`.
 
 ```python
-afqmc_datasets = [
+datasets = [
     dict(
-        abbr="afqmc-dev",
-        type=AFQMCDatasetV2,
-        path="./data/CLUE/AFQMC/dev.json",
-        reader_cfg=afqmc_reader_cfg,
-        infer_cfg=afqmc_infer_cfg,
-        eval_cfg=afqmc_eval_cfg,
-    ),
-]
-```
-
-And `cmnli_datasets` in `CLUE_cmnli/CLUE_cmnli_ppl_b78ad4.py`.
-
-```python
-cmnli_datasets = [
-    dict(
-        type=HFDataset,
-        abbr='cmnli',
-        path='json',
-        split='train',
-        data_files='./data/CLUE/cmnli/cmnli_public/dev.json',
-        reader_cfg=cmnli_reader_cfg,
-        infer_cfg=cmnli_infer_cfg,
-        eval_cfg=cmnli_eval_cfg)
-]
-```
-
-Take these two datasets as examples. If users want to evaluate these two datasets at the same time, they can create a new configuration file in the `configs` directory. We use the import mechanism in the `mmengine` configuration to build the part of the dataset parameters in the evaluation script, as shown below:
-
-```python
-from mmengine.config import read_base
-
-with read_base():
-    from .datasets.CLUE_afqmc.CLUE_afqmc_gen_db509b import afqmc_datasets
-    from .datasets.CLUE_cmnli.CLUE_cmnli_ppl_b78ad4 import cmnli_datasets
-
-datasets = []
-datasets += afqmc_datasets
-datasets += cmnli_datasets
-```
-
-Users can choose different abilities, different datasets and different evaluation methods configuration files to build the part of the dataset in the evaluation script according to their needs.
-
-For information on how to start an evaluation task and how to evaluate self-built datasets, please refer to the relevant documents.
-
-### Multiple Evaluations on the Dataset
-
-In the dataset configuration, you can set the parameter `n` to perform multiple evaluations on the same dataset and return the average metrics, for example:
-
-```python
-afqmc_datasets = [
-    dict(
-        abbr="afqmc-dev",
-        type=AFQMCDatasetV2,
-        path="./data/CLUE/AFQMC/dev.json",
-        n=10, # Perform 10 evaluations
-        reader_cfg=afqmc_reader_cfg,
-        infer_cfg=afqmc_infer_cfg,
-        eval_cfg=afqmc_eval_cfg,
-    ),
-]
-
-```
-
-Additionally, for binary evaluation metrics (such as accuracy, pass-rate, etc.), you can also set the parameter `k` in conjunction with `n` for [G-Pass@k](http://arxiv.org/abs/2412.13147) evaluation. The formula for G-Pass@k is:
-
-```{math}
-\text{G-Pass@}k_\tau=E_{\text{Data}}\left[ \sum_{j=\lceil \tau \cdot k \rceil}^c \frac{{c \choose j} \cdot {n - c \choose k - j}}{{n \choose k}} \right], 
-```
-
-where $n$ is the number of evaluations, and $c$ is the number of times that passed or were correct out of $n$ runs. An example configuration is as follows:
-
-```python
-aime2024_datasets = [
-    dict(
-        abbr='aime2024',
-        type=Aime2024Dataset,
-        path='opencompass/aime2024',
-        k=[2, 4], # Return results for G-Pass@2 and G-Pass@4
-        n=12, # 12 evaluations
-        ...
+        type=MyDataset,
+        abbr='my-dataset',
+        path='data/or/hub-id',
+        reader_cfg=reader_cfg,
+        infer_cfg=infer_cfg,
+        eval_cfg=eval_cfg,
     )
 ]
+```
+
+- `type`: the dataset class registered with OpenCompass. It loads the source data into a Hugging Face `Dataset` or `DatasetDict`.
+- `abbr`: the short name used in task directories and summary results. Use distinguishable abbreviations for different evaluation configurations of the same source data.
+- `path`: a dataset path or repository identifier. Depending on the dataset class, arguments such as `name`, `split`, or `task` may also be accepted to select a subset.
+- `reader_cfg`: specifies the fields, data splits, and sample ranges used in evaluation.
+- `infer_cfg`: specifies prompt construction, few-shot example retrieval, and the inference method.
+- `eval_cfg`: specifies prediction post-processing and scoring rules.
+
+### `reader_cfg`: Fields and Data Splits
+
+The basic form of `reader_cfg` is as follows:
+
+```python
+reader_cfg = dict(
+    input_columns=['question'],
+    output_column='answer',
+    train_split='train',
+    test_split='test',
+    train_range=None,
+    test_range='[:100]',
+)
+```
+
+The fields have the following meanings:
+
+- `input_columns`: fields used to construct the model input, such as the question, options, or context.
+- `output_column`: the field containing the reference answer. Set it to `None` for tasks that do not require reference answers.
+- `train_split` and `test_split`: respectively specify the split from which the Retriever selects few-shot examples and the split on which inference and scoring are performed. Their defaults are `train` and `test`. These fields may be omitted when the data has only one split.
+- `train_range` and `test_range`: limit the samples selected from the corresponding splits. `None` uses all samples; an integer selects a fixed number after shuffling; a float between `0` and `1` selects that proportion; and a slice string such as `'[:100]'` or `'[100:200]'` selects an interval in the original order. These fields may be omitted for full evaluation.
+
+After completing the configuration, verify that `input_columns`, `output_column`, and every placeholder in the prompt exist in the loaded data. To quickly test the first several samples, use `test_range='[:N]'`.
+
+### `infer_cfg`: Prompt, Retrieval, and Inference
+
+The most common structure for generative evaluation is:
+
+```python
+from opencompass.openicl.icl_inferencer import GenInferencer
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
+
+infer_cfg = dict(
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='user', content='{question}\nPlease provide the answer.'),
+        ],
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=GenInferencer),
+)
+```
+
+`infer_cfg` commonly contains the following fields:
+
+- `prompt_template`: converts each dataset sample into model input through a prompt template.
+- `retriever`: determines which few-shot examples are selected from the training split. `ZeroRetriever` retrieves no examples; `FixKRetriever`, `RandomRetriever`, and other Retrievers select examples according to their respective strategies.
+- `inferencer`: determines the inference method. `GenInferencer` asks the model to generate an answer directly and accepts inference arguments such as `max_out_len` and `stopping_criteria`. A `max_out_len` explicitly set here takes precedence over the default in the model configuration.
+
+For prompt placeholders, conversation messages, and few-shot insertion, see [Prompt Templates](../prompt/raw_prompt_template.md). After changing a template, use [Prompt Preview and Debugging](../prompt/debugging.md) to inspect the final input.
+
+A common PPL evaluation configuration is:
+
+```python
+from opencompass.openicl.icl_inferencer import PPLInferencer
+from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
+
+infer_cfg = dict(
+    prompt_template=dict(
+        type=PromptTemplate,
+        template={
+            'yes': '{question} yes',
+            'no': '{question} no',
+        },
+    ),
+    retriever=dict(type=ZeroRetriever),
+    inferencer=dict(type=PPLInferencer),
+)
+```
+
+The keys of the candidate templates must cover the label values in `output_column`. Alternatively, candidate labels may be specified explicitly through the `labels` argument of `PPLInferencer`. PPL evaluation requires a model backend capable of computing log-likelihoods for its input; not every API model provides this capability.
+
+### `eval_cfg`: Post-processing and Scoring
+
+When model outputs cannot be compared directly with reference answers, each side can be post-processed before scoring. For example:
+
+```python
+from opencompass.datasets import (Gsm8kEvaluator,
+                                  gsm8k_dataset_postprocess,
+                                  gsm8k_postprocess)
+
+eval_cfg = dict(
+    evaluator=dict(type=Gsm8kEvaluator),
+    pred_postprocessor=dict(type=gsm8k_postprocess),
+    dataset_postprocessor=dict(type=gsm8k_dataset_postprocess),
+)
+```
+
+The fields serve the following purposes:
+
+- `evaluator`: the scorer configuration. `type` selects the Evaluator, and all remaining fields are passed as initialization arguments. Common scoring methods include accuracy, exact match, mathematical answer verification, code execution, and model-based judging.
+- `pred_postprocessor`: processes model predictions before scoring, for example by extracting an option letter, a number, or an answer enclosed in a particular tag.
+- `dataset_postprocessor`: processes reference answers from `output_column` before scoring so that their format matches the processed predictions.
+- `pred_role`: extracts content for a specified role from the output of a local chat model. Use it only when the model defines a corresponding `meta_template`.
+
+An Evaluator `type` is required by the basic scoring workflow; all other fields are optional.
+
+For data caching and offline behavior, see [Data Sources, Caching, and Offline Operation](data_and_cache.md). For the complete dataset extension procedure, see [Adding a Dataset](../extension/new_dataset.md).
+
+## Dataset Statistics
+
+The following table is generated from `dataset-index.yml` in the repository root. It lists the datasets registered with OpenCompass, their categories, resource links, and recommended configurations, and supports fuzzy search.
+
+```{include} ../dataset_statistics.inc
 ```

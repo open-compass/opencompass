@@ -196,7 +196,7 @@ copybutton_prompt_text = r'>>> |\.\.\. '
 copybutton_prompt_is_regexp = True
 
 # Auto-generated header anchors
-myst_heading_anchors = 3
+myst_heading_anchors = 4
 # Enable "colon_fence" extension of myst.
 myst_enable_extensions = ['colon_fence', 'dollarmath']
 
@@ -227,8 +227,10 @@ notfound_template = '404.html'
 
 
 def builder_inited_handler(app):
-    subprocess.run(['./cp_origin_docs.sh'])
-    subprocess.run(['./statis.py'])
+    subprocess.run(
+        [sys.executable,
+         os.path.join(os.path.dirname(__file__), 'statis.py')],
+        check=True)
 
 
 def setup(app):
