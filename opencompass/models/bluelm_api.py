@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
 import requests
+from tqdm import tqdm
 
 from opencompass.utils.prompt import PromptList
 
@@ -75,8 +76,13 @@ class BlueLMAPI(BaseAPIModel):
         """
         with ThreadPoolExecutor() as executor:
             results = list(
-                executor.map(self._generate, inputs,
-                             [max_out_len] * len(inputs)))
+                tqdm(
+                    executor.map(self._generate, inputs,
+                                 [max_out_len] * len(inputs)),
+                    total=len(inputs),
+                    desc='Inferencing',
+                ))
+
         self.flush()
         return results
 
