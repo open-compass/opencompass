@@ -116,6 +116,8 @@ class OpenAI(BaseAPIModel):
         max_workers (int, optional): Maximum number of worker threads for
             concurrent API requests. For I/O-intensive API calls, recommended
             value is 10-20. Defaults to None (uses CPU count * 2).
+        key_env (str, optional): Environment variable used when ``key`` is
+            set to ``ENV``. Defaults to ``OPENAI_API_KEY``.
     """
 
     is_api: bool = True
@@ -141,6 +143,7 @@ class OpenAI(BaseAPIModel):
         verbose: bool = False,
         think_tag: str = '</think>',
         max_workers: Optional[int] = None,
+        key_env: str = 'OPENAI_API_KEY',
         image_format: Optional[str] = None,
         image_min_edge: Optional[int] = None,
     ):
@@ -177,9 +180,9 @@ class OpenAI(BaseAPIModel):
 
         if isinstance(key, str):
             if key == 'ENV':
-                if 'OPENAI_API_KEY' not in os.environ:
-                    raise ValueError('OpenAI API key is not set.')
-                self.keys = os.getenv('OPENAI_API_KEY').split(',')
+                if key_env not in os.environ:
+                    raise ValueError(f'{key_env} is not set.')
+                self.keys = os.environ[key_env].split(',')
             else:
                 self.keys = [key]
         else:
@@ -761,6 +764,7 @@ class OpenAISDK(OpenAI):
         max_workers: Optional[int] = None,
         openai_extra_kwargs: Dict | None = None,
         timeout: int = 3600,
+        key_env: str = 'OPENAI_API_KEY',
         image_format: str | None = None,
         image_min_edge: int | None = None,
     ):
@@ -783,6 +787,7 @@ class OpenAISDK(OpenAI):
             extra_body,
             verbose=verbose,
             max_workers=max_workers,
+            key_env=key_env,
             image_format=image_format,
             image_min_edge=image_min_edge,
         )
