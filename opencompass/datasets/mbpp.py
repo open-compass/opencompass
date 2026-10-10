@@ -344,6 +344,7 @@ class MBPPEvaluator(BaseEvaluator):
 
     def _process_answer(self, text):
         patterns = [
+            r"^\s*'(.*?)'\s*\[DONE\]",
             r"\[BEGIN\]\s*'(.*)'\s*\[DONE\]",
             r"BEGIN\s*'(.*)'\s*\[DONE\]",
             r"\[BEGIN\]\s*'(.*)'\s*DONE",
