@@ -1205,12 +1205,12 @@
     paper: https://arxiv.org/abs/2508.18124
     configpath: opencompass/configs/datasets/CMPhysBench/cmphysbench_gen.py
     configpath_llmjudge: ''
-- earth_silver:
-    name: Earth-Silver
+- earthse:
+    name: EarthSE
     category: Science
     paper: https://arxiv.org/abs/2505.17139
-    configpath: opencompass/configs/datasets/Earth_Silver/Earth_Silver_gen.py
-    configpath_llmjudge: opencompass/configs/datasets/Earth_Silver/Earth_Silver_llmjudge_gen.py
+    configpath: opencompass/configs/datasets/Earth_Silver/earthse_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/Earth_Silver/earthse_gen.py
 - healthbench:
     name: HealthBench
     category: Knowledge / Medicine
