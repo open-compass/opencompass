@@ -569,7 +569,7 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
         if 'test_range' in dataset and 'dataset_cfg' in chatobj_custom_dataset['eval_cfg']['evaluator'] and 'reader_cfg' in chatobj_custom_dataset[
             'eval_cfg']['evaluator']['dataset_cfg']:
             chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
-            'test_range'] = '[0:16]'
+            'test_range'] = dataset['test_range']
 
         chatobj_custom_dataset_list.append(chatobj_custom_dataset)
 
