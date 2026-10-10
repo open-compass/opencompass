@@ -72,7 +72,8 @@ class Yayi(BaseAPIModel):
         url_path (str): The specific path for the API endpoint.
         x_tilake_app_key (str): The application key for authentication.
         x_tilake_app_secret (str): The application secret for authentication.
-        x_tilake_ca_sginature_method (str): The signature method for authentication.
+        x_tilake_ca_sginature_method (str): The signature method for
+            authentication.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 2.
         max_seq_len (int): The maximum sequence length. Defaults to 8192.
@@ -80,7 +81,8 @@ class Yayi(BaseAPIModel):
             template if needed, in case the requirement of injecting or
             wrapping of any meta instructions.
         retry (int): Number of retries if the API call fails. Defaults to 2.
-        temperature (float): The temperature for the model's response. Defaults to 0.0.
+        temperature (float): The temperature for the model's response.
+            Defaults to 0.0.
     """
 
     def __init__(
@@ -207,7 +209,7 @@ class Yayi(BaseAPIModel):
         accept = '*/*'
         method = 'POST'
         data = {
-            'id': "001",
+            'id': '001',
             'messages': messages,
             'max_new_tokens': 8192,
             'temperature': 0.0,
