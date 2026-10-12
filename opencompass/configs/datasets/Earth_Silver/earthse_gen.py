@@ -42,7 +42,9 @@ def _qa_dataset(dataset_name, path, revision):
         path=path,
         revision=revision,
         dataset_name=dataset_name,
-        question_types=list(EarthSEDataset.SPLITS),
+        question_types=[
+            'multiple_choice', 'true_false', 'fill_in_the_blank', 'free_form'
+        ],
         prompt_mode='zero-shot',
         reader_cfg=qa_reader_cfg,
         infer_cfg=qa_infer_cfg,

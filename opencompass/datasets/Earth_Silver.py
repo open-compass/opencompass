@@ -29,6 +29,7 @@ from typing import Dict, Iterable, List, Optional
 
 from datasets import Dataset, load_dataset
 
+from opencompass.models import HuggingFacewithChatTemplate
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.registry import (ICL_EVALUATORS, ICL_INFERENCERS,
@@ -671,11 +672,16 @@ class EarthSEGoldInferencer(GenInferencer):
                             GOLD_PROMPT):]
                         break
             temperature = 0.6 if turn_idx == 0 else 0
+            generation_kwargs = dict(extra_gen_kwargs, temperature=temperature)
+            if isinstance(self.model, HuggingFacewithChatTemplate):
+                generation_kwargs['do_sample'] = turn_idx == 0
+                # HF selects greedy decoding with do_sample=False.
+                if turn_idx == 1:
+                    generation_kwargs['temperature'] = 1.0
             output = turn_models[turn_idx].generate_from_template(
                 [history],
                 max_out_len=self.max_out_len,
-                temperature=temperature,
-                **extra_gen_kwargs,
+                **generation_kwargs,
             )[0]
             entry[chat_idx][message_idx]['content'] = output
 

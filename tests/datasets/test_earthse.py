@@ -1,11 +1,16 @@
 import copy
+import unittest
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
+import torch
 import yaml
+from mmengine.config import Config
 
 from opencompass.configs.datasets.Earth_Silver.earthse_gen import (
     SYSTEM_PROMPT,
@@ -18,7 +23,7 @@ from opencompass.datasets import (EarthSECombinedDataset, EarthSEDataset,
                                   REASONING_SEPARATOR,
                                   earthse_extract_content, earthse_prompt)
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
-from opencompass.models import OpenAISDK
+from opencompass.models import HuggingFacewithChatTemplate, OpenAISDK
 from opencompass.registry import ICL_EVALUATORS, ICL_INFERENCERS, LOAD_DATASET
 
 
@@ -45,6 +50,69 @@ GOLD_ROW = {
 
 def _parquet(path, rows):
     pq.write_table(pa.Table.from_pylist(rows), path)
+
+
+class TestEarthSERegression(unittest.TestCase):
+
+    def test_native_config_load_and_reload(self):
+        config_path = (Path(__file__).resolve().parents[2] / 'opencompass' /
+                       'configs' / 'datasets' / 'Earth_Silver' /
+                       'earthse_gen.py')
+        config = Config.fromfile(str(config_path))
+        run_config = Config(dict(datasets=config.earthse_datasets))
+        with TemporaryDirectory() as directory:
+            saved_path = Path(directory) / 'config.py'
+            run_config.dump(str(saved_path))
+            reloaded = Config.fromfile(str(saved_path))
+        self.assertEqual(len(reloaded.datasets), 3)
+        for dataset in reloaded.datasets[:2]:
+            self.assertEqual(dataset.question_types,
+                             list(EarthSEDataset.SPLITS))
+
+    def test_gold_huggingface_sampling_reaches_generation(self):
+        for do_sample in (False, True):
+            with self.subTest(do_sample=do_sample):
+                model = HuggingFacewithChatTemplate.__new__(
+                    HuggingFacewithChatTemplate)
+                model.parse_template = Mock(return_value=['question'])
+                model.model = Mock(device='cpu')
+                model.model.generation_config.do_sample = False
+                model.model.generate.return_value = torch.tensor([[1, 2]])
+                model.tokenizer = Mock(pad_token_id=0)
+                model.tokenizer.batch_encode_plus.return_value = {
+                    'input_ids': torch.tensor([[1]])
+                }
+                model.tokenizer.batch_decode.return_value = ['answer']
+                model.max_seq_len = 4096
+                model.fastchat_template = None
+                model.mode = 'none'
+                model.generation_kwargs = {'do_sample': do_sample}
+                model.stop_words = []
+                model.logger = Mock()
+                inferencer = EarthSEGoldInferencer.__new__(
+                    EarthSEGoldInferencer)
+                inferencer.model = model
+                inferencer.batch_size = 1
+                inferencer.max_out_len = 4096
+                entry = [[
+                    {'role': 'user', 'content': 'first'},
+                    {'role': 'assistant', 'content': ''},
+                    {'role': 'user', 'content': 'second'},
+                    {'role': 'assistant', 'content': ''},
+                ]]
+                extra_gen_kwargs = {'min_out_len': 1}
+                self.assertEqual(
+                    inferencer._generate_multiround(entry, extra_gen_kwargs),
+                    [['answer', 'answer']])
+                self.assertEqual(model.model.generate.call_count, 2)
+                first, second = model.model.generate.call_args_list
+                self.assertTrue(first.kwargs['do_sample'])
+                self.assertEqual(first.kwargs['temperature'], 0.6)
+                self.assertFalse(second.kwargs['do_sample'])
+                self.assertEqual(first.kwargs['min_new_tokens'], 1)
+                self.assertEqual(model.generation_kwargs,
+                                 {'do_sample': do_sample})
+                self.assertEqual(extra_gen_kwargs, {'min_out_len': 1})
 
 
 def test_earthse_dataset_index_exposes_full_config():
@@ -260,6 +328,8 @@ def test_earth_gold_second_turn_uses_raw_first_question_history():
     assert second_messages[0][1]['content'] == 'first'
     assert second_messages[0][3]['content'].endswith('\nsecond')
     assert second_kwargs['temperature'] == 0
+    assert all('do_sample' not in kwargs
+               for _, kwargs in inferencer.model.calls)
 
 
 def test_earthse_judge_uses_native_model_request(monkeypatch):
