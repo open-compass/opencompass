@@ -582,6 +582,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
+    "opencompass/maritimebench": {
+        "ms_id": "HiDolphin/MaritimeBench",
+        "hf_id": "Hi-Dolphin/MaritimeBench",
+        "local": "./data/maritimebench",
+    },
     "opencompass/ClimaQA-Gold": {
         "ms_id": "",
         "hf_id": "",
