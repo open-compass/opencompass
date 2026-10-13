@@ -30,6 +30,7 @@ class RJOBRunner(BaseRunner):
         debug (bool): Whether in debug mode.
         lark_bot_url (str): Lark notification URL.
         keep_tmp_file (bool): Whether to keep temporary files.
+        tmp_dir (str): The directory to store temporary files.
         phase (str): Task phase.
     """
 
@@ -181,9 +182,9 @@ class RJOBRunner(BaseRunner):
         logger.info(f'Task name: {task_name}')
         # Generate temporary parameter file
         pwd = os.getcwd()
-        mmengine.mkdir_or_exist('tmp/')
+        mmengine.mkdir_or_exist(self.tmp_dir)
         uuid_str = str(uuid.uuid4())
-        param_file = f'{pwd}/tmp/{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, f'{uuid_str}_params.py')
 
         try:
             cfg.dump(param_file)
