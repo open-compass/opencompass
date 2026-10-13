@@ -10,7 +10,8 @@ Correction = namedtuple(
         "inds",
     ],
 ) 
-char_smi = CharFuncs(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", "data", "lawbench", "eval_assets", "char_meta.txt"))
+cache_dir = os.environ.get('COMPASS_DATA_CACHE', '')
+char_smi = CharFuncs(os.path.join(cache_dir, "data", "lawbench", "eval_assets", "char_meta.txt"))
 
 def check_spell_error(src_span: str,
                       tgt_span: str,

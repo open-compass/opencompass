@@ -12,6 +12,7 @@ from sympy.parsing.latex import parse_latex
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.registry import (ICL_PROMPT_TEMPLATES, LOAD_DATASET,
                                   TEXT_POSTPROCESSORS)
 from opencompass.utils import get_data_path
@@ -422,11 +423,9 @@ class MathJudger:
         expression2: str,
         include_percentage: bool = True,
     ):
-        """
-        (默认 expression1 为 Ground_Truth)
-        函数: 判读两个数值是否在误差允许范围内相等
-        步骤1: 将可能出现的百分号的情况包含进来
-        步骤2: 使用 math.isclose 函数判断是否相等
+        """(默认 expression1 为 Ground_Truth) 函数: 判读两个数值是否在误差允许范围内相等 步骤1:
+
+        将可能出现的百分号的情况包含进来 步骤2: 使用 math.isclose 函数判断是否相等.
         """
         reference = float(expression1)
         prediction = float(expression2)
@@ -442,12 +441,8 @@ class MathJudger:
         return False
 
     def expression_equal(self, exp1, exp2):
-        """
-        (默认 expression1 为 Ground_Truth)
-        函数: 判断两个表达式是否在数学意义上等价
-        步骤1: 提取表达式, 防止有的模型会给出"x=1"而不是"1"
-        步骤2: 使用 sympy 库进行等价判断
-        """
+        """(默认 expression1 为 Ground_Truth) 函数: 判断两个表达式是否在数学意义上等价 步骤1: 提取表达式,
+        防止有的模型会给出"x=1"而不是"1" 步骤2: 使用 sympy 库进行等价判断."""
 
         # 只提取等号右边的表达式
         def extract_expression(expression):
@@ -799,3 +794,45 @@ class OlympiadBenchTemplate(PromptTemplate):
         new_entry = {'prompt': prompt, 'problem': problem}
 
         return super().generate_item(new_entry, *args, **kwargs)
+
+
+@ICL_PROMPT_TEMPLATES.register_module()
+class OlympiadBenchRawTemplate(RawPromptTemplate):
+    """Template for OlympiadBench dataset."""
+
+    def __init__(self):
+        # Define basic template structure
+        messages = [
+            {
+                'role': 'user',
+                'content': '{problem}'
+            },
+        ]
+        super().__init__(messages=messages)
+        self.prompter = OlympiadBenchPrompter()
+
+    def generate_item(self, entry: Dict, *args, **kwargs) -> str:
+        """Generate prompt for a single item."""
+        problem = entry.get('problem', '')
+        language = entry.get('language', 'English')
+        subject = entry.get('subject', 'Math')
+        question_type = entry.get('question_type', '')
+        answer_type = entry.get('answer_type', '')
+        is_multiple_answer = entry.get('is_multiple_answer', False)
+        unit = entry.get('unit', '')
+
+        prompt = self.prompter.make_prompt(
+            language=language,
+            subject=subject,
+            question_type=question_type,
+            answer_type=answer_type,
+            is_multiple_answer=is_multiple_answer,
+            unit=unit,
+        )
+
+        new_entry = {'prompt': prompt, 'problem': problem}
+        new_entry['prompt'] = new_entry['prompt'].replace(
+            '{problem}', new_entry['problem'])
+        final_entry = {'problem': new_entry['prompt']}
+
+        return super().generate_item(final_entry, *args, **kwargs)

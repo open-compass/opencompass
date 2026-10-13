@@ -1,7 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import MATHEvaluator
+from opencompass.evaluator import MATHVerifyEvaluator
 from opencompass.datasets import (
     MATHDataset,
     math_postprocess_v2,
@@ -28,7 +28,7 @@ math_infer_cfg = dict(
 
 # postprocess v2
 math_eval_cfg = dict(
-    evaluator=dict(type=MATHEvaluator)
+    evaluator=dict(type=MATHVerifyEvaluator)
 )
 
 math_datasets = [

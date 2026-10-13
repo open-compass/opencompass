@@ -27,6 +27,7 @@ except ImportError:
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils.code_execution import type_aware_equal
 
 from .base import BaseDataset
 
@@ -342,7 +343,7 @@ class Capturing(list):
 
 
 def run_test(sample, test=None, debug=False):
-    """if test(generated_code) is not None it'll try to run the code.
+    """If test(generated_code) is not None it'll try to run the code.
 
     otherwise it'll just return an input and output pair.
     """
@@ -490,11 +491,12 @@ def run_test(sample, test=None, debug=False):
                     if isinstance(output, tuple):
                         output = list(output)
 
-                    tmp_result = output == in_outs['outputs'][index]
+                    tmp_result = type_aware_equal(output,
+                                                  in_outs['outputs'][index])
                     if isinstance(in_outs['outputs'][index],
                                   list) and in_outs['outputs'][index]:
-                        tmp_result = tmp_result or (
-                            output == in_outs['outputs'][index][0])
+                        tmp_result = tmp_result or type_aware_equal(
+                            output, in_outs['outputs'][index][0])
 
                     # ground truth sequences are not tuples
                     try:

@@ -13,7 +13,7 @@ where Eq. (1) is the normal mean ppl computation formula, for inference-ppl, we 
 
 ```shell
 cd opencompass
-python run.py configs/eval_inference_ppl.py
+python run.py examples/eval_inference_ppl.py
 ```
 
 # Some results

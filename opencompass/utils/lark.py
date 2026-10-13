@@ -15,8 +15,8 @@ class LarkReporter:
              title: Optional[str] = None):
         """Post a message to Lark.
 
-        When title is None, message must be a str.
-        otherwise msg can be in rich text format (see
+        When title is None, message must be a str. otherwise msg can be in rich
+        text format (see
         https://open.feishu.cn/document/uAjLw4CM/ukTMukTMukTM/im-v1/message/create_json#45e0953e
         for details).
         """

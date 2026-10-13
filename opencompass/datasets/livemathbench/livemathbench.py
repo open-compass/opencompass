@@ -39,25 +39,11 @@ class LiveMathBenchDataset(BaseDataset):
              cot: bool = True,
              version: str = '202412') -> List[Dict[str, Any]]:
         dataset = []
-        dataset_info = {}
 
         # Use dataset mapping to generate path
         data_dir = get_data_path(path)
 
         for split, language in product(dataset_splits, dataset_languages):
-            dataset_info[f'{split}_{language}'] = {
-                'single-choice': 0,
-                'multiple-choice': 0,
-                'fill-in-the-blank': 0,
-                'problem-solving': 0
-            }
-            question_type_mapping = {
-                '单选': 'single-choice',
-                '多选': 'multiple-choice',
-                '填空': 'fill-in-the-blank',
-                '问答': 'problem-solving'
-            }
-
             examples = []
             if data_dir.startswith('opencompass/'):
                 # Using HF Dataset
@@ -79,10 +65,6 @@ class LiveMathBenchDataset(BaseDataset):
                         examples.append(example)
 
             for example_idx, example in enumerate(examples):
-                dataset_info[f'{split}_{language}'][
-                    example['question_type'] if language == 'en' else
-                    question_type_mapping[example['question_type']]] += 1
-
                 prompt = PROMPT_EN if language == 'en' else PROMPT_CN
                 if not cot:
                     if language == 'cn':
@@ -92,14 +74,11 @@ class LiveMathBenchDataset(BaseDataset):
                             ', please reasoning step by step', '')
                 example.update({
                     'subdivision':
-                    f'{split}_{language}',
+                    f'livemathbench_{version}_{split}_{language}',
                     'idx':
                     str(example_idx),
                     'prompt':
-                    prompt.format(question_type=example['question_type'],
-                                  question=example['question'] +
-                                  ('' if 'options' not in example else
-                                   ' '.join(example['options']))),
+                    prompt.format(question=example['question']),
                 })
                 dataset.append(example)
 

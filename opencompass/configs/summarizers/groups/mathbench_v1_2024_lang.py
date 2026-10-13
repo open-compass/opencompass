@@ -80,7 +80,6 @@ summarizer = dict(
         'mathbench-a-middle-en',
         'mathbench-a-primary-en',
         'mathbench-a-en-average',
-
         '#########################################################',
         '###### MathBench-T-CN: Theory Part (Chinese) ############',
         'mathbench-t-college-cn',
@@ -88,14 +87,12 @@ summarizer = dict(
         'mathbench-t-middle-cn',
         'mathbench-t-primary-cn',
         'mathbench-t-cn-average',
-
         '###### MathBench-T-EN: Theory Part (English) ############',
         'mathbench-t-college-en',
         'mathbench-t-high-en',
         'mathbench-t-middle-en',
         'mathbench-t-primary-en',
         'mathbench-t-en-average',
-
         '#########################################################',
         '###### MathBench-CN ############',
         'college-cn',
@@ -103,7 +100,6 @@ summarizer = dict(
         'middle-cn',
         'primary-cn',
         'cn-avarage',
-
         '###### MathBench-EN ############',
         'college-en',
         'high-en',

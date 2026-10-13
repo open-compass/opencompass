@@ -25,6 +25,9 @@ import platform
 import signal
 import tempfile
 
+from opencompass.utils.code_execution import (TYPE_AWARE_EQUAL_NAME,
+                                              type_aware_equal)
+
 BASE_IMPORTS = """from itertools import accumulate, chain, combinations, count, permutations, product, groupby, islice, repeat
 from copy import deepcopy
 from string import ascii_lowercase
@@ -66,8 +69,8 @@ def codeexecute_check_correctness(check_program, timeout=3):
     """Evaluates the functional correctness of a completion by running the test
     suite provided in the problem.
 
-    :param completion_id: an optional completion ID so we can match
-        the results later even if execution finishes asynchronously.
+    :param completion_id: an optional completion ID so we can match the results
+        later even if execution finishes asynchronously.
     """
     manager = multiprocessing.Manager()
     result = manager.list()
@@ -103,10 +106,13 @@ def unsafe_execute(check_program, result, timeout):
 
         # Run program.
         try:
+            code, test_case = check_program
             exec_globals = {}
             with swallow_io():
                 with time_limit(timeout):
-                    exec(check_program, exec_globals)
+                    exec(code, exec_globals)
+                    exec_globals[TYPE_AWARE_EQUAL_NAME] = type_aware_equal
+                    exec(test_case, exec_globals)
             result.append('passed')
         except TimeoutException:
             result.append('timed out')

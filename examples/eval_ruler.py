@@ -5,24 +5,21 @@ from opencompass.runners import LocalRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 
 with read_base():
-    from opencompass.configs.datasets.ruler.ruler_cwe_gen import \
-        cwe_datasets  # CWE
-    from opencompass.configs.datasets.ruler.ruler_fwe_gen import \
-        fwe_datasets  # FWE
-    from opencompass.configs.datasets.ruler.ruler_niah_gen import \
-        niah_datasets  # Niah
-    from opencompass.configs.datasets.ruler.ruler_qa_gen import \
-        qa_datasets  # QA
-    from opencompass.configs.datasets.ruler.ruler_vt_gen import \
-        vt_datasets  # VT
-    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat_1m import \
-        models as internlm2_5_7b_chat_1m
-    from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import \
-        models as llama3_8b_instruct_model
-    from opencompass.configs.models.qwen.lmdeploy_qwen2_7b_instruct import \
-        models as qwen2_7b_instruct_model
-    from opencompass.configs.summarizers.groups.ruler import \
-        ruler_summary_groups
+    from opencompass.configs.datasets.ruler.ruler_cwe_gen import cwe_datasets  # CWE
+    from opencompass.configs.datasets.ruler.ruler_fwe_gen import fwe_datasets  # FWE
+    from opencompass.configs.datasets.ruler.ruler_niah_gen import niah_datasets  # Niah
+    from opencompass.configs.datasets.ruler.ruler_qa_gen import qa_datasets  # QA
+    from opencompass.configs.datasets.ruler.ruler_vt_gen import vt_datasets  # VT
+    from opencompass.configs.models.hf_internlm.lmdeploy_internlm2_5_7b_chat_1m import (
+        models as internlm2_5_7b_chat_1m,
+    )
+    from opencompass.configs.models.hf_llama.lmdeploy_llama3_8b_instruct import (
+        models as llama3_8b_instruct_model,
+    )
+    from opencompass.configs.models.qwen.lmdeploy_qwen2_7b_instruct import (
+        models as qwen2_7b_instruct_model,
+    )
+    from opencompass.configs.summarizers.groups.ruler import ruler_summary_groups
 
 import_datasets = sum(
     [niah_datasets, vt_datasets, fwe_datasets, cwe_datasets, qa_datasets], [])

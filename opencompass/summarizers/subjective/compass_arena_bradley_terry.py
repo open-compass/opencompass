@@ -61,7 +61,7 @@ def preprocess_for_elo(df):
 
 
 def preprocess_for_bt(df):
-    """in BT we only need the unique (matchup,outcome) sets along with the
+    """In BT we only need the unique (matchup,outcome) sets along with the
     weights of how often they occur."""
     n_rows = len(df)
     # the 3 columns of schedule represent: model_a id, model_b id, outcome_id
@@ -179,7 +179,7 @@ def fit_vectorized_elo(
     init_rating: float = 1000.0,
     scale: float = 400.0,
 ):
-    """fit multiple sets of Elo ratings on different samples of the data at the
+    """Fit multiple sets of Elo ratings on different samples of the data at the
     same time."""
     alpha = math.log(base) / scale
     num_samples = sample_indices.shape[1]
@@ -282,7 +282,7 @@ def scale_and_offset(
     baseline_model: str = None,
     baseline_rating: float = 1000.0,
 ):
-    """convert ratings from the natural scale to the Elo rating scale with an
+    """Convert ratings from the natural scale to the Elo rating scale with an
     anchored baseline."""
     scaled_ratings = (ratings * scale) + init_rating
 

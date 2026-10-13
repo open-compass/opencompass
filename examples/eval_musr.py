@@ -4,7 +4,7 @@ from mmengine.config import read_base
 
 with read_base():
     from opencompass.configs.datasets.musr.musr_gen_3c6e15 import musr_datasets
-    from opencompass.configs.models.chatglm.lmdeploy_glm4_9b_chat import \
+    from opencompass.configs.models.glm.lmdeploy_glm4_9b_chat import \
         models as lmdeploy_glm4_9b_chat_model
     from opencompass.configs.models.gemma.lmdeploy_gemma_9b_it import \
         models as lmdeploy_gemma_9b_it_model
