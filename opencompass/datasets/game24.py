@@ -163,8 +163,12 @@ class Game24Dataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        path = get_data_path(path, local_mode=True)
-        data = list(pd.read_csv(path)['Puzzles'])
+        if path.startswith(('/', './', '../')):
+            path = get_data_path(path, local_mode=True)
+            data = list(pd.read_csv(path)['Puzzles'])
+        else:
+            from datasets import load_dataset
+            data = list(load_dataset(path, split='train')['Puzzles'])
         data = [{'input': i, 'output': i} for i in data]
         return Dataset.from_list(data[900:905])
 

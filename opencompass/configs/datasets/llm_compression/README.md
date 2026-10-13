@@ -62,7 +62,7 @@ $$ BPC = \frac{TotalCrossEntropyLoss}{TotalCharacterNumber*log(2)} $$
 ### Config Files
 
 1. Dataset config: `configs/datasets/llm-compression.py`
-2. Evaluation config: `configs/eval_llm_compression.py`
+2. Evaluation config: `examples/eval_llm_compression.py`
 
 ## Evaluation Results
 ```

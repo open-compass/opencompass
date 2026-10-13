@@ -238,6 +238,7 @@ def general_eval_wrapper_postprocess(text: str,
         return text
 
 
+@TEXT_POSTPROCESSORS.register_module()
 def match_answer_pattern(response_text: str, answer_pattern: str):
     match = re.search(answer_pattern, response_text)
     extracted_answer = match.group(1) if match else ''
@@ -283,3 +284,10 @@ def extract_non_reasoning_content(
                                  re.DOTALL)
     non_reasoning_content = reasoning_regex.sub('', text).strip()
     return non_reasoning_content
+
+
+def parse_bracketed_answer(text: str, options: str) -> str:
+    match = re.search(rf'<({options})>', text)
+    if match:
+        return match.group(1)
+    return ''

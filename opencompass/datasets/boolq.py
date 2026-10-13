@@ -13,6 +13,8 @@ class BoolQDataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):
+        if 'data_files' in kwargs:
+            kwargs['data_files'] = get_data_path(kwargs['data_files'])
         dataset = load_dataset(**kwargs)
 
         def preprocess(example):

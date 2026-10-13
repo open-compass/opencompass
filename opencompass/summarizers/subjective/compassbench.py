@@ -30,32 +30,10 @@ def post_process_wildbench_pair(judgement: str):
         return None
 
 MAP = {
-    'instruct': [
-        '总分',
-        '中文总分',
-        '英文总分',
-        'instruct/compassbench_2501_IF_en_chatIF_sub',
-        'instruct/compassbench_2501_IF_en_functionalIF_sub',
-        'instruct/compassbench_2501_IF_cn_chatIF_sub',
-        'instruct/compassbench_2501_IF_cn_functionalIF_sub',
-    ],
     'language': [
-        '总分',
-        '中文总分',
-        '英文总分',
-        'language/compassbench_v2501_language_zh_chat_sub',
-        'language/compassbench_v2501_language_zh_nlp_sub',
-        'language/compassbench_v2501_language_zh_creation_sub',
-        'language/compassbench_v2501_language_en_chat_sub',
-        'language/compassbench_v2501_language_en_nlp_sub',
-        'language/compassbench_v2501_language_en_creation_sub',
-    ],
-    'code': [
-        '总分',
-        '中文总分',
-        '英文总分',
-        'code/compassbench_2501_code_arena_en_sub',
-        'code/compassbench_2501_code_arena_zh_sub',
+        'language/compassbench_2601_language_sub_chat',
+        'language/compassbench_2601_language_sub_creation',
+        'language/compassbench_2601_language_sub_nlp',
     ],
 }
 
@@ -179,36 +157,15 @@ class CompassBenchSummarizer:
                 )
                 if dataset_root not in new_score:
                     new_score[dataset_root] = {}
-                if '_en_' in dataset_detail:
-                    for model_name, cate_score in model_scores.items():
-                        if model_name not in new_score[dataset_root]:
-                            new_score[dataset_root][model_name] = {}
-                        if len(cate_score) == 0:
-                            new_score[dataset_root][model_name]['英文总分'] = None
-                        else:
-                            new_score[dataset_root][model_name].update(
-                                cate_score)
-                            new_score[dataset_root][model_name]['英文总分'] = (
-                                sum(cate_score.values()) / len(cate_score))
-                elif '_cn_' in dataset_detail or '_zh_' in dataset_detail:
-                    for model_name, cate_score in model_scores.items():
-                        if model_name not in new_score[dataset_root]:
-                            new_score[dataset_root][model_name] = {}
-                        if len(cate_score) == 0:
-                            new_score[dataset_root][model_name]['中文总分'] = None
-                        else:
-                            new_score[dataset_root][model_name].update(
-                                cate_score)
-                            new_score[dataset_root][model_name]['中文总分'] = (
-                                sum(cate_score.values()) / len(cate_score))
-            for dataset, models in new_score.items():
-                for model, details in models.items():
-                    if (details['英文总分'] is not None
-                            and details['中文总分'] is not None):
-                        average_score = (details['英文总分'] + details['中文总分']) / 2
+
+                for model_name, cate_score in model_scores.items():
+                    if model_name not in new_score[dataset_root]:
+                        new_score[dataset_root][model_name] = {}
+                    if len(cate_score) == 0:
+                        pass
                     else:
-                        average_score = None
-                    details['总分'] = average_score
+                        new_score[dataset_root][model_name].update(
+                            cate_score)
 
             df = pd.DataFrame()
             # Iterate over the MAP and new_score to populate the DataFrame

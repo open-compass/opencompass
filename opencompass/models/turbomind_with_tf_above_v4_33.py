@@ -1,7 +1,11 @@
 # flake8: noqa
 # yapf: disable
 import copy
+import os
+import time
 from typing import Dict, List, Optional, Union
+
+from mmengine.config.config import ConfigDict
 
 from opencompass.models.base import BaseModel
 from opencompass.utils.logging import get_logger
@@ -31,7 +35,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         path: str,
         tokenizer_only: bool = False,
         backend: str = 'turbomind',
-        engine_config: Dict = {},
+        engine_config: Dict|ConfigDict = {},
         gen_config: Dict = {},
         max_seq_len: int = None,
         meta_template: Optional[Dict] = None,
@@ -53,7 +57,13 @@ class TurboMindModelwithChatTemplate(BaseModel):
         if not tokenizer_only:
             DEFAULT_ENGING_CONFIG = {'session_len': self.max_seq_len}
             _engine_config = DEFAULT_ENGING_CONFIG.copy()
-            _engine_config.update(engine_config)
+            if isinstance(engine_config, ConfigDict):
+                _engine_config.update(engine_config.to_dict())
+            elif isinstance(engine_config, Dict):
+                _engine_config.update(engine_config)
+            else:
+                raise ValueError(f'expected Dict or ConfigDict engine_config but got {type(engine_config)}')
+
             self.pipe = self._build_pipe(path, backend, _engine_config)
         else:
             self.pipe = None
@@ -166,9 +176,14 @@ class TurboMindModelwithChatTemplate(BaseModel):
         self.logger.info(gen_config)
 
         results = []
+        start = time.perf_counter()
         outputs = self.pipe(messages, gen_config=gen_config, do_preprocess=False)
-        for output in outputs:
-            results.append(output.text)
+        duration = time.perf_counter() - start
+        input_tokens = [output.input_token_len for output in outputs]
+        output_tokens = [output.generate_token_len for output in outputs]
+        results = [output.text for output in outputs]
+        self.logger.info(f'duration {duration:.2f}s, requests {len(inputs)}, input_tokens {sum(input_tokens)}, '
+                         f'output_tokens {sum(output_tokens)}')
 
         for s in stop_words:
             results = [r.split(s)[0] for r in results]
@@ -200,4 +215,7 @@ class TurboMindModelwithChatTemplate(BaseModel):
         else:
             filtered = {k: v for k, v in engine_config.items() if hasattr(PytorchEngineConfig, k)}
             backend_config = PytorchEngineConfig(**filtered)
-        return pipeline(model_path, backend_config=backend_config, log_level='WARNING')
+
+        log_level = os.getenv('LMDEPLOY_LOG_LEVEL', 'WARNING')
+        max_log_len = os.getenv('LMDEPLOY_MAX_LOG_LEN', 10)
+        return pipeline(model_path, backend_config=backend_config, log_level=log_level, max_log_len=max_log_len)
