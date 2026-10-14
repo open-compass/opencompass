@@ -29,14 +29,12 @@ summarizer = dict(
         'primary',
         'arithmetic',
         'mathbench-a (average)',
-
         '###### MathBench-T: Theory Part ######',
         'college_knowledge',
         'high_knowledge',
         'middle_knowledge',
         'primary_knowledge',
         'mathbench-t (average)',
-
         '###### Overall: Average between MathBench-A and MathBench-T ######',
         'Overall',
     ],

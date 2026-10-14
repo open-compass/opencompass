@@ -16,7 +16,7 @@ class IFEvalDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path)
         datasets = []
         with open(path, 'r', encoding='utf-8') as file:
             for line in file:

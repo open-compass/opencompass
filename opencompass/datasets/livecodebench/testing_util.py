@@ -1,3 +1,4 @@
+# flake8: noqa
 # Copyright LiveCodeBench @ 2024,
 
 import ast
@@ -16,7 +17,13 @@ from io import StringIO
 from unittest.mock import mock_open, patch
 
 import numpy as np
-from pyext import RuntimeModule
+
+from opencompass.utils.code_execution import type_aware_equal
+
+try:
+    from pyext import RuntimeModule
+except ImportError:
+    RuntimeModule = None
 
 
 def truncatefn(s, length=300):
@@ -78,13 +85,17 @@ def combined_int_check(val):
     return only_int_check(val) or string_int_check(val)
 
 
-def run_test(sample, test=None, debug=False, timeout=6):
-    """if test(generated_code) is not None it'll try to run the code.
+def run_test(sample,
+             test=None,
+             debug=False,
+             timeout=6,
+             memory_limit_bytes=None):
+    """If test(generated_code) is not None it'll try to run the code.
 
     otherwise it'll just return an input and output pair.
     """
     # Disable functionalities that can make destructive changes to the test.
-    reliability_guard()
+    reliability_guard(maximum_memory_bytes=memory_limit_bytes)
 
     if debug:
         print(f'start = {datetime.now().time()}')
@@ -276,11 +287,12 @@ def run_test(sample, test=None, debug=False, timeout=6):
                     if isinstance(output, tuple):
                         output = list(output)
 
-                    tmp_result = output == in_outs['outputs'][index]
+                    tmp_result = type_aware_equal(output,
+                                                  in_outs['outputs'][index])
                     if (isinstance(in_outs['outputs'][index], list)
                             and in_outs['outputs'][index]):
-                        tmp_result = tmp_result or (
-                            output == in_outs['outputs'][index][0])
+                        tmp_result = tmp_result or type_aware_equal(
+                            output, in_outs['outputs'][index][0])
 
                     # ground truth sequences are not tuples
                     try:
@@ -653,6 +665,40 @@ def stripped_string_compare(s1, s2):
     return s1 == s2
 
 
+class MockStdinWithBuffer:
+
+    def __init__(self, inputs: str):
+        self.inputs = inputs
+        self._stringio = StringIO(inputs)
+        self.buffer = MockBuffer(inputs)
+
+    def read(self, *args):
+        return self.inputs
+
+    def readline(self, *args):
+        return self._stringio.readline(*args)
+
+    def readlines(self, *args):
+        return self.inputs.split('\n')
+
+    def __getattr__(self, name):
+        # Delegate other attributes to StringIO
+        return getattr(self._stringio, name)
+
+
+class MockBuffer:
+
+    def __init__(self, inputs: str):
+        self.inputs = inputs.encode('utf-8')  # Convert to bytes
+
+    def read(self, *args):
+        # Return as byte strings that can be split
+        return self.inputs
+
+    def readline(self, *args):
+        return self.inputs.split(b'\n')[0] + b'\n'
+
+
 def call_method(method, inputs):
 
     if isinstance(inputs, list):
@@ -660,11 +706,14 @@ def call_method(method, inputs):
 
     inputs_line_iterator = iter(inputs.split('\n'))
 
+    # Create custom stdin mock with buffer support
+    mock_stdin = MockStdinWithBuffer(inputs)
+
     # sys.setrecursionlimit(10000)
 
     # @patch('builtins.input', side_effect=inputs.split("\n"))
     @patch('builtins.open', mock_open(read_data=inputs))
-    @patch('sys.stdin', StringIO(inputs))
+    @patch('sys.stdin', mock_stdin)  # Use our custom mock instead of StringIO
     @patch('sys.stdin.readline', lambda *args: next(inputs_line_iterator))
     @patch('sys.stdin.readlines', lambda *args: inputs.split('\n'))
     @patch('sys.stdin.read', lambda *args: inputs)
@@ -680,11 +729,26 @@ def call_method(method, inputs):
     return _inner_call_method(method)
 
 
+def _get_current_vmsize_bytes():
+    if platform.uname().system != 'Linux':
+        return 0
+
+    import os
+
+    with open('/proc/self/statm', encoding='utf-8') as f:
+        vmsize_pages = int(f.read().split()[0])
+    return vmsize_pages * os.sysconf('SC_PAGE_SIZE')
+
+
 def reliability_guard(maximum_memory_bytes=None):
     """This disables various destructive functions and prevents the generated
     code from interfering with the test (e.g. fork bomb, killing other
     processes, removing filesystem files, etc.) WARNING This function is NOT a
     security sandbox.
+
+    On Linux, ``maximum_memory_bytes`` is added to the worker's current virtual
+    memory size so framework mappings do not consume the generated code's
+    address-space budget.
 
     Untrusted code, including, model- generated code, should not be blindly
     executed outside of one. See the Codex paper for more information about
@@ -692,15 +756,20 @@ def reliability_guard(maximum_memory_bytes=None):
     """
 
     if maximum_memory_bytes is not None:
-        import resource
+        if platform.uname().system != 'Linux':
+            import warnings
 
-        resource.setrlimit(resource.RLIMIT_AS,
-                           (maximum_memory_bytes, maximum_memory_bytes))
-        resource.setrlimit(resource.RLIMIT_DATA,
-                           (maximum_memory_bytes, maximum_memory_bytes))
-        if not platform.uname().system == 'Darwin':
-            resource.setrlimit(resource.RLIMIT_STACK,
-                               (maximum_memory_bytes, maximum_memory_bytes))
+            warnings.warn(
+                'Memory limit is only supported on Linux; skipping setup.',
+                RuntimeWarning)
+        else:
+            import resource
+
+            effective_memory_limit_bytes = (_get_current_vmsize_bytes() +
+                                            maximum_memory_bytes)
+            resource.setrlimit(
+                resource.RLIMIT_AS,
+                (effective_memory_limit_bytes, effective_memory_limit_bytes))
 
     faulthandler.disable()
 

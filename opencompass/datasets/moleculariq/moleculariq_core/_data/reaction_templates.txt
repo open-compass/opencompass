@@ -1,0 +1,111 @@
+# Reaction Templates for Single-Step Transformations
+# Format; Name;Category;SMIRKS;Description
+# IMPORTANT: Only single-substrate reactions for now (no bimolecular reactions)
+
+# ========== OXIDATION REACTIONS ==========
+primary_alcohol_to_aldehyde;oxidation;[CH2:1]([OH])[#6:2]>>[CH:1](=[O])[#6:2];Oxidation of primary alcohol to aldehyde
+secondary_alcohol_to_ketone;oxidation;[CH:1]([OH])([#6:2])[#6:3]>>[C:1](=[O])([#6:2])[#6:3];Oxidation of secondary alcohol to ketone
+aldehyde_to_carboxylic_acid;oxidation;[CH:1](=[O])[#6:2]>>[C:1](=[O])([OH])[#6:2];Oxidation of aldehyde to carboxylic acid
+# Removed thiol_to_disulfide - needs two molecules
+
+# ========== REDUCTION REACTIONS ==========
+ketone_to_secondary_alcohol;reduction;[C:1](=[O])([#6:2])[#6:3]>>[CH:1]([OH])([#6:2])[#6:3];Reduction of ketone to secondary alcohol
+aldehyde_to_primary_alcohol;reduction;[CH:1](=[O])[#6:2]>>[CH2:1]([OH])[#6:2];Reduction of aldehyde to primary alcohol
+carboxylic_acid_to_primary_alcohol;reduction;[C:1](=[O])([OH])[#6:2]>>[CH2:1]([OH])[#6:2];Reduction of carboxylic acid to primary alcohol
+nitro_to_amine;reduction;[#6:1][N+:2](=[O])[O-]>>[#6:1][NH2:2];Reduction of nitro group to amine
+imine_to_amine;reduction;[#6:1][N:2]=[C:3]([#6:4])[#6:5]>>[#6:1][NH:2][CH:3]([#6:4])[#6:5];Reduction of imine to amine
+alkene_to_alkane;reduction;[C:1]=[C:2]>>[C:1][C:2];Hydrogenation of alkene to alkane
+alkyne_to_alkene;reduction;[C:1]#[C:2]>>[C:1]=[C:2];Partial reduction of alkyne to alkene
+
+# ========== SUBSTITUTION REACTIONS ==========
+alcohol_to_alkyl_halide_Cl;substitution;[C:1][OH:2]>>[C:1]Cl;Conversion of alcohol to alkyl chloride
+alcohol_to_alkyl_halide_Br;substitution;[C:1][OH:2]>>[C:1]Br;Conversion of alcohol to alkyl bromide
+alkyl_halide_to_alcohol;substitution;[C:1][Cl,Br,I]>>[C:1][OH];Hydrolysis of alkyl halide to alcohol
+alkyl_halide_to_azide;substitution;[C:1][Cl,Br,I]>>[C:1][N-][N+]#N;Substitution of halide with azide
+alkyl_halide_to_nitrile;substitution;[C:1][Cl,Br,I]>>[C:1]C#N;Substitution of halide with cyanide
+
+# ========== HYDROLYSIS (single substrate) ==========
+ester_hydrolysis_to_acid;hydrolysis;[C:1](=[O:2])[O:3][#6:4]>>[C:1](=[O:2])[OH];Hydrolysis of ester to acid
+amide_hydrolysis_to_acid;hydrolysis;[C:1](=[O:2])[NH:3][#6:4]>>[C:1](=[O:2])[OH];Hydrolysis of amide to acid
+nitrile_hydrolysis;hydrolysis;[C:1]#N>>[C:1](=O)[OH];Hydrolysis of nitrile to carboxylic acid
+
+# ========== ADDITION REACTIONS ==========
+hydration_of_alkene;addition;[C:1]=[C:2]>>[C:1]([OH])[C:2];Hydration of alkene to alcohol
+hydrohalogenation_HCl;addition;[C:1]=[C:2]>>[C:1](Cl)[C:2];Addition of HCl to alkene
+hydrohalogenation_HBr;addition;[C:1]=[C:2]>>[C:1](Br)[C:2];Addition of HBr to alkene
+epoxidation;addition;[C:1]=[C:2]>>[C:1]1[C:2][O]1;Epoxidation of alkene (fixed mapping)
+
+# ========== ELIMINATION REACTIONS ==========  
+dehydration_alcohol;elimination;[C:1][CH:2]([OH])[CH:3][C:4]>>[C:1][C:2]=[C:3][C:4];E2 elimination of alcohol
+dehydrohalogenation;elimination;[C:1][CH:2]([Cl,Br,I])[CH:3][C:4]>>[C:1][C:2]=[C:3][C:4];E2 elimination of alkyl halide
+
+# ========== AROMATIC SUBSTITUTION ==========
+nitration;aromatic_substitution;[cH:1]>>[c:1][N+](=O)[O-];Nitration of benzene
+bromination;aromatic_substitution;[cH:1]>>[c:1]Br;Bromination of benzene
+chlorination;aromatic_substitution;[cH:1]>>[c:1]Cl;Chlorination of benzene
+
+# ========== REARRANGEMENTS ==========
+beckmann_rearrangement;rearrangement;[C:1](=[N:2][OH])[#6:3]>>[NH:2][C:1](=[O])[#6:3];Beckmann rearrangement of oxime
+
+# ========== DECARBOXYLATION ==========
+decarboxylation;decarboxylation;[#6:1][C:2](=[O])[OH]>>[#6:1][H];Decarboxylation of carboxylic acid (adds H)
+
+# ========== PROTECTING GROUP CHEMISTRY ==========
+boc_protection;protection;[NH2:1][#6:2]>>CC(C)(C)OC(=O)[NH:1][#6:2];BOC protection of amine
+boc_deprotection;deprotection;CC(C)(C)OC(=O)[NH:1][#6:2]>>[NH2:1][#6:2];BOC deprotection
+acetylation;protection;[OH:1][#6:2]>>CC(=O)[O:1][#6:2];Acetylation of alcohol
+deacetylation;deprotection;CC(=O)[O:1][#6:2]>>[OH:1][#6:2];Deacetylation
+
+# ========== FUNCTIONAL GROUP INTERCONVERSIONS ==========
+oxime_formation;condensation;[C:1](=[O:2])[#6,H:3]>>[C:1](=[N][OH])[#6,H:3];Formation of oxime from carbonyl
+hydrazone_formation;condensation;[C:1](=[O:2])[#6,H:3]>>[C:1](=[N][NH2])[#6,H:3];Formation of hydrazone from carbonyl
+
+# REMOVED BIMOLECULAR REACTIONS:
+# - fischer_esterification (needs acid + alcohol)
+# - amide_formation (needs acid + amine) 
+# - friedel_crafts reactions (need aromatic + reagent)
+# - grignard_addition (needs carbonyl + grignard)
+# - aldol_condensation (needs two carbonyls)
+# - wittig_reaction (needs carbonyl + ylide)
+# - diels_alder (needs diene + dienophile)
+# Additional Single-Substrate Reactions to Add
+
+# ========== MORE OXIDATIONS ==========
+benzylic_oxidation;oxidation;[c:1][CH3:2]>>[c:1][CH:2]=O;Oxidation of benzylic methyl to aldehyde
+benzylic_alcohol_oxidation;oxidation;[c:1][CH2:2]([OH])>>[c:1][C:2]=O;Oxidation of benzylic alcohol to aldehyde  
+sulfide_to_sulfoxide;oxidation;[#6:1][S:2][#6:3]>>[#6:1][S:2](=O)[#6:3];Oxidation of sulfide to sulfoxide
+
+# ========== MORE REDUCTIONS ==========
+azide_to_amine;reduction;[C:1]N=[N+]=[N-]>>[C:1][NH2];Reduction of azide to amine
+ester_to_alcohol;reduction;[C:1](=[O])[O:2][C:3]>>[C:1][OH];Reduction of ester to alcohol (loses other part)
+nitrile_to_amine;reduction;[C:1]C#N>>[C:1]C[NH2];Reduction of nitrile to primary amine
+amide_to_amine;reduction;[C:1](=[O])[NH:2][#6:3]>>[C:1][NH:2][#6:3];Reduction of amide to amine
+
+# ========== MORE SUBSTITUTIONS ==========
+alcohol_to_alkyl_halide_I;substitution;[C:1][OH:2]>>[C:1]I;Conversion of alcohol to alkyl iodide
+alcohol_to_tosylate;substitution;[C:1][OH:2]>>[C:1][O]S(=O)(=O)c1ccc(C)cc1;Tosylation of alcohol
+alcohol_to_mesylate;substitution;[C:1][OH:2]>>[C:1][O]S(=O)(=O)C;Mesylation of alcohol
+
+# ========== MORE ADDITIONS ==========
+dibromination;addition;[C:1]=[C:2]>>[C:1](Br)[C:2](Br);Dibromination of alkene
+dichlorination;addition;[C:1]=[C:2]>>[C:1](Cl)[C:2](Cl);Dichlorination of alkene
+# Removed hydroboration_oxidation - regioselectivity too complex for simple SMIRKS
+
+# ========== AROMATIC REACTIONS ==========
+aromatic_sulfonation;aromatic_substitution;[cH:1]>>[c:1]S(=O)(=O)O;Sulfonation of benzene
+aromatic_iodination;aromatic_substitution;[cH:1]>>[c:1]I;Iodination of benzene
+aromatic_fluorination;aromatic_substitution;[cH:1]>>[c:1]F;Fluorination of benzene
+
+# ========== FUNCTIONAL GROUP CONVERSIONS ==========
+acid_to_acid_chloride;conversion;[C:1](=[O])[OH]>>[C:1](=[O])Cl;Conversion of acid to acid chloride
+acid_chloride_to_ester_methyl;conversion;[C:1](=[O])Cl>>[C:1](=[O])OC;Acid chloride to methyl ester
+acid_chloride_to_amide;conversion;[C:1](=[O])Cl>>[C:1](=[O])N;Acid chloride to primary amide
+aromatic_amine_to_diazonium;conversion;[c:1][NH2]>>[c:1][N+]#N;Diazotization of aromatic amine
+
+# ========== RING OPENING ==========
+epoxide_to_diol;ring_opening;[C:1]1[O][C:2]1>>[C:1]([OH])[C:2]([OH]);Epoxide opening to vicinal diol
+epoxide_to_halohydrin_Br;ring_opening;[C:1]1[O][C:2]1>>[C:1](Br)[C:2]([OH]);Epoxide to bromohydrin
+epoxide_to_halohydrin_Cl;ring_opening;[C:1]1[O][C:2]1>>[C:1](Cl)[C:2]([OH]);Epoxide to chlorohydrin
+
+# ========== OZONOLYSIS (splits molecule) ==========
+ozonolysis_terminal;cleavage;[C:1]C=C>>[C:1]C=O;Ozonolysis of terminal alkene (loses CO2)

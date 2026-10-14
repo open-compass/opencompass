@@ -61,10 +61,10 @@ Examinee's Answer: {answer}
 Analysis:
 '''
 
-PROMPT_CN = '''下面是一个{question_type}类型的数学问题，请逐步推理，并把最终答案放置于\\boxed{{}}中。
+PROMPT_CN = '''下面是一个数学问题，请逐步推理，并把最终答案放置于\\boxed{{}}中。
 {question}
 '''
 
-PROMPT_EN = '''Here is a {question_type} type math problem, please reasoning step by step, and put your answer in \\boxed{{}}.
+PROMPT_EN = '''Here is a math question, please reasoning step by step, and put your answer in \\boxed{{}}.
 {question}
 '''

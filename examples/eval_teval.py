@@ -50,8 +50,9 @@ for m in _origin_models:
 
 datasets = teval_en_datasets + teval_zh_datasets
 work_dir = './outputs/teval'
-'''
-dataset                                      version    metric          mode       qwen-7b-chat-hf    internlm2-chat-7b-hf    llama-2-7b-chat-hf
+"""Dataset                                      version    metric          mode
+qwen-7b-chat-hf    internlm2-chat-7b-hf    llama-2-7b-chat-hf.
+
 -------------------------------------------  ---------  --------------  -------  -----------------  ----------------------  --------------------
 teval                                        -          naive_average   unknown              57.69                   78.18                 36.63
 teval-instruct_v1                            10482d     string_metric   unknown              28.83                   98.08                 50.27
@@ -77,4 +78,4 @@ teval-reason_retrieve_understand_json_v1_zh  10482d     name            unknown 
 teval-understand_str_v1_zh                   10482d     args            unknown              84.39                   88.62                 77.29
 teval-reason_retrieve_understand_json_v1_zh  10482d     args            unknown              48.71                   72.71                 28.83
 teval-review_str_v1_zh                       10482d     review_quality  unknown              56.67                   60.57                 27.1
-'''
+"""

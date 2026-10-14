@@ -128,18 +128,11 @@ class ERNIEBot(BaseAPIModel):
             str: The generated string.
         """
         assert isinstance(input, (str, PromptList))
-        """
-        {
-          "messages": [
-            {"role":"user","content":"请介绍一下你自己"},
-            {"role":"assistant","content":"我是百度公司开发的人工智能语言模型"},
-            {"role":"user","content": "我在上海，周末可以去哪里玩？"},
-            {"role":"assistant","content": "上海是一个充满活力和文化氛围的城市"},
-            {"role":"user","content": "周末这里的天气怎么样？"}
-          ]
-        }
-
-        """
+        """{ "messages": [ {"role":"user","content":"请介绍一下你自己"},
+        {"role":"assistant","content":"我是百度公司开发的人工智能语言模型"},
+        {"role":"user","content": "我在上海，周末可以去哪里玩？"},
+        {"role":"assistant","content": "上海是一个充满活力和文化氛围的城市"},
+        {"role":"user","content": "周末这里的天气怎么样？"} ] }"""
 
         if isinstance(input, str):
             messages = [{'role': 'user', 'content': input}]

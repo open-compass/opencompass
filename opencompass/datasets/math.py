@@ -512,7 +512,7 @@ class MATHEvaluator(BaseEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class MATHAgentEvaluator(MATHEvaluator):
-    """math agent evaluator for soft condition.
+    """Math agent evaluator for soft condition.
 
     Args:
         action (str): Action for catching internal prediction.

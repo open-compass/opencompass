@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from ..mmlu.mmlu_gen_4d595a import mmlu_datasets
     from ..ceval.ceval_gen_5f30c7 import ceval_datasets
-    from ..agieval.agieval_gen_64afd3 import agieval_datasets
+    from ..agieval.agieval_gen_f84832 import agieval_datasets
     from ..GaokaoBench.GaokaoBench_gen_5cfe9e import GaokaoBench_datasets
     from ..bbh.bbh_gen_5b92b0 import bbh_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets
@@ -45,7 +45,7 @@ with read_base():
     from ..ARC_c.ARC_c_gen_1e0de5 import ARC_c_datasets
     from ..commonsenseqa.commonsenseqa_gen_c946f2 import commonsenseqa_datasets
     from ..piqa.piqa_gen_1194eb import piqa_datasets
-    from ..siqa.siqa_gen_e78df3 import siqa_datasets
+    from ..siqa.siqa_gen_18632c import siqa_datasets
     from ..strategyqa.strategyqa_gen_1180a7 import strategyqa_datasets
     from ..winogrande.deprecated_winogrande_gen_a9ede5 import winogrande_datasets
     from ..obqa.obqa_gen_9069e4 import obqa_datasets

@@ -1,6 +1,10 @@
-# Needlebench: A Benchmark for Needle-In-A-Haystack Evaluations
+# Needlebench: A Benchmark for Needle-In-A-Haystack Evaluations (Deprecated)
 
 English | [简体中文](readme_zh-CN.md)
+
+> ⚠️ **Note: This version is deprecated**
+> 
+> We recommend using [NeedleBench V2](../needlebench_v2/readme.md), which provides more accurate and unbiased evaluations with improved scoring methodology, optimized prompts, and better task design.
 
 ## Overview
 

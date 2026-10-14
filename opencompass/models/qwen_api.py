@@ -69,6 +69,36 @@ class Qwen(BaseAPIModel):
         self.flush()
         return results
 
+    @staticmethod
+    def _get_response_field(obj, field: str):
+        if obj is None:
+            return None
+        if isinstance(obj, dict):
+            return obj.get(field)
+        return getattr(obj, field, None)
+
+    @classmethod
+    def _extract_response_text(cls, response) -> Optional[str]:
+        output = cls._get_response_field(response, 'output')
+
+        text = cls._get_response_field(output, 'text')
+        if isinstance(text, str):
+            return text
+
+        choices = cls._get_response_field(output, 'choices')
+        if choices:
+            choice = choices[0]
+            message = cls._get_response_field(choice, 'message')
+            content = cls._get_response_field(message, 'content')
+            if isinstance(content, str):
+                return content
+
+            text = cls._get_response_field(choice, 'text')
+            if isinstance(text, str):
+                return text
+
+        return None
+
     def _generate(
         self,
         input: PromptType,
@@ -86,17 +116,11 @@ class Qwen(BaseAPIModel):
             str: The generated string.
         """
         assert isinstance(input, (str, PromptList))
-        """
-        {
-          "messages": [
-            {"role":"user","content":"请介绍一下你自己"},
-            {"role":"assistant","content":"我是通义千问"},
-            {"role":"user","content": "我在上海，周末可以去哪里玩？"},
-            {"role":"assistant","content": "上海是一个充满活力和文化氛围的城市"},
-            {"role":"user","content": "周末这里的天气怎么样？"}
-          ]
-        }
+        """{ "messages": [ {"role":"user","content":"请介绍一下你自己"},
+        {"role":"assistant","content":"我是通义千问"}, {"role":"user","content":
 
+        "我在上海，周末可以去哪里玩？"}, {"role":"assistant","content": "上海是一个充满活力和文化氛围的城市"},
+        {"role":"user","content": "周末这里的天气怎么样？"} ] }
         """
 
         if isinstance(input, str):
@@ -150,15 +174,15 @@ class Qwen(BaseAPIModel):
                 continue
 
             if response.status_code == 200:
-                try:
-                    msg = response.output.text
+                msg = self._extract_response_text(response)
+                if msg is not None:
                     self.logger.debug(msg)
                     return msg
-                except KeyError:
-                    print(response)
-                    self.logger.error(str(response.status_code))
-                    time.sleep(1)
-                    continue
+                print(response)
+                self.logger.error('No text content found in response.')
+                time.sleep(1)
+                max_num_retries += 1
+                continue
             if response.status_code == 429:
                 print(response)
                 time.sleep(2)

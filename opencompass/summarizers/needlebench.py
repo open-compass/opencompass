@@ -61,15 +61,28 @@ model_name_mapping = {
     'qwen1.5-4b-chat-hf': 'Qwen-1.5-4B',
     'qwen1.5-14b-chat-hf': 'Qwen-1.5-14B',
     'qwen1.5-72b-chat-hf': 'Qwen-1.5-72B',
+    'qwen1.5-1.8b-chat-vllm': 'Qwen-1.5-1.8B',
     'qwen1.5-14b-chat-vllm': 'Qwen-1.5-14B-vLLM',
     'qwen1.5-72b-chat-vllm': 'Qwen-1.5-72B-vLLM',
     'glm4_notools': 'GLM-4',
     'claude-3-opus': 'Claude-3-Opus',
     'glm-4-9b-chat-1m-vllm': 'GLM4-9B-Chat-1M',
     'internlm2_5-7b-chat-1m-turbomind': 'InternLM2.5-7B-Chat-1M',
+    'internlm3-8b-instruct-turbomind': 'InternLM3-8B-Instruct',
+    'llama-3.1-8b-instruct-vllm': 'LLaMA-3.1-8B',
+    'qwen2.5-1.5b-instruct-vllm': 'Qwen-2.5-1.5B',
+    'qwen2.5-7b-instruct-vllm': 'Qwen-2.5-7B',
+    'qwen2.5-14b-instruct-vllm': 'Qwen-2.5-14B',
+    'qwen2.5-32b-instruct-vllm': 'Qwen-2.5-32B',
+    'qwen2_5-72b-instruct-vllm': 'Qwen-2.5-72B',
+    'gemma-3-4b-it-vllm': 'Gemma-3-4B',
+    'gemma-3-12b-it-vllm': 'Gemma-3-12B',
+    'gemma-3-27b-it-vllm': 'Gemma-3-27B',
+    'glm-4-9b-chat-vllm': 'GLM4-9B-Chat',
+    'llama-3.1-8b-instruct-vllm': 'LLaMA-3.1-8B',
+    'llama-3.1-70b-instruct-vllm': 'LLaMA-3.1-70B',
     # Add more mappings as necessary
 }
-
 dataset_mapping_dict = {}
 
 needle_counts = ['2', '3', '4', '5']
@@ -95,14 +108,19 @@ for t in types:
             dataset_mapping_dict[key] = value
 
 
-def calculate_elementwise_average(model_name, merged_df):
+def calculate_elementwise_average(model_name, merged_df, mean=False):
     score_columns = [col for col in merged_df.columns if col != 'dataset']
 
     origin_columns = [col for col in score_columns if 'origin' in col]
     parallel_columns = [col for col in score_columns if 'parallel' in col]
     multi_columns = [col for col in score_columns if 'needle' in col]
 
-    if origin_columns and parallel_columns and multi_columns:
+    if origin_columns and parallel_columns and multi_columns and mean:
+        origin_avg = merged_df[origin_columns].mean(axis=1)
+        parallel_avg = merged_df[parallel_columns].mean(axis=1)
+        multi_avg = merged_df[multi_columns].mean(axis=1)
+        merged_df[model_name] = (origin_avg + parallel_avg + multi_avg) / 3
+    elif origin_columns and parallel_columns and multi_columns and not mean:
         origin_avg = merged_df[origin_columns].mean(axis=1) * 0.4
         parallel_avg = merged_df[parallel_columns].mean(axis=1) * 0.3
         multi_avg = merged_df[multi_columns].mean(axis=1) * 0.3
@@ -185,7 +203,7 @@ def remove_empty_subfolders(plot_path):
             if not os.listdir(folder_path):
                 shutil.rmtree(folder_path)
 
-def save_results_to_plots(txt_results_save_path):
+def save_results_to_plots(txt_results_save_path, mean=False):
     content = read_after_specific_line_except_last(txt_results_save_path, 'raw format', 2)
     parsed_data = parse_model_scores(content)
     model_names = get_dict_model_names(parsed_data)
@@ -228,25 +246,25 @@ def save_results_to_plots(txt_results_save_path):
         overall_dataset_abbrs = multi_dataset_abbrs + origin_dataset_abbrs + parallel_dataset_abbrs
         overall_score_pic_path = os.path.join(plot_path, f'{model_name}_overall.png')
         merged_df = merge_dataframes(model_name, overall_dataset_abbrs, parsed_data)
-        averaged_df = calculate_elementwise_average(model_name, merged_df)
+        averaged_df = calculate_elementwise_average(model_name, merged_df, mean=mean)
         overall_score = visualize(averaged_df, overall_score_pic_path, model_name, 'Overall Score')
 
         # Single-Retrieval
         single_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_single_retrieval_overall.png')
         single_retrieval_merged_df = merge_dataframes(model_name, origin_dataset_abbrs, parsed_data)
-        single_retrieval_averaged_df = calculate_elementwise_average(model_name, single_retrieval_merged_df)
+        single_retrieval_averaged_df = calculate_elementwise_average(model_name, single_retrieval_merged_df, mean=mean)
         single_retrieval_overall_score = visualize(single_retrieval_averaged_df, single_retrieval_score_pic_path, model_name, 'Single-Retrieval Overall Score')
 
         # Multi-Retrieval
         multi_retrieval_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_retrieval_overall.png')
         multi_retrieval_merged_df = merge_dataframes(model_name, parallel_dataset_abbrs, parsed_data)
-        multi_retrieval_averaged_df = calculate_elementwise_average(model_name, multi_retrieval_merged_df)
+        multi_retrieval_averaged_df = calculate_elementwise_average(model_name, multi_retrieval_merged_df, mean=mean)
         multi_retrieval_overall_score = visualize(multi_retrieval_averaged_df, multi_retrieval_score_pic_path, model_name, 'Multi-Retrieval Overall Score')
 
         # Multi-Reasoning
         multi_reasoning_score_pic_path = os.path.join(plot_path, f'{model_name}_multi_reasoning_overall.png')
         multi_reasoning_merged_df = merge_dataframes(model_name, multi_dataset_abbrs, parsed_data)
-        multi_reasoning_averaged_df = calculate_elementwise_average(model_name, multi_reasoning_merged_df)
+        multi_reasoning_averaged_df = calculate_elementwise_average(model_name, multi_reasoning_merged_df, mean=mean)
         multi_reasoning_overall_score = visualize(multi_reasoning_averaged_df, multi_reasoning_score_pic_path, model_name, 'Multi-Reasoning Overall Score')
 
         model_scores[model_name] = averaged_df
@@ -279,7 +297,7 @@ def visualize(df_raw, save_path: str,model_name: str ,dataset_type:str):
 
         mean_scores = pivot_table.mean().values
         overall_score = mean_scores.mean()
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(7.5, 4.5))
         ax = plt.gca()
         cmap = LinearSegmentedColormap.from_list(
             'custom_cmap', ['#F0496E', '#EBB839', '#0CD79F'])
@@ -540,6 +558,42 @@ class NeedleBenchSummarizer(DefaultSummarizer):
             output_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.txt')
         # plot to show visualize results
         save_results_to_plots(output_path)
+
+class NeedleBenchSummarizerV2(NeedleBenchSummarizer):
+    """NeedleBench summarizer V2 in OpenCompass.
+
+    This version calls save_results_to_plots with mean=True.
+
+    Args:
+        config (ConfigDict): The configuration object of the evaluation task. It's expected to be filled out at runtime.
+        dataset_abbrs (list[str], optional): Dataset abbreviations to be listed in the summary.
+        summary_groups (list): The dataset groups whose results need to be averaged out. For example, mmlu. Each item it a dict with
+            'name' (str) and 'subsets' (list of dataset abbrs), and optionally
+            'weights' if weighted average is needed.
+        prompt_db: A deprecated field.
+    """
+
+    def summarize(
+        self,
+        output_path: str = None,
+        time_str: str = datetime.now().strftime('%Y%m%d_%H%M%S')):  # noqa
+
+        raw_results, parsed_results, dataset_metrics, dataset_eval_mode = self._pick_up_results()
+        raw_results, parsed_results, dataset_metrics, dataset_eval_mode = \
+            self._calculate_group_metrics(raw_results, parsed_results, dataset_metrics, dataset_eval_mode)
+        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode)
+        raw_txts = self._format_raw_txt(raw_results)
+        print(tabulate.tabulate(table, headers='firstrow'))
+        self._output_to_file(output_path, time_str, table, raw_txts)
+        if self.lark_reporter:
+            content = f'{getpass.getuser()} 的'
+            content += f'详细评测汇总已输出至 {osp.abspath(output_path)}'
+            self.lark_reporter.post(content)
+
+        if output_path is None:
+            output_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.txt')
+        # plot to show visualize results
+        save_results_to_plots(output_path, mean=True)
 
 class NeedleBenchATCSummarizer(DefaultSummarizer):
     """NeedleBench-ATC summarizer in OpenCompass.

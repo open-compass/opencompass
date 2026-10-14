@@ -47,9 +47,9 @@ def bbh_mcq_postprocess(text: str) -> str:
 @TEXT_POSTPROCESSORS.register_module('bbh-freeform')
 def bbh_freeform_postprocess(text: str) -> str:
     ans = text
-    ans_line = ans.split('answer is ')
+    ans_line = re.split(r'answer is\s*:?\s*', ans, flags=re.IGNORECASE)
     if len(ans_line) != 1:
-        ans = ans_line[1].strip()
+        ans = ans_line[-1].strip()
     ans = ans.split('\n')[0].strip()
 
     if ans.endswith('.'):
@@ -57,7 +57,19 @@ def bbh_freeform_postprocess(text: str) -> str:
 
     match = re.search(r'\*\*(.*?)\*\*', ans)
     if match:
-        return match.group(1)
+        ans = match.group(1).strip()
+
+    match = re.match(r'^(yes|no)\b', ans, flags=re.IGNORECASE)
+    if match:
+        return match.group(1).capitalize()
+
+    match = re.match(r'^(true|false)\b', ans, flags=re.IGNORECASE)
+    if match:
+        return match.group(1).capitalize()
+
+    if not re.search(r'\d\s*,\s*\d', ans):
+        ans = re.sub(r'\s*,\s*', ' ', ans)
+    ans = re.sub(r'\s+', ' ', ans).strip()
 
     return ans
 
@@ -73,12 +85,13 @@ class BBHEvaluator(BaseEvaluator):
             }
 
         predictions = [bbh_freeform_postprocess(pred) for pred in predictions]
+        references = [bbh_freeform_postprocess(ref) for ref in references]
 
         details = []
         cnt = 0
         for pred, ref in zip(predictions, references):
             detail = {'pred': pred, 'answer': ref, 'correct': False}
-            if pred == ref:
+            if pred.casefold() == ref.casefold():
                 cnt += 1
                 detail['correct'] = True
             details.append(detail)

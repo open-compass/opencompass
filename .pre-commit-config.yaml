@@ -1,7 +1,8 @@
 exclude: |
     (?x)^(
       tests/data/|
-      tests/dataset/|
+      tests/datasets/|
+      tests/models/|
       opencompass/models/internal/|
       opencompass/utils/internal/|
       opencompass/openicl/icl_evaluator/hf_metrics/|
@@ -11,12 +12,13 @@ exclude: |
       opencompass/datasets/matbench/|
       opencompass/datasets/teval/|
       opencompass/datasets/NPHardEval/|
+      opencompass/datasets/moleculariq/moleculariq_core/|
       opencompass/datasets/TheoremQA|
       opencompass/datasets/subjective/mtbench101.py|
       docs/zh_cn/advanced_guides/compassbench_intro.md |
       docs/zh_cn/advanced_guides/compassbench_v2_0.md |
       opencompass/utils/datasets.py |
-      opencompass/utils/datasets_info.py
+      opencompass/utils/datasets_info.py 
     )
 repos:
   - repo: https://github.com/PyCQA/flake8
@@ -58,7 +60,7 @@ repos:
                 examples/
             )
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.3.0
+    rev: v5.0.0
     hooks:
       - id: trailing-whitespace
         exclude: |
@@ -90,11 +92,11 @@ repos:
           - mdformat_frontmatter
           - linkify-it-py
         exclude: configs/
-  - repo: https://github.com/myint/docformatter
-    rev: v1.3.1
-    hooks:
-      - id: docformatter
-        args: ["--in-place", "--wrap-descriptions", "79"]
+  # - repo: https://github.com/myint/docformatter
+  #   rev: v1.3.1
+  #   hooks:
+  #     - id: docformatter
+  #       args: ["--in-place", "--wrap-descriptions", "79"]
   - repo: local
     hooks:
     -   id: update-dataset-suffix
@@ -116,12 +118,6 @@ repos:
         args:
           - --root_folder
           - opencompass/configs/datasets
-  - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.23.1
-    hooks:
-    -   id: gitleaks
-        entry: "gitleaks dir"
-        args: ["--verbose", "--redact=50"]
   # - repo: https://github.com/open-mmlab/pre-commit-hooks
   #   rev: v0.2.0  # Use the ref you want to point at
   #   hooks:

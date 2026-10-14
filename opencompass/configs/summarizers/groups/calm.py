@@ -157,7 +157,6 @@ summarizer = dict(
         'Accuracy Average',
         'English Average',
         'Chinese Average',
-
         '###### CALM-Lite Errors ######',
         'Same response to all questions Average',
         'Language inconsistency Average',
