@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Edited from the official SimpleQA config: https://github.com/openai/simple-evals/blob/main/simpleqa_eval.py # noqa E501
 import json
 import os

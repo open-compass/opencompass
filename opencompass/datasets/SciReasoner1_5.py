@@ -4,6 +4,8 @@ The loader reads five user-provided test files:
 OQMD/JARVIS-DFT material regression, GO biological-process prediction,
 TM-score regression, and DUD-E-like molecule-pair classification.
 """
+from __future__ import annotations
+
 
 import json
 import math
