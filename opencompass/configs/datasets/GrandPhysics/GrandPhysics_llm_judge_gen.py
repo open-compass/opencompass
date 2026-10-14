@@ -80,7 +80,7 @@ grand_physics_eval_cfg = dict(
     pred_role='BOT',
 )
 
-grand_physics_dataset = [
+grand_physics_datasets = [
     dict(
         abbr='GrandPhysics',
         type=GrandPhysicsDataset,

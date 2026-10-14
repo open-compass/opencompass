@@ -635,7 +635,7 @@ DATASETS_MAPPING = {
     "opencompass/GrandPhysics": {
         "ms_id": "",
         "hf_id": "",
-        "local": "./data/GrandPhysics/GrandPhysics_50_questions.json",
+        "local": "./data/GrandPhysics_50_questions.json",
     },
     "opencompass/Chem_exam_gaokao":{
         "ms_id": "",

@@ -1,5 +1,3 @@
-import os
-
 from datasets import load_dataset
 
 from opencompass.datasets.base import BaseDataset
@@ -13,8 +11,7 @@ class GrandPhysicsDataset(BaseDataset):
     @staticmethod
     def load(path: str, **kwargs):
         path = get_data_path(path)
-        path = os.path.join(path)
-        data = load_dataset(path)['train']
+        data = load_dataset('json', data_files=path, split='train', **kwargs)
         data = data.rename_columns({'problem': 'input', 'answer': 'target'})
 
         return data
