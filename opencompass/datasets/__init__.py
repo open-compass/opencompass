@@ -164,6 +164,7 @@ from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401
 from .piqa import *  # noqa: F401, F403
 from .ProcessBench import *  # noqa: F401, F403
+from .PromptCBLUE import *  # noqa: F401, F403
 from .ProteinLMBench import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
