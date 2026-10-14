@@ -1171,5 +1171,9 @@ DATASETS_URL = {
     "/imo-bench-answerbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/imo-bench-answerbench.zip",
         "md5": "34b814c97344016d5b597d75a8fff7be",
+    },
+    "/GrandPhysics": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GrandPhysics_50_questions.zip",
+        "md5": "06e37ec7676c800d3c0010ee4cb93765",
     }
 }
