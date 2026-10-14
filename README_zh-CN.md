@@ -64,6 +64,7 @@ OpenCompass 坚持开放、可复现和易扩展的设计，用户可以灵活�
 
 ## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
+- **\[2026.09.30\]** 我们发布了 [AgentCompass](https://github.com/open-compass/AgentCompass)，一个可扩展的开源智能体评测基础设施，用于系统评估 LLM/VLM 智能体能力。AgentCompass 将模型、基准、Harness 与执行环境解耦，支持 30+ 公开基准和 10+ 智能体 Harness（如 Claude Code、Codex、OpenHands 等），并已被 EMNLP 2026 Demo Track 接收。详情请参阅 [技术报告](https://arxiv.org/abs/2607.13705)和 [项目文档](https://agent-compass.mintlify.app/zh/)！🔥🔥🔥
 - **\[2026.09.21\]** OpenCompass 更新了主流厂商旗舰模型的 API 推荐配置，并全面重构了中英文文档体系，进一步改善模型接入与评测体验。详情请参阅 [模型配置](opencompass/configs/models/)和 [OpenCompass 文档](docs/zh_cn/index.rst)！🔥🔥🔥
 - **\[2026.08.25\]** OpenCompass 现已集成 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，支持原生加载多模态数据集、通过 OpenAI 兼容接口完成推理，并使用 VLMEvalKit 官方评测逻辑计算指标。详情请参阅 [MMBench 评测示例](examples/eval_mmbench_vlmevalkit.py)和 [MMMU-Pro 评测示例](examples/eval_mmmu_pro_vlmevalkit.py)！🔥🔥🔥
 - **\[2026.07.28\]** OpenCompass 进一步扩展了 API 模型生态，新增 OpenAI Responses API 和 LiteLLM AI Gateway 支持，并将 Gemini 与 Anthropic 集成更新至最新 SDK 接口。详情请参阅 [OpenAI Responses API 实现](opencompass/models/openai_response.py)、[LiteLLM AI Gateway 实现](opencompass/models/litellm_api.py)、[Gemini SDK 实现](opencompass/models/gemini_sdk_api.py)和 [Anthropic SDK 实现](opencompass/models/claude_sdk_api.py)！
