@@ -2,9 +2,12 @@ import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
+
 import requests
+
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
+
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
@@ -61,11 +64,9 @@ class JiutianApi(BaseAPIModel):
         self.model_id = model_id
         self.appcode = appcode
 
-    def generate(
-            self,
-            inputs: List[str or PromptList],
-            max_out_len: int = 512
-    ) -> List[str]:
+    def generate(self,
+                 inputs: List[str or PromptList],
+                 max_out_len: int = 512) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
@@ -99,12 +100,7 @@ class JiutianApi(BaseAPIModel):
         assert isinstance(input, (str, PromptList))
 
         if isinstance(input, str):
-            messages = [
-                {
-                    "role": "user",
-                    "content": input
-                }
-            ]
+            messages = [{'role': 'user', 'content': input}]
         else:
             messages = []
             for item in input:
@@ -122,8 +118,8 @@ class JiutianApi(BaseAPIModel):
         while max_num_retries < self.retry:
             self.wait()
             header = {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer %s" % self.appcode
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer %s' % self.appcode
             }
             data = {
                 'model': self.model_id,
@@ -155,14 +151,14 @@ class JiutianApi(BaseAPIModel):
                 self.wait()
                 continue
             if isinstance(response, str):
-                self.logger.error('Get stram result error, retry.')
+                self.logger.error('Get stream result error, retry.')
                 self.wait()
                 continue
             try:
                 msg = response['full_text']
                 self.logger.debug(f'Generated: {msg}')
                 return msg
-            except:
+            except (KeyError, TypeError):
                 return ''
 
             max_num_retries += 1
@@ -176,15 +172,16 @@ class JiutianApi(BaseAPIModel):
             """
 
         def _deal_data(data: str):
-            if data.startswith("data"):
-                data = data.split("data:")[-1]
+            if data.startswith('data'):
+                data = data.split('data:')[-1]
                 try:
                     d_data = json.loads(data)
-                    if "full_text" in d_data and d_data["full_text"]:
-                        self.logger.debug(f"client, request response={data}")
+                    if 'full_text' in d_data and d_data['full_text']:
+                        self.logger.debug(f'client, request response={data}')
                         return True, d_data
                 except Exception as e:
-                    self.logger.error(f"client, request response={data}, error={e}")
+                    self.logger.error(
+                        f'client, request response={data}, error={e}')
 
             return False, {}
 
@@ -192,12 +189,12 @@ class JiutianApi(BaseAPIModel):
             if resp.encoding is None:
                 resp.encoding = 'utf-8'
             for chunk in resp.iter_lines(decode_unicode=True):
-                if chunk.startswith(("event", "ping")):
+                if chunk.startswith(('event', 'ping')):
                     continue
                 flag, data = _deal_data(chunk)
                 if flag:
                     return data
             return ''
         except Exception as e:
-            self.logger.error(f"client, get stram response error={e}")
-            return "get parse_event_data error"
+            self.logger.error(f'client, get stream response error={e}')
+            return 'get parse_event_data error'

@@ -24,6 +24,7 @@ from .huggingface_above_v4_33 import HuggingFacewithChatTemplate  # noqa: F401
 from .hunyuan_api import Hunyuan  # noqa: F401
 from .intern_model import InternLM  # noqa: F401
 from .interntrain import InternTrain  # noqa: F401
+from .jiutian_api import JiutianApi  # noqa: F401
 from .krgpt_api import KrGPT  # noqa: F401
 from .lightllm_api import LightllmAPI, LightllmChatAPI  # noqa: F401
 from .litellm_api import LiteLLMAPI  # noqa: F401
@@ -57,5 +58,3 @@ from .yayi_api import Yayi  # noqa: F401
 from .yi_api import YiAPI  # noqa: F401
 from .zhipuai_api import ZhiPuAI  # noqa: F401
 from .zhipuai_v2_api import ZhiPuV2AI  # noqa: F401
-from .jiutian_api import JiutianApi  # noqa: F401
-
