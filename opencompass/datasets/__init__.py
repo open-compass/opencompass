@@ -78,6 +78,7 @@ from .general365 import general365_llmjudge_postprocess  # noqa: F401
 from .generic import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
+from .grand_physics import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .healthbench.healthbench import *  # noqa: F401, F403
