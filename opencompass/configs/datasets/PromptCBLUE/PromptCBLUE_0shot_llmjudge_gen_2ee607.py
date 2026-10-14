@@ -97,6 +97,5 @@ for name in PromptCBLUE_lifescience_sets:
             reader_cfg=reader_cfg,
             infer_cfg=infer_cfg,
             eval_cfg=eval_cfg,
-            mode='singlescore',
         )
     )
