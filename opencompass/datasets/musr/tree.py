@@ -38,7 +38,8 @@ class LogicNodeFactType:
 
 
 class LogicNodeConstraints:
-    """Useful for things like children = ['X is the murderer', 'Y is the murderer', 'Z is the murderer'], we no longer use this structure though."""
+    """Useful for things like children = ['X is the murderer', 'Y is the
+    murderer', 'Z is the murderer'], we no longer use this structure though."""
     ONLY_ONE_CAN_BE_TRUE = 'Only one child can be true'
 
 
@@ -244,8 +245,10 @@ class LogicTree:
         explicit leaf nodes.
 
         :param include_cs: Include the commonsense nodes from all levels.
-        :param include_deductions_from_level: Include any intermediate deduction nodes from the specified level and deeper.
-        :param no_facts_after_depth: Essentially tree the deductions at the specified depth as leaf nodes.
+        :param include_deductions_from_level: Include any intermediate
+            deduction nodes from the specified level and deeper.
+        :param no_facts_after_depth: Essentially tree the deductions at the
+            specified depth as leaf nodes.
         """
 
         def recurse_facts(_node: LogicNode, depth: int = 0) -> List[str]:
@@ -302,16 +305,21 @@ class LogicTree:
 
         However, more complex arguments can be used to control what is printed.
 
-        This returns a string that must be printed (don't be confused by the method name.)
+        This returns a string that must be printed (don't be confused by the
+        method name.)
 
         :param node: Start at a specific node.
-        :param level: Controls how much tabbing is done when printing the current node.
-        :param pad_char: Char to use that specifies depth ('> ' at depth 3 will look like '> > > ' if you have pad_space equal to 1 for example)
+        :param level: Controls how much tabbing is done when printing the
+            current node.
+        :param pad_char: Char to use that specifies depth ('> ' at depth 3 will
+            look like '> > > ' if you have pad_space equal to 1 for example)
         :param pad_space: How many spaces to include between pad_chars
         :param print_forward: Print the tree with parent nodes first.
-        :param print_conjection_types: Print the Ands and Ors per deduction (not used)
+        :param print_conjection_types: Print the Ands and Ors per deduction
+            (not used)
         :param print_reasoning_types: Print the deduction types (not used)
-        :param ignore_value_after_depth: Ignore content of the nodes once a depth is met
+        :param ignore_value_after_depth: Ignore content of the nodes once a
+            depth is met
         :param print_only_nodes_with_value: Ignore nodes without content.
         """
 

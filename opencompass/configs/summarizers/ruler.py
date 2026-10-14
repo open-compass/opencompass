@@ -47,6 +47,18 @@ ruler_128k_summarizer = dict(
         [v for k, v in locals().items() if k.endswith('_summary_groups')], []
     ),
 )
+ruler_256k_summarizer = dict(
+    dataset_abbrs=['ruler_256k'],
+    summary_groups=sum(
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []
+    ),
+)
+ruler_512k_summarizer = dict(
+    dataset_abbrs=['ruler_512k'],
+    summary_groups=sum(
+        [v for k, v in locals().items() if k.endswith('_summary_groups')], []
+    ),
+)
 
 ruler_1m_summarizer = dict(
     dataset_abbrs=['ruler_1m'],
@@ -63,6 +75,8 @@ ruler_combined_summarizer = dict(
         'ruler_32k',
         'ruler_64k',
         'ruler_128k',
+        'ruler_256k',
+        'ruler_512k',
         'ruler_1m',
     ],
     summary_groups=sum(

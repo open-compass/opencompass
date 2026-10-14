@@ -125,7 +125,8 @@ class DefaultSummarizer:
             dataset_abbr = dataset_abbr_from_cfg(dataset)
             if 'GenInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
-            elif 'PPLInferencer' in inferencer:
+            elif ('PPLInferencer' in inferencer
+                  or 'PPLOnlyInferencer' in inferencer):
                 dataset_eval_mode[dataset_abbr] = 'ppl'
             elif 'LLInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'll'
@@ -200,6 +201,17 @@ class DefaultSummarizer:
                                 scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
                                 parsed_results[model_abbr][dataset_abbr][metric]
                                 eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
+
+                # Apply per-subset transforms before aggregation
+                transforms = sg.get('transforms', {})
+                if transforms:
+                    for metric in scores:
+                        for key in list(scores[metric].keys()):
+                            subset_name = key.split('@')[0]
+                            if subset_name in transforms:
+                                x = scores[metric][key]
+                                scores[metric][key] = eval(transforms[subset_name])
+
                 result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
@@ -363,6 +375,7 @@ class DefaultSummarizer:
             f.write(text)
         self.logger.info(f'write summary to {osp.abspath(output_path)}')
 
+        table = [[col.replace(',', ' ') if isinstance(col, str) else col for col in row] for row in table]
         with open(output_csv_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')

@@ -8,5 +8,7 @@ with read_base():
     from .ruler_32k_gen import ruler_datasets as ruler_32k_ds
     from .ruler_64k_gen import ruler_datasets as ruler_64k_ds
     from .ruler_128k_gen import ruler_datasets as ruler_128k_ds
+    from .ruler_256k_gen import ruler_datasets as ruler_256k_ds
+    from .ruler_512k_gen import ruler_datasets as ruler_512k_ds
 
 ruler_combined_datasets = sum((v for k, v in locals().items() if k.endswith('_ds')), [])

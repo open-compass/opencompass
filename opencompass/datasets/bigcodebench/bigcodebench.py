@@ -72,6 +72,7 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             release_version='v0.1.2',
             eval_type='instruct',
             remote_execute_api='https://bigcode-bigcodebench-evaluator.hf.space/',  # noqa
+            headers: dict[str, str] | None = None,
             dataset_version: str = 'full',
             local_mode: bool = False,
             path: str = 'opencompass/bigcodebench',
@@ -91,7 +92,7 @@ class BigCodeBenchEvaluator(BaseEvaluator):
             path=path)['test']
         self.eval_type = eval_type
         self.remote_execute_api = remote_execute_api
-
+        self.headers = headers
         self.eval_kwargs = dict(subset=dataset_version,
                                 pass_k=pass_k,
                                 parallel=parallel,
@@ -183,12 +184,19 @@ class BigCodeBenchEvaluator(BaseEvaluator):
         if not is_accessible:
             logger.error(f'Failed to connect to {self.remote_execute_api} '
                          f'with status code {status_code}')
-            return False
+            return {
+                'error': 'remote evaluator unreachable',
+                'pass@1': 0.0,
+                'details': [],
+            }
 
         while True:
             try:
                 eval_client = Client(self.remote_execute_api,
-                                     httpx_kwargs=dict(proxies=proxies))
+                                     headers=self.headers,
+                                     httpx_kwargs=dict(
+                                         proxies=proxies,
+                                         timeout=httpx.Timeout(100.0)))
                 results, pass_at_k = eval_client.predict(
                     split=self.eval_type,
                     samples=handle_file(submitted_contents_path),
@@ -196,7 +204,7 @@ class BigCodeBenchEvaluator(BaseEvaluator):
                     **self.eval_kwargs)
                 break
             except (httpx.ReadTimeout, CancelledError):
-                logger.info('Read timeout error. Retrying in 4s...')
+                logger.info('Read timeout error. Retrying in 10s...')
                 time.sleep(10)
 
         if 'pass@1' in pass_at_k.keys():

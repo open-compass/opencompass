@@ -1,6 +1,10 @@
-# Needlebench：大海捞针测试评估基准
+# Needlebench：大海捞针测试评估基准 (已废弃)
 
 [English](readme.md) | 简体中文
+
+> ⚠️ **注意：此版本已废弃**
+> 
+> 我们建议使用 [NeedleBench V2](../needlebench_v2/readme_zh-CN.md)，它提供了更准确和公正的评估方法，包括改进的评分系统、优化的提示和更好的任务设计。
 
 ## 概览
 

@@ -280,7 +280,11 @@ class MusrDataset(BaseDataset):
 @ICL_EVALUATORS.register_module()
 class MusrEvaluator(BaseEvaluator):
 
-    def __init__(self, answer_index_modifier=1, self_consistency_n=1):
+    def __init__(self,
+                 answer_index_modifier=1,
+                 self_consistency_n=1,
+                 pred_postprocessor=None):
+        super().__init__(pred_postprocessor=pred_postprocessor)
         self.answer_index_modifier = answer_index_modifier
         self.self_consistency_n = self_consistency_n
 

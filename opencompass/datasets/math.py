@@ -204,7 +204,11 @@ def math_postprocess_v2(text: str) -> str:
 @ICL_EVALUATORS.register_module()
 class MATHEvaluator(BaseEvaluator):
 
-    def __init__(self, version='v1'):
+    def __init__(self,
+                 version='v1',
+                 pred_postprocessor=None):  # 可能需要接收父类__init__的参数
+        super().__init__(
+            pred_postprocessor=pred_postprocessor)  # 调用父类的__init__
         assert version in ['v1', 'v2']
         self.version = version
 
@@ -508,7 +512,7 @@ class MATHEvaluator(BaseEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class MATHAgentEvaluator(MATHEvaluator):
-    """math agent evaluator for soft condition.
+    """Math agent evaluator for soft condition.
 
     Args:
         action (str): Action for catching internal prediction.

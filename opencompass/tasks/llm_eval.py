@@ -74,7 +74,7 @@ class ModelEvaluator:
         prompt = ('Below are a question and a set of answers, each numbered by'
                   ' a digit. Please sort the answers from least to most '
                   'appropriate to the question. Only return the digit '
-                  'seperated by a blank space. For example, when there are '
+                  'separated by a blank space. For example, when there are '
                   'three answers presented, you should say "1 0 2" when the '
                   'second answer is the best and the third is the worst.\n'
                   f'Q: {question}\n')

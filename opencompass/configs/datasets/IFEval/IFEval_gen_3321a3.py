@@ -26,7 +26,7 @@ ifeval_datasets = [
     dict(
         abbr='IFEval',
         type=IFEvalDataset,
-        path='data/ifeval/input_data.jsonl',
+        path='opencompass/IFEval',
         reader_cfg=ifeval_reader_cfg,
         infer_cfg=ifeval_infer_cfg,
         eval_cfg=ifeval_eval_cfg)

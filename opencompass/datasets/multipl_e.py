@@ -1,3 +1,4 @@
+import difflib
 import json
 import os.path as osp
 
@@ -28,7 +29,6 @@ class MultiplEDataset(BaseDataset):
     @staticmethod
     def load(path: str,
              language: str,
-             num_repeats: int = 1,
              tag: str = 'humaneval',
              local_mode: bool = False):
         """Load dataset for pass k mode.
@@ -56,8 +56,7 @@ class MultiplEDataset(BaseDataset):
         dataset = []
         with open(file_path, 'r', encoding='utf-8') as f:
             for line in f:
-                dataset.extend(
-                    [json.loads(line.strip()) for _ in range(num_repeats)])
+                dataset.append(json.loads(line.strip()))
         return Dataset.from_list(dataset)
 
 
@@ -84,20 +83,56 @@ class MultiplEEvaluator(CodeEvaluator):
                 min_stop_index = stop_index
         return decoded_string[:min_stop_index]
 
-    def _process_completions(self, test_case, completions):
+    def _remove_prefix(self,
+                       prompt: str,
+                       completion: str,
+                       threshold: float = 0.95) -> str:
+        """Determine the truncation point in the completion based on the last
+        line of the prompt, remove all content before that line in the
+        completion, and return the completion string after removing the prefix.
+        This is done to convert chatbot-style inference mode to completion
+        mode.
+
+        Args:
+            prompt (str): The prompt text.
+            completion (str): The completion text.
+            threshold (float): Line similarity threshold.
+
+        Returns:
+            str: The completion string after removing the prefix.
+        """
+        prompt_lines = prompt.splitlines()
+        completion_lines = completion.splitlines()
+
+        if not prompt_lines:
+            return completion
+
+        last_prompt_line = prompt_lines[-1]
+        cut_index = -1
+
+        for i, completion_line in enumerate(completion_lines):
+            similarity = difflib.SequenceMatcher(None, last_prompt_line,
+                                                 completion_line).ratio()
+            if similarity >= threshold:
+                cut_index = i
+                break
+
+        if cut_index != -1:
+            return '\n'.join(completion_lines[cut_index + 1:])
+        else:
+            return completion
+
+    def _process_completions(self, test_case, completion):
         """Process completions with a test case.
 
         Args:
-            test_case: A test case.
-            completions: A list of completions.
+            test_case (dict): A test case containing prompt and stop tokens.
+            completion (str): The generated code completion.
         Returns:
-            A list of processed completions.
+            str: Processed code completion.
         """
-        processed_completions = []
-        for comp in completions:
-            comp = self._extract_code(comp)
-            post_comp = self._remove_prefix(test_case['prompt'], comp)
-            post_comp = self._stop_at_stop_token(post_comp,
-                                                 test_case['stop_tokens'])
-            processed_completions.append(post_comp)
-        return processed_completions
+        post_comp = self._extract_code(completion)
+        post_comp = self._remove_prefix(test_case['prompt'], post_comp)
+        post_comp = self._stop_at_stop_token(post_comp,
+                                             test_case['stop_tokens'])
+        return post_comp
