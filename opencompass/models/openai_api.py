@@ -982,6 +982,16 @@ class OpenAISDKCompletion(OpenAISDK):
 
         assert isinstance(input, (str, list, PromptList))
 
+        if isinstance(input, list):
+            content_key = 'content' if input and all(
+                message['role'] in CHATML_ROLE
+                for message in input) else 'prompt'
+            for message in input:
+                content = message[content_key]
+                if not isinstance(content, str):
+                    raise TypeError(
+                        'OpenAISDKCompletion only supports text prompts.')
+
         messages, max_out_len = self._preprocess_messages(
             input, max_out_len, self.max_seq_len, self.mode,
             self.get_token_len)
