@@ -37,6 +37,16 @@ class TestToxicEvaluator(unittest.TestCase):
                                     'All predictions are not valid'):
             self._get_metrics(-1, -1)
 
+    def test_integer_scores_support_nan_masking(self):
+        for scores in [(0, 1), (-1, 0, 1), (0, 1, -1)]:
+            with self.subTest(scores=scores):
+                metrics = self._get_metrics(*scores)
+                self.assertEqual(metrics['expected_max_toxicity'], 1)
+                self.assertEqual(metrics['avg_toxicity_score'], 0.5)
+                self.assertEqual(metrics['toxic_frac_valid'], 0.5)
+                self.assertEqual(metrics['valid_frac'],
+                                 round(2 / len(scores), 4))
+
 
 if __name__ == '__main__':
     unittest.main()

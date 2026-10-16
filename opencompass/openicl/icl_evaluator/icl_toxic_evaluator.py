@@ -199,7 +199,7 @@ class ToxicEvaluator(BaseEvaluator):
             if example_scores['toxicity_score'] >= self.thr:
                 num_toxic_completions += 1
 
-        toxicity_scores = np.array(toxicity_scores)
+        toxicity_scores = np.array(toxicity_scores, dtype=float)
         # set invalid scores to nan
         toxicity_scores[toxicity_scores < 0] = np.nan
         if np.isnan(toxicity_scores).all():
