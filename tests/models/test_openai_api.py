@@ -128,6 +128,36 @@ class TestOpenAI(unittest.TestCase):
     @patch('tiktoken.encoding_for_model')
     @patch('opencompass.models.openai_api.requests')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_with_reasoning_fallback(self, mock_requests,
+                                              mock_encoding):
+        """Test the vLLM ``reasoning`` response field fallback."""
+        setup_tiktoken_mock(mock_encoding)
+
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'choices': [{
+                'message': {
+                    'content': 'Final answer',
+                    'reasoning': 'Thinking process'
+                }
+            }]
+        }
+        mock_requests.post.return_value = mock_response
+
+        model = OpenAI(
+            path='gpt-3.5-turbo',
+            max_seq_len=16384,
+            think_tag='</think>',
+        )
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Thinking process</think>Final answer'])
+
+    @patch('tiktoken.encoding_for_model')
+    @patch('opencompass.models.openai_api.requests')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_retry(self, mock_requests, mock_encoding):
         """Test generate with retry on failure."""
         setup_tiktoken_mock(mock_encoding)
@@ -321,6 +351,39 @@ class TestOpenAISDK(unittest.TestCase):
 
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Thinking process</think>Final answer')
+
+    @patch('tiktoken.encoding_for_model')
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_with_reasoning_fallback(self, mock_httpx_client,
+                                              mock_openai_class,
+                                              mock_encoding):
+        """Test the vLLM ``reasoning`` response field fallback."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_encoding.return_value = mock_enc
+
+        mock_client = MagicMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock()]
+        message = mock_response.choices[0].message
+        message.content = 'Final answer'
+        message.reasoning_content = None
+        message.reasoning = 'Thinking process'
+        mock_client.chat.completions.create.return_value = mock_response
+        mock_openai_class.return_value = mock_client
+        mock_httpx_client.return_value = MagicMock()
+
+        model = OpenAISDK(
+            path='gpt-3.5-turbo',
+            max_seq_len=16384,
+            think_tag='</think>',
+        )
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Thinking process</think>Final answer'])
 
     @patch('tiktoken.encoding_for_model')
     @patch('openai.OpenAI')

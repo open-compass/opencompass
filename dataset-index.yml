@@ -767,6 +767,12 @@
     paper: https://arxiv.org/pdf/2009.03300
     configpath: opencompass/configs/datasets/mmlu/mmlu_gen.py
     configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
+- PromptCBLUE:
+    name: PromptCBLUE
+    category: Understanding
+    paper: https://arxiv.org/pdf/2310.14151
+    configpath: opencompass/configs/datasets/PromptCBLUE/PromptCBLUE_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/PromptCBLUE/PromptCBLUE_llmjudge_gen.py
 - SciEval:
     name: SciEval
     category: Understanding
@@ -1173,6 +1179,12 @@
     paper: https://arxiv.org/pdf/2203.14371
     configpath: opencompass/configs/datasets/medmcqa/medmcqa_gen.py
     configpath_llmjudge: opencompass/configs/datasets/medmcqa/medmcqa_llmjudge_gen.py
+- grand_physics:
+    name: GrandPhysics
+    category: Science
+    paper: ''
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/GrandPhysics/GrandPhysics_llm_judge_gen.py
 - phybench:
     name: PHYBench
     category: Science /Physics

@@ -582,6 +582,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
+    "opencompass/maritimebench": {
+        "ms_id": "HiDolphin/MaritimeBench",
+        "hf_id": "Hi-Dolphin/MaritimeBench",
+        "local": "./data/maritimebench",
+    },
     "opencompass/ClimaQA-Gold": {
         "ms_id": "",
         "hf_id": "",
@@ -626,6 +631,11 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
+    },
+    "opencompass/GrandPhysics": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/GrandPhysics_50_questions.json",
     },
     "opencompass/Chem_exam_gaokao":{
         "ms_id": "",
@@ -1161,5 +1171,9 @@ DATASETS_URL = {
     "/imo-bench-answerbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/imo-bench-answerbench.zip",
         "md5": "34b814c97344016d5b597d75a8fff7be",
+    },
+    "/GrandPhysics": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GrandPhysics_50_questions.zip",
+        "md5": "06e37ec7676c800d3c0010ee4cb93765",
     }
 }

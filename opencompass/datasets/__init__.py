@@ -1,4 +1,6 @@
 from .aa_lcr import AALCRDataset, aa_lcr_llmjudge_postprocess  # noqa: F401
+from .aa_omniscience import AAOmniscienceDataset  # noqa: F401
+from .aa_omniscience import aa_omniscience_llmjudge_postprocess  # noqa: F401
 from .advancedIF import AdvancedIFDataset  # noqa: F401
 from .advancedIF import advancedif_rubric_postprocess  # noqa: F401
 from .advglue import *  # noqa: F401, F403
@@ -76,6 +78,7 @@ from .general365 import general365_llmjudge_postprocess  # noqa: F401
 from .generic import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
+from .grand_physics import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .healthbench.healthbench import *  # noqa: F401, F403
@@ -115,6 +118,7 @@ from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .longbenchv2 import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
+from .maritime_bench import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
 from .matbench import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
@@ -161,6 +165,7 @@ from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401
 from .piqa import *  # noqa: F401, F403
 from .ProcessBench import *  # noqa: F401, F403
+from .PromptCBLUE import *  # noqa: F401, F403
 from .ProteinLMBench import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
