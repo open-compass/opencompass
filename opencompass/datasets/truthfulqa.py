@@ -7,11 +7,14 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils.device import is_supa_available
 
 from .base import BaseDataset
 
 if is_npu_available():
     backend = 'npu'
+elif is_supa_available():
+    backend = 'supa'
 elif torch.cuda.is_available():
     backend = 'cuda'
 else:
