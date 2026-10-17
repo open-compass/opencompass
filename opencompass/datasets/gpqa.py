@@ -108,8 +108,14 @@ class GPQASimpleEvalDataset(BaseDataset):
 
 @TEXT_POSTPROCESSORS.register_module()
 def GPQA_Simple_Eval_postprocess(text: str) -> str:
-    ANSWER_PATTERN = r'(?i)ANSWER\s*:\s*([A-D])'
-    match = re.search(ANSWER_PATTERN, text)
-    if match:
-        return match.group(1)
+    """Extract the final explicit answer from GPQA simple-eval output.
+
+    The prompt requires the answer to appear on the last line, so we keep the
+    last valid `ANSWER: <letter>` match instead of the first one.
+    """
+
+    answer_pattern = r'(?i)ANSWER\s*:\s*([A-D])'
+    matches = re.findall(answer_pattern, text)
+    if matches:
+        return matches[-1]
     return None
