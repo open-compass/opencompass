@@ -1,3 +1,4 @@
+from __future__ import annotations
 import copy
 import threading
 from concurrent.futures import ThreadPoolExecutor

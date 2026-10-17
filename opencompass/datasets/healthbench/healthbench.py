@@ -1,3 +1,4 @@
+from __future__ import annotations
 import hashlib
 import json
 import os
@@ -283,7 +284,7 @@ class HealthBenchEvaluator(BaseEvaluator):
 
     def __init__(
         self,
-        subset_name=Literal['hard', 'consensus'] | None,
+        subset_name: Literal['hard', 'consensus'] | None = None,
         n_repeats=1,
         n_threads=1,
         sampler_retry=5,
