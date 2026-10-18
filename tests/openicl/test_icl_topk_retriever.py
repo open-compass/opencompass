@@ -1,11 +1,19 @@
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
+import numpy as np
 import torch
 from transformers import BatchEncoding
 
-from opencompass.openicl.icl_retriever.icl_topk_retriever import \
-    DataCollatorWithPaddingAndCuda
+from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_retriever.icl_topk_retriever import (
+    DataCollatorWithPaddingAndCuda, TopkRetriever)
+
+try:
+    import faiss
+except ImportError:
+    faiss = None
 
 
 class _Tokenizer:
@@ -68,6 +76,62 @@ class TestDataCollatorWithPaddingAndCuda(unittest.TestCase):
                 torch.testing.assert_close(batch['attention_mask'],
                                            torch.tensor([[1, 1], [1, 1]]))
                 self.assertEqual(batch['metadata'], metadata)
+
+
+@unittest.skipIf(faiss is None, 'faiss is required for nearest-neighbor tests')
+class TestTopkRetriever(unittest.TestCase):
+
+    def setUp(self):
+        self.retriever = object.__new__(TopkRetriever)
+        self.retriever.index = faiss.IndexIDMap(faiss.IndexFlatIP(2))
+        self.retriever.index.add_with_ids(
+            np.array([[1, 0], [0, 1]], dtype=np.float32),
+            np.array([0, 1], dtype=np.int64))
+        self.retriever.dataloader = None
+        self.retriever.is_main_process = False
+        self.retriever.ice_num = 4
+        self.embeddings = [{
+            'embed': np.array([0, 1], dtype=np.float32),
+            'metadata': {
+                'id': 0
+            }
+        }]
+
+    def test_retrieve_excludes_missing_neighbors(self):
+        with patch.object(self.retriever,
+                          'forward',
+                          return_value=self.embeddings):
+            indices = self.retriever.retrieve()
+
+        self.assertEqual(indices, [[1, 0]])
+
+    def test_missing_neighbors_do_not_duplicate_last_example_in_prompt(self):
+        self.retriever.index_ds = [{
+            'question': 'first',
+            'answer': 'A'
+        }, {
+            'question': 'second',
+            'answer': 'B'
+        }]
+        self.retriever.dataset_reader = SimpleNamespace(output_column='answer')
+        self.retriever.ice_separator = '\n'
+        self.retriever.ice_eos_token = '\n'
+        template = PromptTemplate('{question}: {answer}')
+
+        with patch.object(self.retriever,
+                          'forward',
+                          return_value=self.embeddings):
+            indices = self.retriever.retrieve()[0]
+
+        self.assertEqual(self.retriever.generate_ice(indices, template),
+                         'second: B\nfirst: A\n')
+
+    def test_retrieve_preserves_rank_for_available_neighbors(self):
+        for count in (1, 2):
+            with self.subTest(count=count), patch.object(
+                    self.retriever, 'forward', return_value=self.embeddings):
+                self.retriever.ice_num = count
+                self.assertEqual(self.retriever.retrieve(), [[1, 0][:count]])
 
 
 if __name__ == '__main__':
