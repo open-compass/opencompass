@@ -682,8 +682,58 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
         return ce_loss
 
     def get_loglikelihood(self, inputs: List[str], conts:  List[str]) -> List[float]:
-        mask_length = [self.get_token_len(c, add_special_tokens=False) for c in conts]
-        return - self.get_ppl(inputs, mask_length)
+        """Sum log probabilities of the continuation suffix in each input.
+
+        Context, padding, and tokenizer-added special tokens are not scored.
+        """
+        import torch.nn.functional as F
+        from torch.nn.utils.rnn import pad_sequence
+
+        messages = _convert_base_messages(inputs)
+        input_ids, labels = [], []
+        for message, continuation in zip(messages, conts):
+            raw_ids = self.tokenizer(message, add_special_tokens=False)['input_ids']
+            context = message[:-len(continuation)] if continuation else message
+            context_ids = self.tokenizer(context, add_special_tokens=False)['input_ids']
+            # Include a token spanning the context/continuation boundary.
+            prefix_length = 0
+            for token_id, context_id in zip(raw_ids, context_ids):
+                if token_id != context_id:
+                    break
+                prefix_length += 1
+
+            encoded = self.tokenizer(message, truncation=not self.drop_middle,
+                                     max_length=self.max_seq_len,
+                                     return_special_tokens_mask=True)
+            token_ids = encoded['input_ids']
+            special_tokens_mask = encoded['special_tokens_mask']
+            raw_position = 0
+            if not self.drop_middle and self.tokenizer.truncation_side == 'left':
+                raw_position = len(raw_ids) - special_tokens_mask.count(0)
+            target_ids = []
+            for token_id, is_special in zip(token_ids, special_tokens_mask):
+                target_ids.append(token_id if not is_special and raw_position >= prefix_length else -100)
+                raw_position += not is_special
+
+            if self.drop_middle and len(token_ids) > self.max_seq_len:
+                left = self.max_seq_len // 2
+                right = self.max_seq_len - left
+                token_ids = token_ids[:left] + token_ids[-right:]
+                target_ids = target_ids[:left] + target_ids[-right:]
+
+            input_ids.append(torch.tensor(token_ids, dtype=torch.long, device=self.model.device))
+            labels.append(torch.tensor(target_ids, dtype=torch.long, device=self.model.device))
+
+        # Right padding preserves positions when batching different lengths.
+        attention_mask = pad_sequence([torch.ones_like(ids) for ids in input_ids], batch_first=True)
+        input_ids = pad_sequence(input_ids, batch_first=True, padding_value=self.tokenizer.pad_token_id)
+        labels = pad_sequence(labels, batch_first=True, padding_value=-100)
+        logits = self.model(input_ids=input_ids, attention_mask=attention_mask)[0]
+        shift_logits = logits[:, :-1].contiguous().float()
+        shift_labels = labels[:, 1:].contiguous()
+        loss = F.cross_entropy(shift_logits.view(-1, shift_logits.size(-1)),
+                               shift_labels.view(-1), reduction='none')
+        return -loss.view(shift_labels.shape).sum(-1).detach().cpu().numpy()
 
     def get_token_len(self, prompt: str, add_special_tokens: bool=True) -> int:
         m = _convert_base_messages([prompt])[0]
