@@ -34,7 +34,7 @@ class Tokenizer:
             raise NotImplementedError
 
     def __repr__(self) -> str:
-        return "{:s}\nMode:{:s}\n}".format(str(self.__class__.__name__), self.mode)
+        return "{:s}\nMode:{:s}\n".format(str(self.__class__.__name__), self.granularity)
 
     def __call__(self,
                  input_strings: List[str]
