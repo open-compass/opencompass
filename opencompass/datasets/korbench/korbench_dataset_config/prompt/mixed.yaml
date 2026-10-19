@@ -1,0 +1,22 @@
+prompt_format:
+  - |
+    You are an intelligent assistant capable of handling all types of reasoning and problem-solving tasks. Below is the text of a set of rules. Your task is to apply the appropriate rules to solve a series of problems.
+
+    ### Instructions:
+    1. Read each question carefully and rules to find something relevant to that question.
+    2. Use the relevant rules to answer each question accurately.
+    3. Provide the final answers to all questions in JSON format.
+      {{
+      "question1": "your answer",
+      "question2": "your answer",
+      "question3": "your answer",
+      }}
+
+    ### Rules:
+
+    {}
+
+    ### Questions:
+    {}
+
+    ### Answers:

@@ -1,0 +1,17 @@
+# claude
+anthropic
+# Qwen
+dashscope
+# openai
+openai
+ # xunfei
+spark_ai_python
+sseclient-py==1.7.2
+# tecent
+tencentcloud-sdk-python
+# bytedance
+volcengine
+volcengine-python-sdk
+websocket-client
+# zhipu
+zhipuai

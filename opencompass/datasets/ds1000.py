@@ -1,15 +1,19 @@
 import configparser
 import importlib
+import json
 import os
+import os.path as osp
 import pickle
 import re
 import shutil
 import signal
+import subprocess
 import sys
 import tempfile
 import threading
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
+from shutil import copyfile
 from subprocess import PIPE, Popen
 from typing import Optional, Union
 
@@ -17,8 +21,14 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
+
+_LIBRARY_NAME_LIST = [
+    'Pandas', 'Numpy', 'Tensorflow', 'Scipy', 'Sklearn', 'Pytorch',
+    'Matplotlib'
+]
 
 
 @LOAD_DATASET.register_module()
@@ -90,6 +100,7 @@ class DS1000Dataset(BaseDataset):
                 are supported. Defaults to `Insertion`.
         """
 
+        path = get_data_path(path, local_mode=True)
         if isinstance(libs, str):
             libs = [libs]
 
@@ -128,6 +139,17 @@ def ds1000_postprocess(text: str) -> str:
         text = match.group(1)
 
     match = re.search('BEGIN SOLUTION(.*?)END SOLUTION', text, re.DOTALL)
+    if match:
+        text = match.group(1)
+
+    return text
+
+
+@TEXT_POSTPROCESSORS.register_module('ds1000_completion')
+def ds1000_completion_postprocess(text: str) -> str:
+    text += '</code>'
+
+    match = re.search('(.*?)</code>', text, re.DOTALL)
     if match:
         text = match.group(1)
 
@@ -323,3 +345,105 @@ def import_source_file(fname, modname):
     except FileNotFoundError as e:
         raise ImportError(f'{e.strerror}: {fname}') from e
     return module
+
+
+class DS1000ServiceEvaluator(BaseEvaluator):
+    """Evaluator for ds1000 eval by using a service.
+
+    Before you use this Evaluator, launch a code eval service according to:
+    https://opencompass.readthedocs.io/en/latest/advanced_guides/code_eval_service.html
+
+    Args:
+        lib (str): The library to be evaluated.
+        ip_address (str): The IP Address of DS1000 code evaluate service.
+            Defaults to 'localhost'.
+        port (int): The port of DS1000 code evaluate service.
+            Defaults to 5000.
+        timeout (int): Maximum wait time when accessing the service,
+            Defaults to 100.
+    """
+
+    def __init__(self,
+                 lib: str,
+                 ip_address='localhost',
+                 port='',
+                 timeout=600) -> None:
+        assert lib in _LIBRARY_NAME_LIST, (
+            f' lib must be in {_LIBRARY_NAME_LIST}')
+        self.lib = lib
+        self.ip_address = ip_address
+        self.port = port
+        self.timeout = timeout
+        super().__init__()
+
+    def score(self, predictions, references):
+        processed_predictions = {}
+        assert len(predictions) == len(references)
+        for i, (pred, gold) in enumerate(zip(predictions, references)):
+            if len(pred) > 10000:
+                pred = ''
+            processed_predictions[str(i)] = {'prediction': pred, 'gold': gold}
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_out_path = osp.join(tmp_dir, f'ds1000_{self.lib}.json')
+            with open(tmp_out_path, 'w', encoding='utf-8') as json_file:
+                json.dump(processed_predictions,
+                          json_file,
+                          indent=4,
+                          ensure_ascii=False)
+
+            succeed, output = self._code_eval_service(file_path=tmp_out_path)
+            if succeed:
+                if isinstance(output, str):
+                    return json.loads(output)
+                elif isinstance(output, dict):
+                    return output
+            else:
+                result_file_path = os.path.join('outputs',
+                                                f'ds1000_{self.lib}.json')
+                copyfile(tmp_out_path, result_file_path)
+                ref_url = 'https://opencompass.readthedocs.io/en/latest/advanced_guides/code_eval_service.html'  # noqa
+                raise Exception(
+                    'Call CodeEvalService Error in `DS1000ServiceEvaluator`, '
+                    'The results have been saved in path '
+                    f"'{result_file_path}'. You need to check that your "
+                    'code evaluate service is launched and the network to '
+                    'service is connected, you can also get results directly '
+                    f'by using `curl` command refer to {ref_url}.'
+                    f'\nError Information: {output}')
+
+    def _code_eval_service(self, file_path: str) -> tuple:
+        """Access the code eval service.
+
+        Args:
+            file_path (str): The file path to the file to be evaluated.
+
+        Returns:
+            tuple[bool, str]: Whether the access is successful and the output.
+        """
+        if self.port:
+            eval_server_url = f'{self.ip_address}:{self.port}/evaluate'
+        else:
+            eval_server_url = f'{self.ip_address}/evaluate'
+
+        exec_result = subprocess.run([
+            'curl', '-X', 'POST', '-F', f'file=@{file_path}',
+            f'{eval_server_url}'
+        ],
+                                     timeout=self.timeout,
+                                     capture_output=True)
+        if exec_result.returncode == 0 and re.match(
+                "\"{.*:.*}\"", exec_result.stdout.decode('utf-8')):
+            return True, json.loads(exec_result.stdout.decode('utf-8'))
+        else:
+            if exec_result.stderr:
+                try:
+                    err = exec_result.stderr.decode()
+                except Exception:
+                    err = exec_result.stderr
+            else:
+                try:
+                    err = exec_result.stdout.decode()
+                except Exception:
+                    err = exec_result.stdout
+            return False, err

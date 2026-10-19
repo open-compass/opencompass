@@ -30,6 +30,14 @@ def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
             hashes = ','.join([get_prompt_hash(cfg) for cfg in dataset_cfg])
             hash_object = hashlib.sha256(hashes.encode())
             return hash_object.hexdigest()
+    # for custom datasets
+    if 'infer_cfg' not in dataset_cfg:
+        dataset_cfg.pop('abbr', '')
+        dataset_cfg.pop('path', '')
+        d_json = json.dumps(dataset_cfg.to_dict(), sort_keys=True)
+        hash_object = hashlib.sha256(d_json.encode())
+        return hash_object.hexdigest()
+    # for regular datasets
     if 'reader_cfg' in dataset_cfg.infer_cfg:
         # new config
         reader_cfg = dict(type='DatasetReader',
@@ -67,10 +75,15 @@ def get_hash(path):
 
 def check_and_rename(filepath):
     base_name = os.path.basename(filepath)
-    match = re.match(r'(.*)_(gen|ppl)_(.*).py', base_name)
+    match = re.match(r'(.*)_(gen|ppl|ll|mixed)_(.*).py', base_name)
     if match:
         dataset, mode, old_hash = match.groups()
-        new_hash = get_hash(filepath)
+        try:
+            new_hash = get_hash(filepath)
+        except Exception:
+            print(f'Failed to get hash for {filepath}')
+            raise ModuleNotFoundError
+
         if not new_hash:
             return None, None
         if old_hash != new_hash:
@@ -81,29 +94,31 @@ def check_and_rename(filepath):
     return None, None
 
 
-def update_imports(data):
-    python_file, name_pairs = data
-    for filepath, new_file in name_pairs:
-        old_name = os.path.basename(filepath)[:-3]
-        new_name = os.path.basename(new_file)[:-3]
-        if not os.path.exists(python_file):
-            return
-        with open(python_file, 'r') as file:
-            filedata = file.read()
-        # Replace the old name with new name
-        new_data = filedata.replace(old_name, new_name)
-        if filedata != new_data:
-            with open(python_file, 'w') as file:
-                file.write(new_data)
-            # print(f"Updated imports in {python_file}")
+# def update_imports(data):
+#     python_file, name_pairs = data
+#     for filepath, new_file in name_pairs:
+#         old_name = os.path.basename(filepath)[:-3]
+#         new_name = os.path.basename(new_file)[:-3]
+#         if not os.path.exists(python_file):
+#             return
+#         with open(python_file, 'r') as file:
+#             filedata = file.read()
+#         # Replace the old name with new name
+#         new_data = filedata.replace(old_name, new_name)
+#         if filedata != new_data:
+#             with open(python_file, 'w') as file:
+#                 file.write(new_data)
+#             # print(f"Updated imports in {python_file}")
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('python_files', nargs='*')
+    # Could be opencompass/configs/datasets and configs/datasets
+    parser.add_argument('--root_folder', default='configs/datasets')
     args = parser.parse_args()
 
-    root_folder = 'configs/datasets'
+    root_folder = args.root_folder
     if args.python_files:
         python_files = [
             i for i in args.python_files if i.startswith(root_folder)
@@ -119,10 +134,11 @@ def main():
         return
     with Pool(16) as p:
         p.starmap(os.rename, name_pairs)
-    python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
-    update_data = [(python_file, name_pairs) for python_file in python_files]
-    with Pool(16) as p:
-        p.map(update_imports, update_data)
+    # root_folder = 'configs'
+    # python_files = glob.glob(f'{root_folder}/**/*.py', recursive=True)
+    # update_data = [(python_file, name_pairs) for python_file in python_files]
+    # with Pool(16) as p:
+    #     p.map(update_imports, update_data)
 
 
 if __name__ == '__main__':

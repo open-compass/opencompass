@@ -1,38 +1,87 @@
+# flake8: noqa
+# yapf: disable
 import os
-from typing import List, Union
+from copy import deepcopy
+from typing import Any, Dict, List, Tuple, Union
 
 import tabulate
 from mmengine.config import Config
 
-from opencompass.partitioners import NaivePartitioner, SizePartitioner
+from opencompass.datasets.custom import make_custom_dataset_config
+from opencompass.models import (VLLM, HuggingFace, HuggingFaceBaseModel,
+                                HuggingFaceCausalLM, HuggingFaceChatGLM3,
+                                HuggingFacewithChatTemplate,
+                                TurboMindModelwithChatTemplate,
+                                VLLMwithChatTemplate)
+from opencompass.partitioners import NaivePartitioner, NumWorkerPartitioner
 from opencompass.runners import DLCRunner, LocalRunner, SlurmRunner
 from opencompass.tasks import OpenICLEvalTask, OpenICLInferTask
 from opencompass.utils import get_logger, match_files
 
+logger = get_logger()
 
-def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
+
+def _get_generation_kwargs(model: Dict) -> Dict:
+    generation_kwargs = model.get('generation_kwargs')
+    if generation_kwargs is None:
+        generation_kwargs = model.get('gen_config')
+    return (generation_kwargs.copy()
+            if generation_kwargs is not None else dict())
+
+
+def _to_vllm_generation_kwargs(generation_kwargs: Dict) -> Dict:
+    generation_kwargs = generation_kwargs.copy()
+    generation_kwargs.pop('do_sample', None)
+    generation_kwargs.pop('max_new_tokens', None)
+    if 'min_new_tokens' in generation_kwargs:
+        generation_kwargs['min_tokens'] = generation_kwargs.pop(
+            'min_new_tokens')
+    if 'eos_token_id' in generation_kwargs:
+        generation_kwargs['stop_token_ids'] = generation_kwargs.pop(
+            'eos_token_id')
+    return generation_kwargs
+
+
+def _preserve_model_task_cfg(model: Dict, acc_model: Dict) -> None:
+    for item in ['pred_postprocessor', 'min_out_len', 'summarizer_abbr']:
+        if model.get(item) is not None:
+            acc_model[item] = model[item]
+
+
+def match_cfg_file(workdir: Union[str, List[str]],
+                   pattern: Union[str, List[str]]) -> List[Tuple[str, str]]:
     """Match the config file in workdir recursively given the pattern.
 
     Additionally, if the pattern itself points to an existing file, it will be
     directly returned.
     """
+    def _mf_with_multi_workdirs(workdir, pattern, fuzzy=False):
+        if isinstance(workdir, str):
+            workdir = [workdir]
+        files = []
+        for wd in workdir:
+            files += match_files(wd, pattern, fuzzy=fuzzy)
+        return files
+
     if isinstance(pattern, str):
         pattern = [pattern]
     pattern = [p + '.py' if not p.endswith('.py') else p for p in pattern]
-    files = match_files(workdir, pattern, fuzzy=False)
+    files = _mf_with_multi_workdirs(workdir, pattern, fuzzy=False)
     if len(files) != len(pattern):
         nomatched = []
         ambiguous = []
+        ambiguous_return_list = []
         err_msg = ('The provided pattern matches 0 or more than one '
                    'config. Please verify your pattern and try again. '
                    'You may use tools/list_configs.py to list or '
                    'locate the configurations.\n')
         for p in pattern:
-            files = match_files(workdir, p, fuzzy=False)
-            if len(files) == 0:
+            files_ = _mf_with_multi_workdirs(workdir, p, fuzzy=False)
+            if len(files_) == 0:
                 nomatched.append([p[:-3]])
-            elif len(files) > 1:
-                ambiguous.append([p[:-3], '\n'.join(f[1] for f in files)])
+            elif len(files_) > 1:
+                ambiguous.append([p[:-3], '\n'.join(f[1] for f in files_)])
+                ambiguous_return_list.append(files_[0])
         if nomatched:
             table = [['Not matched patterns'], *nomatched]
             err_msg += tabulate.tabulate(table,
@@ -40,11 +89,35 @@ def match_cfg_file(workdir: str, pattern: Union[str, List[str]]) -> List[str]:
                                          tablefmt='psql')
         if ambiguous:
             table = [['Ambiguous patterns', 'Matched files'], *ambiguous]
-            err_msg += tabulate.tabulate(table,
+            warning_msg = 'Found ambiguous patterns, using the first matched config.\n'
+            warning_msg += tabulate.tabulate(table,
                                          headers='firstrow',
                                          tablefmt='psql')
+            logger.warning(warning_msg)
+            return ambiguous_return_list
+
         raise ValueError(err_msg)
     return files
+
+
+def try_fill_in_custom_cfgs(config):
+    for i, dataset in enumerate(config['datasets']):
+        if 'type' not in dataset:
+            config['datasets'][i] = make_custom_dataset_config(dataset)
+    if 'model_dataset_combinations' not in config:
+        return config
+    for mdc in config['model_dataset_combinations']:
+        for i, dataset in enumerate(mdc['datasets']):
+            if 'type' not in dataset:
+                mdc['datasets'][i] = make_custom_dataset_config(dataset)
+    return config
+
+
+def _normalize_config_arg(config):
+    if not isinstance(config, str):
+        return config
+    config = config.strip()
+    return config or None
 
 
 def get_config_from_arg(args) -> Config:
@@ -55,82 +128,286 @@ def get_config_from_arg(args) -> Config:
     2. args.models and args.datasets
     3. Huggingface parameter groups and args.datasets
     """
+
+    args.config = _normalize_config_arg(args.config)
     if args.config:
-        return Config.fromfile(args.config, format_python_code=False)
-    if args.datasets is None:
-        raise ValueError('You must specify "--datasets" if you do not specify '
-                         'a config file path.')
+        config = Config.fromfile(args.config, format_python_code=False)
+        config = try_fill_in_custom_cfgs(config)
+
+        if 'chatml_datasets' in config.keys():
+            chatml_datasets = consturct_chatml_datasets(config['chatml_datasets'])
+            config['datasets'] += chatml_datasets
+
+        # set infer accelerator if needed
+        if args.accelerator in ['vllm', 'lmdeploy']:
+            config['models'] = change_accelerator(config['models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('models') is not None:
+                config['eval']['partitioner']['models'] = change_accelerator(config['eval']['partitioner']['models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('base_models') is not None:
+                config['eval']['partitioner']['base_models'] = change_accelerator(config['eval']['partitioner']['base_models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('compare_models') is not None:
+                config['eval']['partitioner']['compare_models'] = change_accelerator(config['eval']['partitioner']['compare_models'], args.accelerator)
+            if config.get('eval', {}).get('partitioner', {}).get('judge_models') is not None:
+                config['eval']['partitioner']['judge_models'] = change_accelerator(config['eval']['partitioner']['judge_models'], args.accelerator)
+            if config.get('judge_models') is not None:
+                config['judge_models'] = change_accelerator(config['judge_models'], args.accelerator)
+        return config
+
+    # parse dataset args
+    if not args.datasets and not args.custom_dataset_path:
+        raise ValueError('You must specify "--datasets" or "--custom-dataset-path" if you do not specify a config file path.')
     datasets = []
-    datasets_dir = os.path.join(args.config_dir, 'datasets')
-    for dataset in match_cfg_file(datasets_dir, args.datasets):
-        get_logger().info(f'Loading {dataset[0]}: {dataset[1]}')
-        cfg = Config.fromfile(dataset[1])
-        for k in cfg.keys():
-            if k.endswith('_datasets'):
-                datasets += cfg[k]
-    if not args.models and not args.hf_path:
-        raise ValueError('You must specify a config file path, '
-                         'or specify --models and --datasets, or '
-                         'specify HuggingFace model parameters and '
-                         '--datasets.')
-    models = []
-    if args.models:
-        model_dir = os.path.join(args.config_dir, 'models')
-        for model in match_cfg_file(model_dir, args.models):
-            get_logger().info(f'Loading {model[0]}: {model[1]}')
-            cfg = Config.fromfile(model[1])
-            if 'models' not in cfg:
-                raise ValueError(
-                    f'Config file {model[1]} does not contain "models" field')
-            models += cfg['models']
+    if args.datasets:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.dirname(script_dir)
+        default_configs_dir = os.path.join(parent_dir, 'configs')
+        datasets_dir = [
+            os.path.join(args.config_dir, 'datasets'),
+            os.path.join(args.config_dir, 'dataset_collections'),
+            os.path.join(default_configs_dir, './datasets'),
+            os.path.join(default_configs_dir, './dataset_collections')
+
+        ]
+        for dataset_arg in args.datasets:
+            if '/' in dataset_arg:
+                dataset_name, dataset_suffix = dataset_arg.split('/', 1)
+                dataset_key_suffix = dataset_suffix
+            else:
+                dataset_name = dataset_arg
+                dataset_key_suffix = '_datasets'
+
+            for dataset in match_cfg_file(datasets_dir, [dataset_name]):
+                logger.info(f'Loading {dataset[0]}: {dataset[1]}')
+                cfg = Config.fromfile(dataset[1])
+                for k in cfg.keys():
+                    if k.endswith(dataset_key_suffix):
+                        datasets += cfg[k]
     else:
-        from opencompass.models import HuggingFace
-        model = dict(type=f'{HuggingFace.__module__}.{HuggingFace.__name__}',
+        dataset = {'path': args.custom_dataset_path}
+        if args.custom_dataset_infer_method is not None:
+            dataset['infer_method'] = args.custom_dataset_infer_method
+        if args.custom_dataset_data_type is not None:
+            dataset['data_type'] = args.custom_dataset_data_type
+        if args.custom_dataset_meta_path is not None:
+            dataset['meta_path'] = args.custom_dataset_meta_path
+        dataset = make_custom_dataset_config(dataset)
+        datasets.append(dataset)
+    ## apply the dataset repeat runs
+    if len(datasets) > 0 and args.dataset_num_runs > 1:
+        logger.warning(f'User has set the --dataset-num-runs, the datasets will be evaluated with {args.dataset_num_runs} runs.')
+        for _dataset in datasets:
+            logger.warning(f"The default num runs of {_dataset['abbr']} is: {_dataset['n']}, changed into: {args.dataset_num_runs}")
+            _dataset['n'] = args.dataset_num_runs
+            _dataset['k'] = args.dataset_num_runs
+
+    # parse model args
+    if not args.models and not args.hf_path:
+        raise ValueError('You must specify a config file path, or specify --models and --datasets, or specify HuggingFace model parameters and --datasets.')
+    models = []
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    default_configs_dir = os.path.join(parent_dir, 'configs')
+    models_dir = [
+        os.path.join(args.config_dir, 'models'),
+        os.path.join(default_configs_dir, './models'),
+
+    ]
+    if args.models:
+        for model_arg in args.models:
+            for model in match_cfg_file(models_dir, [model_arg]):
+                logger.info(f'Loading {model[0]}: {model[1]}')
+                cfg = Config.fromfile(model[1])
+                if 'models' not in cfg:
+                    raise ValueError(f'Config file {model[1]} does not contain "models" field')
+                models += cfg['models']
+    else:
+        if args.hf_type == 'chat':
+            mod = HuggingFacewithChatTemplate
+        else:
+            mod = HuggingFaceBaseModel
+        model = dict(type=f'{mod.__module__}.{mod.__name__}',
+                     abbr=args.hf_path.split('/')[-1] + '_hf',
                      path=args.hf_path,
-                     peft_path=args.peft_path,
-                     tokenizer_path=args.tokenizer_path,
                      model_kwargs=args.model_kwargs,
+                     tokenizer_path=args.tokenizer_path,
                      tokenizer_kwargs=args.tokenizer_kwargs,
+                     generation_kwargs=args.generation_kwargs,
+                     peft_path=args.peft_path,
+                     peft_kwargs=args.peft_kwargs,
                      max_seq_len=args.max_seq_len,
                      max_out_len=args.max_out_len,
-                     batch_padding=not args.no_batch_padding,
                      batch_size=args.batch_size,
                      pad_token_id=args.pad_token_id,
-                     run_cfg=dict(num_gpus=args.num_gpus))
+                     stop_words=args.stop_words,
+                     run_cfg=dict(num_gpus=args.hf_num_gpus))
+        logger.debug(f'Using model: {model}')
         models.append(model)
+    # set infer accelerator if needed
+    if args.accelerator in ['vllm', 'lmdeploy']:
+        models = change_accelerator(models, args.accelerator)
+    # parse summarizer args
+    summarizer_arg = args.summarizer if args.summarizer is not None else 'example'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(script_dir)
+    default_configs_dir = os.path.join(parent_dir, 'configs')
+    summarizers_dir = [
+        os.path.join(args.config_dir, 'summarizers'),
+        os.path.join(default_configs_dir, './summarizers'),
+    ]
 
-    summarizer = {}
-    if args.summarizer:
-        summarizers_dir = os.path.join(args.config_dir, 'summarizers')
-        s = match_cfg_file(summarizers_dir, [args.summarizer])[0]
-        get_logger().info(f'Loading {s[0]}: {s[1]}')
-        cfg = Config.fromfile(s[1])
-        summarizer = cfg['summarizer']
-
-    return Config(dict(models=models, datasets=datasets,
-                       summarizer=summarizer),
-                  format_python_code=False)
-
-
-def exec_mm_infer_runner(tasks, args, cfg):
-    """execute multimodal infer runner according to args."""
-    if args.slurm:
-        runner = SlurmRunner(dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             partition=args.partition,
-                             quotatype=args.quotatype,
-                             retry=args.retry,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    elif args.dlc:
-        raise NotImplementedError('Currently, we do not support evaluating \
-                             multimodal models on dlc.')
+    # Check if summarizer_arg contains '/'
+    if '/' in summarizer_arg:
+        # If it contains '/', split the string by '/'
+        # and use the second part as the configuration key
+        summarizer_file, summarizer_key = summarizer_arg.split('/', 1)
     else:
-        runner = LocalRunner(task=dict(type='MultimodalInferTask'),
-                             max_num_workers=args.max_num_workers,
-                             debug=args.debug,
-                             lark_bot_url=cfg['lark_bot_url'])
-    runner(tasks)
+        # If it does not contain '/', keep the original logic unchanged
+        summarizer_key = 'summarizer'
+        summarizer_file = summarizer_arg
+
+    s = match_cfg_file(summarizers_dir, [summarizer_file])[0]
+    logger.info(f'Loading {s[0]}: {s[1]}')
+    cfg = Config.fromfile(s[1])
+    # Use summarizer_key to retrieve the summarizer definition
+    # from the configuration file
+    summarizer = cfg[summarizer_key]
+
+    return Config(dict(models=models, datasets=datasets, summarizer=summarizer), format_python_code=False)
+
+
+def change_accelerator(models, accelerator):
+    models = models.copy()
+    logger = get_logger()
+    model_accels = []
+    for model in models:
+        logger.info(f'Transforming {model["abbr"]} to {accelerator}')
+        # change HuggingFace model to VLLM or LMDeploy
+        if model['type'] in [HuggingFace, HuggingFaceCausalLM,
+                             HuggingFaceChatGLM3, HuggingFaceBaseModel,
+                             f'{HuggingFaceBaseModel.__module__}.'
+                             f'{HuggingFaceBaseModel.__name__}']:
+            gen_args = dict()
+            generation_kwargs = _get_generation_kwargs(model)
+            if generation_kwargs:
+                gen_args['temperature'] = generation_kwargs.get('temperature', 0.001)
+                gen_args['top_k'] = generation_kwargs.get('top_k', 1)
+                gen_args['top_p'] = generation_kwargs.get('top_p', 0.9)
+                gen_args['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
+                generation_kwargs['stop_token_ids'] = generation_kwargs.get('eos_token_id', None)
+                generation_kwargs.pop('eos_token_id') if 'eos_token_id' in generation_kwargs else None
+            else:
+                # if generation_kwargs is not provided, set default values
+                generation_kwargs = dict()
+                gen_args['temperature'] = 0.0
+                gen_args['top_k'] = 1
+                gen_args['top_p'] = 0.9
+                gen_args['stop_token_ids'] = None
+
+            if accelerator == 'lmdeploy':
+                logger.info(f'Transforming {model["abbr"]} to {accelerator}')
+                mod = TurboMindModelwithChatTemplate
+                max_seq_len = model.get('max_seq_len')
+                engine_config = dict(
+                    max_batch_size=model['batch_size'],
+                    tp=model['run_cfg']['num_gpus'],
+                )
+                if max_seq_len is not None:
+                    engine_config['session_len'] = max_seq_len
+                acc_model = dict(
+                    type=f'{mod.__module__}.{mod.__name__}',
+                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
+                    path=model['path'],
+                    engine_config=engine_config,
+                    gen_config=dict(top_k=gen_args['top_k'],
+                                    temperature=gen_args['temperature'],
+                                    top_p=gen_args['top_p'],
+                                    max_new_tokens=model['max_out_len'],
+                                    stop_words=gen_args['stop_token_ids']),
+                    max_out_len=model['max_out_len'],
+                    max_seq_len=max_seq_len,
+                    batch_size=model['batch_size'],
+                    run_cfg=model['run_cfg'],
+                )
+                for item in ['meta_template']:
+                    if model.get(item) is not None:
+                        acc_model[item] = model[item]
+            elif accelerator == 'vllm':
+                model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
+                model_kwargs.update(model.get('model_kwargs') or {})
+                generation_kwargs = _to_vllm_generation_kwargs(generation_kwargs)
+                logger.info(f'Transforming {model["abbr"]} to {accelerator}')
+
+                acc_model = dict(
+                    type=f'{VLLM.__module__}.{VLLM.__name__}',
+                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
+                    path=model['path'],
+                    model_kwargs=model_kwargs,
+                    max_out_len=model['max_out_len'],
+                    max_seq_len=model.get('max_seq_len', None),
+                    batch_size=model['batch_size'],
+                    generation_kwargs=generation_kwargs,
+                    run_cfg=model['run_cfg'],
+                )
+                for item in ['meta_template', 'end_str']:
+                    if model.get(item) is not None:
+                        acc_model[item] = model[item]
+            else:
+                raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
+        elif model['type'] in [HuggingFacewithChatTemplate,
+                               f'{HuggingFacewithChatTemplate.__module__}.'
+                               f'{HuggingFacewithChatTemplate.__name__}']:
+            if accelerator == 'vllm':
+                model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
+                model_kwargs.update(model.get('model_kwargs') or {})
+                generation_kwargs = _to_vllm_generation_kwargs(_get_generation_kwargs(model))
+                mod = VLLMwithChatTemplate
+                acc_model = dict(
+                    type=f'{mod.__module__}.{mod.__name__}',
+                    abbr=model['abbr'].replace('hf', 'vllm') if '-hf' in model['abbr'] else model['abbr'] + '-vllm',
+                    path=model['path'],
+                    model_kwargs=model_kwargs,
+                    max_seq_len=model.get('max_seq_len', None),
+                    max_out_len=model['max_out_len'],
+                    batch_size=model.get('batch_size', 16),
+                    generation_kwargs=generation_kwargs,
+                    run_cfg=model['run_cfg'],
+                    stop_words=model.get('stop_words', []),
+                )
+            elif accelerator == 'lmdeploy':
+
+                if model.get('generation_kwargs') is not None:
+                    logger.warning(f'LMDeploy uses do_sample=False as default, and you need to set do_sample=True for sampling mode')
+                    gen_config = model['generation_kwargs'].copy()
+                else:
+                    logger.info('OpenCompass uses greedy decoding as default, you can set generation-kwargs for your purpose')
+                    gen_config=dict(top_k=1, temperature=1e-6, top_p=0.9)
+
+                mod = TurboMindModelwithChatTemplate
+                acc_model = dict(
+                    type=f'{mod.__module__}.{mod.__name__}',
+                    abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
+                    path=model['path'],
+                    engine_config=dict(
+                        max_batch_size=model.get('batch_size', 16),
+                        tp=model['run_cfg']['num_gpus'],
+                        session_len=model.get('max_seq_len', None),
+                        max_new_tokens=model['max_out_len']
+                    ),
+                    gen_config=gen_config,
+                    max_seq_len=model.get('max_seq_len', None),
+                    max_out_len=model['max_out_len'],
+                    batch_size=model.get('batch_size', 16),
+                    run_cfg=model['run_cfg'],
+                    stop_words=model.get('stop_words', []),
+                )
+            else:
+                raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
+        else:
+            acc_model = model
+            logger.warning(f'Unsupported model type {model["type"]}, will keep the original model.')
+        _preserve_model_task_cfg(model, acc_model)
+        model_accels.append(acc_model)
+    return model_accels
 
 
 def get_config_type(obj) -> str:
@@ -139,9 +416,8 @@ def get_config_type(obj) -> str:
 
 def fill_infer_cfg(cfg, args):
     new_cfg = dict(infer=dict(
-        partitioner=dict(type=get_config_type(SizePartitioner),
-                         max_task_size=args.max_partition_size,
-                         gen_task_coef=args.gen_task_coef),
+        partitioner=dict(type=get_config_type(NumWorkerPartitioner),
+                         num_worker=args.max_num_workers),
         runner=dict(
             max_num_workers=args.max_num_workers,
             debug=args.debug,
@@ -191,3 +467,120 @@ def fill_eval_cfg(cfg, args):
         new_cfg['eval']['runner'][
             'max_workers_per_gpu'] = args.max_workers_per_gpu
     cfg.merge_from_dict(new_cfg)
+
+def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
+
+    """All parameter used in your chat_custom_dataset configs.
+
+    1.abbr: str
+    2.path: str
+    3.input_columns: List
+    4.output_column: str
+    5.input_prompt(Inferencer: PromptTemplate + ZeroRetriever + GenInferencer): str
+    6.evaluator: Dict
+
+    """
+
+    from opencompass.configs.datasets.chatobj_custom.chatobj_custom_gen import (
+        chatobj_custom_datasets, chatobj_custom_infer_cfg,
+        chatobj_custom_reader_cfg, optional_evaluator)
+
+    chatobj_custom_dataset_list = []
+
+    for dataset in custom_cfg:
+        # assert input format
+        assert all(key in dataset for key in ['abbr', 'path', 'evaluator'])
+
+        # general cfg
+        chatobj_custom_dataset = dict()
+        chatobj_custom_dataset['abbr'] = dataset['abbr']
+        chatobj_custom_dataset['path'] = dataset['path']
+
+        if 'n' in dataset:
+            chatobj_custom_dataset['n'] = dataset['n']
+
+        # reader_cfg
+        chatobj_custom_dataset['reader_cfg'] = deepcopy(
+            chatobj_custom_reader_cfg)
+        if 'test_range' in dataset:
+            chatobj_custom_dataset['reader_cfg']['test_range'] = dataset['test_range']
+
+
+        # infer_cfg
+        chatobj_custom_dataset['infer_cfg'] = deepcopy(chatobj_custom_infer_cfg)
+
+        # eval_cfg
+        def init_math_evaluator(evalcfg):
+            eval_cfg = deepcopy(optional_evaluator['math_evaluator'])
+            return eval_cfg
+
+        def init_mcq_rule_evaluator(evalcfg):
+            eval_cfg = deepcopy(optional_evaluator['mcq_rule_evaluator'])
+            if 'answer_pattern' in evalcfg.keys():
+                eval_cfg['pred_postprocessor']['answer_pattern'] = evalcfg['answer_pattern']
+            return eval_cfg
+
+        def init_llm_evaluator(evalcfg):
+            eval_cfg = deepcopy(optional_evaluator['llm_evaluator'])
+            assert 'judge_cfg' in evalcfg.keys()
+            eval_cfg['judge_cfg'] = evalcfg['judge_cfg']
+            if 'prompt' in evalcfg.keys():
+                for i in range(len(eval_cfg['prompt_template']['messages'])):
+                    if isinstance(eval_cfg['prompt_template']['messages'][i], dict) and eval_cfg['prompt_template']['messages'][i]['role'] == 'user':
+                        eval_cfg['prompt_template']['messages'][i]['content'] = evalcfg['prompt']
+            return eval_cfg
+
+        def init_cascade_evaluator(evalcfg, func_locals):
+            rule_func_eval_type = f"init_{evalcfg['rule_evaluator']['type']}"
+            llm_func_eval_type = f"init_{evalcfg['llm_evaluator']['type']}"
+            assert 'rule_evaluator' in evalcfg.keys() and 'llm_evaluator' in evalcfg.keys() and \
+                   rule_func_eval_type in func_locals and callable(func_locals[rule_func_eval_type]) and \
+                   llm_func_eval_type in func_locals and callable(func_locals[llm_func_eval_type])
+
+            eval_cfg = deepcopy(optional_evaluator['cascade_evaluator'])
+            rule_func_eval_cfg = func_locals[rule_func_eval_type]
+            llm_func_eval_cfg = func_locals[llm_func_eval_type]
+            eval_cfg['rule_evaluator'] = rule_func_eval_cfg(evalcfg['rule_evaluator'])
+            eval_cfg['llm_evaluator'] = llm_func_eval_cfg(evalcfg['llm_evaluator'])
+            return eval_cfg
+
+        func_eval_type = f"init_{dataset['evaluator']['type']}"
+        func_locals = locals().copy()
+        assert func_eval_type in func_locals and callable(func_locals[func_eval_type])
+        func_eval_cfg = func_locals[func_eval_type]
+        if func_eval_type == 'init_cascade_evaluator':
+            eval_cfg = func_eval_cfg(dataset['evaluator'], func_locals)
+        else:
+            eval_cfg = func_eval_cfg(dataset['evaluator'])
+        chatobj_custom_dataset['eval_cfg'] = dict()
+        chatobj_custom_dataset['eval_cfg']['evaluator'] = deepcopy(eval_cfg)
+
+        # append datasets
+        chatobj_custom_dataset = chatobj_custom_dataset | deepcopy(
+            chatobj_custom_datasets)
+        dataset_cfg = deepcopy(chatobj_custom_dataset)
+        if 'infer_cfg' in dataset_cfg:
+            del dataset_cfg['infer_cfg']
+        if 'eval_cfg' in dataset_cfg:
+            del dataset_cfg['eval_cfg']
+        if 'n' in dataset_cfg:
+            del dataset_cfg['n']
+
+        if dataset['evaluator']['type'] == 'llm_evaluator':
+            chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
+        if dataset['evaluator']['type'] == 'cascade_evaluator':
+            chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'] = deepcopy(dataset_cfg)
+
+        if 'test_range' in dataset and 'llm_evaluator' in chatobj_custom_dataset['eval_cfg']['evaluator'] and 'dataset_cfg' in chatobj_custom_dataset[
+            'eval_cfg']['evaluator']['llm_evaluator']:
+            chatobj_custom_dataset['eval_cfg']['evaluator']['llm_evaluator']['dataset_cfg'][
+            'reader_cfg']['test_range'] = dataset['test_range']
+
+        if 'test_range' in dataset and 'dataset_cfg' in chatobj_custom_dataset['eval_cfg']['evaluator'] and 'reader_cfg' in chatobj_custom_dataset[
+            'eval_cfg']['evaluator']['dataset_cfg']:
+            chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
+            'test_range'] = dataset['test_range']
+
+        chatobj_custom_dataset_list.append(chatobj_custom_dataset)
+
+    return chatobj_custom_dataset_list

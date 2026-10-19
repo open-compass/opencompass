@@ -2,7 +2,7 @@ import copy
 import math
 import os.path as osp
 from fnmatch import fnmatch
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import mmengine
 from mmengine.config import Config, ConfigDict
@@ -24,6 +24,11 @@ class SizePartitioner(BasePartitioner):
         max_task_size (int): The maximum size of a task.
         gen_task_coef (int): The dataset cost measurement coefficient for
             generation tasks.
+        strategy (str): The partition strategy. Supported strategies are:
+            'heuristic' and 'split'. Defaults to 'heuristic'.
+            heuristic: split large datasets into several tasks, merge small
+                datasets into one task.
+            split: split large datasets into several tasks only.
         dataset_size_path (str): The path to the dataset size cache file.
         keep_keys (list[str]): The keys to be kept from the experiment config
             to the task config.
@@ -33,16 +38,21 @@ class SizePartitioner(BasePartitioner):
                  out_dir: str,
                  max_task_size: int = 40000,
                  gen_task_coef: int = 20,
+                 strategy: str = 'heuristic',
                  dataset_size_path: str = '.cache/dataset_size.json',
-                 keep_keys: List[str] = ['eval.runner.task.judge_cfg']):
+                 keep_keys: Optional[List[str]] = None):
         super().__init__(out_dir=out_dir, keep_keys=keep_keys)
         self.max_task_size = max_task_size
         self.gen_task_coef = gen_task_coef
         self.dataset_size_path = dataset_size_path
+        assert strategy in ('heuristic', 'split'), \
+            f'Unsupported partition strategy: {strategy}. '\
+            'Supported strategies are: `heuristic`, `split` .'
+        self.strategy = strategy
 
     def partition(self,
-                  models: List[ConfigDict],
-                  datasets: List[ConfigDict],
+                  model_dataset_combinations: List[Dict[str,
+                                                        List[ConfigDict]]],
                   work_dir: str,
                   out_dir: str,
                   add_cfg: Dict = {}) -> List[ConfigDict]:
@@ -61,8 +71,9 @@ class SizePartitioner(BasePartitioner):
             }
 
         Args:
-            models (List[ConfigDict]): A list of model configs.
-            datasets (List[ConfigDict]): A list of dataset configs.
+            model_dataset_combinations (List[Dict]): List of
+                `{models: [...], datasets: [...]}` dicts. Each dict contains
+                a list of model configs and a list of dataset configs.
             work_dir (str): The work dir for the task.
             out_dir (str): The full output path for the task, intended for
                 Partitioners to check whether the task is finished via the
@@ -74,52 +85,54 @@ class SizePartitioner(BasePartitioner):
             List[ConfigDict]: A list of tasks.
         """
 
-        datasets = sorted(datasets,
-                          key=lambda x: self.get_cost(x),
-                          reverse=True)
         tasks = []
-        for model in models:
-            task = Config({
-                'models': [model],
-                'datasets': [[]],
-                'work_dir': work_dir,
-                **add_cfg
-            })
-            num_data = 0
-            for dataset in datasets:
-                filename = get_infer_output_path(model, dataset, out_dir)
-                root, ext = osp.splitext(filename)
-                # skip the task if the task output exists
-                if osp.exists(filename):
-                    continue
-                dataset_size = self.get_cost(dataset)
-                if dataset_size > self.max_task_size:
-                    dataset_splits = self.split_dataset(dataset)
-                    for i, dataset_split in enumerate(dataset_splits):
-                        # skip the task it the task output exists
-                        if not osp.exists(f'{root}_{i}{ext}'):
+        for comb in model_dataset_combinations:
+            comb['datasets'] = sorted(comb['datasets'],
+                                      key=lambda x: self.get_cost(x),
+                                      reverse=True)
+            for model in comb['models']:
+                chunks = []  # elements: tuple(size, dataset_chunk)
+                for dataset in comb['datasets']:
+                    filename = get_infer_output_path(model, dataset, out_dir)
+                    # skip the task if the task output exists
+                    if osp.exists(filename):
+                        continue
+                    dataset_size = self.get_cost(dataset)
+                    if dataset_size > self.max_task_size:
+                        root, ext = osp.splitext(filename)
+                        dataset_splits = self.split_dataset(dataset)
+                        for i, dataset_split in enumerate(dataset_splits):
+                            if not osp.exists(f'{root}_{i}{ext}'):
+                                chunks.append(
+                                    (self.max_task_size, dataset_split))
+                    else:
+                        chunks.append((dataset_size, dataset))
+
+                if self.strategy == 'heuristic':
+                    chunks = sorted(chunks, key=lambda x: x[0], reverse=True)
+                    current_size, current_chunks = 0, []
+                    for index in range(len(chunks)):
+                        current_size += chunks[index][0]
+                        current_chunks.append(chunks[index][1])
+                        if index == len(chunks) - 1 or current_size + chunks[
+                                index + 1][0] > self.max_task_size:
                             tasks.append(
                                 Config({
                                     'models': [model],
-                                    'datasets': [[dataset_split]],
+                                    'datasets': [current_chunks],
                                     'work_dir': work_dir,
                                     **add_cfg
                                 }))
-                else:
-                    if num_data + dataset_size > self.max_task_size:
-                        tasks.append(task)
-                        task = Config({
-                            'models': [model],
-                            'datasets': [[]],
-                            'work_dir': work_dir,
-                            **add_cfg
-                        })
-                        num_data = 0
-                    task['datasets'][0].append(dataset)
-                    num_data = num_data + dataset_size
-            if task['datasets'][0]:
-                tasks.append(task)
-
+                            current_size, current_chunks = 0, []
+                elif self.strategy == 'split':
+                    for _, dataset in chunks:
+                        tasks.append(
+                            Config({
+                                'models': [model],
+                                'datasets': [[dataset]],
+                                'work_dir': work_dir,
+                                **add_cfg
+                            }))
         return tasks
 
     @property
@@ -144,7 +157,7 @@ class SizePartitioner(BasePartitioner):
             cfg = copy.deepcopy(dataset_cfg)
             cfg['abbr'] = abbr + f'_{part}'
             test_range = cfg['reader_cfg'].get('test_range', '')
-            cfg['reader_cfg']['test_range'] = f'{test_range}[{i}:{i+step}]'
+            cfg['reader_cfg']['test_range'] = f'{test_range}[{i}: {i + step}]'
             split_configs.append(cfg)
         return split_configs
 
@@ -172,6 +185,39 @@ class SizePartitioner(BasePartitioner):
 
         return factor
 
+    def _get_actual_size(self, test_range: Optional[Union[int, float, str]],
+                         total_size: int) -> int:
+        """Compute the actual number of test samples after applying test_range.
+
+        This mirrors the slicing logic in
+        :func:`opencompass.openicl.icl_dataset_reader.load_partial_dataset`
+        so that :meth:`get_cost` returns an accurate estimate without
+        loading the dataset into memory.
+
+        Args:
+            test_range: The ``test_range`` value from the dataset reader
+                config.  May be ``None``, an empty string, an ``int``, a
+                ``float``, or a slice string such as ``"[:100]"``.
+            total_size (int): The full size of the dataset.
+
+        Returns:
+            int: The number of samples that will actually be evaluated.
+        """
+        if not test_range:
+            return total_size
+
+        if isinstance(test_range, (int, float)):
+            if test_range <= 0 or test_range >= total_size:
+                return total_size
+            if isinstance(test_range, float) and test_range < 1:
+                return int(test_range * total_size)
+            return int(test_range)
+
+        if isinstance(test_range, str):
+            return len(eval(f'range(total_size){test_range}'))
+
+        return total_size
+
     def get_cost(self,
                  dataset: ConfigDict,
                  get_raw_factors: bool = False) -> Union[int, Tuple[int, int]]:
@@ -192,8 +238,8 @@ class SizePartitioner(BasePartitioner):
         factor = self.get_factor(dataset)
 
         if dataset_abbr in self.dataset_size:
-            actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
-                               f'{test_range})')
+            actual_size = self._get_actual_size(
+                test_range, self.dataset_size[dataset_abbr])
             if get_raw_factors:
                 return actual_size, factor
             return factor * actual_size
@@ -201,14 +247,15 @@ class SizePartitioner(BasePartitioner):
         dataset = build_dataset_from_cfg(dataset)
         self.dataset_size[dataset_abbr] = len(dataset.test)
 
-        mmengine.mkdir_or_exist('.cache/')
+        tmp_dir_root = osp.dirname(self.dataset_size_path)
+        mmengine.mkdir_or_exist(tmp_dir_root)
         mmengine.dump(self.dataset_size,
                       self.dataset_size_path,
                       indent=4,
                       ensure_ascii=False)
 
-        actual_size = eval('len(range(self.dataset_size[dataset_abbr])'
-                           f'{test_range})')
+        actual_size = self._get_actual_size(test_range,
+                                            self.dataset_size[dataset_abbr])
         if get_raw_factors:
             return actual_size, factor
         return factor * actual_size

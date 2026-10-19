@@ -1,0 +1,57 @@
+判断一句人为构造的关于体育的句子是否可信。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：下面的句子可信吗? "泰森打出右直拳"
+选项：
+(A) 可信
+(B) 不可信
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: Is the following sentence plausible? "Tyson throws a straight right."
+Options:
+(A) Credible
+(B) Unbelievable
+Step-by-step answer:
+1.Tyson is a professional boxer from the American. The right straight punch is a common move in boxing.
+2.It's normal for a boxer to throw a right straight punch, so this sentence is credible.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：下面的句子可信吗? "贝克汉姆完成了一次扣篮"
+选项：
+(A) 可信
+(B) 不可信
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: Is the following sentence plausible? "Beckham completed a slam dunk."
+Options:
+(A) Credible
+(B) Unbelievable
+Step-by-step answer:
+1.Beckham is a professional footballer from England.
+2.A slam dunk is a technical move in basketball.
+3.Therefore, this sentence is not credible.
+So the answer is (B).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：下面的句子可信吗? "勒布朗詹姆斯打进老鹰球"
+选项：
+(A) 可信
+(B) 不可信
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: Is the following sentence believable? "LeBron James scored the Eagles' goal."
+Options:
+(A) Credible
+(B) Unbelievable
+Step-by-step answer:
+1.LeBron James is a well-known professional basketball player from the United States.
+2.An eagle is a term in golf, meaning two strokes under par.
+3.Therefore, this sentence is not credible.
+So the answer is (B).

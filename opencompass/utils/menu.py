@@ -1,4 +1,12 @@
-import curses
+import sys
+
+if sys.platform == 'win32':  # Always return win32 for Windows
+    # curses is not supported on Windows
+    # If you want to use this function in Windows platform
+    # you can try `windows_curses` module by yourself
+    curses = None
+else:
+    import curses
 
 
 class Menu:

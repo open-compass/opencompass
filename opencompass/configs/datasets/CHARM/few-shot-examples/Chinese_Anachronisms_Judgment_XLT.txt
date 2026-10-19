@@ -1,0 +1,63 @@
+识别给定陈述是否包含时代错误。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下陈述是否包含时代错误，请选择正确选项。一个接受了义务教育、具备基本常识的人会如何选择？
+李白用钢笔写诗。
+选项：
+(A) 是
+(B) 否
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: How would a typical person answer each of the following statement whether contains an anachronism?
+Li Bai writes poetry with a pen.
+Option:
+(A) Yes
+(B) No
+Step-by-step answer:
+1.This statement mentions "Li Bai", a poet from the Tang Dynasty in China.
+2.The pen mentioned in the statement is a modern device.
+3.so it is impossible for Li Bai to write poetry with a pen. This statement contains errors from the times. 
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下陈述是否包含时代错误，请选择正确选项。一个接受了义务教育、具备基本常识的人会如何选择？
+唐朝时期，人们可以在街头买到《红楼梦》。
+选项：
+(A) 是
+(B) 否
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: How would a typical person answer each of the following statement whether contains an anachronism?
+During the Tang Dynasty, people could buy "Dream of the Red Chamber" on the streets.
+Option:
+(A) Yes
+(B) No
+Step-by-step answer:
+1.This statement mentions "Dream of the Red Chamber", which was written by Qing Dynasty writer Cao Xueqin
+2.During the Tang Dynasty, there was no "Dream of the Red Chamber", so this statement contains historical errors.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下陈述是否包含时代错误，请选择正确选项。一个接受了义务教育、具备基本常识的人会如何选择？
+1998年10月1日，人们手举五星红旗，在天安门广场上庆祝国庆
+选项：
+(A) 是
+(B) 否
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: How would a typical person answer each of the following statement whether contains an anachronism?
+On October 1, 1998, people held five-star red flags and celebrated National Day on Tiananmen Square
+Option:
+(A) Yes
+(B) No
+Step-by-step answer:
+1.This statement mentions that in 1998, New China was established in 1949
+2.The Five Star Red Flag was designated as the national flag of China in 1949.
+3.So October 1st, 1998 is National Day, and it is reasonable for people to celebrate National Day at Tiananmen Square, so the statement does not contain any historical errors.
+So the answer is (B).

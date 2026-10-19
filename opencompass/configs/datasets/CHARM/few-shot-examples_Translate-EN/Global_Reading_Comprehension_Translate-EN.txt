@@ -1,0 +1,25 @@
+Please understand the meaning of the question and choose the correct answer.
+
+Q:A person's intake of refined sugar and foods that break down into sugar during digestion is almost all of that person's dietary source of glucose (a type of sugar) in the bloodstream. However, coffee itself does not break down into sugar during digestion, which can sometimes cause a person's blood sugar levels to rise sharply, even if the coffee is not sweetened with cream or any sweetener. Which of the following, if true, would best help explain the effect of coffee on blood sugar levels as described above? Options:
+(A) People with sedentary office jobs are more likely to drink large amounts of coffee and to have higher blood sugar levels than people with jobs that require constant physical activity.
+(B) People often drink coffee with meals that consist of several foods that break down quickly into sugar during digestion.
+(C) For many people, a slice of chocolate cake consumes the same stimulating effect as a regular cup of coffee.
+(D) Drinking more than two cups of coffee in an hour increases a person's stress level, and the body responds to stress by releasing stored glucose into the bloodstream.
+A: Let's think step by step.
+The key to the question is to find a factor that explains how coffee causes blood sugar levels to rise, even though coffee itself does not break down into sugar during digestion. This requires us to find a mechanism that can explain how coffee indirectly affects blood sugar levels. Option (D) "Drinking more than two cups of coffee in an hour increases a person's stress levels, and the body responds to stress by releasing stored glucose into the bloodstream" would, if true, best help to explain the effect of coffee on blood sugar levels. This option provides a possible mechanism by which the coffee-induced stress response may cause the body to release stored glucose, leading to an increase in blood sugar levels. This explains why coffee (even without creamer or sweetener) causes blood sugar levels to rise, even though it does not break down into sugar during digestion. So the answer is (D).
+
+Q:A person has tried several different psychotherapies for a mental illness:psychoanalytic therapy,cognitive behavioral therapy and sandplay therapy. He says: "The psychotherapy process made me very unhappy and, therefore, these therapies are ineffective." Which of the following, if true, would most strongly challenge the above conclusion? Options:
+(A) Several different psychotherapies target different mental illnesses.
+(B) People who try multiple psychotherapies are happier than those who try only one.
+(C) Trying different psychotherapies at the same time makes it easier to find the one that works
+(D) People who do well in therapy tend to feel unhappy during the therapy process
+A: Let's think step by step.
+Understanding the question shows that if unhappiness during psychotherapy is a sign of a good therapeutic outcome, then the person's conclusion - that the therapy is ineffective because he feels unhappy during the process - may be wrong. He may have misinterpreted the difficulty and discomfort of the therapy process as a sign that the therapy is ineffective, when in fact it may be a sign that the therapy is working. (D) "People whose therapy is working well tend to feel unhappy during the therapy process" If true, this would most strongly challenge the above conclusion. So the answer is (D).
+
+Q:For a book to be a bestseller,it must be readable or well packaged. If the above assertion holds true, which of the following must be true? Option:
+(A) A book that is not readable and not well-packaged must not be a bestseller.
+(B) A book that is not carefully packaged must not be a bestseller.
+(C) A book that is readable must be a bestseller
+(D) Most people like bestsellers that are readable.
+A: Let's think step by step.
+According to the above assertion, "For a book to be a bestseller, it must be readable or well-packaged", so (A) "A book that is neither readable nor well-packaged must not be a bestseller" must be true. Because if a book is neither readable nor well-packaged, then it does not fulfill the conditions for being a bestseller. So the answer is (A).

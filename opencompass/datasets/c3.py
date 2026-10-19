@@ -13,7 +13,7 @@ class C3Dataset(BaseDataset):
     @staticmethod
     def load(path: str):
 
-        with open(path) as f:
+        with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         rows = []
         for _, row in enumerate(data):
@@ -58,7 +58,7 @@ class C3Dataset_V2(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        with open(path) as f:
+        with open(path, 'r', encoding='utf-8') as f:
             raw = json.load(f)
         data = []
         for line in raw:

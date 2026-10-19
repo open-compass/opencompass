@@ -4,6 +4,7 @@ import os.path as osp
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,18 +14,20 @@ class CMBDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        with open(osp.join(path, 'test.json'), 'r') as f:
-            test_data = json.load(f)
-        with open(osp.join(path, 'val.json'), 'r') as f:
+        path = get_data_path(path, local_mode=True)
+        with open(osp.join(path, 'val.json'), 'r', encoding='utf-8') as f:
             val_data = json.load(f)
-
-        for da in test_data:
-            da['option_str'] = '\n'.join(
-                [f'{k}. {v}' for k, v in da['option'].items() if len(v) > 1])
-        for da in val_data:
-            da['option_str'] = '\n'.join(
-                [f'{k}. {v}' for k, v in da['option'].items() if len(v) > 1])
-
-        test_dataset = Dataset.from_list(test_data)
+        for d in val_data:
+            d['option_str'] = '\n'.join(
+                [f'{k}. {v}' for k, v in d['option'].items() if len(v) > 1])
         val_dataset = Dataset.from_list(val_data)
-        return DatasetDict({'test': test_dataset, 'val': val_dataset})
+
+        with open(osp.join(path, 'test.json'), 'r', encoding='utf-8') as f:
+            test_data = json.load(f)
+        for d in test_data:
+            d['option_str'] = '\n'.join(
+                [f'{k}. {v}' for k, v in d['option'].items() if len(v) > 1])
+            d['answer'] = 'NULL'
+        test_dataset = Dataset.from_list(test_data)
+
+        return DatasetDict({'val': val_dataset, 'test': test_dataset})

@@ -1,0 +1,25 @@
+Identify whether a given statement contains an era error.
+
+Q: How would a person with compulsory education and basic common sense answer whether the following statement contains an anachronism?
+During the landing operations on Iwo Jima, Ralph spoke loudly into the radio.
+Options:
+(A) Yes
+(B) No
+A: Let's think step by step.
+The statement refers to "during the Iwo Jima landings," which is a historical event during World War II. At that time, it was accurate and appropriate for military personnel to use radios to communicate with each other. So the answer is (B).
+
+Q: Does the following statement contain an anachronism and how would a person with a compulsory education and basic common sense answer?
+During the landing operations on Iwo Jima, Ralph speaks loudly into his iPhone.
+Options:
+(A) Yes
+(B) No
+A: Let's think step by step.
+The statement mentions "during the Iwo Jima landings," which refers to a historical event during World War II. However, the reference to Ralph speaking loudly into his iPhone introduces an anachronism; the iPhone is a modern smartphone that did not exist during the Iwo Jima landings in 1945. So the answer is (A).
+
+Q: How would a person with compulsory education and basic common sense answer whether the following statement contains an anachronism?
+Nothing is more satisfying than Sally Hemmings knitting a sweater while watching HBO's True Detective.
+Options:
+(A) Yes
+(B) No
+A: Let's think step by step.
+This statement mentions Sally Hemings, an enslaved woman in late 18th and early 19th century America. However, the reference to her knitting while watching HBO's True Detective introduces an anachronism. Television did not exist in the time period in which Sally Hemings lived, and the specific reference to watching a particular program like True Detective is clearly inappropriate for that time period in history. So the answer is (A).

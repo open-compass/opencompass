@@ -1,17 +1,23 @@
-
+.DS_Store
 output_*/
 outputs/
+scripts/
 icl_inference_output/
 .vscode/
 tmp/
+configs/eval_subjective_alignbench_test.py
 configs/openai_key.py
 configs/secrets.py
 configs/datasets/log.json
 configs/eval_debug*.py
 configs/viz_*.py
+configs/**/*_bkup.py
+opencompass/**/*_bkup.py
 data
 work_dirs
-
+outputs
+models/*
+configs/internal/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -86,3 +92,44 @@ docs/zh_cn/_build/
 
 # .zip
 *.zip
+
+# sft config ignore list
+configs/sft_cfg/*B_*
+configs/sft_cfg/1B/*
+configs/sft_cfg/7B/*
+configs/sft_cfg/20B/*
+configs/sft_cfg/60B/*
+configs/sft_cfg/100B/*
+
+configs/cky/
+configs/_internal_legacy*
+# in case llama clone in the opencompass
+llama/
+
+# in case ilagent clone in the opencompass
+ilagent/
+
+# ignore the config file for criticbench evaluation
+configs/sft_cfg/criticbench_eval/*
+
+# path of turbomind's model after runing `lmdeploy.serve.turbomind.deploy`
+turbomind/
+
+# cibench output
+*.db
+*.pth
+*.pt
+*.onnx
+*.gz
+*.gz.*
+*.png
+*.txt
+*.jpg
+*.json
+*.jsonl
+*.csv
+*.npy
+*.c
+
+# aliyun
+core.*

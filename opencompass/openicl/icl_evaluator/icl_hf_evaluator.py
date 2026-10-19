@@ -1,9 +1,11 @@
 import os
 import random
-from typing import List
+from typing import List, Optional
 
 import evaluate
 import numpy as np
+from datasets import Dataset
+from mmengine.config import ConfigDict
 
 from opencompass.registry import ICL_EVALUATORS
 
@@ -18,12 +20,17 @@ class HuggingfaceEvaluator(BaseEvaluator):
         seed (int): There exists some randomness during the calculation of some
             metrics, thus we set a fixed random seed for reproducing. Defaults
             to 0.
+        pred_postprocessor (optional): Function or configuration for prediction
+            post-processing.
     """
 
-    def __init__(self, metric: str, seed: int = 0) -> None:
+    def __init__(self,
+                 metric: str,
+                 seed: int = 0,
+                 pred_postprocessor=None) -> None:
         self.metric = metric
         self.seed = seed
-        super().__init__()
+        super().__init__(pred_postprocessor=pred_postprocessor)
 
     def _preprocess(self, predictions: List, references: List) -> dict:
         """Preprocess the final predictions and references to needed format.
@@ -51,7 +58,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
         """
         return scores
 
-    def score(self, predictions: List, references: List) -> dict:
+    def score(self,
+              predictions: List,
+              references: List,
+              test_set=None) -> dict:
         """Calculate scores.
 
         Args:
@@ -91,10 +101,15 @@ class HuggingfaceEvaluator(BaseEvaluator):
 class AccEvaluator(HuggingfaceEvaluator):
     """Accuracy evaluator."""
 
-    def __init__(self) -> None:
-        super().__init__(metric='accuracy')
+    def __init__(self,
+                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
+        super().__init__(metric='accuracy',
+                         pred_postprocessor=pred_postprocessor)
 
-    def _preprocess(self, predictions: List, references: List) -> dict:
+    def _preprocess(self,
+                    predictions: List,
+                    references: List,
+                    test_set=None) -> dict:
         """Preprocess the final predictions and references to needed format.
 
         Args:
@@ -133,14 +148,62 @@ class AccEvaluator(HuggingfaceEvaluator):
 
 
 @ICL_EVALUATORS.register_module()
+class AccContaminationEvaluator(AccEvaluator):
+    """Accuracy evaluator."""
+
+    def score(self, predictions: List, references: List,
+              test_set: Dataset) -> dict:
+        # group the predictions and references by their contamination status
+        clean_predictions, clean_references = [], []
+        input_contaminated_predictions, input_contaminated_references = [], []
+        input_and_label_contaminated_predictions, \
+            input_and_label_contaminated_references = [], []
+        for pred, ref, is_clean in zip(predictions, references,
+                                       test_set['is_clean']):
+            if is_clean == 'clean':
+                clean_predictions.append(pred)
+                clean_references.append(ref)
+            elif is_clean == 'input contamination':
+                input_contaminated_predictions.append(pred)
+                input_contaminated_references.append(ref)
+            elif is_clean == 'input-and-label contamination':
+                input_and_label_contaminated_predictions.append(pred)
+                input_and_label_contaminated_references.append(ref)
+        clean_results = super().score(clean_predictions, clean_references)
+        input_contaminated_results = super().score(
+            input_contaminated_predictions, input_contaminated_references)
+        input_and_label_contaminated_results = super().score(
+            input_and_label_contaminated_predictions,
+            input_and_label_contaminated_references)
+
+        # rename the keys of the results, add 'clean, 'input contaminated',
+        # 'input-and-label contaminated' as prefixes
+        clean_results = {f'{k} - clean': v for k, v in clean_results.items()}
+        input_contaminated_results = {
+            f'{k} - input contaminated': v
+            for k, v in input_contaminated_results.items()
+        }
+        input_and_label_contaminated_results = {
+            f'{k} - input-and-label contaminated': v
+            for k, v in input_and_label_contaminated_results.items()
+        }
+        return {
+            **clean_results,
+            **input_contaminated_results,
+            **input_and_label_contaminated_results
+        }
+
+
+@ICL_EVALUATORS.register_module()
 class RougeEvaluator(HuggingfaceEvaluator):
     """Rouge evaluator.
 
     Note: this evaluator is not suitable for chinese datasets.
     """
 
-    def __init__(self) -> None:
-        super().__init__(metric='rouge')
+    def __init__(self,
+                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
+        super().__init__(metric='rouge', pred_postprocessor=pred_postprocessor)
 
     def _postprocess(self, scores: dict) -> dict:
         """Postprocess for final scores.
@@ -158,8 +221,24 @@ class RougeEvaluator(HuggingfaceEvaluator):
 class BleuEvaluator(HuggingfaceEvaluator):
     """Bleu evaluator."""
 
+    def __init__(self,
+                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
+        super().__init__(metric='sacrebleu',
+                         pred_postprocessor=pred_postprocessor)
+
+
+class BleuFloresEvaluator(HuggingfaceEvaluator):
+    """Bleu evaluator using flores200 tokenize."""
+
     def __init__(self) -> None:
         super().__init__(metric='sacrebleu')
+
+    def _preprocess(self, predictions: List, references: List) -> dict:
+        return {
+            'predictions': predictions,
+            'references': references,
+            'tokenize': 'flores200',
+        }
 
 
 @ICL_EVALUATORS.register_module()
@@ -266,7 +345,13 @@ class EDAccEvaluator(AccEvaluator):
 
         for i in range(len(predictions)):
             pred, ref = predictions[i], references[i]
-            dists = [self.dist(pred, cand) for cand in ref['candidates']]
+            dists = []
+            for cands in ref['candidates']:
+                if isinstance(cands, str):
+                    d = self.dist(pred, cands)
+                else:
+                    d = np.min([self.dist(pred, cand) for cand in cands])
+                dists.append(d)
             preds.append(np.argmin(dists))
             golds.append(ref['label'])
 
@@ -274,3 +359,29 @@ class EDAccEvaluator(AccEvaluator):
             'predictions': preds,
             'references': golds,
         }
+
+
+@ICL_EVALUATORS.register_module()
+class AccwithDetailsEvaluator(BaseEvaluator):
+
+    def score(self, predictions, references, origin_prompt) -> dict:
+
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length.'}
+
+        details = {}
+        correct, total = 0, 0
+        for index, (pred, ref) in enumerate(zip(predictions, references)):
+            is_correct = pred == ref
+            correct += is_correct
+            details[str(index)] = {
+                'prompt': origin_prompt[index],
+                'pred': pred,
+                'refr': ref,
+                'is_correct': is_correct,
+            }
+            total += 1
+
+        results = {'accuracy': correct / total * 100, 'details': details}
+
+        return results

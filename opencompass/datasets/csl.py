@@ -3,6 +3,7 @@ import json
 from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,6 +14,9 @@ class CslDataset(BaseDataset):
     @staticmethod
     def load(**kwargs):
 
+        if 'data_files' in kwargs:
+            kwargs['data_files'] = get_data_path(kwargs['data_files'],
+                                                 local_mode=True)
         dataset = load_dataset(**kwargs)
 
         def preprocess(example):
@@ -26,12 +30,13 @@ class CslDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class CslDataset_V2(BaseDataset):
+class CslDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         data = []
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = json.loads(line)
                 item = {

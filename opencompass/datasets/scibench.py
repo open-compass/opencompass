@@ -5,6 +5,7 @@ import re
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -14,6 +15,7 @@ class ScibenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str):
+        path = get_data_path(path, local_mode=True)
         train_data = []
 
         filename = osp.join(path, f'{name}.json')

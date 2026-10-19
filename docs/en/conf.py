@@ -117,6 +117,10 @@ html_js_files = [
     'js/custom.js'
 ]
 
+html_context = {
+    'github_version': 'main',
+}
+
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
@@ -192,7 +196,7 @@ copybutton_prompt_text = r'>>> |\.\.\. '
 copybutton_prompt_is_regexp = True
 
 # Auto-generated header anchors
-myst_heading_anchors = 3
+myst_heading_anchors = 4
 # Enable "colon_fence" extension of myst.
 myst_enable_extensions = ['colon_fence', 'dollarmath']
 
@@ -220,3 +224,14 @@ autodoc_typehints = 'none'
 
 # The not found page
 notfound_template = '404.html'
+
+
+def builder_inited_handler(app):
+    subprocess.run(
+        [sys.executable,
+         os.path.join(os.path.dirname(__file__), 'statis.py')],
+        check=True)
+
+
+def setup(app):
+    app.connect('builder-inited', builder_inited_handler)

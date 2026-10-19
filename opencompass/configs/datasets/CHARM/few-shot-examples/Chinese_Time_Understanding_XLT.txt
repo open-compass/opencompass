@@ -1,0 +1,68 @@
+根据上下文选择正确答案。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：小华在丙申年出生，他的哥哥比他大6岁，所以他的哥哥出生在哪一年？
+选项：
+(A) 己卯年
+(B) 庚寅年
+(C) 丙申年
+(D) 乙丑年
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: Xiaohua was born in the year of Bingshen, and his brother is 6 years older than him, so in which year was his brother born?
+Option:
+(A) Ji Mao Year
+(B) Gengyin Year
+(C) Bingshen Year
+(D) Yi Chou Year
+Step-by-step answer:
+1.Xiaohua was born in the year of Bingshen, and his older brother is 6 years older than him. According to the Chinese Tian Gan Di Zhi chronology, the sixth year before Bingshen is the year of Gengyin.
+2.So his brother was born in the year of Gengyin.
+So the answer is (B).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：如果今年是甲辰年，李华的爷爷说：“今年是我的知天命之年”，请问赵婷爷爷的属相是什么？
+选项：
+(A) 狗
+(B) 虎
+(C) 鸡
+(D) 鼠
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: If this year is the year of Jiachen and Li Hua's grandfather says, "This year is my year of knowing fate." What is the zodiac sign of Grandpa Zhao Ting?
+Option:
+(A) Dogs
+(B) Tiger
+(C) Chicken
+(D) Mouse
+Step-by-step answer:
+1.The title mentions that Grandpa is the "year of knowing destiny", and in ancient China, "year of knowing destiny" referred to the age of 50, so Grandpa is 50 years old this year.
+2.This year is the year of Jiachen. According to the Chinese Tiangan and Dizhi chronology, the year my grandfather was born is the year of Jiayin.
+3.The year of Jiayin is the year of the tiger, so my grandfather belongs to the tiger.
+So the answer is (B).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：小李在亥时三刻开始制作画画，他知道他需要10个小时才能完成。那么他最早在什么时辰可以完成？
+选项：
+ (A) 辰时
+ (B) 卯时
+ (C) 午时
+ (D) 未时
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：Xiao Li started making paintings at the third quarter of the pig hour, and he knew it would take him 10 hours to complete. So when can he finish it at the earliest?
+Option:
+(A) Dragon Hour
+(B) Rabbit Hour
+(C) Horse Hour
+(D) Sheep Hour
+Step-by-step answer:
+1.According to the ancient Chinese timing method, the third quarter of the hour of Hai refers to approximately 21:45,
+2.Ten hours later, it will be 7:45, which is Dragon Hour .
+So the answer is (A).

@@ -1,0 +1,40 @@
+Given based on the given list of artworks, identify the most similar.
+
+Q: The movies that have something in common with these movies Crazy Aliens, Bullitt, Killjoys and Crazy Stone are:
+Options.
+(A) 'Lost in Thailand'
+(B)The Young and the Restless
+(C)The Children of the River and the Lake
+(D)The Mekong Operation
+A: Let's think step by step.
+Crazy Aliens is a comedy sci-fi film directed by Ning Hao, written by Liu Cixin and Sun Xiaohang, and starring Huang Bo, Shen Teng and Xu Zheng, released in 2019.
+Bullfight is a black comedy film directed by Guan Hu and starring Huang Bo and Yan Ni, released in 2009.
+Killing Life is an absurd suspense comedy film directed by Guan Hu and co-starring Huang Bo, Ren Dahua, Su Youpeng and Yu Nan, released in 2012.
+Crazy Stone is a black comedy film directed by Ning Hao and starring Guo Tao, Liu Hua, Lian Jin, Liu Gang, Xu Zheng and Huang Bo, released in 2006.
+These are all famous classic Chinese comedy movies with Huang Bo in them, and out of all the options, the only movie that seems to have something in common with these movies is Lost in Thailand (a comedy film directed by Xu Zheng and starring Huang Bo, Xu Zheng and Wang Baoqiang, released in 2012). So the answer is (A).
+
+Q: The movie that has something in common with these movies 'Red High Beam', 'Alive', 'Big Red Lantern' and 'Hero' is:
+Option.
+(A) 'Not One Less'
+(B)Let the Bullets Fly
+(C)The Legend of Ah Fei
+(D)East is East, West is West
+A: Let's think step by step.
+Red Sorghum, a war literary film directed by Zhang Yimou and starring Jiang Wen, Gong Li and Teng Rujun, was released in China in 1987.
+Alive, a drama film directed by Zhang Yimou and starring Ge You and Gong Li, was released in China in 1994.
+Hanging the Red Lantern High is a drama film directed by Zhang Yimou and starring Gong Li, He Saifei, Ma Jingwu, Cao CuiFen, Kong Lin, and Jin Shuyuan, released in China in 1991.
+Hero is a martial arts film directed by Zhang Yimou and starring Jet Li, Tony Leung, Maggie Cheung, Chen Dao Ming, Zhang Ziyi and Donnie Yen, released in China in 2002.
+These are all famous classic Chinese movies directed by Zhang Yimou. Among all the choices, the only movie that seems to have something in common with these movies is Not One Less (a drama movie directed by Zhang Yimou and starring Wei Minzhi and Zhang Huike, released in 1999). So the answer is (A).
+
+Q: The songs that have something in common with these songs 'Nocturne', 'Materia Medica', 'Listen to Your Mother' and 'Seven Miles' are:
+Option.
+(A) 'Nunchaku'
+(B) 'The Young and the Restless'
+(C) 'Pomp and Circumstance'
+(D) "Three's a Crowd
+A: Let's think step by step.
+Nocturne is a song performed by Jay Chou, written by Fong, composed by Jay Chou, and arranged by Lin Maike, and included in Jay Chou's 2005 album Chopin in November
+"Materia Medica" is a song by Jay Chou, written by Fong, composed by Jay Chou, and arranged by Michael Lam, and featured on Jay Chou's 2006 album Still Vantage Point.
+Listen to Your Mother" is a song by Jay Chou, composed by Jay Chou and arranged by Lin Maike and Hong Jingyao, included in Jay Chou's 2006 album "Still Vantage".
+Seven Miles is a song performed by Jay Chou, with lyrics by Fong, music by Jay Chou, and arrangement by Chung Hsing-min, included in Jay Chou's 2004 album of the same name, Seven Miles.
+These are all famous Chinese pop songs sung by Jay Chou. Among all the choices, the only song that seems to have something in common with these songs is "Nunchaku" (sung by Jay Chou, composed by Jay Chou, lyrics by Fong Wen-shan, arranged by Chung Hsing-min, and featured in Jay Chou's 2001 album "Fantasia"). So the answer is (A).

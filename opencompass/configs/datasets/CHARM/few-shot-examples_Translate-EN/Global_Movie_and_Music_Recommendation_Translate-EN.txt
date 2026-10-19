@@ -1,0 +1,40 @@
+Given based on the given list of artworks, identify the most similar.
+
+Q: Find a movie similar to Braveheart, Pretty Woman, Schindler's List, Apollo 13:
+Options:
+(A) Star Trek.
+(B) My Grand Greek Wedding 2
+(C)The Santa Clause 2
+(D) Dances with Wolves
+A: Let's think step by step.
+Star Trek is a science fiction movie, and while it has depth and complexity, its themes and style are quite different from the four movies mentioned above.
+MY GREAT GREEK WEDDING 2 is a light-hearted comedy movie that differs considerably in theme and style from the four movies mentioned above.
+Santa Claus 2 is a Christmas-themed family movie that also differs considerably in theme and style from the four movies mentioned above.
+Dances with Wolves is a movie depicting the relationship with Native Americans during the pioneering period of the American West.
+The theme and style of one of the movies, Dances with Wolves, matches the four movies mentioned above. This movie, like Braveheart, Pretty Woman, Schindler's List, and Apollo 13, is a historical movie with depth and seriousness. So the answer is (D).
+
+Q: Find a movie similar to Braveheart, Pretty Woman, Apollo 13, Dances with Wolves:
+Options:
+(A) Batman: Assault on Arkham
+(B)The Shawshank Redemption
+(C) "Toy Story
+(D) The Lion King
+A: Let's think step by step.
+Batman: Assault on Arkham is a superhero movie whose theme and style are quite different from the four movies mentioned above.
+The Shawshank Redemption is a 1994 American drama film directed by Frank Delabonte and starring Tim Robbins and Morgan Freeman; it's a movie about hope and perseverance.
+Toy Story is an animated movie, and while it may have some themes of adventure and friendship, its themes and style differ considerably from the four movies mentioned above.
+The Lion King, while it is a classic animated movie that covers themes of courage and growing up, has themes and styles that differ considerably from the four movies mentioned above.
+One of the movies, The Shawshank Redemption, like Braveheart, Pretty Woman, Apollo 13, and Dances with Wolves, is a movie with depth and seriousness and has a similar theme and style to the other three movies. So the answer is (B).
+
+Q: Find a movie similar to Astonishing, Braveheart, Lowlife, Schindler's List:
+Options:
+(A) The Cabin of Dr. Caligari
+(B)The Shawshank Redemption
+(C) 'Spider-Man 2'
+(D)Taxi
+A: Let's think step by step.
+The Cabin of Dr. Caligari is a 1920 German Expressionist silent film directed by Robert Wiene. It is often considered a landmark work of German Expressionist cinema and one of the earliest horror films.
+The Shawshank Redemption is a 1994 American drama film directed by Frank Delabonte and starring Tim Robbins and Morgan Freeman; it is a movie about hope and perseverance.
+Spider-Man 2 is a 2004 American superhero film directed by Sam Raimi and starring Tobey Maguire as the second installment of the Spider-Man trilogy.
+Cab is a 2004 American comedy-action film directed by Tim Story and starring Jimmy Foran and Quentin Latafa. The movie is an American remake of the 1998 French film.
+And the titles, "The Thing," "Braveheart," "Lowlife," and "Schindler's List" are some very deep, richly plotted movies with strong human themes. They have all won high praise from audiences and critics for their excellent scripts, brilliant performances and profound themes. Among the options is The Shawshank Redemption, which tells the story of how a wrongly accused banker keeps hope alive in prison and eventually escapes. With its deeply moving plot and profound depiction of human nature, this movie has many similarities with the movie in the title. So the answer is (B).

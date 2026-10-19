@@ -1,0 +1,67 @@
+请根据题目中两句话的关系选择正确答案。
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：语句一：小明刚刚去什刹海滑冰
+语句二：北京现在是冬季
+请问这两句话什么关系？
+(A) 蕴含
+(B) 矛盾
+(C) 无关
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：Sentence 1: Xiaoming has just gone ice-skating in Shichahai
+Sentence 2: It's winter in Beijing
+What is the relationship between these two statements?
+(A) Implicit
+(B) Contradictory
+(C) Irrelevant
+Step-by-step answer:
+1.The first sentence mentions that Xiaoming goes to Shichahai for ice skating, which usually takes place in winter.
+2.Moreover, Shichahai is located in Beijing, which contains the message from the second sentence that it is currently winter.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：语句一：下周，一股强降水将影响整个河北省
+语句二：下周，上海天气很好
+请问这两句话什么关系？
+(A) 蕴含
+(B) 矛盾
+(C) 无关
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：Sentence 1：Next week, a heavy rainfall will affect the whole Hebei province
+Sentence 2: Next week, the weather in Shanghai will be fine.
+What is the relationship between these two statements?
+(A) Implied
+(B) Contradictory
+(C) Irrelevant
+Step-by-step answer:
+1.These two sentences describe the weather conditions in two geographical locations, one in Hebei Province and the other in Shanghai.
+2.Hebei Province and Shanghai are geographically far apart, so the weather conditions in these two places may not necessarily be directly related. So, the relationship between these two sentences is irrelevant.
+So the answer is (C).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：语句一：昨天，小明在山上看落日，感叹道："夕阳无限好，只是近黄昏"
+语句二：昨天下雨，小明没有出门
+请问这两句话什么关系？
+(A) 蕴含
+(B) 矛盾
+(C) 无关
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request：Sentence 1: Yesterday, Xiao Ming watched the sunset on a hill and exclaimed, "The sunset is infinite, but it's just near dusk"
+Sentence 2: Yesterday it rained and Ming didn't go out
+What is the relationship between these two statements?
+(A) implied
+(B) contradictory
+(C) Irrelevant
+Step-by-step answer:
+1.The first sentence states that Xiaoming saw the sunset on the mountain yesterday, while the second sentence states that it rained yesterday and Xiaoming did not go out.
+2.There is a contradiction between these two sentences, because if Xiaoming had not gone out, he could not have seen the sunset on the mountain. So, the relationship between these two sentences is contradictory.
+So the answer is (B).

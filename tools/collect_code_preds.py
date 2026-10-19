@@ -96,7 +96,7 @@ def collect_preds(filename: str):
     if not osp.exists(osp.realpath(filename)) and not osp.exists(
             osp.realpath(partial_filename)):
         print(f'No predictions found for {filename}')
-        return FAILED, None, None
+        return FAILED, None, None, None
     else:
         if osp.exists(osp.realpath(filename)):
             preds = mmengine.load(filename)
@@ -106,10 +106,12 @@ def collect_preds(filename: str):
             ori_prompt_strs = [
                 preds[str(i)]['origin_prompt'] for i in range(len(preds))
             ]
+            gold_strs = [preds[str(i)]['gold'] for i in range(len(preds))]
         else:
             filename = partial_filename
             pred_strs = []
             ori_prompt_strs = []
+            gold_strs = []
             i = 1
             while osp.exists(osp.realpath(filename)):
                 preds = mmengine.load(filename)
@@ -121,7 +123,8 @@ def collect_preds(filename: str):
                 ori_prompt_strs += [
                     preds[str(i)]['origin_prompt'] for i in range(len(preds))
                 ]
-        return SUCCEED, ori_prompt_strs, pred_strs
+                gold_strs += [preds[str(i)]['gold'] for i in range(len(preds))]
+        return SUCCEED, ori_prompt_strs, pred_strs, gold_strs
 
 
 def main():
@@ -153,16 +156,22 @@ def main():
             filename = get_infer_output_path(
                 model, dataset, osp.join(cfg.work_dir, 'predictions'))
 
-            succeed, ori_prompt_strs, pred_strs = collect_preds(filename)
+            succeed, ori_prompt_strs, pred_strs, gold_strs = collect_preds(
+                filename)
             if not succeed:
                 continue
 
+            lang = None
+            task = None
             # infer the language type
             for k, v in _LANGUAGE_NAME_DICT.items():
                 if k in dataset_abbr:
                     lang = k
                     task = v
                     break
+            if lang is None:
+                logger.warning(f'Not a HumanEvalX dataset: {dataset_abbr}')
+                continue
 
             # special postprocess for GPT
             if model_abbr in [
@@ -187,8 +196,8 @@ def main():
             else:
                 predictions = [{
                     'task_id': f'{task}/{i}',
-                    'generation': _clean_up_code(pred, lang),
-                } for i, pred in enumerate(pred_strs)]
+                    'generation': _clean_up_code(pred, lang, gold),
+                } for i, (pred, gold) in enumerate(zip(pred_strs, gold_strs))]
 
             # save processed results if not exists
             result_file_path = os.path.join(cfg['work_dir'], 'humanevalx',

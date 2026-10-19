@@ -3,6 +3,7 @@ import json
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -12,6 +13,7 @@ class ReCoRDDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r', errors='ignore') as in_f:
             rows = []
             for i, line in enumerate(in_f):
@@ -43,10 +45,11 @@ class ReCoRDDataset(BaseDataset):
             return dataset
 
 
-class ReCoRDDataset_V2(BaseDataset):
+class ReCoRDDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         with open(path, 'r', errors='ignore') as in_f:
             rows = []
             for i, line in enumerate(in_f):

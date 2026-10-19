@@ -13,7 +13,7 @@ class bustumDataset_V2(BaseDataset):
     @staticmethod
     def load(path):
         data = []
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = json.loads(line)
                 line['label'] = 'AB'[int(line['label'])]

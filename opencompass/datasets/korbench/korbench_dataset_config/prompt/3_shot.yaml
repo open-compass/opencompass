@@ -1,0 +1,184 @@
+cipher_prompt_format:
+  - |
+    You are an intelligent assistant that specializes in encryption and decryption tasks. Below are the rules for a specific cipher. When responding, please ensure that your output adheres to the specified encryption and decryption rules and format.
+
+    ### Instructions:
+
+    1. Identify the relevant properties and objects specified in the rule, including the plaintext, keyword, and ciphertext.
+    2. Follow the specified encryption or decryption operations precisely as described in the rules.
+    3. Ensure your output is formatted according to the specified notation and symbols.
+
+    ### Cipher Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+counterfactual_prompt_format:
+  - |
+    You are an advanced assistant with expertise in storytelling and rule-based reasoning. Your task is to carefully analyze the provided story, which includes specific rules and details, and use this information to accurately answer related questions.
+
+    ### Instructions:
+
+    1. Thoroughly review the story to identify and understand the relevant details and rules.
+    2. Use the context provided by the story to offer precise and insightful answers.
+    3. Ensure your responses align with the rules and information given in the story.
+
+    ### Story Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+logic_prompt_format:
+  - |
+    You are an intelligent assistant that helps with various logical reasoning tasks. Below is a custom-defined rule for a specific type of logic. When responding, please ensure that your output adheres to the specified logical rules and format.
+
+    ### Instructions:
+
+    1. Identify the relevant properties and objects as specified in the rule.
+    2. Apply the given logical operations or reasoning patterns.
+    3. Ensure your output is formatted according to the specified notation and symbols.
+
+    ### Logic Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+operation_prompt_format:
+  - |
+    You are an intelligent assistant specializing in evaluating custom operations. Below is a specific rule defined for a custom operation. Your task is to apply this rule accurately to the provided question.
+
+    ### Instructions:
+
+    1. Carefully read and understand the definitions of the new operations in the rule.
+    2. If the question does not specifically ask for it, your answer should be a number or a group of numbers.
+    3. Double-check your final answer to ensure it follows the rule accurately.
+
+    ### Operation Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+
+puzzle_prompt_format:
+  - |
+    You are an intelligent assistant specializing in solving custom puzzle problems. Below is a specific rule defined for a custom puzzle. Your task is to apply this rule accurately to the provided question.
+
+    ### Instructions:
+
+    1. Thoroughly understand the rule provided. If needed, break down the rule into simpler components or steps.
+    2. Apply the rule carefully to address the question presented.
+    3. Verify your answer to ensure it aligns with the rule and the context of the puzzle.
+
+    ### Puzzle Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:
+    {}
+
+    ### Question:
+    {}
+
+    ### Answer:

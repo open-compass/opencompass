@@ -1,6 +1,7 @@
 from datasets import Dataset, load_dataset
 
-from opencompass.registry import LOAD_DATASET
+from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 
@@ -9,8 +10,12 @@ from ..base import BaseDataset
 class LongBenchlshtDataset(BaseDataset):
 
     @staticmethod
-    def load(**kwargs):
-        dataset = load_dataset(**kwargs)
+    def load(path: str, name: str):
+        path = get_data_path(path)
+        dataset = load_dataset(path=path,
+                               name=name,
+                               data_dir=path,
+                               trust_remote_code=True)
         split = 'test'
         raw_data = []
         for i in range(len(dataset[split])):
@@ -28,3 +33,9 @@ class LongBenchlshtDataset(BaseDataset):
             })
         dataset[split] = Dataset.from_list(raw_data)
         return dataset
+
+
+@TEXT_POSTPROCESSORS.register_module()
+def lsht_postprocess(text: str) -> str:
+    text = text.lstrip('\n').split('\n')[0]
+    return text

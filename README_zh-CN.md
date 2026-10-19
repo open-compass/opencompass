@@ -3,17 +3,26 @@
   <br />
   <br />
 
-[![docs](https://readthedocs.org/projects/opencompass/badge)](https://opencompass.readthedocs.io/zh_CN)
-[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](https://github.com/open-compass/opencompass/blob/main/LICENSE)
+[![][github-release-shield]][github-release-link]
+[![][github-releasedate-shield]][github-releasedate-link]
+[![][github-contributors-shield]][github-contributors-link]<br>
+[![][github-forks-shield]][github-forks-link]
+[![][github-stars-shield]][github-stars-link]
+[![][github-issues-shield]][github-issues-link]
+[![][github-license-shield]][github-license-link]
 
 <!-- [![PyPI](https://badge.fury.io/py/opencompass.svg)](https://pypi.org/project/opencompass/) -->
 
-[🌐Website](https://opencompass.org.cn/) |
-[📘Documentation](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
-[🛠️Installation](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html) |
-[🤔Reporting Issues](https://github.com/open-compass/opencompass/issues/new/choose)
+[🌐官方网站](https://opencompass.org.cn/) |
+[📖数据集社区](https://hub.opencompass.org.cn/home) |
+[📊性能榜单](https://rank.opencompass.org.cn/home) |
+[📘文档教程](https://opencompass.readthedocs.io/zh_CN/latest/index.html) |
+[🛠️安装](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html) |
+[🤔报告问题](https://github.com/open-compass/opencompass/issues/new/choose)
 
 [English](/README.md) | 简体中文
+
+[![][github-trending-shield]][github-trending-url]
 
 </div>
 
@@ -21,373 +30,120 @@
     👋 加入我们的 <a href="https://discord.gg/KKwfEbFj7U" target="_blank">Discord</a> 和 <a href="https://r.vansin.top/?r=opencompass" target="_blank">微信社区</a>
 </p>
 
+> \[!IMPORTANT\]
+>
+> **收藏项目**，你将能第一时间获取 OpenCompass 的最新动态～⭐️
+
+<details>
+  <summary><kbd>Star History</kbd></summary>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&theme=dark&type=Date">
+    <img width="100%" src="https://api.star-history.com/svg?repos=open-compass%2Fopencompass&type=Date">
+  </picture>
+</details>
+
 ## 🧭	欢迎
 
 来到**OpenCompass**！
 
 就像指南针在我们的旅程中为我们导航一样，我们希望OpenCompass能够帮助你穿越评估大型语言模型的重重迷雾。OpenCompass提供丰富的算法和功能支持，期待OpenCompass能够帮助社区更便捷地对NLP模型的性能进行公平全面的评估。
 
-> **🔥 注意**<br />
-> 我们正式启动 OpenCompass 共建计划，诚邀社区用户为 OpenCompass 提供更具代表性和可信度的客观评测数据集!
-> 点击 [Issue](https://github.com/open-compass/opencompass/issues/248) 获取更多数据集.
-> 让我们携手共进，打造功能强大易用的大模型评测平台！
+🚩🚩🚩 欢迎加入 OpenCompass！我们目前**招聘全职研究人员/工程师和实习生**。如果您对 LLM 和 OpenCompass 充满热情，请随时通过[电子邮件](mailto:opencompass@pjlab.org.cn)与我们联系。我们非常期待与您交流！
 
-## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
-
-- **\[2023.09.26\]** 我们在评测榜单上更新了[Qwen](https://github.com/QwenLM/Qwen), 这是目前表现最好的开源模型之一, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
-- **\[2023.09.20\]** 我们在评测榜单上更新了[InternLM-20B](https://github.com/InternLM/InternLM), 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.🔥🔥🔥.
-- **\[2023.09.19\]** 我们在评测榜单上更新了WeMix-LLaMA2-70B/Phi-1.5-1.3B, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情.
-- **\[2023.09.18\]** 我们发布了[长文本评测指引](docs/zh_cn/advanced_guides/longeval.md).
-- **\[2023.09.08\]** 我们在评测榜单上更新了Baichuan-2/Tigerbot-2/Vicuna-v1.5, 欢迎访问[官方网站](https://opencompass.org.cn)获取详情。
-- **\[2023.09.06\]** 欢迎 [**Baichuan2**](https://github.com/baichuan-inc/Baichuan2) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
-- **\[2023.09.02\]** 我们加入了[Qwen-VL](https://github.com/QwenLM/Qwen-VL)的评测支持。
-- **\[2023.08.25\]** 欢迎 [**TigerBot**](https://github.com/TigerResearch/TigerBot) 团队采用OpenCompass对模型进行系统评估。我们非常感谢社区在提升LLM评估的透明度和可复现性上所做的努力。
-- **\[2023.08.21\]** [**Lagent**](https://github.com/InternLM/lagent) 正式发布，它是一个轻量级、开源的基于大语言模型的智能体（agent）框架。我们正与Lagent团队紧密合作，推进支持基于Lagent的大模型工具能力评测 !
-
-> [更多](docs/zh_cn/notes/news.md)
+🔥🔥🔥 祝贺 **OpenCompass 作为大模型标准测试工具被Meta AI官方推荐**, 点击 Llama 的 [入门文档](https://ai.meta.com/llama/get-started/#validation) 获取更多信息。
 
 ## ✨ 介绍
 
 ![image](https://github.com/open-compass/opencompass/assets/22607038/30bcb2e2-3969-4ac5-9f29-ad3f4abb4f3b)
 
-OpenCompass 是面向大模型评测的一站式平台。其主要特点如下：
+OpenCompass 是面向大模型评测的一站式平台，支持来自 OpenAI、Anthropic、Gemini、Qwen、GLM、DeepSeek 等广泛的模型，集成超过 100 个数据集，覆盖知识、推理、代码、科学、语言、长上下文、安全等多个能力维度。OpenCompass 也已集成 VLMEvalKit，可在统一的评测流程中支持文本数据集与图文数据集。
 
-- **开源可复现**：提供公平、公开、可复现的大模型评测方案
+OpenCompass 提供从数据集与模型配置、推理、评测到结果汇总的完整工作流，支持本地开源模型和 API 模型，以及 HuggingFace、LMDeploy、vLLM 等多种推理后端。平台支持零样本、少样本、思维链、基于规则及 LLM Judge 等多种评测方式，并可通过任务切分、并发与分布式执行满足不同规模的评测需求。
 
-- **全面的能力维度**：五大维度设计，提供 70+ 个数据集约 40 万题的的模型评测方案，全面评估模型能力
+OpenCompass 坚持开放、可复现和易扩展的设计，用户可以灵活接入新的模型、数据集、评测器、推理后端及任务调度系统。配套的 [CompassHub](https://hub.opencompass.org.cn/home) 提供评测基准导航，[CompassRank](https://rank.opencompass.org.cn/home) 展示模型评测榜单。
 
-- **丰富的模型支持**：已支持 20+ HuggingFace 及 API 模型
+## 🚀 最新进展 <a><img width="35" height="20" src="https://user-images.githubusercontent.com/12782558/212848161-5e783dd6-11e8-4fe0-bbba-39ffb77730be.png"></a>
 
-- **分布式高效评测**：一行命令实现任务分割和分布式评测，数小时即可完成千亿模型全量评测
+- **\[2026.09.30\]** 我们发布了 [AgentCompass](https://github.com/open-compass/AgentCompass)，一个可扩展的开源智能体评测基础设施，用于系统评估 LLM/VLM 智能体能力。AgentCompass 将模型、基准、Harness 与执行环境解耦，支持 30+ 公开基准和 10+ 智能体 Harness（如 Claude Code、Codex、OpenHands 等），并已被 EMNLP 2026 Demo Track 接收。详情请参阅 [技术报告](https://arxiv.org/abs/2607.13705)和 [项目文档](https://agent-compass.mintlify.app/zh/)！🔥🔥🔥
+- **\[2026.09.21\]** OpenCompass 更新了主流厂商旗舰模型的 API 推荐配置，并全面重构了中英文文档体系，进一步改善模型接入与评测体验。详情请参阅 [模型配置](opencompass/configs/models/)和 [OpenCompass 文档](docs/zh_cn/index.rst)！🔥🔥🔥
+- **\[2026.08.25\]** OpenCompass 现已集成 [VLMEvalKit](https://github.com/open-compass/VLMEvalKit)，支持原生加载多模态数据集、通过 OpenAI 兼容接口完成推理，并使用 VLMEvalKit 官方评测逻辑计算指标。详情请参阅 [MMBench 评测示例](examples/eval_mmbench_vlmevalkit.py)和 [MMMU-Pro 评测示例](examples/eval_mmmu_pro_vlmevalkit.py)！🔥🔥🔥
+- **\[2026.07.28\]** OpenCompass 进一步扩展了 API 模型生态，新增 OpenAI Responses API 和 LiteLLM AI Gateway 支持，并将 Gemini 与 Anthropic 集成更新至最新 SDK 接口。详情请参阅 [OpenAI Responses API 实现](opencompass/models/openai_response.py)、[LiteLLM AI Gateway 实现](opencompass/models/litellm_api.py)、[Gemini SDK 实现](opencompass/models/gemini_sdk_api.py)和 [Anthropic SDK 实现](opencompass/models/claude_sdk_api.py)！
+- **\[2026.07.27\]** OpenCompass 的 `GenInferencer` 现已支持多轮推理，并新增 Multi-IF 数据集支持，用于评测模型的多轮指令遵循能力。详情请参阅 [Multi-IF 评测配置](opencompass/configs/datasets/MultiIF/MultiIF_gen.py)！🔥🔥🔥
+- **\[2026.05.25\]** OpenCompass 新增重复输出分析工具，支持检测模型生成中的重复内容与循环输出，可用于分析当前评测任务或已有的评测结果。详情请参阅 [重复输出分析工具](tools/analyze_repeat.py)！
+- **\[2026.03.20\]** OpenCompass 现已支持跨任务并发推理与评测监听，可协同监控已完成的推理任务并触发后续评测。并行 Inferencer、任务监控及心跳机制进一步提升了大规模评测效率。详情请参阅 [并发推理实现](opencompass/tasks/openicl_infer_concurrent.py) 和 [评测监听实现](opencompass/tasks/openicl_eval_watch.py)！
+- **\[2026.03.17\]** OpenCompass 新增 `RawPromptTemplate`，可以在不引入非预期格式转换的情况下向模型传递 benchmark 的原始 Prompt 和结构化对话，并支持 API 模型、ChatML 数据集，以及模型侧的额外 Prompt 内容附加。详情请参阅 [RawPromptTemplate 使用指南](docs/zh_cn/prompt/raw_prompt_template.md)！
+- **\[2026.02.05\]** OpenCompass 现已支持Intern-S1-Pro相关的通用及科学评测基准，请参阅[Intern-S1-Pro评测示例](examples/eval_intern_s1_pro.py)和[模型信息](https://huggingface.co/internlm/Intern-S1-Pro)了解详情！🔥🔥🔥
+- **\[2025.12.08\]** OpenCompass 现已支持SciReasoner评测，请参阅[SciReasoner评测示例](examples/eval_scireasoner.py)和[原项目地址](https://github.com/InternScience/SciReason)了解详情！🔥🔥🔥
+- **\[2025.07.26\]** OpenCompass 现已支持Intern-S1相关的通用及科学评测基准，请参阅[Intern-S1模型配置](opencompass/configs/models/intern_s/intern_s1.py)了解详情！🔥🔥🔥
+- **\[2025.04.01\]** OpenCompass 现已支持 `CascadeEvaluator`，允许多个评估器按顺序工作，可以为更复杂的评估场景创建自定义评估流程，查看[文档](docs/zh_cn/evaluation/cascade_evaluator.md)了解具体用法！🔥🔥🔥
+- **\[2025.03.11\]** 现已支持 `SuperGPQA`  覆盖285 个研究生学科的知识能力评测，欢迎尝试！🔥🔥🔥
+- **\[2025.02.28\]** OpenCompass 现已支持 `DeepSeek-R1` 系列模型，请查看 [DeepSeek-R1 模型配置](opencompass/configs/models/deepseek/deepseek_r1_streaming.py) 了解更多详情！🔥🔥🔥
+- **\[2025.02.15\]** 我们新增了两个实用的评测工具：用于 LLM 作为评判器的 `GenericLLMEvaluator` 和用于数学推理评估的 `MATHVerifyEvaluator`。查看 [LLM 评判器](docs/zh_cn/evaluation/llm_judge.md)和[数学能力评测](docs/zh_cn/evaluation/math_verify.md)文档了解更多详情！🔥🔥🔥
 
-- **多样化评测范式**：支持零样本、小样本及思维链评测，结合标准型或对话型提示词模板，轻松激发各种模型最大性能
+## 🛠️ 安装指南
 
-- **灵活化拓展**：想增加新模型或数据集？想要自定义更高级的任务分割策略，甚至接入新的集群管理系统？OpenCompass 的一切均可轻松扩展！
+下面提供了快速安装和数据集准备的步骤。
 
-## 📊 性能榜单
+### 💻 环境搭建
 
-我们将陆续提供开源模型和API模型的具体性能榜单，请见 [OpenCompass Leaderbaord](https://opencompass.org.cn/rank) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至邮箱  `opencompass@pjlab.org.cn`.
+我们强烈建议使用 `conda` 来管理您的 Python 环境。OpenCompass 的常规安装和完整安装已经支持
+Python 3.12。如果您的评测依赖基于 `pyext` 的代码执行类数据集，请改用 Python 3.10：
+`pyext==0.7` 会在 Python >=3.11 时被跳过，因为它依赖的 `inspect.getargspec` 已在
+Python 3.11 中移除。缺少 `pyext` 时，APPS（`apps`、`apps_mini`）、TACO 和
+LiveCodeBench Code Generation 将不可用。
 
-<p align="right"><a href="#top">🔝返回顶部</a></p>
+- #### 创建虚拟环境
 
-## 🛠️ 安装
+  ```bash
+  conda create --name opencompass python=3.12 -y
+  conda activate opencompass
+  ```
 
-下面展示了快速安装以及准备数据集的步骤。
+- #### 通过pip安装OpenCompass
 
-```Python
-conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-conda activate opencompass
-git clone https://github.com/open-compass/opencompass opencompass
-cd opencompass
-pip install -e .
-# 下载数据集到 data/ 处
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
-```
+  ```bash
+  # 支持绝大多数数据集及模型
+  pip install -U opencompass
 
-有部分第三方功能,如 Humaneval 以及 Llama,可能需要额外步骤才能正常运行，详细步骤请参考[安装指南](https://opencompass.readthedocs.io/zh_CN/latest/get_started/installation.html)。
+  # 完整安装（支持更多数据集）
+  # pip install "opencompass[full]"
 
-<p align="right"><a href="#top">🔝返回顶部</a></p>
+  # 模型推理后端，由于这些推理后端通常存在依赖冲突，建议使用不同的虚拟环境来管理它们。
+  # pip install "opencompass[lmdeploy]"
+  # pip install "opencompass[vllm]"
 
-## 🏗️ ️评测
+  # API 测试（例如 OpenAI、Qwen）
+  # pip install "opencompass[api]"
 
-确保按照上述步骤正确安装 OpenCompass 并准备好数据集后，可以通过以下命令评测 LLaMA-7b 模型在 MMLU 和 C-Eval 数据集上的性能：
+  # 多模态评测
+  # pip install "opencompass[vlm]"
+  ```
 
-```bash
-python run.py --models hf_llama_7b --datasets mmlu_ppl ceval_ppl
-```
+- #### 基于源码安装OpenCompass
 
-OpenCompass 预定义了许多模型和数据集的配置，你可以通过 [工具](./docs/zh_cn/tools.md#ListConfigs) 列出所有可用的模型和数据集配置。
+  如果希望使用 OpenCompass 的最新功能，也可以从源代码构建它：
 
-```bash
-# 列出所有配置
-python tools/list_configs.py
-# 列出所有跟 llama 及 mmlu 相关的配置
-python tools/list_configs.py llama mmlu
-```
+  ```bash
+  git clone https://github.com/open-compass/opencompass opencompass
+  cd opencompass
+  pip install -e .
+  # pip install -e ".[full]"
+  # pip install -e ".[vllm]"
+  ```
 
-你也可以通过命令行去评测其它 HuggingFace 模型。同样以 LLaMA-7b 为例：
+完成安装后，接下来请阅读[快速开始](https://opencompass.readthedocs.io/zh_CN/latest/get_started/quick_start.html)了解如何运行一个评测任务。
 
-```bash
-python run.py --datasets ceval_ppl mmlu_ppl \
---hf-path huggyllama/llama-7b \  # HuggingFace 模型地址
---model-kwargs device_map='auto' \  # 构造 model 的参数
---tokenizer-kwargs padding_side='left' truncation='left' use_fast=False \  # 构造 tokenizer 的参数
---max-out-len 100 \  # 最长生成 token 数
---max-seq-len 2048 \  # 模型能接受的最大序列长度
---batch-size 8 \  # 批次大小
---no-batch-padding \  # 不打开 batch padding，通过 for loop 推理，避免精度损失
---num-gpus 1  # 运行该模型所需的最少 gpu 数
-```
-
-> **注意**<br />
-> 若需要运行上述命令，你需要删除所有从 `# ` 开始的注释。
-
-通过命令行或配置文件，OpenCompass 还支持评测 API 或自定义模型，以及更多样化的评测策略。请阅读[快速开始](https://opencompass.readthedocs.io/zh_CN/latest/get_started/quick_start.html)了解如何运行一个评测任务。
-
-更多教程请查看我们的[文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
+更多教程请查看我们的[完整文档](https://opencompass.readthedocs.io/zh_CN/latest/index.html)。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
 ## 📖 数据集支持
 
-<table align="center">
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>语言</b>
-      </td>
-      <td>
-        <b>知识</b>
-      </td>
-      <td>
-        <b>推理</b>
-      </td>
-      <td>
-        <b>考试</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>字词释义</b></summary>
+我们已经在OpenCompass官网的文档中支持了所有可在本平台上使用的数据集的统计列表。
 
-- WiC
-- SummEdits
+您可以通过排序、筛选和搜索等功能从列表中快速找到您需要的数据集。
 
-</details>
-
-<details open>
-<summary><b>成语习语</b></summary>
-
-- CHID
-
-</details>
-
-<details open>
-<summary><b>语义相似度</b></summary>
-
-- AFQMC
-- BUSTM
-
-</details>
-
-<details open>
-<summary><b>指代消解</b></summary>
-
-- CLUEWSC
-- WSC
-- WinoGrande
-
-</details>
-
-<details open>
-<summary><b>翻译</b></summary>
-
-- Flores
-- IWSLT2017
-
-</details>
-
-<details open>
-<summary><b>多语种问答</b></summary>
-
-- TyDi-QA
-- XCOPA
-
-</details>
-
-<details open>
-<summary><b>多语种总结</b></summary>
-
-- XLSum
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>知识问答</b></summary>
-
-- BoolQ
-- CommonSenseQA
-- NaturalQuestions
-- TriviaQA
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>文本蕴含</b></summary>
-
-- CMNLI
-- OCNLI
-- OCNLI_FC
-- AX-b
-- AX-g
-- CB
-- RTE
-- ANLI
-
-</details>
-
-<details open>
-<summary><b>常识推理</b></summary>
-
-- StoryCloze
-- COPA
-- ReCoRD
-- HellaSwag
-- PIQA
-- SIQA
-
-</details>
-
-<details open>
-<summary><b>数学推理</b></summary>
-
-- MATH
-- GSM8K
-
-</details>
-
-<details open>
-<summary><b>定理应用</b></summary>
-
-- TheoremQA
-- StrategyQA
-- SciBench
-
-</details>
-
-<details open>
-<summary><b>综合推理</b></summary>
-
-- BBH
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>初中/高中/大学/职业考试</b></summary>
-
-- C-Eval
-- AGIEval
-- MMLU
-- GAOKAO-Bench
-- CMMLU
-- ARC
-- Xiezhi
-
-</details>
-
-<details open>
-<summary><b>医学考试</b></summary>
-
-- CMB
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-  <tbody>
-    <tr align="center" valign="bottom">
-      <td>
-        <b>理解</b>
-      </td>
-      <td>
-        <b>长文本</b>
-      </td>
-      <td>
-        <b>安全</b>
-      </td>
-      <td>
-        <b>代码</b>
-      </td>
-    </tr>
-    <tr valign="top">
-      <td>
-<details open>
-<summary><b>阅读理解</b></summary>
-
-- C3
-- CMRC
-- DRCD
-- MultiRC
-- RACE
-- DROP
-- OpenBookQA
-- SQuAD2.0
-
-</details>
-
-<details open>
-<summary><b>内容总结</b></summary>
-
-- CSL
-- LCSTS
-- XSum
-- SummScreen
-
-</details>
-
-<details open>
-<summary><b>内容分析</b></summary>
-
-- EPRSTMT
-- LAMBADA
-- TNEWS
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>长文本理解</b></summary>
-
-- LEval
-- LongBench
-- GovReports
-- NarrativeQA
-- Qasper
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>安全</b></summary>
-
-- CivilComments
-- CrowsPairs
-- CValues
-- JigsawMultilingual
-- TruthfulQA
-
-</details>
-<details open>
-<summary><b>健壮性</b></summary>
-
-- AdvGLUE
-
-</details>
-      </td>
-      <td>
-<details open>
-<summary><b>代码</b></summary>
-
-- HumanEval
-- HumanEvalX
-- MBPP
-- APPs
-- DS1000
-
-</details>
-      </td>
-    </tr>
-</td>
-    </tr>
-  </tbody>
-</table>
+详情请参阅 [数据集相关文档](docs/zh_cn/user_guides/datasets.md) 的数据集统计章节。
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
@@ -409,25 +165,26 @@ python run.py --datasets ceval_ppl mmlu_ppl \
     <tr valign="top">
       <td>
 
-- InternLM
-- LLaMA
-- Vicuna
-- Alpaca
-- Baichuan
-- WizardLM
-- ChatGLM2
-- Falcon
-- TigerBot
-- Qwen
-- ……
+- [DeepSeek](opencompass/configs/models/deepseek/)
+- [Gemma](opencompass/configs/models/gemma/)
+- [GLM](opencompass/configs/models/glm/)
+- [Intern-S](opencompass/configs/models/intern_s/)
+- [Kimi](opencompass/configs/models/moonshot/)
+- [Llama](opencompass/configs/models/hf_llama/)
+- [MiniMax](opencompass/configs/models/minimax/)
+- [Mistral](opencompass/configs/models/mistral/)
+- [Qwen](opencompass/configs/models/qwen3/)
+- [更多模型配置](opencompass/configs/models/)
 
 </td>
 <td>
 
-- OpenAI
-- Claude
-- PaLM (即将推出)
-- ……
+- [OpenAI](opencompass/configs/models/openai/)
+- [Anthropic Claude](opencompass/configs/models/claude/)
+- [Google Gemini](opencompass/configs/models/gemini/)
+- [ByteDance Doubao](opencompass/configs/models/bytedance/)
+- [xAI Grok](opencompass/configs/models/xai/)
+- [更多模型配置](opencompass/configs/models/)
 
 </td>
 
@@ -437,26 +194,25 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
 
-## 🔜 路线图
+## 📊 性能榜单
 
-- [ ] 主观评测
-  - [ ] 发布主观评测榜单
-  - [ ] 发布主观评测数据集
-- [ ] 长文本
-  - [ ] 支持广泛的长文本评测集
-  - [ ] 发布长文本评测榜单
-- [ ] 代码能力
-  - [ ] 发布代码能力评测榜单
-  - [ ] 提供非Python语言的评测服务
-- [ ] 智能体
-  - [ ] 支持丰富的智能体方案
-  - [ ] 提供智能体评测榜单
-- [ ] 鲁棒性
-  - [ ] 支持各类攻击方法
+我们将陆续提供开源模型和 API 模型的具体性能榜单，请见 [OpenCompass Leaderboard](https://rank.opencompass.org.cn/home) 。如需加入评测，请提供模型仓库地址或标准的 API 接口至[电子邮件](mailto:opencompass@pjlab.org.cn)。
+
+<p align="right"><a href="#top">🔝返回顶部</a></p>
 
 ## 👷‍♂️ 贡献
 
-我们感谢所有的贡献者为改进和提升 OpenCompass 所作出的努力。请参考[贡献指南](https://opencompass.readthedocs.io/zh_CN/latest/notes/contribution_guide.html)来了解参与项目贡献的相关指引。
+我们感谢所有的贡献者为改进和提升 OpenCompass 所作出的努力。请参考[贡献指南](https://opencompass.readthedocs.io/zh_CN/latest/faq/contribution_guide.html)来了解参与项目贡献的相关指引。
+
+<a href="https://github.com/open-compass/opencompass/graphs/contributors" target="_blank">
+  <table>
+    <tr>
+      <th colspan="2">
+        <br><img src="https://contrib.rocks/image?repo=open-compass/opencompass"><br><br>
+      </th>
+    </tr>
+  </table>
+</a>
 
 ## 🤝 致谢
 
@@ -476,3 +232,20 @@ python run.py --datasets ceval_ppl mmlu_ppl \
 ```
 
 <p align="right"><a href="#top">🔝返回顶部</a></p>
+
+[github-contributors-link]: https://github.com/open-compass/opencompass/graphs/contributors
+[github-contributors-shield]: https://img.shields.io/github/contributors/open-compass/opencompass?color=c4f042&labelColor=black&style=flat-square
+[github-forks-link]: https://github.com/open-compass/opencompass/network/members
+[github-forks-shield]: https://img.shields.io/github/forks/open-compass/opencompass?color=8ae8ff&labelColor=black&style=flat-square
+[github-issues-link]: https://github.com/open-compass/opencompass/issues
+[github-issues-shield]: https://img.shields.io/github/issues/open-compass/opencompass?color=ff80eb&labelColor=black&style=flat-square
+[github-license-link]: https://github.com/open-compass/opencompass/blob/main/LICENSE
+[github-license-shield]: https://img.shields.io/github/license/open-compass/opencompass?color=white&labelColor=black&style=flat-square
+[github-release-link]: https://github.com/open-compass/opencompass/releases
+[github-release-shield]: https://img.shields.io/github/v/release/open-compass/opencompass?color=369eff&labelColor=black&logo=github&style=flat-square
+[github-releasedate-link]: https://github.com/open-compass/opencompass/releases
+[github-releasedate-shield]: https://img.shields.io/github/release-date/open-compass/opencompass?labelColor=black&style=flat-square
+[github-stars-link]: https://github.com/open-compass/opencompass/stargazers
+[github-stars-shield]: https://img.shields.io/github/stars/open-compass/opencompass?color=ffcb47&labelColor=black&style=flat-square
+[github-trending-shield]: https://trendshift.io/api/badge/repositories/6630
+[github-trending-url]: https://trendshift.io/repositories/6630

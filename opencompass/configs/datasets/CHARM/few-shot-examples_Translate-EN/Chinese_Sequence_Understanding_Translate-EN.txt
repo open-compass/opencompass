@@ -1,0 +1,25 @@
+Choose the correct answer based on the context
+
+Q: The following characters are correctly ordered in chronological order? Options:
+(A) Qin Shi Huang, Zhuge Liang, Liu Bang, Bai Juyi
+(B) Zhuge Liang, Qin Shi Huang, Liu Bang, Bai Ju Yi
+(C) Qin Shi Huang, Liu Bang, Zhu Geliang, Bai Juyi
+(D) Bai Juyi, Zhu Geliang, Liu Bang, Qin Shi Huang
+A: Let's think step by step.
+There are 4 characters mentioned in the options, in which Qin Shi Huang is from Qin Dynasty, Zhuge Liang is from Three Kingdoms period, Liu Bang is from Han Dynasty period and Bai Juyi is from Tang Dynasty period, according to the chronological order they are Qin Dynasty, Han Dynasty, Three Kingdoms period and Tang Dynasty, so the characters are sequentially Qin Shi Huang, Liu Bang, Zhuge Liang and Bai Juyi. So the answer is (C).
+
+Q:The following words describing age are correctly ordered from youngest to oldest age? Options:
+(A) Unconfused, Established, Knowledge of life, Flowering age
+(B) To stand, not to be confused, to know one's destiny, and to be in the prime of life.
+(C) Being in the prime of life, knowing one's destiny, being in the prime of life, not being confused.
+(D) to stand up, to grow old, to be unperturbed, to know one's destiny
+A: Let us think step by step.
+The options mention four words describing age. "Established" means 30 years old, "not perplexed" means 40 years old, "knowing one's destiny" means 50 years old, and "at the age of 60" means 50 years old. Therefore, the order of age from youngest to oldest is "to be established", "not to be perplexed", "to know one's life" and "to be at the end of one's life". So the answer is (B).
+
+Q:Which of the following steps is correct for making old-fashioned lollipops? Options:
+(A) Preparing the ingredients, pouring the syrup into the molds, making the syrup, cooling to set the shape
+(B) Prepare ingredients, make syrup, pour syrup into molds, cool to set
+(C) Prepare ingredients, pour syrup into mold, cool and set, make syrup
+(D) Prepare ingredients, cool and set, make syrup, pour syrup into molds
+A: Let's think step by step.
+The question refers to the steps in making old-fashioned lollipops, and the options include "prepare ingredients", "pour syrup into molds", and "make syrup", "According to the steps of making old-fashioned lollipops, the first step is to prepare the ingredients, then you need to make the syrup, then pour the syrup into the molds, and finally cool and set the lollipops. So the answer is (B).

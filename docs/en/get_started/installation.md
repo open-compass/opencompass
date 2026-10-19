@@ -1,75 +1,76 @@
-# Installation
+# Installation and Environment Setup
 
-1. Set up the OpenCompass environment:
+OpenCompass requires Python 3.8 or later. Model backends impose their own version constraints on PyTorch, CUDA, and inference frameworks. When preparing a GPU environment, first install a PyTorch build compatible with the model and backend, then install OpenCompass.
 
-   ```bash
-   conda create --name opencompass python=3.10 pytorch torchvision pytorch-cuda -c nvidia -c pytorch -y
-   conda activate opencompass
-   ```
+## Creating an Isolated Environment
 
-   If you want to customize the PyTorch version or related CUDA version, please refer to the [official documentation](https://pytorch.org/get-started/locally/) to set up the PyTorch environment. Note that OpenCompass requires `pytorch>=1.13`.
-
-2. Install OpenCompass:
-
-   ```bash
-   git clone https://github.com/open-compass/opencompass.git
-   cd opencompass
-   pip install -e .
-   ```
-
-3. Install humaneval (Optional)
-
-   If you want to **evaluate your models coding ability on the humaneval dataset**, follow this step.
-
-   <details>
-   <summary><b>click to show the details</b></summary>
-
-   ```bash
-   git clone https://github.com/openai/human-eval.git
-   cd human-eval
-   pip install -r requirements.txt
-   pip install -e .
-   cd ..
-   ```
-
-   Please read the comments in `human_eval/execution.py` **lines 48-57** to understand the potential risks of executing the model generation code. If you accept these risks, uncomment **line 58** to enable code execution evaluation.
-
-   </details>
-
-4. Install Llama (Optional)
-
-   If you want to **evaluate Llama / Llama-2 / Llama-2-chat with its official implementation**, follow this step.
-
-   <details>
-   <summary><b>click to show the details</b></summary>
-
-   ```bash
-   git clone https://github.com/facebookresearch/llama.git
-   cd llama
-   pip install -r requirements.txt
-   pip install -e .
-   cd ..
-   ```
-
-   You can find example configs in `configs/models`. ([example](https://github.com/open-compass/opencompass/blob/eb4822a94d624a4e16db03adeb7a59bbd10c2012/configs/models/llama2_7b_chat.py))
-
-   </details>
-
-# Dataset Preparation
-
-The datasets supported by OpenCompass mainly include two parts:
-
-1. Huggingface datasets: The [Huggingface Datasets](https://huggingface.co/datasets) provide a large number of datasets, which will **automatically download** when running with this option.
-2. Custom dataset: OpenCompass also provides some Chinese custom **self-built** datasets. Please run the following command to **manually download and extract** them.
-
-Run the following commands to download and place the datasets in the `${OpenCompass}/data` directory can complete dataset preparation.
+Python 3.12 is recommended:
 
 ```bash
-# Run in the OpenCompass directory
-wget https://github.com/open-compass/opencompass/releases/download/0.1.1/OpenCompassData.zip
-unzip OpenCompassData.zip
+conda create -n opencompass python=3.12 -y
+conda activate opencompass
 ```
 
-OpenCompass has supported most of the datasets commonly used for performance comparison, please refer to `configs/dataset` for the specific list of supported datasets.
+Both the regular and full OpenCompass installations support Python 3.12. However, code-execution evaluations such as APPS (`apps`, `apps_mini`), TACO, and LiveCodeBench Code Generation depend on `pyext==0.7`. That package is incompatible with Python 3.11 and later, so create a Python 3.10 environment when running these evaluations.
 
-For next step, please read [Quick Start](./quick_start.md).
+LMDeploy and vLLM may require different versions of PyTorch, CUDA, or other dependencies. If you need multiple inference backends, create a separate virtual environment for each backend.
+
+## Choosing an Installation Method
+
+For common language models and datasets, install the base package:
+
+```bash
+pip install -U opencompass
+```
+
+Install optional dependencies according to the capabilities you need:
+
+```bash
+pip install "opencompass[api]"       # OpenAI, Anthropic, and other API models
+pip install "opencompass[full]"      # More datasets and evaluation dependencies
+pip install "opencompass[vlm]"       # Multimodal evaluation
+pip install "opencompass[lmdeploy]"  # LMDeploy backend
+pip install "opencompass[vllm]"      # vLLM backend
+```
+
+To use the latest code or contribute to development, install from source:
+
+```bash
+git clone https://github.com/open-compass/opencompass.git
+cd opencompass
+pip install -e .
+```
+
+A source installation also registers the `opencompass` command. From the repository root, the equivalent `python run.py` entry point is also available.
+
+## Verifying the Installation
+
+The following commands apply to both PyPI and source installations. `which python` confirms the active Python environment; the next command reports the OpenCompass version and actual import path; the final command verifies that the CLI entry point and its dependencies are available.
+
+```bash
+which python
+python -c "import opencompass; print(opencompass.__version__); print(opencompass.__file__)"
+opencompass --help
+```
+
+## Data Caches
+
+Datasets are normally downloaded on first use. On a shared machine, configure cache directories through these environment variables:
+
+```bash
+export HF_DATASETS_CACHE=/path/to/huggingface-cache/datasets
+export COMPASS_DATA_CACHE=/path/to/opencompass-data-cache
+export LMUData=/path/to/mm-data-cache
+```
+
+`HF_DATASETS_CACHE` manages the Hugging Face dataset cache, `COMPASS_DATA_CACHE` specifies the OpenCompass data-cache root, and `LMUData` specifies the cache directory for multimodal datasets imported from VLMEvalKit. Download and loading behavior differs by dataset. See [Dataset Download and Caching](../user_guides/data_and_cache.md) for detailed rules and offline preparation.
+
+## Checking Models and Inference Backends
+
+After completing the installation and configuration above, you can evaluate an API model. Before running an evaluation, verify the service URL, model name, API key, rate-limit parameters, and timeout settings.
+
+To deploy a local model with LMDeploy or vLLM for one-stop evaluation, also verify compatibility between the inference-backend version and the model. First confirm that the backend can load the target model and perform inference, then launch the complete evaluation through OpenCompass.
+
+## Start Evaluating
+
+After installation, continue to the [Five-Minute Quick Start](quick_start.md). For dependency, memory, or download issues, see [FAQ and Troubleshooting](../faq/index.md).

@@ -1,10 +1,12 @@
 import json
 import re
+from os import environ
 
 from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -13,10 +15,17 @@ from .base import BaseDataset
 class GaokaoBenchDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
-        with open(path, encoding='utf-8') as f:
-            data = json.load(f)
-        return Dataset.from_list(data['example'])
+    def load(path: str, filename: str, name: str):
+        path = get_data_path(path)
+        path = path + filename
+
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            return MsDataset.load(path, subset_name=name, split='test')
+        else:
+            with open(path, encoding='utf-8') as f:
+                data = json.load(f)
+            return Dataset.from_list(data['example'])
 
 
 valid_gaokao_bench_question_types = [
@@ -91,34 +100,51 @@ class GaokaoBenchEvaluator(BaseEvaluator):
         ]:
             return {'score': 0}
         elif self.question_type == 'multi_choice':
+            details = {}
             correct_score, total_score = 0, 0
-            for pred, refr in zip(predictions, references):
+            for index, (pred, refr) in enumerate(zip(predictions, references)):
                 pred = self.do_predictions_postprocess(pred)
                 pred = self.ensure_same_length(pred, refr)
+                is_corrects = []
                 for p, r in zip(pred, refr):
                     if p == r:
                         correct_score += 2
+                        is_corrects.append(True)
                     else:
                         for i in p:
                             if i not in r:
                                 break
                         else:
                             correct_score += 1
+                        is_corrects.append(False)
                     total_score += 2
-            return {'score': correct_score / total_score * 100}
+                details[str(index)] = {
+                    'pred': pred,
+                    'refr': refr,
+                    'is_correct': all(is_corrects),
+                }
+
         else:
+            details = {}
             correct_score, total_score = 0, 0
-            for pred, refr in zip(predictions, references):
+            for index, (pred, refr) in enumerate(zip(predictions, references)):
                 if self.question_type == 'multi_question_choice':
                     pred = self.do_predictions_postprocess(pred, len(refr))
                 else:
                     pred = self.do_predictions_postprocess(pred)
                 pred = self.ensure_same_length(pred, refr)
+                is_corrects = []
                 for p, r in zip(pred, refr):
-                    if p == r:
-                        correct_score += 1
+                    is_correct = p == r
+                    correct_score += is_correct
                     total_score += 1
-            return {'score': correct_score / total_score * 100}
+                    is_corrects.append(is_correct)
+                details[str(index)] = {
+                    'pred': pred,
+                    'refr': refr,
+                    'is_correct': all(is_corrects),
+                }
+        return {'score': correct_score / total_score * 100, 'details': details}
 
 
 for question_type in valid_gaokao_bench_question_types:

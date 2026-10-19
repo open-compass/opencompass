@@ -1,0 +1,62 @@
+根据上下文选择正确答案
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request: 下列人物按时间先后顺序排序正确的是？选项：
+(A) 秦始皇、诸葛亮、刘邦、白居易
+(B) 诸葛亮、秦始皇、刘邦、白居易
+(C) 秦始皇、刘邦、诸葛亮、白居易
+(D) 白居易、诸葛亮、刘邦、秦始皇
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: The following characters are correctly ordered in chronological order? Options:
+(A) Qin Shi Huang, Zhuge Liang, Liu Bang, Bai Juyi
+(B) Zhuge Liang, Qin Shi Huang, Liu Bang, Bai Ju Yi
+(C) Qin Shi Huang, Liu Bang, Zhu Geliang, Bai Juyi
+(D) Bai Juyi, Zhu Geliang, Liu Bang, Qin Shi Huang
+Step-by-step answer:
+1.There are four characters mentioned in the options, among which Qin Shi Huang is from the Qin Dynasty, Zhuge Liang is from the Three Kingdoms period, Liu Bang is from the Han Dynasty period, and Bai Juyi is from the Tang Dynasty period.
+2.They are sorted in chronological order as Qin Dynasty, Han Dynasty, Three Kingdoms period, and Tang Dynasty.
+3.Therefore, the characters are sorted in chronological order as Qin Shi Huang, Liu Bang, Zhuge Liang, and Bai Juyi.
+So the answer is (C).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request: 下列描述年龄的词语按照年龄从小到大的顺序排序正确的是？选项：
+(A) 不惑、而立、知天命、花甲
+(B) 而立、不惑、知天命、花甲
+(C) 花甲、知天命、而立、不惑
+(D) 而立、花甲、不惑、知天命
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: The following words describing age are correctly ordered from youngest to oldest age? Options:
+(A) Unconfused, Established, Knowledge of life, Flowering age
+(B) To stand, not to be confused, to know one's destiny, and to be in the prime of life.
+(C) Being in the prime of life, knowing one's destiny, being in the prime of life, not being confused.
+(D) to stand up, to grow old, to be unperturbed, to know one's destiny
+Step-by-step answer:
+1.The options mention four words that describe age, among which "Erli" refers to 30 years old, "Bu Fu" refers to 40 years old, "Zhi Tian Ming" refers to 50 years old, and "Hua Jia" refers to 60 years old.
+2.Therefore, in order of age, they are Erli, Bu Fu, Zhi Tian Ming, and Hua Jia.
+So the answer is (B).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request: 下列制作老式棒棒糖的步骤正确的是？选项：
+(A) 准备材料、将糖浆倒入模具、制作糖浆、冷却定型
+(B) 准备材料、制作糖浆、将糖浆倒入模具、冷却定型
+(C) 准备材料、将糖浆倒入模具、冷却定型、制作糖浆
+(D) 准备材料、冷却定型、制作糖浆、将糖浆倒入模具
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request: Which of the following steps is correct for making old-fashioned lollipops? Options:
+(A) Preparing the ingredients, pouring the syrup into the molds, making the syrup, cooling to set the shape
+(B) Prepare ingredients, make syrup, pour syrup into molds, cool to set
+(C) Prepare ingredients, pour syrup into mold, cool and set, make syrup
+(D) Prepare ingredients, cool and set, make syrup, pour syrup into molds
+Step-by-step answer:
+1.The title mentions the steps to make old-fashioned lollipops, and the options include "preparing materials", "pouring syrup into the mold", "making syrup", and "cooling and shaping".
+2.According to the steps to make old-fashioned lollipops, the first step should be to prepare the materials, then make syrup, pour syrup into the mold, and finally cool and shape.
+So the answer is (B).
