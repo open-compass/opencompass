@@ -15,22 +15,41 @@ class JudgeEvaluator(BaseEvaluator):
         correct = 0
         count = 0
         details = []
-        for prediction, reference in zip(predictions, references):
-            choice = prediction.split("\"Choice\": \"Model ")[-1][0] if len(
-                prediction) != 0 else None
+        for idx, (prediction,
+                  reference) in enumerate(zip(predictions, references)):
             gold_winner = reference.get('winner', '')
             detail = {
                 'pred': prediction,
                 'answer': gold_winner,
                 'correct': False
             }
+            # Isolate unparseable judge responses instead of silently
+            # counting them as wrong answers.
+            outcome = self.protected_sample(self._parse_choice, idx,
+                                            prediction)
+            if 'error' in outcome:
+                detail['error'] = outcome['error']
+                details.append(detail)
+                continue
+            choice = outcome
             count += 1
             if choice == gold_winner:
                 correct += 1
                 detail['correct'] = True
             details.append(detail)
+        if count == 0:
+            return {'error': 'all judge responses failed to parse'}
         result = {'accuracy': 100 * correct / count, 'details': details}
         return result
+
+    @staticmethod
+    def _parse_choice(prediction):
+        choice = prediction.split("\"Choice\": \"Model ")[-1][0] if len(
+            prediction) != 0 else None
+        if choice not in ('A', 'B'):
+            raise ValueError(
+                f'unparseable judge response: {prediction[:50]!r}')
+        return choice
 
 
 class RMBEvaluator(BaseEvaluator):
