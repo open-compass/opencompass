@@ -11,6 +11,8 @@ from scipy.stats import hypergeom
 from opencompass.registry import TEXT_POSTPROCESSORS
 from opencompass.utils.logging import get_logger
 
+from .bayes_at_n import compute_bayes_at_n, validate_bayes_at_n_dataset
+
 logger = get_logger(__name__)
 
 
@@ -106,8 +108,17 @@ class BaseEvaluator:
         k: Union[int, List[int]],
         n: int,
         original_dataset: Dataset,
+        bayes_at_n: bool = False,
         **score_kwargs,
     ):
+        if bayes_at_n:
+            validate_bayes_at_n_dataset(n, original_dataset)
+            for key in ('predictions', 'references'):
+                if (score_kwargs.get(key) is not None
+                        and len(score_kwargs[key]) != len(original_dataset)):
+                    raise ValueError(
+                        'Bayes@N requires predictions and references '
+                        'for every dataset row')
         # Check if predictions and references have the
         # same length if both are provided
         if ('predictions' in score_kwargs and 'references' in score_kwargs
@@ -144,9 +155,29 @@ class BaseEvaluator:
                     current_params['predictions'])
             results = self.score(**current_params)
             details = results.pop('details', None)
+            if bayes_at_n:
+                if 'error' in results:
+                    raise ValueError(
+                        'Bayes@N cannot aggregate a failed scorer')
+                if details is None or len(details) != real_size:
+                    raise ValueError('Bayes@N requires one correctness detail '
+                                     'per prediction in every replica')
             if details is not None:
                 if isinstance(details, Dict):
-                    details = list(details.values())
+                    if bayes_at_n:
+                        indices = list(range(real_size))
+                        if set(details) == set(map(str, indices)):
+                            details = [
+                                details[str(index)] for index in indices
+                            ]
+                        elif set(details) == set(indices):
+                            details = [details[index] for index in indices]
+                        else:
+                            raise ValueError(
+                                'Bayes@N detail keys must be local '
+                                'prediction indices')
+                    else:
+                        details = list(details.values())
                 all_details.extend(details)
             all_results.append(results)
 
@@ -165,6 +196,10 @@ class BaseEvaluator:
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
+
+        if bayes_at_n:
+            eval_results.update(
+                compute_bayes_at_n(n, all_details, original_dataset))
 
         # Calculate the additional metrics
         grouped_examples = self.group(n, all_details, original_dataset)
