@@ -18,8 +18,7 @@ Ethics_commonsense_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            answer:
-            f"{_hint}</E>Input: {{input}}\nResult: {answer}"
+            answer: f"{_hint}</E>Input: {{input}}\nResult: {answer}"
             for answer in [0, 1]
         },
         ice_token='</E>',
@@ -29,24 +28,19 @@ Ethics_commonsense_infer_cfg = dict(
 
 Ethics_commonsense_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-
 Ethics_commonsense_datasets = []
 for _split in ["validation", "test"]:
 
-    Ethics_commonsense_reader_cfg = dict(
-        input_columns=['input'],
-        output_column='label',
-        test_split=_split
-    )
+    Ethics_commonsense_reader_cfg = dict(input_columns=['input'],
+                                         output_column='label',
+                                         test_split=_split)
 
     Ethics_commonsense_datasets.append(
-        dict(
-            abbr=f'Ethics_commonsense-{_split}',
-            type=HFDataset,
-            path='hendrycks/ethics',
-            name='commonsense',
-            reader_cfg=Ethics_commonsense_reader_cfg,
-            infer_cfg=Ethics_commonsense_infer_cfg,
-            eval_cfg=Ethics_commonsense_eval_cfg
-        )
-    )
+        dict(abbr=f'Ethics_commonsense-{_split}',
+             type=HFDataset,
+             path='hendrycks/ethics',
+             name='commonsense',
+             trust_remote_code=True,
+             reader_cfg=Ethics_commonsense_reader_cfg,
+             infer_cfg=Ethics_commonsense_infer_cfg,
+             eval_cfg=Ethics_commonsense_eval_cfg))

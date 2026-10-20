@@ -18,8 +18,7 @@ Ethics_justice_infer_cfg = dict(
     prompt_template=dict(
         type=PromptTemplate,
         template={
-            answer:
-            f"{_hint}</E>Scenario: {{scenario}}\nResult: {answer}"
+            answer: f"{_hint}</E>Scenario: {{scenario}}\nResult: {answer}"
             for answer in [0, 1]
         },
         ice_token='</E>',
@@ -29,24 +28,19 @@ Ethics_justice_infer_cfg = dict(
 
 Ethics_justice_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-
 Ethics_justice_datasets = []
 for _split in ["validation", "test"]:
 
-    Ethics_justice_reader_cfg = dict(
-        input_columns=['scenario'],
-        output_column='label',
-        test_split=_split
-    )
+    Ethics_justice_reader_cfg = dict(input_columns=['scenario'],
+                                     output_column='label',
+                                     test_split=_split)
 
     Ethics_justice_datasets.append(
-        dict(
-            abbr=f'Ethics_justice-{_split}',
-            type=HFDataset,
-            path='hendrycks/ethics',
-            name='justice',
-            reader_cfg=Ethics_justice_reader_cfg,
-            infer_cfg=Ethics_justice_infer_cfg,
-            eval_cfg=Ethics_justice_eval_cfg
-        )
-    )
+        dict(abbr=f'Ethics_justice-{_split}',
+             type=HFDataset,
+             path='hendrycks/ethics',
+             name='justice',
+             trust_remote_code=True,
+             reader_cfg=Ethics_justice_reader_cfg,
+             infer_cfg=Ethics_justice_infer_cfg,
+             eval_cfg=Ethics_justice_eval_cfg))

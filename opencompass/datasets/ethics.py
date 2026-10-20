@@ -11,8 +11,8 @@ from .base import BaseDataset
 class EthicsUtilitarianismDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
-        dataset = load_dataset(path=path, name=name)
+    def load(path: str, name: str, **kwargs):
+        dataset = load_dataset(path=path, name=name, **kwargs)
         new_dataset = DatasetDict()
         splits = ['train', 'validation', 'test']
 

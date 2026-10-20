@@ -24,29 +24,25 @@ Ethics_virtue_infer_cfg = dict(
         },
         ice_token='</E>',
     ),
-    retriever=dict(type=FixKRetriever, fix_id_list=[28240, 28241, 28242, 28243, 28244]),
+    retriever=dict(type=FixKRetriever,
+                   fix_id_list=[28240, 28241, 28242, 28243, 28244]),
     inferencer=dict(type=PPLInferencer))
 
 Ethics_virtue_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-
 Ethics_virtue_datasets = []
 for _split in ["validation", "test"]:
 
-    Ethics_virtue_reader_cfg = dict(
-        input_columns=['scenario'],
-        output_column='label',
-        test_split=_split
-    )
+    Ethics_virtue_reader_cfg = dict(input_columns=['scenario'],
+                                    output_column='label',
+                                    test_split=_split)
 
     Ethics_virtue_datasets.append(
-        dict(
-            abbr=f'Ethics_virtue-{_split}',
-            type=HFDataset,
-            path='hendrycks/ethics',
-            name='virtue',
-            reader_cfg=Ethics_virtue_reader_cfg,
-            infer_cfg=Ethics_virtue_infer_cfg,
-            eval_cfg=Ethics_virtue_eval_cfg
-        )
-    )
+        dict(abbr=f'Ethics_virtue-{_split}',
+             type=HFDataset,
+             path='hendrycks/ethics',
+             name='virtue',
+             trust_remote_code=True,
+             reader_cfg=Ethics_virtue_reader_cfg,
+             infer_cfg=Ethics_virtue_infer_cfg,
+             eval_cfg=Ethics_virtue_eval_cfg))

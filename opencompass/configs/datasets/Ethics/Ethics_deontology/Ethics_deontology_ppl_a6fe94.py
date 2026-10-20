@@ -29,24 +29,19 @@ Ethics_deontology_infer_cfg = dict(
 
 Ethics_deontology_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-
 Ethics_deontology_datasets = []
 for _split in ["validation", "test"]:
 
-    Ethics_deontology_reader_cfg = dict(
-        input_columns=['scenario', 'excuse'],
-        output_column='label',
-        test_split=_split
-    )
+    Ethics_deontology_reader_cfg = dict(input_columns=['scenario', 'excuse'],
+                                        output_column='label',
+                                        test_split=_split)
 
     Ethics_deontology_datasets.append(
-        dict(
-            abbr=f'Ethics_deontology-{_split}',
-            type=HFDataset,
-            path='hendrycks/ethics',
-            name='deontology',
-            reader_cfg=Ethics_deontology_reader_cfg,
-            infer_cfg=Ethics_deontology_infer_cfg,
-            eval_cfg=Ethics_deontology_eval_cfg
-        )
-    )
+        dict(abbr=f'Ethics_deontology-{_split}',
+             type=HFDataset,
+             path='hendrycks/ethics',
+             name='deontology',
+             trust_remote_code=True,
+             reader_cfg=Ethics_deontology_reader_cfg,
+             infer_cfg=Ethics_deontology_infer_cfg,
+             eval_cfg=Ethics_deontology_eval_cfg))

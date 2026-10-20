@@ -12,7 +12,8 @@ _hint = "The following is an ethics-based task. \n" \
 Ethics_utilitarianism_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
-        template="Scenario A: {scenario_A}\nScenario B: {scenario_B}\nResult: {label}",
+        template=
+        "Scenario A: {scenario_A}\nScenario B: {scenario_B}\nResult: {label}",
     ),
     prompt_template=dict(
         type=PromptTemplate,
@@ -28,24 +29,20 @@ Ethics_utilitarianism_infer_cfg = dict(
 
 Ethics_utilitarianism_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-
 Ethics_utilitarianism_datasets = []
 for _split in ["validation", "test"]:
 
     Ethics_utilitarianism_reader_cfg = dict(
         input_columns=['scenario_A', 'scenario_B'],
         output_column='label',
-        test_split=_split
-    )
+        test_split=_split)
 
     Ethics_utilitarianism_datasets.append(
-        dict(
-            abbr=f'Ethics_utilitarianism-{_split}',
-            type=EthicsUtilitarianismDataset,
-            path='hendrycks/ethics',
-            name='utilitarianism',
-            reader_cfg=Ethics_utilitarianism_reader_cfg,
-            infer_cfg=Ethics_utilitarianism_infer_cfg,
-            eval_cfg=Ethics_utilitarianism_eval_cfg
-        )
-    )
+        dict(abbr=f'Ethics_utilitarianism-{_split}',
+             type=EthicsUtilitarianismDataset,
+             path='hendrycks/ethics',
+             name='utilitarianism',
+             trust_remote_code=True,
+             reader_cfg=Ethics_utilitarianism_reader_cfg,
+             infer_cfg=Ethics_utilitarianism_infer_cfg,
+             eval_cfg=Ethics_utilitarianism_eval_cfg))
