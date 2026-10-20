@@ -9,8 +9,8 @@ from .base import BaseDataset
 class LogiQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
-        dataset = load_dataset(path=path)
+    def load(path: str, **kwargs):
+        dataset = load_dataset(path=path, **kwargs)
 
         def preprocess(example):
             options = example.pop('options')

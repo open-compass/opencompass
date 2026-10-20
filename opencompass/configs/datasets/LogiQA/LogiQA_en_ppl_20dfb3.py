@@ -10,7 +10,8 @@ _hint = "The following are logical reasoning questions from the Chinese National
 LogiQA_en_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
-        template="Context: {context}\nQuery: {query}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: {correct_option}",
+        template=
+        "Context: {context}\nQuery: {query}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: {correct_option}",
     ),
     prompt_template=dict(
         type=PromptTemplate,
@@ -26,23 +27,19 @@ LogiQA_en_infer_cfg = dict(
 
 LogiQA_en_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
-
 LogiQA_en_datasets = []
 for _split in ["validation", "test"]:
 
     LogiQA_en_reader_cfg = dict(
         input_columns=['context', 'query', 'A', 'B', 'C', 'D'],
         output_column='correct_option',
-        test_split=_split
-    )
+        test_split=_split)
 
     LogiQA_en_datasets.append(
-        dict(
-            abbr=f'LogiQA_en-{_split}',
-            type=LogiQADataset,
-            path='lucasmccabe/logiqa',
-            reader_cfg=LogiQA_en_reader_cfg,
-            infer_cfg=LogiQA_en_infer_cfg,
-            eval_cfg=LogiQA_en_eval_cfg
-        )
-    )
+        dict(abbr=f'LogiQA_en-{_split}',
+             type=LogiQADataset,
+             path='lucasmccabe/logiqa',
+             trust_remote_code=True,
+             reader_cfg=LogiQA_en_reader_cfg,
+             infer_cfg=LogiQA_en_infer_cfg,
+             eval_cfg=LogiQA_en_eval_cfg))
