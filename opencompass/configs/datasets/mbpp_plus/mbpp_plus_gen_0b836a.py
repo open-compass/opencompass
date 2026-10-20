@@ -57,7 +57,7 @@ mbpp_plus_datasets = [
     dict(
         type=MBPPPlusDataset,
         abbr='mbpp_plus',
-        path='./data/mbpp_plus/mbpp_plus.jsonl',
+        path='opencompass/mbpp_plus',
         reader_cfg=mbpp_plus_reader_cfg,
         infer_cfg=mbpp_plus_infer_cfg,
         eval_cfg=mbpp_plus_eval_cfg)

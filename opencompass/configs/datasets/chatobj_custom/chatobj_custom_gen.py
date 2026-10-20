@@ -3,11 +3,13 @@ chatobj_custom_reader_cfg = dict(input_columns=['question'], output_column='answ
 
 chatobj_custom_infer_cfg = dict(
     prompt_template=dict(
-        type='PromptTemplate',
-        template=dict(),
+        type='RawPromptTemplate',
+        messages=[
+            {'role': 'user', 'content': '{question}\nRemember to put your final answer within \\boxed{}.'},
+        ],
     ),
     retriever=dict(type='ZeroRetriever'),
-    inferencer=dict(type='ChatMLInferencer'),
+    inferencer=dict(type='GenInferencer'),
 )
 
 GRADER_TEMPLATE = """
@@ -46,19 +48,11 @@ mcq_rule_evaluator = dict(
 llm_evaluator = dict(
     type='GenericLLMEvaluator',
     prompt_template=dict(
-        type='PromptTemplate',
-        template=dict(
-            begin=[
-                dict(
-                    role='SYSTEM',
-                    fallback_role='HUMAN',
-                    prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                )
-            ],
-            round=[
-                dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-            ],
-        ),
+        type='RawPromptTemplate',
+        messages=[
+            {'role': 'system', 'content': "You are a helpful assistant who evaluates the correctness and quality of models' outputs."},
+            {'role': 'user', 'content': GRADER_TEMPLATE},
+        ],
     ),
     dataset_cfg=dict(
         type='ChatMLDataset',

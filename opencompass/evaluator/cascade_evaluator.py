@@ -1,3 +1,4 @@
+import inspect
 import os
 from typing import Any, Callable, Dict, List, Optional
 
@@ -86,8 +87,13 @@ class CascadeEvaluator(BaseEvaluator):
         else:
             # Use rule_evaluator to evaluate a single sample by calling
             # the score method with single-element lists
-            result = self.rule_evaluator.score([prediction], [reference],
-                                               [test_set])
+            score_params = inspect.signature(
+                self.rule_evaluator.score).parameters
+            if 'test_set' in score_params:
+                result = self.rule_evaluator.score([prediction], [reference],
+                                                   test_set=[test_set])
+            else:
+                result = self.rule_evaluator.score([prediction], [reference])
             if 'details' in result and len(result['details']) > 0:
                 return result['details'][0]
             else:
@@ -149,8 +155,11 @@ class CascadeEvaluator(BaseEvaluator):
                 test_item = test_set[i]
             else:
                 test_item = None
-            # Apply prediction postprocessing for each sample
-            [pred_rule] = self.rule_evaluator.pred_postprocess([pred])
+            # Apply the rule evaluator's prediction postprocessor if available.
+            if self.rule_evaluator is not None:
+                [pred_rule] = self.rule_evaluator.pred_postprocess([pred])
+            else:
+                pred_rule = pred
 
             result = self.sample_score(pred_rule, ref, test_item)
             result['evaluation_method'] = 'rule'
@@ -172,7 +181,7 @@ class CascadeEvaluator(BaseEvaluator):
 
         self.logger.info(
             f'Rule-based evaluation: {initial_correct}/{len(predictions)} '
-            f'correct ({initial_accuracy:.2f}%)')
+            'correct ({:.2f}%)'.format(initial_accuracy))
 
         eval_mode = ('parallel (all samples)'
                      if self.parallel else 'cascade (only failed samples)')
@@ -308,12 +317,12 @@ class CascadeEvaluator(BaseEvaluator):
 
             self.logger.info(
                 f'Final evaluation: {final_correct}/{len(predictions)}'
-                f'correct ({final_accuracy:.2f}%)')
+                'correct ({:.2f}%)'.format(final_accuracy))
 
             if llm_evaluated > 0:
                 self.logger.info(
                     f'LLM evaluation: {llm_correct}/{llm_evaluated} '
-                    f'correct ({llm_accuracy:.2f}%)')
+                    'correct ({:.2f}%)'.format(llm_accuracy))
 
             # Append cascade correctness flag to each sample
             for item in details:

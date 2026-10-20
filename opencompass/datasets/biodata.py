@@ -1,6 +1,7 @@
 import ast
 import json
 import os
+import random
 import re
 from collections import defaultdict
 
@@ -140,7 +141,7 @@ class BiodataRMSEEvaluator(BaseEvaluator):
             pred = extract_number(prediction)
             ans = reference
             detail = {'pred': pred, 'answer': ans}
-            if not pred:
+            if pred is None:
                 pred = 0
             rmse_score = np.sqrt(np.mean((np.array(pred) - np.array(ans))**2))
             detail['score'] = rmse_score
@@ -156,6 +157,8 @@ def extract_dict_text(text):
     pattern = re.compile(r'\{[^{}]*\}', re.DOTALL)
     matches = pattern.findall(text)
     if not matches:
+        return None
+    if '...' in [match for match in matches][-1]:
         return None
     return [match for match in matches][-1]
 
@@ -538,7 +541,7 @@ class BiodataECNumberEvaluator(BaseEvaluator):
 class BiodataTaskDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, task: str):
+    def load(path: str, task: str, mini_set=False):
         hint_dict = {
             'cls':
             'Please use "yes" or "no" as your answer, '
@@ -587,6 +590,12 @@ class BiodataTaskDataset(BaseDataset):
                 new_ins['prompt'] = new_ins['prompt'] + '\n' + hint_dict[
                     ins['meta_data']['task']]
             new_data.append(new_ins)
+
+        if mini_set:
+            random.seed(1024)
+            sample_size = max(1, len(new_data) // 10)
+            new_data = random.sample(new_data, sample_size)
+            random.seed(0)
 
         dataset = Dataset.from_list(new_data)
         return dataset
@@ -960,7 +969,7 @@ class BiodataSpearmanEvaluator(BaseEvaluator):
                 pred = pred.split('</think>')[-1]
             pred = extract_number(pred)
             detail = {'pred': pred, 'answer': ans}
-            if not pred:
+            if pred is None:
                 pred = np.inf
             y_true.append(ans)
             y_pred.append(pred)
@@ -993,7 +1002,7 @@ class BiodataMixedScoreEvaluator(BaseEvaluator):
                 pred = pred.split('</think>')[-1]
             pred = extract_number(pred)
             detail = {'pred': pred, 'answer': ans}
-            if not pred:
+            if pred is None:
                 pred = 0
             y_true.append(ans)
             y_pred.append(pred)
@@ -1071,7 +1080,7 @@ class BiodataR2Evaluator(BaseEvaluator):
                     pred = pred.split('</think>')[-1]
                 pred = extract_number(pred)
                 detail = {'pred': pred, 'answer': ans}
-                if not pred:
+                if pred is None:
                     pred = np.inf
                 y_true.append(ans)
                 y_pred.append(pred)

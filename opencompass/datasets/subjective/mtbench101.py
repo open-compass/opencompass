@@ -367,6 +367,8 @@ def get_final_results(judged_answers, references):
         task: sum(scores) / len(scores) if scores else 0
         for task, scores in task_scores.items()
     }
+    if not final_task_scores:
+        return {'avg': 0.0}
     average_score = round(
         sum(final_task_scores.values()) / len(final_task_scores), 3)
 
@@ -380,6 +382,90 @@ def mtbench101_postprocess(output: dict,
     judged_answers, references = get_judgeanswer_and_reference(
         output, output_path, post_process_mtbench101)
 
+    if not judged_answers:
+        return {
+            'warning':
+            'no valid mtbench101 judgements extracted (expect [[score]] in output)',
+            'details': output,
+        }
+
     results = get_final_results(judged_answers, references)
     results['details'] = output
     return results
+
+
+@LOAD_DATASET.register_module()
+class MTBench101WithRawPromptDataset(BaseDataset):
+
+    def load(self, path: str, name: str, *args, **kwargs):
+        import copy
+
+        filename = osp.join(path, f'{name}.jsonl')
+        filename = get_data_path(filename, local_mode=True)
+        raw_data = []
+
+        lines = open(filename, 'r', encoding='utf-8').readlines()
+        conversations = []
+        for line in lines:
+            line = json.loads(line)
+            conversations.append(line)
+
+        for dialogue in conversations:
+            multi_id = dialogue['id']
+            task = dialogue['task']
+            if task in skip_first_tasks:
+                skip_first = True
+            else:
+                skip_first = False
+
+            current_multi_id = None
+            pre_dia = []
+            history = ''
+            for turn_index, turn in enumerate(dialogue['history']):
+                human = turn['user']
+                assistant = turn['bot']
+                turn_id = str(turn_index + 1)
+
+                if current_multi_id is not None and multi_id != current_multi_id:
+                    pre_dia = []
+                    history = ''
+
+                current_multi_id = multi_id
+
+                if skip_first and turn_index == 0:
+                    pre_dia = add_format(question=human, answer=assistant)
+                    history = '\n\n Human: ' + human + '\n\nAssistant: ' + assistant
+                    continue
+
+                history = history + '\n\n Human: ' + human + '\n\nAssistant: '
+                pre_dia += add_format(question=human, answer=assistant)
+
+                pre_dia_copy = copy.deepcopy(pre_dia)
+
+                # Strip last assistant message so the model doesn't see
+                # the gold answer (matches old ChatInferencer.infer_last).
+                if pre_dia_copy and pre_dia_copy[-1]['role'] == 'assistant':
+                    dialogue_for_infer = pre_dia_copy[:-1]
+                else:
+                    dialogue_for_infer = pre_dia_copy
+
+                system_prompt, prompt_template = eval_prompt_construct(
+                    task, pre_dia, history)
+
+                raw_data.append({
+                    'dialogue': dialogue_for_infer,
+                    'task': task,
+                    'multi_id': current_multi_id,
+                    'turn_id': turn_id,
+                    'system_prompt': system_prompt,
+                    'prompt_template': prompt_template,
+                    'judge': {
+                        'task': task,
+                        'multi_id': current_multi_id,
+                        'turn_id': turn_id,
+                    }
+                })
+                history = history + assistant
+
+        dataset = Dataset.from_list(raw_data)
+        return dataset

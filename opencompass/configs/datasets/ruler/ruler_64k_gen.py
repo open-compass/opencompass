@@ -17,7 +17,7 @@ NUM_SAMPLES = 100  # Change to the number of samples you need
 tokenizer_model = os.environ.get('TOKENIZER_MODEL', 'gpt-4')
 # Change the context lengths to be tested
 max_seq_lens = [1024 * 64]
-abbr_suffixs: list[str] = ['64k']
+abbr_suffixs = ['64k']
 
 ruler_datasets = []
 

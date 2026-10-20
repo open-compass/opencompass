@@ -1,4 +1,5 @@
 # flake8: noqa: W605
+import random
 import re
 from collections import defaultdict
 
@@ -467,9 +468,12 @@ def smolinstruct_acc_0shot_postprocess(text: str) -> str:
     patterns = [
         r'\\boxed\{\s*(yes|no)\s*\}',
         r'[Th]he\s+answer\s+is\s*[\.:\'"“‘’\-]*\s*(yes|no)[\s\.,!?:;\'"”’\-]*',
-        r'[Aa]nswer:\s*(yes|no)\b', r'\*\*[Aa]nswer:\*\*\s*(yes|no)\b',
+        r'[Aa]nswer:\s*(yes|no)\b',
+        r'\*\*[Aa]nswer:\*\*\s*(yes|no)\b',
         r'\*\*[Aa]nswer\*\*:\s*(yes|no)\b',
-        r'<BOOLEAN>\s*(yes|no)\s*</BOOLEAN>', r'^\s*(yes|no)[\.\?!]?\s*$'
+        r'<BOOLEAN>\s*(yes|no)\s*</BOOLEAN>',
+        r'^\s*(yes|no)[\.\?!]?\s*$',
+        r'<\|begin_of_box\|>\s*(yes|no)\s*<\|end_of_box\|>',
     ]
     for pattern in patterns:
         text = text.strip()

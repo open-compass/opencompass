@@ -7,7 +7,9 @@ from opencompass.utils import get_logger
 def get_final_results(judged_answers,
                       references,
                       origial_responses,
-                      metric_name='accuracy'):
+                      metric_name='accuracy',
+                      true_tag: str = 'A',
+                      false_tag: str = 'B'):
     count = 0
     is_correct_count = 0
     is_incorrect_count = 0
@@ -15,7 +17,7 @@ def get_final_results(judged_answers,
     attempted_judge_count = 0
     details = []
     for i, j, k in zip(judged_answers, references, origial_responses):
-        if i in ['A', 'B']:
+        if i in [true_tag, false_tag]:
             attempted_judge_count += 1
         grade_letter = i
         detail = {
@@ -26,10 +28,10 @@ def get_final_results(judged_answers,
             'correct': False,
         }
         count += 1
-        if grade_letter == 'A':
+        if grade_letter == true_tag:
             is_correct_count += 1
             detail['correct'] = True
-        elif grade_letter == 'B':
+        elif grade_letter == false_tag:
             is_incorrect_count += 1
         else:
             is_not_attempted_count += 1
@@ -58,10 +60,12 @@ def get_final_results(judged_answers,
     return result
 
 
-def _generic_llmjudge_postprocess(judgement: str):
-    match = re.search(r'(A|B)', judgement)
-    grade_letter = (match.group(0) if match else 'unknown'
-                    )  # Return 'unknown' if no match
+def _generic_llmjudge_postprocess(judgement: str,
+                                  true_tag: str = 'A',
+                                  false_tag: str = 'B'):
+    match = re.search(rf'({re.escape(true_tag)}|{re.escape(false_tag)})',
+                      judgement)
+    grade_letter = match.group(0) if match else 'unknown'
     return grade_letter
 
 
@@ -69,13 +73,17 @@ def _generic_llmjudge_postprocess(judgement: str):
 def generic_llmjudge_postprocess(
     output: dict,
     output_path: str,
+    true_tag: str = 'A',
+    false_tag: str = 'B',
 ) -> dict:
+
     judged_answers = []
     origial_responses = []
     references = []
     for k, v in output.items():
         origial_responses.append(v['prediction'])
-        processed_judge = _generic_llmjudge_postprocess(v['prediction'])
+        processed_judge = _generic_llmjudge_postprocess(
+            v['prediction'], true_tag, false_tag)
         if processed_judge is not None:
             judged_answers.append(processed_judge)
             try:
@@ -85,7 +93,11 @@ def generic_llmjudge_postprocess(
                 get_logger().warning(
                     f'No gold answer for {k}, use empty string as reference!')
                 references.append('')
-    results = get_final_results(judged_answers, references, origial_responses)
+    results = get_final_results(judged_answers,
+                                references,
+                                origial_responses,
+                                true_tag=true_tag,
+                                false_tag=false_tag)
     results['details'] = output
     return results
 

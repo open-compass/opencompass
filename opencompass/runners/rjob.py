@@ -30,6 +30,7 @@ class RJOBRunner(BaseRunner):
         debug (bool): Whether in debug mode.
         lark_bot_url (str): Lark notification URL.
         keep_tmp_file (bool): Whether to keep temporary files.
+        tmp_dir (str): The directory to store temporary files.
         phase (str): Task phase.
     """
 
@@ -42,9 +43,13 @@ class RJOBRunner(BaseRunner):
         debug: bool = False,
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
+        tmp_dir: str = 'tmp',
         phase: str = 'unknown',
     ):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.rjob_cfg = rjob_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
@@ -71,7 +76,7 @@ class RJOBRunner(BaseRunner):
         """
         logger = get_logger()
         status = None
-        time.sleep(10)
+        time.sleep(1)
         while True:
             get_cmd = f'rjob get {task_name}'
             get_result = subprocess.run(get_cmd,
@@ -161,7 +166,7 @@ class RJOBRunner(BaseRunner):
         if random_sleep is None:
             random_sleep = self.max_num_workers > 8
         if random_sleep:
-            sleep_time = random.randint(0, 60)
+            sleep_time = random.randint(0, 10)
             logger = get_logger()
             logger.info(f'Sleeping for {sleep_time} seconds to launch task')
             time.sleep(sleep_time)
@@ -177,9 +182,9 @@ class RJOBRunner(BaseRunner):
         logger.info(f'Task name: {task_name}')
         # Generate temporary parameter file
         pwd = os.getcwd()
-        mmengine.mkdir_or_exist('tmp/')
+        mmengine.mkdir_or_exist(self.tmp_dir)
         uuid_str = str(uuid.uuid4())
-        param_file = f'{pwd}/tmp/{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, f'{uuid_str}_params.py')
 
         try:
             cfg.dump(param_file)
@@ -260,7 +265,14 @@ class RJOBRunner(BaseRunner):
                                         capture_output=True)
                 logger.info(f'CMD: {cmd}')
                 logger.info(f'Command output: {result.stdout}')
-                logger.error(f'Command error: {result.stderr}')
+                if result.returncode != 0:
+                    error_msg = (
+                        f'Command failed with return code {result.returncode}')
+                    if result.stderr:
+                        error_msg += f': {result.stderr}'
+                    logger.error(error_msg)
+                elif result.stderr:
+                    logger.warning(f'Command stderr: {result.stderr}')
                 logger.info(f'Return code: {result.returncode}')
                 if result.returncode == 0:
                     break
@@ -271,6 +283,7 @@ class RJOBRunner(BaseRunner):
             if result.returncode != 0:
                 # Submit failed, return directly
                 return task_name, result.returncode
+            logger.info(f'RJob submitted: {task_name}')
 
             # Submit successful, start polling
             status = self._run_task(task_name, out_path)
