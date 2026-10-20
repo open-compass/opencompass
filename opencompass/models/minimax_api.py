@@ -1,3 +1,4 @@
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
@@ -185,12 +186,13 @@ class MiniMax(BaseAPIModel):
 class MiniMaxChatCompletionV2(BaseAPIModel):
     """Model wrapper around MiniMax ChatCompletionV2.
 
-    Documentation:
+    Documentation: https://platform.minimax.io/docs/api-reference/text-openai-api
 
     Args:
-        path (str): The name of MiniMax model.
-            e.g. `moonshot-v1-32k`
-        key (str): Authorization key.
+        path (str): The name of MiniMax model. Defaults to
+            ``MiniMax-M3.1-Flash``. Explicit model names are passed through.
+        key (str): Authorization key. ``ENV`` reads ``MINIMAX_API_KEY``.
+        url (str): Chat Completions endpoint. Defaults to the global API.
         query_per_second (int): The maximum queries allowed per second
             between two consecutive calls of the API. Defaults to 1.
         max_seq_len (int): Unused here.
@@ -202,11 +204,11 @@ class MiniMaxChatCompletionV2(BaseAPIModel):
 
     def __init__(
         self,
-        path: str,
-        key: str,
-        url: str,
+        path: str = 'MiniMax-M3.1-Flash',
+        key: str = 'ENV',
+        url: str = 'https://api.minimax.io/v1/chat/completions',
         query_per_second: int = 2,
-        max_seq_len: int = 2048,
+        max_seq_len: int = 1000000,
         meta_template: Optional[Dict] = None,
         retry: int = 2,
     ):
@@ -215,6 +217,8 @@ class MiniMaxChatCompletionV2(BaseAPIModel):
                          query_per_second=query_per_second,
                          meta_template=meta_template,
                          retry=retry)
+        if key == 'ENV':
+            key = os.environ['MINIMAX_API_KEY']
         self.headers = {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + key,
@@ -269,15 +273,15 @@ class MiniMaxChatCompletionV2(BaseAPIModel):
             messages = []
             msg_buffer, last_role = [], None
             for item in input:
-                item['role'] = 'assistant' if item['role'] == 'BOT' else 'user'
-                if item['role'] != last_role and last_role is not None:
+                role = 'assistant' if item['role'] == 'BOT' else 'user'
+                if role != last_role and last_role is not None:
                     messages.append({
                         'content': '\n'.join(msg_buffer),
                         'role': last_role
                     })
                     msg_buffer = []
                 msg_buffer.append(item['prompt'])
-                last_role = item['role']
+                last_role = role
             messages.append({
                 'content': '\n'.join(msg_buffer),
                 'role': last_role
