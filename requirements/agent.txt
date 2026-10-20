@@ -5,7 +5,7 @@ json5
 jupyter
 jupyter_client
 jupytext
-lagent==0.1.2
+-e git+https://github.com/open-compass/lagent-cibench.git#egg=lagent
 lightgbm==4.1.0
 networkx
 scikit-image

@@ -43,7 +43,8 @@ for _split in list(wikibench_sets.keys()):
         wikibench_datasets.append(
             dict(
                 type=WikiBenchDataset,
-                path=f'./data/WikiBench/{_name}.jsonl',
+                path='opencompass/WikiBench',
+                filename=f'{_name}.jsonl',
                 name='circular_' + _name if do_circular else _name,
                 abbr='wikibench-' + _split + '-' + _name + 'circular' if do_circular else '',
                 reader_cfg=dict(

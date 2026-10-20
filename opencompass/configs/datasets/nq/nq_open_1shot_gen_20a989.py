@@ -38,7 +38,7 @@ for k in [1]:
         dict(
             type=NQOpenDataset,
             abbr=f'nq_open_{k}shot',
-            path='./data/nq-open/',
+            path='opencompass/nq_open',
             reader_cfg=nq_reader_cfg,
             infer_cfg=nq_infer_cfg,
             eval_cfg=nq_eval_cfg)

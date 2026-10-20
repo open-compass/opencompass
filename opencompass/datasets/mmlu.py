@@ -15,7 +15,7 @@ from .base import BaseDataset
 class MMLUDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
+    def load(path: str, name: str, **kwargs):
         path = get_data_path(path)
         dataset = DatasetDict()
         if environ.get('DATASET_SOURCE') == 'ModelScope':

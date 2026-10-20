@@ -3,6 +3,7 @@
 from typing import Dict, List, Optional, Union
 
 import torch
+from mmengine.device import is_npu_available
 
 from opencompass.models.base import BaseModel, LMTemplateParser
 from opencompass.models.base_api import APITemplateParser
@@ -105,7 +106,7 @@ def _format_with_fast_chat_template(inputs: List[str], name: str='vicuna'):
             elif item['role'] == 'system':
                 continue
             else:
-                raise ValueError(f'Unknown role {item["role"]}')
+                raise ValueError(f"Unknown role {item['role']}")
         template.append_message(template.roles[1], None)
         outputs.append(template.get_prompt())
     return outputs
@@ -123,20 +124,48 @@ def _get_meta_template(meta_template):
     return APITemplateParser(meta_template or default_meta_template)
 
 
-def _set_model_kwargs_torch_dtype(model_kwargs):
+def _set_model_kwargs_torch_dtype(model_kwargs, path=None):
     import torch
-    if 'torch_dtype' not in model_kwargs:
-        torch_dtype = torch.float16
+    from transformers import AutoConfig
+
+    # If torch_dtype already exists and is not a string, return directly
+    if 'torch_dtype' in model_kwargs and not isinstance(model_kwargs['torch_dtype'], str):
+        return model_kwargs
+
+    # Mapping from string to torch data types
+    dtype_map = {
+        'torch.float16': torch.float16, 'float16': torch.float16,
+        'torch.bfloat16': torch.bfloat16, 'bfloat16': torch.bfloat16,
+        'torch.float': torch.float, 'float': torch.float,
+        'torch.float32': torch.float32, 'float32': torch.float32,
+        'auto': 'auto', 'None': None
+    }
+
+    # 1. Priority: Use torch_dtype from model_kwargs if available
+    if 'torch_dtype' in model_kwargs:
+        torch_dtype = dtype_map.get(model_kwargs['torch_dtype'], torch.float16)
+
+    # 2. Secondary: Try to read from model config
+    elif path is not None:
+        try:
+            config = AutoConfig.from_pretrained(path)
+            if hasattr(config, 'torch_dtype'):
+                config_dtype = config.torch_dtype
+                if isinstance(config_dtype, str):
+                    torch_dtype = dtype_map.get(config_dtype, torch.float16)
+                else:
+                    torch_dtype = config_dtype
+            else:
+                torch_dtype = torch.float16
+        except Exception:
+            torch_dtype = torch.float16
+
+    # 3. Default: Use float16 as fallback
     else:
-        torch_dtype = {
-            'torch.float16': torch.float16,
-            'torch.bfloat16': torch.bfloat16,
-            'torch.float': torch.float,
-            'auto': 'auto',
-            'None': None,
-        }.get(model_kwargs['torch_dtype'])
-    if torch_dtype is not None:
-        model_kwargs['torch_dtype'] = torch_dtype
+        torch_dtype = torch.float16
+
+    # Update model_kwargs with the resolved torch_dtype
+    model_kwargs['torch_dtype'] = torch_dtype
     return model_kwargs
 
 
@@ -217,13 +246,15 @@ class HuggingFacewithChatTemplate(BaseModel):
         raise ValueError('pad_token_id is not set for this tokenizer. Please set `pad_token_id={PAD_TOKEN_ID}` in model_cfg.')
 
     def _load_model(self, path: str, kwargs: dict, peft_path: Optional[str] = None, peft_kwargs: dict = dict()):
-        from transformers import AutoModel, AutoModelForCausalLM
+        from transformers import AutoConfig, AutoModel, AutoModelForCausalLM
 
         DEFAULT_MODEL_KWARGS = dict(device_map='auto', trust_remote_code=True)
         model_kwargs = DEFAULT_MODEL_KWARGS
         model_kwargs.update(kwargs)
-        model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs)
+        model_kwargs = _set_model_kwargs_torch_dtype(model_kwargs, path)
         self.logger.debug(f'using model_kwargs: {model_kwargs}')
+        if is_npu_available():
+            model_kwargs['device_map'] = 'npu'
 
         try:
             self.model = AutoModelForCausalLM.from_pretrained(path, **model_kwargs)
@@ -471,6 +502,8 @@ class HuggingFacewithChatTemplate(BaseModel):
         if min_out_len is not None:
             generation_kwargs['min_new_tokens'] = min_out_len
         generation_kwargs['pad_token_id'] = self.tokenizer.pad_token_id
+        self.logger.info('Generation Args of Huggingface: ')
+        self.logger.info(generation_kwargs)
 
         # step-2: conduct model forward to generate output
         outputs = self.model.generate(**tokens, **generation_kwargs)
@@ -515,6 +548,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
                  max_seq_len: Optional[int] = None,
                  pad_token_id: Optional[int] = None,
                  stop_words: Optional[str] = [],
+                 drop_middle: bool = False,
                  **other_kwargs):
 
         self.logger = get_logger()
@@ -522,6 +556,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
         self.tokenizer_only = tokenizer_only
         self.template_parser = LMTemplateParser()
         self.max_seq_len = _get_possible_max_seq_len(max_seq_len, path)
+        self.drop_middle = drop_middle
         self._load_tokenizer(tokenizer_path or path, tokenizer_kwargs, pad_token_id)
         if not tokenizer_only:
             self._load_model(path=path, kwargs=model_kwargs, peft_path=peft_path, peft_kwargs=peft_kwargs)
@@ -548,7 +583,17 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             add_special_tokens=True,
             max_length=self.max_seq_len
         )
-        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
+        if self.drop_middle:
+            assert len(inputs) == 1
+            input_ids = self.tokenizer(inputs, padding=False, truncation=False)['input_ids']
+            input_ids = torch.tensor(input_ids)
+            if input_ids.shape[-1] > self.max_seq_len:
+                input_ids = torch.cat([input_ids[:, : self.max_seq_len // 2], input_ids[:, - self.max_seq_len // 2:]], dim=-1)
+            tokens = {'input_ids': input_ids, }
+        else:
+            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
 
         generation_kwargs = self.generation_kwargs.copy()
@@ -600,7 +645,17 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             add_special_tokens=True,
             max_length=self.max_seq_len
         )
-        tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
+        if self.drop_middle:
+            assert len(inputs) == 1
+            input_ids = self.tokenizer(inputs, padding=False, truncation=False)['input_ids']
+            input_ids = torch.tensor(input_ids)
+            if input_ids.shape[-1] > self.max_seq_len:
+                input_ids = torch.cat([input_ids[:, : self.max_seq_len // 2], input_ids[:, - self.max_seq_len // 2:]], dim=-1)
+            tokens = {'input_ids': input_ids, }
+        else:
+            tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
+
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
         outputs = self.model(**tokens)[0]
 

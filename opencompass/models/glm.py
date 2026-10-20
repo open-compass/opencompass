@@ -75,7 +75,7 @@ class GLM130B(BaseModel):
             ['--vocab-size', '150528'],
             ['--num-attention-heads', '96'],
             ['--max-sequence-length', '2048'],
-            ['--tokenizer-type', 'icetk-glm-130B'],
+            ['--tokenizer-type', 'icetk-glm-130B'],  # gitleaks:allow
             ['--layernorm-order', 'post'],
             ['--load', self.ckpt_path],
             ['--skip-init'],

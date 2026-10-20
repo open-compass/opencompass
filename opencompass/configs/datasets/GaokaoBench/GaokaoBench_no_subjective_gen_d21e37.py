@@ -30,10 +30,12 @@ for folder, prompts in [
             'evaluator': {'type': 'GaokaoBenchEvaluator' + '_' + p['type']},
             'pred_role': 'BOT',
         }
+        _base_path = 'opencompass/GAOKAO-BENCH'
         dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + p['keyword'],
-            'path': os.path.join('data', 'GAOKAO-BENCH', 'data', folder, p['keyword'] + '.json'),
+            'path': _base_path,
+            'filename': '/' + folder + '/' + p['keyword'] + '.json',
             'name': p['keyword'],
             'reader_cfg': reader_cfg,
             'infer_cfg': infer_cfg,

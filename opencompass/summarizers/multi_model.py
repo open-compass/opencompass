@@ -180,7 +180,8 @@ class MultiModelSummarizer:
             dataset_abbr = dataset_abbr_from_cfg(dataset)
             if 'GenInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
-            elif 'PPLInferencer' in inferencer:
+            elif ('PPLInferencer' in inferencer
+                  or 'PPLOnlyInferencer' in inferencer):
                 dataset_eval_mode[dataset_abbr] = 'ppl'
             else:
                 dataset_eval_mode[dataset_abbr] = 'unknown'
@@ -283,25 +284,20 @@ class MultiModelSummarizer:
         self.models_summary_group_metrics[new_model_name] = summarizer.models_summary_group_metrics[new_model_name]
 
     def summarize(self):
-        """
-        Format in self.table
-        [
-            ['dataset', 'version', 'metric', 'mode', 'model_name'],
-            ['--------- 考试 Exam ---------', '-', '-', '-', '-'],
-            ['ARC-c', '1e0de5', 'accuracy', 'gen', '79.32'],
-            ['ARC-e', '1e0de5', 'accuracy', 'gen', '85.36'],
-            ['--------- 语言 Language ---------', '-', '-', '-', '-'],
-            ['WiC', 'd06864', 'accuracy', 'gen', '55.64'],
-            ['chid-dev', '211ee7', 'accuracy', 'gen', '52.97'],
-            ['--------- 知识 Knowledge ---------', '-', '-', '-', '-'],
-            ['BoolQ', '883d50', 'accuracy', 'gen', '86.06'],
-            ['--------- 理解 Understanding ---------', '-', '-', '-', '-'],
-            ['C3', '8c358f', 'accuracy', 'gen', '88.33'],
-            ['race-middle', '9a54b6', 'accuracy', 'gen', '90.32'],
-            ['--------- 推理 Reasoning ---------', '-', '-', '-', '-'],
-            ['cmnli', '1abf97', 'accuracy', 'gen', '38.26'],
-            ['ocnli', 'c4cb6c', 'accuracy', 'gen', '32.92'],
-        ]
+        """Format in self.table [ ['dataset', 'version', 'metric', 'mode',
+        'model_name'], ['--------- 考试 Exam ---------', '-', '-', '-', '-'],
+
+        ['ARC-c', '1e0de5', 'accuracy', 'gen', '79.32'], ['ARC-e', '1e0de5',
+        'accuracy', 'gen', '85.36'], ['--------- 语言 Language ---------', '-',
+        '-', '-', '-'], ['WiC', 'd06864', 'accuracy', 'gen', '55.64'], ['chid-
+
+        dev', '211ee7', 'accuracy', 'gen', '52.97'], ['--------- 知识 Knowledge
+        ---------', '-', '-', '-', '-'], ['BoolQ', '883d50', 'accuracy', 'gen',
+        '86.06'], ['--------- 理解 Understanding ---------', '-', '-', '-', '-'],
+        ['C3', '8c358f', 'accuracy', 'gen', '88.33'], ['race-middle', '9a54b6',
+        'accuracy', 'gen', '90.32'], ['--------- 推理 Reasoning ---------', '-',
+        '-', '-', '-'], ['cmnli', '1abf97', 'accuracy', 'gen', '38.26'],
+        ['ocnli', 'c4cb6c', 'accuracy', 'gen', '32.92'], ]
         """
 
         table = Table()

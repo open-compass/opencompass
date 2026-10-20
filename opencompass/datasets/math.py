@@ -1,4 +1,5 @@
 import json
+import os
 import re
 from os import environ
 
@@ -140,7 +141,7 @@ def extract_answer(response_text: str):
 class MATHDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, file_name: str = 'math.json', **kwargs):
         path = get_data_path(path)
         dataset = DatasetDict()
         raw_data = []
@@ -155,7 +156,8 @@ class MATHDataset(BaseDataset):
                     extract_boxed_answer(item['solution'])
                 })
         else:
-            data = json.load(open(path))
+            file_path = os.path.join(path, file_name)
+            data = json.load(open(file_path))
             for i in data.keys():
                 raw_data.append({
                     'problem':
@@ -202,7 +204,11 @@ def math_postprocess_v2(text: str) -> str:
 @ICL_EVALUATORS.register_module()
 class MATHEvaluator(BaseEvaluator):
 
-    def __init__(self, version='v1'):
+    def __init__(self,
+                 version='v1',
+                 pred_postprocessor=None):  # 可能需要接收父类__init__的参数
+        super().__init__(
+            pred_postprocessor=pred_postprocessor)  # 调用父类的__init__
         assert version in ['v1', 'v2']
         self.version = version
 
@@ -506,7 +512,7 @@ class MATHEvaluator(BaseEvaluator):
 
 @ICL_EVALUATORS.register_module()
 class MATHAgentEvaluator(MATHEvaluator):
-    """math agent evaluator for soft condition.
+    """Math agent evaluator for soft condition.
 
     Args:
         action (str): Action for catching internal prediction.

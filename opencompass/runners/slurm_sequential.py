@@ -24,11 +24,11 @@ class SlurmSequentialRunner(BaseRunner):
     using `srun` command.
 
     This runner launches tasks one by one for execution. A new task will only
-    be launched when and only when max_num_workers is not met, and the previous
-    task has been successfully allocated to a machine. Therefore, unlike the
-    `SlurmRunner`, at most only one task will be in the PENDING status at the
-    same time during a run, making the random_sleep strategy no longer
-    necessary. In addition, this runner also includes a feature to
+    be launched when and only when  max_num_workers is not met, and the
+    previous task has been successfully allocated to a machine. Therefore,
+    unlike the `SlurmRunner`, at most only one task will be in the PENDING
+    status at the same time during a run, making the random_sleep strategy
+    no longer necessary. In addition, this runner also includes a feature to
     automatically kill all jobs by the job_id on exit.
 
     The runner will obtain the job_id by reading the srun output similar to
@@ -47,6 +47,10 @@ class SlurmSequentialRunner(BaseRunner):
         lark_bot_url (str): Lark bot url. Defaults to None.
         extra_command (List, optional): Extra slurm command.
             For example ['-c 12', '-w node1']. Defaults to None.
+        keep_tmp_file (bool): Whether to keep the temporary file. Defaults to
+            False.
+        tmp_dir (str): The directory to store temporary files.
+            Defaults to 'tmp'.
     """
 
     def __init__(self,
@@ -59,14 +63,20 @@ class SlurmSequentialRunner(BaseRunner):
                  qos: str = None,
                  debug: bool = False,
                  lark_bot_url: str = None,
-                 extra_command: Optional[List[str]] = None):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+                 extra_command: Optional[List[str]] = None,
+                 keep_tmp_file: bool = False,
+                 tmp_dir: str = 'tmp'):
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.max_num_workers = max_num_workers
         self.retry = retry
         self.partition = partition
         self.quotatype = quotatype
         self.qos = qos
         self.task_prefix = task_prefix
+        self.keep_tmp_file = keep_tmp_file
         if not extra_command:
             extra_command = []
         assert isinstance(extra_command, list)
@@ -170,8 +180,12 @@ class SlurmSequentialRunner(BaseRunner):
         task_name = self.task_prefix + task_name
 
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_params.py'
+        mmengine.mkdir_or_exist(self.tmp_dir)
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, param_file)
         process = None
         try:
             cfg.dump(param_file)
@@ -256,7 +270,11 @@ class SlurmSequentialRunner(BaseRunner):
                 child_conn.close()
             if process is not None:
                 process.kill()
-            os.remove(param_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+            else:
+                pass
+
         return task_name, process.returncode
 
     def _job_failed(self, return_code: int, output_paths: List[str]) -> bool:

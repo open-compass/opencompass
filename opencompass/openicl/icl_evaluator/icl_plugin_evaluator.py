@@ -2,8 +2,12 @@
 
 import json
 
+from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.registry import ICL_EVALUATORS
 
-class TEvalEvaluator:
+
+@ICL_EVALUATORS.register_module()
+class TEvalEvaluator(BaseEvaluator):
     """This module contains the following evaluators for evaluating the
     capabilities of the various dimensions of the LLM.
 

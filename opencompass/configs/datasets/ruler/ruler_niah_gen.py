@@ -1,9 +1,7 @@
+from opencompass.datasets.ruler.ruler_niah import RulerNiahDataset, RulerNiahEvaluator
+from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.datasets.ruler.ruler_niah import RulerNiahDataset
-from opencompass.datasets.ruler.ruler_niah import RulerNiahEvaluator
-
 
 # Ruler Dataset settings
 niah_configurations = [
@@ -92,10 +90,7 @@ for index, config in enumerate(niah_configurations):
         'type': RulerNiahDataset,
         'base_path': base_path,
         'file_path': file_path,
-        # 'tokenizer_model': model_path,
         'tokens_to_generate': 128,
-        # 'max_seq_length': max_seq_len,
-        # 'num_samples': NUM_SAMPLES,
         'type_haystack': config['type_haystack'],
         'type_needle_k': config['type_needle_k'],
         'type_needle_v': config['type_needle_v'],

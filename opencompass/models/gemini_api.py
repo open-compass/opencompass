@@ -44,21 +44,18 @@ class Gemini(BaseAPIModel):
         top_p: float = 0.8,
         top_k: float = 10.0,
     ):
-        super().__init__(path=path,
-                         max_seq_len=max_seq_len,
-                         query_per_second=query_per_second,
-                         meta_template=meta_template,
-                         retry=retry)
+        super().__init__(
+            path=path,
+            max_seq_len=max_seq_len,
+            query_per_second=query_per_second,
+            meta_template=meta_template,
+            retry=retry,
+        )
         assert isinstance(key, str)
         if key == 'ENV':
             if 'GEMINI_API_KEY' not in os.environ:
                 raise ValueError('GEMINI API key is not set.')
             key = os.getenv('GEMINI_API_KEY')
-
-        assert path in [
-            'gemini-1.0-pro', 'gemini-pro', 'gemini-1.5-flash',
-            'gemini-1.5-pro'
-        ]  # https://ai.google.dev/gemini-api/docs/models/gemini#model-variations
 
         self.url = f'https://generativelanguage.googleapis.com/v1beta/models/{path}:generateContent?key={key}'
         self.temperature = temperature
@@ -147,19 +144,15 @@ class Gemini(BaseAPIModel):
             'safetySettings': [
                 {
                     'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
                 {
                     'category': 'HARM_CATEGORY_HATE_SPEECH',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
                 {
                     'category': 'HARM_CATEGORY_HARASSMENT',
-                    'threshold': 'BLOCK_NONE'
-                },
-                {
-                    'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                    'threshold': 'BLOCK_NONE'
+                    'threshold': 'BLOCK_NONE',
                 },
             ],
             'generationConfig': {
@@ -167,8 +160,8 @@ class Gemini(BaseAPIModel):
                 'temperature': self.temperature,
                 'maxOutputTokens': 2048,
                 'topP': self.top_p,
-                'topK': self.top_k
-            }
+                'topK': self.top_k,
+            },
         }
 
         for _ in range(self.retry):
@@ -190,14 +183,17 @@ class Gemini(BaseAPIModel):
                     if 'content' not in response['candidates'][0]:
                         return "Due to Google's restrictive policies, I am unable to respond to this question."
                     else:
-                        return response['candidates'][0]['content']['parts'][
-                            0]['text'].strip()
+                        if not response['candidates'][0]['content']:
+                            return ''
+                        else:
+                            return response['candidates'][0]['content'][
+                                'parts'][0]['text'].strip()
             try:
                 msg = response['error']['message']
                 self.logger.error(msg)
             except KeyError:
                 pass
             self.logger.error(response)
-            time.sleep(1)
+            time.sleep(20)
 
         raise RuntimeError('API call failed.')

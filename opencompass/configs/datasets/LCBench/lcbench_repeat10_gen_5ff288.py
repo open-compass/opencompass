@@ -86,7 +86,7 @@ LC_cn_infer_cfg = dict(
 
 LC_eval_cfg = dict(evaluator=dict(type=LCPassKEvaluator), pred_role='BOT')
 
-LCBench_datasets_repeat10 = [
+LCBench_repeat10_datasets = [
     dict(
         type=LCDataset,
         abbr='lcbench_en_repeat10',

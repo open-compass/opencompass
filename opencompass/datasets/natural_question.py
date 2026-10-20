@@ -55,7 +55,7 @@ class NQOpenDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path)
         dataset = DatasetDict()
         for split in ['validation', 'train']:
             filename = osp.join(path, f'nq-open-{split}.jsonl')

@@ -2,8 +2,8 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import LMEvaluator
-from opencompass.datasets import AlignmentBenchDataset
 from opencompass.summarizers import AlignmentBenchSummarizer
+from opencompass.datasets import AlignmentBenchDataset
 
 subjective_reader_cfg = dict(
     input_columns=['question', 'capability', 'critiquellm_prefix'],
@@ -32,7 +32,7 @@ for _name in subjective_all_sets:
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=2048),
+            inferencer=dict(type=GenInferencer),
         )
 
     subjective_eval_cfg = dict(

@@ -5,6 +5,7 @@ import copy
 import getpass
 import os
 import os.path as osp
+import threading
 from datetime import datetime
 
 from mmengine.config import Config, DictAction
@@ -12,9 +13,27 @@ from mmengine.config import Config, DictAction
 from opencompass.registry import PARTITIONERS, RUNNERS, build_from_cfg
 from opencompass.runners import SlurmRunner
 from opencompass.summarizers import DefaultSummarizer
-from opencompass.utils import LarkReporter, get_logger
+from opencompass.utils import (HeartBeatManager, LarkReporter, get_logger,
+                               pretty_print_config, read_from_station,
+                               save_to_station)
+from opencompass.utils.repeat_analysis import analyze_repeat_predictions
 from opencompass.utils.run import (fill_eval_cfg, fill_infer_cfg,
                                    get_config_from_arg)
+
+
+def _run_eval_tasks(runner, tasks):
+    if isinstance(tasks, list) and len(tasks) != 0 and isinstance(tasks[0],
+                                                                  list):
+        for task_part in tasks:
+            runner(task_part)
+    else:
+        runner(tasks)
+
+
+def _is_eval_daemon(task_type) -> bool:
+    if isinstance(task_type, str):
+        return task_type.endswith('OpenICLEvalWatchTask')
+    return getattr(task_type, '__name__', '') == 'OpenICLEvalWatchTask'
 
 
 def parse_args():
@@ -93,6 +112,11 @@ def parse_args():
         help='Use the custom config directory instead of config/ to '
         'search the configs for datasets, models and summarizers',
         type=str)
+    parser.add_argument(
+        '--config-verbose',
+        default=False,
+        action='store_true',
+        help='Whether to print the config in verbose mode.')
     parser.add_argument('-l',
                         '--lark',
                         help='Report the running status to lark bot',
@@ -118,15 +142,57 @@ def parse_args():
     parser.add_argument(
         '--dump-eval-details',
         help='Whether to dump the evaluation details, including the '
-        'correctness of each sample, bpb, etc.',
-        action='store_true',
+        'correctness of each sample, bpb, etc. Defaults to True.',
+        nargs='?',
+        const=True,
+        default=True,
+        type=lambda x: False if x and x.lower() == 'false' else True
     )
+    parser.add_argument('--dump-res-length',
+                        help='dump the length of model responses',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('--analysis-repeat',
+                        help='Analyze repeated predictions in viz stage.',
+                        action='store_true',
+                        default=False)
     parser.add_argument(
         '--dump-extract-rate',
         help='Whether to dump the evaluation details, including the '
         'correctness of each sample, bpb, etc.',
         action='store_true',
     )
+    # for the results persistence
+    parser.add_argument('-sp',
+        '--station-path',
+        help='Path to your results station.',
+        type=str,
+        default=None,
+    )
+    parser.add_argument('--station-overwrite',
+        help='Whether to overwrite the results at station.',
+        action='store_true',
+    )
+    parser.add_argument(
+        '--read-from-station',
+        help='Whether to save the evaluation results to the '
+             'data station.',
+        action='store_true',
+    )
+    # for evaluation with multiple runs
+    parser.add_argument('--dataset-num-runs',
+        help='How many runs for one dataset',
+        type=int,
+        default=1,
+    )
+
+    parser.add_argument(
+        '--dump-only-message-path',
+        help='Where to dump message only',
+        type=str,
+        default=None,
+    )
+
     # set srun args
     slurm_parser = parser.add_argument_group('slurm_args')
     parse_slurm_args(slurm_parser)
@@ -177,8 +243,6 @@ def parse_dlc_args(dlc_parser):
                             type=str)
 
 
-
-
 def parse_hf_args(hf_parser):
     """These args are all for the quick construction of HuggingFace models."""
     hf_parser.add_argument('--hf-type', type=str, choices=['base', 'chat'], default='chat', help='The type of the HuggingFace model, base or chat')
@@ -213,7 +277,6 @@ def parse_custom_dataset_args(custom_dataset_parser):
 
 def main():
     args = parse_args()
-
     if args.num_gpus is not None:
         raise ValueError('The `--num-gpus` argument is deprecated, please use '
                          '`--hf-num-gpus` to describe number of gpus used for '
@@ -243,9 +306,11 @@ def main():
         else:
             dir_time_str = args.reuse
         logger.info(f'Reusing experiements from {dir_time_str}')
-    elif args.mode in ['eval', 'viz']:
-        raise ValueError('You must specify -r or --reuse when running in eval '
-                         'or viz mode!')
+    elif args.mode in ['eval', 'viz'] and not args.read_from_station:
+        raise ValueError(
+            'You must specify -r or --reuse, or you have to specify '
+            '--read-from-station and --station-path when running in eval '
+            'or viz mode!')
 
     # update "actual" work_dir
     cfg['work_dir'] = osp.join(cfg.work_dir, dir_time_str)
@@ -262,6 +327,12 @@ def main():
     # types cannot be serialized
     cfg = Config.fromfile(output_config_path, format_python_code=False)
 
+    # get existed results from station
+    if args.read_from_station:
+        existing_results_list = read_from_station(cfg, args)
+        rs_exist_results = [comb['combination'] for comb in existing_results_list]
+        cfg['rs_exist_results'] = rs_exist_results
+
     # report to lark bot if specify --lark
     if not args.lark:
         cfg['lark_bot_url'] = None
@@ -269,6 +340,20 @@ def main():
         content = f'{getpass.getuser()}\'s task has been launched!'
         LarkReporter(cfg['lark_bot_url']).post(content)
 
+
+    # print config if specified --config-verbose
+    if args.config_verbose:
+        pretty_print_config(cfg)
+
+    infer_tasks = None
+    infer_runner = None
+    eval_tasks = None
+    eval_runner = None
+    eval_daemon = False
+
+    # ========================
+    #  Setup Configuration
+    # ========================
     if args.mode in ['all', 'infer']:
         # When user have specified --slurm or --dlc, or have not set
         # "infer" in config, we will provide a default configuration
@@ -305,7 +390,14 @@ def main():
             for task in tasks:
                 cfg.attack.dataset = task.datasets[0][0].abbr
                 task.attack = cfg.attack
-        runner(tasks)
+        if args.dump_res_length:
+            for task in tasks:
+                task.dump_res_length = True
+        if args.dump_only_message_path:
+            for task in tasks:
+                task.dump_only_message_path = args.dump_only_message_path
+        infer_tasks = tasks
+        infer_runner = runner
 
     # evaluate
     if args.mode in ['all', 'eval']:
@@ -321,6 +413,9 @@ def main():
         if args.dlc or args.slurm or cfg.get('eval', None) is None:
             fill_eval_cfg(cfg, args)
         if args.dump_eval_details:
+            logger.warning('Default to dump eval details, it might take extra'
+                        'space to save all the evaluation details. '
+                        'Set --dump-eval-details False to skip the details dump')
             cfg.eval.runner.task.dump_details = True
         if args.dump_extract_rate:
             cfg.eval.runner.task.cal_extract_rate = True
@@ -341,14 +436,39 @@ def main():
         if args.dry_run:
             return
         runner = RUNNERS.build(cfg.eval.runner)
+        task_type = getattr(cfg.eval.runner, 'task', {}).get('type', '')
+        eval_daemon = _is_eval_daemon(task_type)
 
-        # For meta-review-judge in subjective evaluation
-        if isinstance(tasks, list) and len(tasks) != 0 and isinstance(
-                tasks[0], list):
-            for task_part in tasks:
-                runner(task_part)
-        else:
-            runner(tasks)
+        eval_tasks = tasks
+        eval_runner = runner
+
+    # =================
+    #  Startup Runner
+    # =================
+    if infer_runner and eval_runner and eval_daemon:
+        heartbeat = HeartBeatManager(cfg['work_dir'])
+        stop_event, hb_thread = heartbeat.start_heartbeat()
+
+        eval_thread = threading.Thread(target=_run_eval_tasks,
+                                       args=(eval_runner, eval_tasks),
+                                       daemon=True)
+        eval_thread.start()
+
+        infer_runner(infer_tasks)
+
+        stop_event.set()
+        hb_thread.join()
+        logger.info('All infer tasks finished, stop heartbeat.')
+        eval_thread.join()
+    else:
+        if infer_runner is not None:
+            infer_runner(infer_tasks)
+        if eval_runner is not None:
+            _run_eval_tasks(eval_runner, eval_tasks)
+
+    # save to station
+    if args.station_path is not None or cfg.get('station_path') is not None:
+        save_to_station(cfg, args)
 
     # visualize
     if args.mode in ['all', 'eval', 'viz']:
@@ -385,6 +505,13 @@ def main():
             summarizer = build_from_cfg(summarizer_cfg)
             summarizer.summarize(time_str=cfg_time_str)
 
+        if args.analysis_repeat:
+            output_path = analyze_repeat_predictions(
+                cfg,
+                time_str=cfg_time_str,
+                show_progress=True,
+                print_summary=True)
+            logger.info(f'write repeat analysis to {osp.abspath(output_path)}')
 
 
 if __name__ == '__main__':

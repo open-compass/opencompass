@@ -16,7 +16,7 @@ from .base import BaseDataset
 class GPQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
+    def load(path: str, name: str, **kwargs):
         path = get_data_path(path, local_mode=True)
         cnt = 0
         data = []

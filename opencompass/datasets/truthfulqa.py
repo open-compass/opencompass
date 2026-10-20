@@ -2,6 +2,7 @@ import evaluate
 import numpy as np
 import torch
 from datasets import load_dataset
+from mmengine.device import is_npu_available
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -9,7 +10,13 @@ from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
 
 from .base import BaseDataset
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+if is_npu_available():
+    backend = 'npu'
+elif torch.cuda.is_available():
+    backend = 'cuda'
+else:
+    backend = 'cpu'
+device = torch.device(backend)
 
 
 @LOAD_DATASET.register_module()

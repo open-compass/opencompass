@@ -3,7 +3,7 @@ _cibench_generation_modules = ['pandas', 'matplotlib', 'opencv', 'scipy', 'seabo
 _cibench_generation = ['cibench_generation/' + i for i in _cibench_generation_modules]
 cibench_summary_groups = []
 _cibench_generation_weight = {
-    'matplotlib': [223, 50, 1, 156],
+    'matplotlib': [175, 2, 1, 156],
     'pandas': [200, 45, 45, 38],
     'pytorch': [69, 0, 8, 11],
     'seaborn': [130, 0, 2, 106],

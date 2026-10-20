@@ -320,14 +320,14 @@ class BulletListChecker(Instruction):
     def check_following(self, value):
         r"""Check if the number of bullet lists meets the requirement.
 
-    Args:
-      value: A string representing the response. The response is expected to
-        contain some bullet lists that start with `\*`.
+        Args:
+          value: A string representing the response. The response is expected to
+            contain some bullet lists that start with `\*`.
 
-    Returns:
-      True if the actual number of bullet lists in the response meets the
-      requirement.
-    """
+        Returns:
+          True if the actual number of bullet lists in the response meets the
+          requirement.
+        """
         bullet_lists = re.findall(r'^\s*\*[^\*].*$', value, flags=re.MULTILINE)
         bullet_lists_2 = re.findall(r'^\s*-.*$', value, flags=re.MULTILINE)
         num_bullet_lists = len(bullet_lists) + len(bullet_lists_2)
@@ -687,14 +687,14 @@ class RephraseChecker(Instruction):
     def check_following(self, value):
         r"""Checks if the rephrasing follows the instruction.
 
-    Args:
-      value: A string representing the response, which is expected to rephras
-        the string of `instruction_args`.
+        Args:
+          value: A string representing the response, which is expected to rephras
+            the string of `instruction_args`.
 
-    Returns:
-      True if `value` and `instruction_args` only differ by the words/sentences
-      in between two asterisks such as *change me*; otherwise, False.
-    """
+        Returns:
+          True if `value` and `instruction_args` only differ by the words/sentences
+          in between two asterisks such as *change me*; otherwise, False.
+        """
 
         if not self.is_change(value):
             raise ValueError(f'value {value} does not contain '
@@ -930,17 +930,17 @@ class ParagraphFirstWordCheck(Instruction):
                           first_word=None):
         r"""Build the instruction description.
 
-    Args:
-      num_paragraphs: An integer indicating the number of paragraphs expected
-        in the response. A paragraph is a subset of the string that is
-        expected to be separated by '\n\n'.
-      nth_paragraph: An integer indicating the paragraph number that we look at.
-        Note that n starts from 1.
-      first_word: A string that represent the first word of the bth paragraph.
+        Args:
+          num_paragraphs: An integer indicating the number of paragraphs expected
+            in the response. A paragraph is a subset of the string that is
+            expected to be separated by '\n\n'.
+          nth_paragraph: An integer indicating the paragraph number that we look at.
+            Note that n starts from 1.
+          first_word: A string that represent the first word of the bth paragraph.
 
-    Returns:
-      A string representing the instruction description.
-    """
+        Returns:
+          A string representing the instruction description.
+        """
         self._num_paragraphs = num_paragraphs
         if self._num_paragraphs is None or self._num_paragraphs < 0:
             self._num_paragraphs = random.randint(1, _NUM_PARAGRAPHS)

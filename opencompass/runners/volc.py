@@ -36,6 +36,9 @@ class VOLCRunner(BaseRunner):
         retry (int): Number of retries when job failed. Default: 2.
         debug (bool): Whether to run in debug mode. Default: False.
         lark_bot_url (str): Lark bot url. Default: None.
+        keep_tmp_file (bool): Whether to keep the temporary file. Default:
+            False.
+        tmp_dir (str): The directory to store temporary files. Default: 'tmp'.
     """
 
     def __init__(self,
@@ -47,14 +50,20 @@ class VOLCRunner(BaseRunner):
                  max_num_workers: int = 32,
                  retry: int = 2,
                  debug: bool = False,
-                 lark_bot_url: str = None):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+                 lark_bot_url: str = None,
+                 keep_tmp_file: bool = True,
+                 tmp_dir: str = 'tmp'):
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.volcano_cfg = volcano_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
         self.queue_name = queue_name
         self.preemptible = preemptible
         self.priority = priority
+        self.keep_tmp_file = keep_tmp_file
 
     def launch(self, tasks: List[Dict[str, Any]]) -> List[Tuple[str, int]]:
         """Launch multiple tasks.
@@ -99,10 +108,15 @@ class VOLCRunner(BaseRunner):
         # Build up VCC command
         pwd = os.getcwd()
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
-        param_file = f'{pwd}/tmp/{os.getpid()}_params.py'
+        mmengine.mkdir_or_exist(self.tmp_dir)
+        # Using uuid to avoid filename conflict
+        import uuid
+        uuid_str = str(uuid.uuid4())
+        param_file = f'{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, param_file)
 
-        volc_cfg_file = f'{pwd}/tmp/{os.getpid()}_cfg.yaml'
+        volc_cfg_file = f'{uuid_str}_cfg.yaml'
+        volc_cfg_file = osp.join(self.tmp_dir, volc_cfg_file)
         volc_cfg = self._choose_flavor(num_gpus)
         with open(volc_cfg_file, 'w') as fp:
             yaml.dump(volc_cfg, fp, sort_keys=False)
@@ -171,7 +185,7 @@ class VOLCRunner(BaseRunner):
             cmd = get_cmd()
 
             logger = get_logger()
-            logger.debug(f'Running command: {cmd}')
+            logger.info(f'Running command: {cmd}')
 
             out_path = task.get_log_path(file_extension='txt')
             mmengine.mkdir_or_exist(osp.split(out_path)[0])
@@ -191,15 +205,26 @@ class VOLCRunner(BaseRunner):
 
         finally:
             # Clean up
-            os.remove(param_file)
-            os.remove(volc_cfg_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+                os.remove(volc_cfg_file)
+            else:
+                pass
+
         return task_name, returncode
 
     def _run_task(self, cmd, log_path, poll_interval):
+        logger = get_logger()
         result = subprocess.run(cmd,
                                 shell=True,
                                 text=True,
                                 capture_output=True)
+
+        logger.info(f'Command output: {result.stdout}')
+        if result.stderr:
+            logger.error(f'Command error: {result.stderr}')
+        logger.info(f'Return code: {result.returncode}')
+
         pattern = r'(?<=task_id=).*(?=\n\n)'
         match = re.search(pattern, result.stdout)
         if match:
@@ -211,20 +236,20 @@ class VOLCRunner(BaseRunner):
                 task_status = os.popen(ask_cmd).read()
                 pattern = r'(?<=\[{"Status":").*(?="}\])'
                 match = re.search(pattern, task_status)
-                if match:
-                    task_status = match.group()
-                else:
-                    task_status = 'Exception'
                 if self.debug:
                     print(task_status)
                 logs = os.popen(log_cmd).read()
                 with open(log_path, 'w', encoding='utf-8') as f:
                     f.write(logs)
-                if task_status in [
-                        'Success', 'Failed', 'Cancelled', 'Exception',
-                        'Killing', 'SuccessHolding', 'FailedHolding'
-                ]:
-                    break
+                if match:
+                    task_status = match.group()
+                    if task_status in [
+                            'Success', 'Failed', 'Cancelled', 'Exception',
+                            'Killing', 'SuccessHolding', 'FailedHolding',
+                            'Killed'
+                    ]:
+                        break
+                # If pattern not found or command failed, sleep and retry
                 time.sleep(poll_interval)
         else:
             task_status = 'Exception'
@@ -240,7 +265,7 @@ class VOLCRunner(BaseRunner):
         with open(config_path) as fp:
             volc_cfg = yaml.safe_load(fp)
         if num_gpus <= 0:
-            flavor = 'ml.c1ie.2xlarge'
+            flavor = 'ml.r3i.2xlarge'
         elif num_gpus == 1:
             flavor = 'ml.pni2l.3xlarge'
         elif num_gpus == 2:

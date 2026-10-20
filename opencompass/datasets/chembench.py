@@ -4,6 +4,7 @@ import os.path as osp
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -14,6 +15,7 @@ class ChemBenchDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         dataset = DatasetDict()
+        path = get_data_path(path)
         for split in ['dev', 'test']:
             raw_data = []
             filename = osp.join(path, split, f'{name}_benchmark.json')

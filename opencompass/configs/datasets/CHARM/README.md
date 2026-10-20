@@ -95,11 +95,11 @@ ln -snf ${path_to_CHARM_repo}/data/CHARM ./data/CHARM
 ```bash
 cd ${path_to_opencompass}
 
-# modify config file `configs/eval_charm_rea.py`: uncomment or add models you want to evaluate
-python run.py configs/eval_charm_rea.py -r --dump-eval-details
+# modify config file `examples/eval_charm_rea.py`: uncomment or add models you want to evaluate
+python run.py examples/eval_charm_rea.py -r --dump-eval-details
 
-# modify config file `configs/eval_charm_mem.py`: uncomment or add models you want to evaluate
-python run.py configs/eval_charm_mem.py -r --dump-eval-details
+# modify config file `examples/eval_charm_mem.py`: uncomment or add models you want to evaluate
+python run.py examples/eval_charm_mem.py -r --dump-eval-details
 ```
 The inference and evaluation results would be in `${path_to_opencompass}/outputs`, like this:
 ```bash

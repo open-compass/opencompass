@@ -4,12 +4,15 @@ import os.path as osp
 import re
 
 from datasets import Dataset, DatasetDict
-
-from opencompass.registry import LOAD_DATASET
+from collections import defaultdict
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
+from typing import Optional
 
+from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
+
+from .utils import get_judgeanswer_and_reference
 skip_first_tasks = ['FR', 'CR', 'AR', 'SA', 'SC', 'CM']
 
 need_ref_tasks = ['MR', 'GR']
@@ -310,6 +313,147 @@ class MTBench101Dataset(BaseDataset):
 
                 raw_data.append({
                     'dialogue': pre_dia_copy,
+                    'task': task,
+                    'multi_id': current_multi_id,
+                    'turn_id': turn_id,
+                    'system_prompt': system_prompt,
+                    'prompt_template': prompt_template,
+                    'judge': {
+                        'task': task,
+                        'multi_id': current_multi_id,
+                        'turn_id': turn_id,
+                    }
+                })
+                history = history + assistant
+
+        dataset = Dataset.from_list(raw_data)
+        return dataset
+
+
+def post_process_mtbench101(judgement: str):
+    """Input a string like below:
+
+    xxx[[5]]xxx, and extract the score
+    """
+    judgement = judgement['prediction']
+    match = re.search(r'\[([0-9]+)\]', judgement)
+    if match:
+        score = int(match.group(1))
+
+    else:
+        return None
+
+    return {'score': score, 'judgement': judgement}
+
+
+def get_final_results(judged_answers, references):
+
+    task_multi_id_scores = defaultdict(list)
+    task_scores = defaultdict(list)
+
+    for ans, ref in zip(judged_answers, references):
+
+        task = ref['task']
+        multi_id = ref['multi_id']
+        score = ans['score']
+
+        task_multi_id_scores[(task, multi_id)].append(score)
+
+    for (task, multi_id), scores in task_multi_id_scores.items():
+        min_score = min(scores)
+        task_scores[task].append(min_score)
+
+    final_task_scores = {
+        task: sum(scores) / len(scores) if scores else 0
+        for task, scores in task_scores.items()
+    }
+    if not final_task_scores:
+        return {'avg': 0.0}
+    average_score = round(
+        sum(final_task_scores.values()) / len(final_task_scores), 3)
+
+    return {f'avg': average_score, **final_task_scores}
+
+
+@DICT_POSTPROCESSORS.register_module('mtbench101')
+def mtbench101_postprocess(output: dict,
+                           output_path: str,
+                           ) -> dict:
+    judged_answers, references = get_judgeanswer_and_reference(
+        output, output_path, post_process_mtbench101)
+
+    if not judged_answers:
+        return {
+            'warning':
+            'no valid mtbench101 judgements extracted (expect [[score]] in output)',
+            'details': output,
+        }
+
+    results = get_final_results(judged_answers, references)
+    results['details'] = output
+    return results
+
+
+@LOAD_DATASET.register_module()
+class MTBench101WithRawPromptDataset(BaseDataset):
+
+    def load(self, path: str, name: str, *args, **kwargs):
+        import copy
+
+        filename = osp.join(path, f'{name}.jsonl')
+        filename = get_data_path(filename, local_mode=True)
+        raw_data = []
+
+        lines = open(filename, 'r', encoding='utf-8').readlines()
+        conversations = []
+        for line in lines:
+            line = json.loads(line)
+            conversations.append(line)
+
+        for dialogue in conversations:
+            multi_id = dialogue['id']
+            task = dialogue['task']
+            if task in skip_first_tasks:
+                skip_first = True
+            else:
+                skip_first = False
+
+            current_multi_id = None
+            pre_dia = []
+            history = ''
+            for turn_index, turn in enumerate(dialogue['history']):
+                human = turn['user']
+                assistant = turn['bot']
+                turn_id = str(turn_index + 1)
+
+                if current_multi_id is not None and multi_id != current_multi_id:
+                    pre_dia = []
+                    history = ''
+
+                current_multi_id = multi_id
+
+                if skip_first and turn_index == 0:
+                    pre_dia = add_format(question=human, answer=assistant)
+                    history = '\n\n Human: ' + human + '\n\nAssistant: ' + assistant
+                    continue
+
+                history = history + '\n\n Human: ' + human + '\n\nAssistant: '
+                pre_dia += add_format(question=human, answer=assistant)
+
+                pre_dia_copy = copy.deepcopy(pre_dia)
+
+                # Strip last assistant message so the model doesn't see
+                # the gold answer (matches old ChatInferencer.infer_last).
+                if pre_dia_copy and pre_dia_copy[-1]['role'] == 'assistant':
+                    dialogue_for_infer = pre_dia_copy[:-1]
+                else:
+                    dialogue_for_infer = pre_dia_copy
+
+                system_prompt, prompt_template = eval_prompt_construct(
+                    task, pre_dia, history)
+
+                raw_data.append({
+                    'dialogue': dialogue_for_infer,
                     'task': task,
                     'multi_id': current_multi_id,
                     'turn_id': turn_id,

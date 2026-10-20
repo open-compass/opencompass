@@ -390,6 +390,7 @@ class LMTemplateParser:
                 elif item.get('prompt', ''):  # it's a dict
                     prompt += last_sep + item.get('prompt', '')
                 last_sep = '\n'
+
         return prompt
 
     def _split_rounds(

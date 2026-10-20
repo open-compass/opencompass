@@ -5,6 +5,7 @@ import json
 import os.path as osp
 import re
 import tempfile
+from argparse import Namespace
 from os import environ
 from typing import List
 
@@ -154,27 +155,34 @@ class HumanEvalPlusEvaluator(BaseEvaluator):
                 test_details=0.2,
                 min_time_limit=0.2,
                 gt_time_limit_factor=4.0,
-                mini=None,
+                mini=False,
+                noextreme=False,
             )
-            score = evaluate(flags)
+            evaluate(Namespace(**flags))
             results_path = osp.join(tmp_dir, 'human_eval_eval_results.json')
             with open(results_path, 'r') as f:
-                results = json.load(f)
+                eval_results = json.load(f)
             details = {}
+            n_total = 0
+            n_plus_pass = 0
             for index in range(len(predictions)):
-                r = results['eval'][references[index]]
-
+                task_results = eval_results['eval'][references[index]]
+                r = task_results[0]
+                n_total += 1
+                if r['base_status'] == 'pass' and r.get('plus_status') == 'pass':
+                    n_plus_pass += 1
                 details[str(index)] = {
                     'prompt': prompts[index],
                     'prediction': predictions[index],
                     'reference': references[index],
-                    'base_result': r['base'][0][0],
-                    'plus_result': r['plus'][0][0],
-                    'is_correct': r['base'][0][0] == 'success' and r['plus'][0][0] == 'success',
+                    'base_result': r['base_status'],
+                    'plus_result': r.get('plus_status'),
+                    'is_correct': r['base_status'] == 'pass' and r.get('plus_status') == 'pass',
                 }
-                if r['nfiles'] > 1:
+                if len(task_results) > 1:
                     details[str(index)]['warning'] = 'Multiple files in the solution. Details may be wrong.'
-        results = {f'humaneval_plus_{k}': score[k] * 100 for k in score}
+        pass_at_1 = n_plus_pass / n_total * 100 if n_total > 0 else 0.0
+        results = {'humaneval_plus_pass@1': pass_at_1}
         results['details'] = details
         return results
 
@@ -183,4 +191,77 @@ def humaneval_postprocess_v2(text: str) -> str:
     blocks = re.findall(r'```\w*\n(.*?)```', text, re.DOTALL)
     if len(blocks) >= 1:
         text = blocks[0]
+    return text.lstrip()
+
+def humaneval_postprocess_v3(text: str) -> str:
+    blocks = re.findall(r'```\w*\n(.*?)```', text, re.DOTALL)
+    if len(blocks) >= 1:
+        text = blocks[-1]
+    return text.lstrip()
+
+def humaneval_internal_v2_postprocess(text: str):
+    if text.startswith('   ') and not text.startswith('    '):
+        text = ' ' + text
+    prediction = text.split('\n\n\n')[0]
+    prediction = prediction.split('\n```')[0]
+    prediction_list = prediction.split('\n')
+    return_list = []
+    for line in prediction_list:
+        if line and line[0] != ' ':
+            break
+        return_list.append(line)
+    return '\n'.join(return_list)
+
+def humaneval_internal_v1_postprocess(text: str) -> str:
+    """This is an advanced version of previous postprocess to handle more
+    situations, better to use this one."""
+    try:
+        # for chatGLM related text
+        eval_text = eval(text)
+    except Exception:
+        pass
+    else:
+        if isinstance(eval_text, str):
+            text = eval_text
+    text = text.lstrip('\n')
+    if '```' in text:
+        blocks = re.findall(r'```(.*?)```', text, re.DOTALL)
+        if len(blocks) == 0:
+            text = text.split('```')[1]  # fall back to default strategy
+        else:
+            text = blocks[0]  # fetch the first code block
+            if not text.startswith('\n'):  # in case starting with ```python
+                text = text[max(text.find('\n') + 1, 0) :]
+    if text.strip().startswith('from') or text.strip().startswith('import'):
+        def_idx = text.find('def')
+        if def_idx != -1:
+            text = text[max(text.find('\n', def_idx) + 1, 0) :]
+    # remove empty lines
+    text = '\n'.join([line for line in text.split('\n') if line != ''])
+    text = text.lstrip('\n')
+    if text.strip().startswith('def'):
+        text = '\n'.join(text.split('\n')[1:])
+    # deal with the indentation error
+    if text.startswith(' '):
+        text = '    ' + text.lstrip()
+    else:
+        text = '\n'.join(['    ' + line for line in text.split('\n')])
+    text = text.split('\n')
+
+    # If number of leading space reduces, we assume that the code block ends.
+    min_leading_space = None
+    end_index = None
+    for index, line in enumerate(text):
+        if line.strip() == '' or line.strip()[0] in ["'", '"', '#']:
+            continue
+        current_leading_space = len(line.rstrip()) - len(line.strip())
+        if min_leading_space is None:
+            min_leading_space = current_leading_space
+        elif current_leading_space < min_leading_space:
+            end_index = index
+            break
+    if end_index is not None:
+        text = '\n'.join(text[:end_index])
+    else:
+        text = '\n'.join(text)
     return text

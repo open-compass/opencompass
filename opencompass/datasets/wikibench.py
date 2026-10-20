@@ -21,8 +21,9 @@ def get_number(options):
 class WikiBenchDataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, name: str):
-        path = get_data_path(path, local_mode=True)
+    def load(path: str, filename: str, name: str):
+        path = get_data_path(path)
+        path = path + filename
 
         circular_patterns = ['ABCD', 'BCDA', 'CDAB', 'DABC']
 

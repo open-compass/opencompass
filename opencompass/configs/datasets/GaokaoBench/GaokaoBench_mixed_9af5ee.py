@@ -288,7 +288,8 @@ for _folder, _prompts in [
         _dataset = {
             'type': GaokaoBenchDataset,
             'abbr': 'GaokaoBench_' + _p['keyword'],
-            'path': _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+            'path': _base_path,
+            'filename': '/' + _folder + '/' + _p['keyword'] + '.json',
             'name': _p['keyword'],
             'reader_cfg': _reader_cfg,
             'infer_cfg': _infer_cfg,
@@ -335,11 +336,12 @@ for _p in _MCQ_prompts:
         },
         'pred_role': 'BOT',
     }
-    _base_path = './data/GAOKAO-BENCH/data'
+    _base_path = 'opencompass/GAOKAO-BENCH'
     _dataset = {
         'type': GaokaoBenchDataset,
         'abbr': 'GaokaoBench_' + _p['keyword'],
-        'path': _base_path + '/' + _folder + '/' + _p['keyword'] + '.json',
+        'path': _base_path,
+        'filename': '/' + _folder + '/' + _p['keyword'] + '.json',
         'name': _p['keyword'],
         'reader_cfg': _reader_cfg,
         'infer_cfg': _infer_cfg,

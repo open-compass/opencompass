@@ -15,18 +15,21 @@ class BaseRunner:
         task (ConfigDict): Task type config.
         debug (bool): Whether to run in debug mode.
         lark_bot_url (str): Lark bot url.
+        tmp_dir (str): The directory to store temporary files.
     """
 
     def __init__(self,
                  task: ConfigDict,
                  debug: bool = False,
-                 lark_bot_url: str = None):
+                 lark_bot_url: str = None,
+                 tmp_dir: str = 'tmp'):
         self.task_cfg = Config(task)
         self.debug = debug
         if lark_bot_url:
             self.lark_reporter = LarkReporter(lark_bot_url)
         else:
             self.lark_reporter = None
+        self.tmp_dir = tmp_dir
 
     def __call__(self, tasks: List[Dict[str, Any]]):
         """Launch multiple tasks and summarize the results.
@@ -77,7 +80,8 @@ class BaseRunner:
             else:
                 content = f'{getpass.getuser()}\'s '
                 content += f'{self.task_cfg.type} tasks finished. '
-                content += f'{num_succeeded} tasks succeeded.'
+                content += f'{num_succeeded} tasks succeeded.\n'
+                content += '\n'.join([task for task, _ in status])
                 self.lark_reporter.post(title='Great news: all tasks '
                                         'finished!',
                                         content=content)

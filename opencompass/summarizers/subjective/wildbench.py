@@ -156,8 +156,8 @@ class WildBenchPairSummarizer(CompassArenaSummarizer):
         self.tasks = []
         self.cfg = config
 
-        self.base_models = self.cfg['eval']['partitioner']['base_models']
-        self.compare_models = self.cfg['eval']['partitioner']['compare_models']
+        self.base_models = self.cfg['datasets'][0]['base_models']
+        self.compare_models = self.cfg['eval']['partitioner']['models']
         self.judge_models = self.cfg.get('judge_models', None)
         self.meta_judge_model = self.cfg.eval.partitioner.get('meta_judge_model', None)
         self.judge_abbr = model_abbr_from_cfg(self.cfg['judge_models'][0])
@@ -247,8 +247,10 @@ class WildBenchPairSummarizer(CompassArenaSummarizer):
             pd.DataFrame: The summary results.
         """
         scores = self.get_score(time_str)
+        all_scores = {}
         output_dir, results_folder = get_outdir(self.cfg, time_str)
         for idx, judge_model in enumerate(self.judge_models):
+            score_by_judgemodel = {}
             judge_abbr = model_abbr_from_cfg(judge_model)
             for dataset in self.cfg['datasets']:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
@@ -258,7 +260,7 @@ class WildBenchPairSummarizer(CompassArenaSummarizer):
                 row_headers = [dataset_abbr, 'position_bias'] + row_headers
 
                 table = []
-                for row_header in row_headers:
+                for idx, row_header in enumerate(row_headers):
                     row = [row_header]
                     headers = ['']
                     for model_cfg in self.compare_models:
@@ -276,12 +278,13 @@ class WildBenchPairSummarizer(CompassArenaSummarizer):
                                 s = str(s)
                             row.append(s)
                         avg = avg/len(self.base_models)
+                        if idx == 0:
+                            score_by_judgemodel[model_abbr] = {'score': avg}
                         row.append(f'{avg:.2f}')
                         headers.append('Avg')
                     table.append(row)
 
                 txt = tabulate(table, headers=headers)
-                print(txt)
 
                 if idx == len(self.judge_models):
                     output_filename = osp.join(output_dir, 'summarized-by--' + judge_abbr + '-' + dataset_abbr + '-report.csv')
@@ -292,4 +295,5 @@ class WildBenchPairSummarizer(CompassArenaSummarizer):
                     f.write(','.join(headers) + '\n')
                     for line in table:
                         f.write(','.join(line) + '\n')
-                print(output_filename)
+            all_scores[judge_abbr] = score_by_judgemodel
+        return {'Wildbench': all_scores}

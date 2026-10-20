@@ -1,6 +1,7 @@
 import gzip
 import hashlib
 import io
+import json
 import os
 import os.path
 import shutil
@@ -10,9 +11,155 @@ import urllib.error
 import urllib.request
 import zipfile
 from contextlib import contextmanager
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 import mmengine.fileio as fileio
 from mmengine.fileio import LocalBackend, get_file_backend
+
+from .logging import get_logger
+
+logger = get_logger()
+
+
+class JSONToolkit:
+    """A toolkit for handling JSON and JSONL file operations."""
+
+    @staticmethod
+    def read_json(file_path: Union[str, Path]) -> Dict[str, Any]:
+        """Read a JSON file and return its contents as a dictionary.
+
+        Args:
+            file_path: Path to the JSON file
+
+        Returns:
+            Dictionary containing the JSON data
+
+        Raises:
+            FileNotFoundError: If the file doesn't exist
+            json.JSONDecodeError: If the file contains invalid JSON
+        """
+        file_path = Path(file_path)
+        try:
+            with file_path.open('r', encoding='utf-8') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.error(f'File not found: {file_path}')
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(f'Invalid JSON in file {file_path}: {str(e)}')
+            raise
+
+    @staticmethod
+    def read_jsonl(file_path: Union[str, Path]) -> List[Dict[str, Any]]:
+        """Read a JSONL file and return its contents as a list of dictionaries.
+
+        Args:
+            file_path: Path to the JSONL file
+
+        Returns:
+            List of dictionaries, each representing a JSON line
+
+        Raises:
+            FileNotFoundError: If the file doesn't exist
+            json.JSONDecodeError: If any line contains invalid JSON
+        """
+        file_path = Path(file_path)
+        results = []
+        try:
+            with file_path.open('r', encoding='utf-8') as f:
+                for line_num, line in enumerate(f, 1):
+                    line = line.strip()
+                    if not line:  # Skip empty lines
+                        continue
+                    try:
+                        results.append(json.loads(line))
+                    except json.JSONDecodeError as e:
+                        logger.error(
+                            f'Invalid JSON on line {line_num}: {str(e)}')
+                        raise
+        except FileNotFoundError:
+            logger.error(f'File not found: {file_path}')
+            raise
+        return results
+
+    @staticmethod
+    def save_json(data: Dict[str, Any],
+                  file_path: Union[str, Path],
+                  indent: Optional[int] = 2) -> None:
+        """Save a dictionary as a JSON file.
+
+        Args:
+            data: Dictionary to save
+            file_path: Path where to save the JSON file
+            indent: Number of spaces for indentation
+                (None for no pretty printing)
+
+        Raises:
+            TypeError: If data is not JSON serializable
+        """
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            with file_path.open('w', encoding='utf-8') as f:
+                json.dump(data, f, indent=indent, ensure_ascii=False)
+            logger.info(f'Successfully saved JSON to {file_path}')
+        except TypeError as e:
+            logger.error(f'Data is not JSON serializable: {str(e)}')
+            raise
+
+    @staticmethod
+    def save_jsonl(data: List[Dict[str, Any]], file_path: Union[str,
+                                                                Path]) -> None:
+        """Save a list of dictionaries as a JSONL file.
+
+        Args:
+            data: List of dictionaries to save
+            file_path: Path where to save the JSONL file
+
+        Raises:
+            TypeError: If any item in data is not JSON serializable
+        """
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        try:
+            with file_path.open('w', encoding='utf-8') as f:
+                for item in data:
+                    json_line = json.dumps(item, ensure_ascii=False)
+                    f.write(json_line + '\n')
+            logger.info(f'Successfully saved JSONL to {file_path}')
+        except TypeError as e:
+            logger.error(f'Data is not JSON serializable: {str(e)}')
+            raise
+
+    @staticmethod
+    @contextmanager
+    def jsonl_writer(file_path: Union[str, Path]):
+        """Context manager for writing JSONL files line by line.
+
+        Args:
+            file_path: Path where to save the JSONL file
+
+        Yields:
+            Function to write individual JSON lines
+        """
+        file_path = Path(file_path)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        def write_line(data: Dict[str, Any]):
+            nonlocal f
+            json_line = json.dumps(data, ensure_ascii=False)
+            f.write(json_line + '\n')
+
+        try:
+            with file_path.open('w', encoding='utf-8') as f:
+                yield write_line
+            logger.info(f'Successfully saved JSONL to {file_path}')
+        except TypeError as e:
+            logger.error(f'Data is not JSON serializable: {str(e)}')
+            raise
 
 
 def patch_func(module, fn_name_to_wrap):

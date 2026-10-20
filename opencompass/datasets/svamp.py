@@ -13,7 +13,7 @@ class SVAMPDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        path = get_data_path(path, local_mode=True)
+        path = get_data_path(path)
         dataset = []
         with open(path, 'r', encoding='utf-8') as f:
             for line in f:

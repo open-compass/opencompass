@@ -76,7 +76,6 @@ class ReviewEvaluator:
 
         pred_data = data_sample.pred
         if pred_data is not None:
-            # import pdb; pdb.set_trace()
             metrics_result['review_quality'] = 1.0 if pred_data == \
                 data_sample.gt else 0.0
             metrics_result['parse_rate'] = 1.0

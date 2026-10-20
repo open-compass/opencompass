@@ -15,7 +15,7 @@ from mmengine.config import ConfigDict
 from mmengine.utils import track_parallel_progress
 
 from opencompass.registry import RUNNERS, TASKS
-from opencompass.utils import get_logger
+from opencompass.utils import LarkReporter, get_logger
 
 from .base import BaseRunner
 
@@ -33,23 +33,39 @@ class DLCRunner(BaseRunner):
         retry (int): Number of retries when job failed. Default: 2.
         debug (bool): Whether to run in debug mode. Default: False.
         lark_bot_url (str): Lark bot url. Default: None.
+        keep_tmp_file (bool): Whether to keep the temporary file.
+            Default: True.
+        tmp_dir (str): The directory to store temporary files. Default: 'tmp'.
     """
 
-    def __init__(self,
-                 task: ConfigDict,
-                 aliyun_cfg: ConfigDict,
-                 max_num_workers: int = 32,
-                 eval_with_gpu: list = ['plugin_eval'],
-                 retry: int = 2,
-                 debug: bool = False,
-                 lark_bot_url: str = None):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+    def __init__(
+        self,
+        task: ConfigDict,
+        aliyun_cfg: ConfigDict,
+        max_num_workers: int = 32,
+        eval_with_gpu: list = ['plugin_eval'],
+        retry: int = 2,
+        debug: bool = False,
+        lark_bot_url: str = None,
+        keep_tmp_file: bool = True,
+        preemptible: bool = False,
+        tmp_dir: str = 'tmp',
+    ):
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.aliyun_cfg = aliyun_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
 
         self.eval_with_gpu = eval_with_gpu
-
+        self.keep_tmp_file = keep_tmp_file
+        self.preemptible = preemptible
+        if lark_bot_url:
+            self.lark_reporter = LarkReporter(lark_bot_url)
+        else:
+            self.lark_reporter = None
         logger = get_logger()
         logger.warning(
             'To ensure the integrity of the log results, the log displayed '
@@ -67,10 +83,12 @@ class DLCRunner(BaseRunner):
         """
 
         if not self.debug:
-            status = track_parallel_progress(self._launch,
-                                             tasks,
-                                             nproc=self.max_num_workers,
-                                             keep_order=False)
+            status = track_parallel_progress(
+                self._launch,
+                tasks,
+                nproc=self.max_num_workers,
+                keep_order=False,
+            )
         else:
             status = [self._launch(task, random_sleep=False) for task in tasks]
         return status
@@ -91,7 +109,7 @@ class DLCRunner(BaseRunner):
             tuple[str, int]: Task name and exit code.
         """
         if random_sleep is None:
-            random_sleep = (self.max_num_workers > 32)
+            random_sleep = self.max_num_workers > 32
 
         task = TASKS.build(dict(cfg=cfg, type=self.task_cfg['type']))
         num_gpus = task.num_gpus
@@ -105,8 +123,13 @@ class DLCRunner(BaseRunner):
                     break
 
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_params.py'
+        mmengine.mkdir_or_exist(self.tmp_dir)
+        # Using uuid to avoid filename conflict
+        import uuid
+
+        uuid_str = str(uuid.uuid4())
+        param_file = f'{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, param_file)
         pwd = os.getcwd()
         try:
             cfg.dump(param_file)
@@ -119,14 +142,16 @@ class DLCRunner(BaseRunner):
                 shell_cmd = (f'source {bashrc_path}; '
                              f'conda activate {conda_env_name}; ')
                 shell_cmd += f'export PYTHONPATH={pwd}:$PYTHONPATH; '
-            else:
+            elif self.aliyun_cfg.get('python_env_path') is not None:
                 # using public conda env
                 # users can also set `python_env_path` to their
                 # own env python path
-                assert self.aliyun_cfg.get('python_env_path') is not None
                 shell_cmd = (
-                    f'export PATH={self.aliyun_cfg["python_env_path"]}/bin:$PATH; '  # noqa: E501
+                    f'''export PATH={self.aliyun_cfg['python_env_path']}/bin:$PATH; '''  # noqa: E501
                     f'export PYTHONPATH={pwd}:$PYTHONPATH; ')
+            else:
+                # using system python
+                shell_cmd = ''
 
             huggingface_cache = self.aliyun_cfg.get('huggingface_cache')
             if huggingface_cache is not None:
@@ -163,26 +188,50 @@ class DLCRunner(BaseRunner):
 
             # set priority to 1 as default
             task_priority = self.aliyun_cfg.get('priority', 1)
+            worker_cpu = self.aliyun_cfg.get('worker_cpu', 12)
+            worker_memory = self.aliyun_cfg.get('worker_memory', 192)
+            config_path = (
+                f''' --config {self.aliyun_cfg['dlc_config_path']}'''
+                if 'dlc_config_path' in self.aliyun_cfg else '')
+
+            # Different dlc versions has different commands
+            if self.aliyun_cfg.get('dlc_job_cmd') == 'create':
+                dlc_job_cmd = 'create job --kind PyTorchJob'
+                worker_cmd = ' --worker_count 1'
+            else:
+                dlc_job_cmd = 'submit pytorchjob'
+                worker_cmd = ' --workers 1'
+
+            pre_cmd = self.aliyun_cfg.get('pre_cmd')
+            if pre_cmd is not None:
+                shell_cmd = pre_cmd + '; ' + shell_cmd
 
             tmpl = (
-                'dlc submit pytorchjob'
-                f" --command '{shell_cmd}'"
+                f'dlc {dlc_job_cmd}'
+                f''' --command '{shell_cmd}' '''
                 f' --name {task_name[:512]}'
-                f" --config {self.aliyun_cfg['dlc_config_path']}"
-                f" --workspace_id {self.aliyun_cfg['workspace_id']}"
-                f" --resource_id {self.aliyun_cfg['resource_id']}"
+                f'{config_path}'
+                f''' --workspace_id {self.aliyun_cfg['workspace_id']}'''
+                f''' --resource_id={self.aliyun_cfg['resource_id']}'''
                 f' --priority {task_priority}'
-                ' --workers 1'
-                f' --worker_cpu {max(num_gpus * 8, 12)}'
+                f'{worker_cmd}'
+                f' --worker_cpu {max(num_gpus * 8, worker_cpu)}'
                 f' --worker_gpu {num_gpus}'
-                f' --worker_memory {max(num_gpus * 128, 192)}Gi'
-                f" --worker_image {self.aliyun_cfg['worker_image']}"
-                f" --data_sources {','.join(self.aliyun_cfg['data_sources'])}")
+                f' --worker_memory {max(num_gpus * 128, worker_memory)}Gi'
+                f''' --worker_image {self.aliyun_cfg['worker_image']}'''
+                f''' --data_sources={','.join(self.aliyun_cfg['data_sources'])}'''  # noqa: E501
+                f''' --enable_priority_preemption={self.preemptible}''')
             get_cmd = partial(task.get_command,
                               cfg_path=param_file,
                               template=tmpl)
             cmd = get_cmd()
 
+            # Use specified python env instead of sys.executable
+            if self.aliyun_cfg['python_env_path']:
+                cmd = cmd.replace(
+                    sys.executable,
+                    f'''{self.aliyun_cfg['python_env_path']}/bin/python''',
+                )
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
 
@@ -225,19 +274,27 @@ class DLCRunner(BaseRunner):
                 pri_time = None
                 initial_time = datetime.datetime.now()
 
-                url = f"https://pai.console.aliyun.com/?regionId=cn-wulanchabu&workspaceId={self.aliyun_cfg['workspace_id']}#/dlc/jobs/{job_id}"  # noqa: E501
+                url = f'''https://pai.console.aliyun.com/?regionId=cn-wulanchabu&workspaceId={self.aliyun_cfg['workspace_id']}#/dlc/jobs/{job_id}'''  # noqa: E501
                 logger = get_logger()
                 logger.debug('\n' + '*' * 168 + '\n' + url + '\n' + '*' * 168)
 
                 while True:
                     # 1. Avoid to request dlc too frequently.
                     # 2. DLC job may not be ready immediately after creation.
+                    dlc_sleep_time = self.aliyun_cfg.get('dlc_sleep_time', 10)
+                    time.sleep(dlc_sleep_time)
                     num_retry = 60
                     for retry_index in range(num_retry):
                         time.sleep(2)
                         try:
-                            job_info = json.loads(
-                                subprocess.getoutput(f'dlc get job {job_id}'))
+                            raw_job_info = subprocess.getoutput(
+                                f'dlc get job {job_id}{config_path}')
+                            if (raw_job_info.startswith('/bin/bash')
+                                    or raw_job_info.startswith('[OK]')
+                                    or raw_job_info.startswith('[FAILED]')):
+                                raw_job_info = raw_job_info[raw_job_info.
+                                                            index('\n') + 1:]
+                            job_info = json.loads(raw_job_info)
                             break
                         except:  # noqa: E722
                             if retry_index > num_retry // 3:
@@ -249,7 +306,7 @@ class DLCRunner(BaseRunner):
                             f'Failed to get job info for {job_id}')
 
                     status = job_info['Status']
-                    if status == 'Failed':
+                    if status == 'Failed' or status == 'Stopped':
                         return -1
                     elif status == 'Succeeded':
                         return 0
@@ -270,7 +327,7 @@ class DLCRunner(BaseRunner):
                                 elasped_time).strftime('%Y-%m-%dT%H:%M:%SZ')
                     logs_cmd = ('dlc logs'
                                 f' {job_id} {job_id}-master-0'
-                                f" -c {self.aliyun_cfg['dlc_config_path']}"
+                                f'{config_path}'
                                 f' --start_time {pri_time}'
                                 f' --end_time {cur_time}')
                     try:
@@ -292,7 +349,15 @@ class DLCRunner(BaseRunner):
                 return_code = _run_within_retry()
         finally:
             # Clean up
-            os.remove(param_file)
+            if not self.keep_tmp_file:
+                os.remove(param_file)
+            else:
+                pass
+
+        # Lark Report when failed
+        if return_code == -1 and self.lark_reporter is not None:
+            content = f'DLC job failed. Task name: {task_name}'
+            self.lark_reporter.post(title='DLC job failed', content=content)
 
         return task_name, return_code
 

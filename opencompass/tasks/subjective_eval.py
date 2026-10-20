@@ -4,6 +4,7 @@ import copy
 import fnmatch
 import os.path as osp
 import random
+import sys
 import time
 from typing import List, Optional, Union
 
@@ -12,8 +13,7 @@ from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
 from opencompass.registry import ICL_EVALUATORS, MODELS, TEXT_POSTPROCESSORS
-from opencompass.tasks.base import BaseTask
-from opencompass.tasks.openicl_eval import extract_role_pred
+from opencompass.tasks.base import BaseTask, extract_role_pred
 from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
                                deal_with_judge_model_abbr, get_data_path,
                                get_infer_output_path, get_logger,
@@ -67,13 +67,15 @@ class SubjectiveEvalTask(BaseTask):
                 the command.
         """
         script_path = __file__
+        python = sys.executable
         if self.num_gpus > 0:
             port = random.randint(12000, 32000)
-            command = (f'torchrun --master_port={port} '
-                       f'--nproc_per_node {self.num_procs} '
-                       f'{script_path} {cfg_path}')
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
         else:
-            command = f'python {script_path} {cfg_path}'
+            command = f'{python} {script_path} {cfg_path}'
 
         return template.format(task_cmd=command)
 
@@ -101,7 +103,7 @@ class SubjectiveEvalTask(BaseTask):
             'datasets': self.dataset_cfgs
         })
         return self.name_prefix + task_name + \
-            '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
+                '--judge-by--' + model_abbr_from_cfg(self.judge_cfg)
 
     def _load_model_pred(
         self,
@@ -199,14 +201,24 @@ class SubjectiveEvalTask(BaseTask):
             if fnmatch.fnmatch(ds_abbr, pattern):
                 pred_postprocessor = model_postprocessors[pattern]
                 break
+
         if 'pred_postprocessor' in eval_cfg['evaluator'] or pred_postprocessor:
             kwargs = pred_postprocessor or eval_cfg['evaluator'][
                 'pred_postprocessor']
-            proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
+            temp_kwargs = copy.deepcopy(kwargs)
+            proc = TEXT_POSTPROCESSORS.get(temp_kwargs.pop('type'))
             self.logger.info('Get postprocessor {postprocessor}.')
-            pred_strs = [proc(s, **kwargs) for s in pred_strs]
+            pred_strs = [proc(s, **temp_kwargs) for s in pred_strs]
         else:
-            self.logger.info('No postprocessor found.')
+            self.logger.info('No dataset postprocessor found.')
+
+        if 'pred_postprocessor' in model_cfg or pred_postprocessor:
+            kwargs = pred_postprocessor or model_cfg['pred_postprocessor']
+            temp_kwargs = copy.deepcopy(kwargs)
+            proc = TEXT_POSTPROCESSORS.get(temp_kwargs.pop('type'))
+            pred_strs = [proc(s, **temp_kwargs) for s in pred_strs]
+        else:
+            self.logger.info('No model postprocessor found.')
 
         return {
             'model_name': model_abbr_from_cfg(model_cfg),
@@ -330,7 +342,9 @@ class SubjectiveEvalTask(BaseTask):
             if fnmatch.fnmatch(ds_abbr, pattern):
                 pred_postprocessor = model_postprocessors[pattern]
                 break
+
         if 'pred_postprocessor' in eval_cfg or pred_postprocessor:
+
             kwargs = pred_postprocessor or eval_cfg['pred_postprocessor']
             proc = TEXT_POSTPROCESSORS.get(kwargs.pop('type'))
             pred_strs = [proc(s, **kwargs) for s in pred_strs]

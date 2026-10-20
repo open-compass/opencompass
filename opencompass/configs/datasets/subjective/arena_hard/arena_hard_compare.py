@@ -38,7 +38,7 @@ for _name in subjective_all_sets:
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=4096),
+            inferencer=dict(type=GenInferencer),
         )
 
     subjective_eval_cfg = dict(
@@ -76,6 +76,6 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='double',
             base_models=gpt4,
+            given_pred = [{'abbr':'gpt4-0314', 'path':'./data/subjective/arena_hard'}],
             summarizer = dict(type=ArenaHardSummarizer),
-            given_pred = [{'abbr':'gpt4-0314', 'path':'./data/subjective/arena_hard'}]
         ))

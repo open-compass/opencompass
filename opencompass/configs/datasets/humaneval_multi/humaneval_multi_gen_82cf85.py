@@ -22,14 +22,18 @@ humaneval_multi_eval_cfg = {
         pred_role='BOT',
     ) for lang in ['cpp', 'cs', 'd', 'go', 'java', 'jl', 'js', 'lua', 'php', 'pl', 'py', 'r', 'rb', 'rkt', 'rs', 'scala', 'sh', 'swift', 'ts']
 }
+"""There are four versions of humaneval-{LANG}-{version}.jsonl:
 
-'''there are four versions of humaneval-{LANG}-{version}.jsonl:
-['keep', 'transform', 'reworded', 'remove']
-SRCDATA-LANG-keep is the same as SRCDATA-LANG, but the text of the prompt is totally unchanged. If the original prompt had Python doctests, they remain as Python instead of being translated to LANG. If the original prompt had Python-specific terminology, e.g., 'list', it remains 'list', instead of being translated, e.g., to 'vector' for C++.
-SRCDATA-LANG-transform transforms the doctests to LANG but leaves the natural language text of the prompt unchanged.
-SRCDATA-LANG-reworded transforms both the doctests and the natural language text of the prompt to LANG.
-SRCDATA-LANG-remove removes the doctests from the prompt.
-'''
+['keep', 'transform', 'reworded', 'remove'] SRCDATA-LANG-keep is the same as
+SRCDATA-LANG, but the text of the prompt is totally unchanged. If the original
+prompt had Python doctests, they remain as Python instead of being translated
+to LANG. If the original prompt had Python-specific terminology, e.g., 'list',
+it remains 'list', instead of being translated, e.g., to 'vector' for C++.
+SRCDATA-LANG-transform transforms the doctests to LANG but leaves the natural
+language text of the prompt unchanged. SRCDATA-LANG-reworded transforms both
+the doctests and the natural language text of the prompt to LANG. SRCDATA-LANG-
+remove removes the doctests from the prompt.
+"""
 
 humaneval_multi_datasets = [
     dict(

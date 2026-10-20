@@ -17,7 +17,7 @@ def time_limit(seconds: float):
 
 
 def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
-    from latex2sympy2 import latex2sympy
+    from latex2sympy2_extended import latex2sympy
 
     if any([option in pred.lower() for option in ['yes', 'true']]):
         pred = 'True'
@@ -33,7 +33,12 @@ def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
             try:
                 with time_limit(1):
                     tmp = str(latex2sympy(pred))
-                    pred = str(eval(tmp))
+                    pred = eval(tmp)
+                    if isinstance(pred, tuple):
+                        pred = str(list(pred))
+                    else:
+                        pred = str(pred)
+
             except Exception:
                 if re.match(r'-?[\d\.]+\s\D+$', pred):
                     pred = pred.split(' ')[0]

@@ -37,6 +37,7 @@ def general_cn_postprocess(text: str) -> str:
 
     cleaned_text = re.sub(r'\s+', ' ', no_articles).strip()
     import jieba
+
     cleaned_text = ' '.join(jieba.cut(text))
     return cleaned_text
 
@@ -57,6 +58,18 @@ def last_capital_postprocess(text: str) -> str:
     return ''
 
 
+@TEXT_POSTPROCESSORS.register_module('think_pred')
+def think_pred_postprocess(
+    prediction: str,
+    re_pattern: str,
+) -> str:
+    match = re.search(re_pattern, prediction)
+    if match:
+        return match.group(1).strip()
+    else:
+        return prediction
+
+
 def first_option_postprocess(text: str, options: str, cushion=True) -> str:
     """Find first valid option for text."""
 
@@ -71,6 +84,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案应该?是\s*([{options}])',
         f'答案应该?选\s*([{options}])',
         f'答案选项为?\s*：\s*([{options}])',
+        f'答案选项为?\s+\(?\*?\*?([{options}])\*?\*?\)?',
         f'答案选项是?\s*:\s*([{options}])',
         f'答案为\s*([{options}])',
         f'答案选\s*([{options}])',
@@ -100,6 +114,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案为\s?(\S+)(?:。|$)',
         f'(?i)ANSWER\s*:\s*([{options}])',
         f'[Tt]he answer is:?\s+\(?([{options}])\)?',
+        f'[Tt]he answer is:?\s+\(?\*?\*?([{options}])\*?\*?\)?',
         f'[Tt]he answer is option:?\s+\(?([{options}])\)?',
         f'[Tt]he correct answer is:?\s+\(?([{options}])\)?',
         f'[Tt]he correct answer is option:?\s+\(?([{options}])\)?',
@@ -126,7 +141,10 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         text = text.strip()
         match = re.search(pattern, text, re.DOTALL)
         if match:
-            outputs = match.group(0)
+            if match.group(1) is not None and match.group(1) != '':
+                outputs = match.group(1)
+            else:
+                outputs = match.group(0)
             for i in options:
                 if i in outputs:
                     return i
@@ -166,6 +184,34 @@ def multiple_select_postprocess(text: str) -> str:
     return ''.join(sorted(ret))
 
 
+@TEXT_POSTPROCESSORS.register_module('specific-xml-tag')
+def xml_tag_postprocessor(text, tag):
+    """Extracts content enclosed within a specified XML-style tag from a
+    string.
+
+    Args:
+        texts: The input string containing XML-style tags.
+        tag: The XML-style tag to extract content from (e.g., "<conclude>").  Must include the angle brackets.
+
+    Returns:
+        The content enclosed within the specified tag, or None if the tag is not found.
+    """
+
+    # Use a regular expression to find the content within the specified tag.  This handles cases where the tag might appear multiple times.
+    matches = re.findall(
+        rf'{tag}(.*?)</{tag[1:-1]}>', text,
+        re.DOTALL)  # re.DOTALL allows . to match newline characters
+
+    if matches:
+        # Only keep the last one
+        output = matches[-1].strip(
+        )  # Extract the content and remove leading/trailing whitespace
+    else:
+        output = 'NO ANSWER FOUND'
+
+    return output
+
+
 def general_eval_wrapper_postprocess(text: str,
                                      postprocess: Optional[Union[
                                          str, Callable]] = None,
@@ -192,7 +238,56 @@ def general_eval_wrapper_postprocess(text: str,
         return text
 
 
+@TEXT_POSTPROCESSORS.register_module()
 def match_answer_pattern(response_text: str, answer_pattern: str):
     match = re.search(answer_pattern, response_text)
     extracted_answer = match.group(1) if match else ''
     return extracted_answer
+
+
+@TEXT_POSTPROCESSORS.register_module('extract-non-reasoning-content')
+def extract_non_reasoning_content(
+    text: str,
+    think_start_token: str = '<think>',
+    think_end_token: str = '</think>',
+) -> str:
+    """Extract content after the last reasoning tag from text.
+
+    When only end token is present, returns content after the end token.
+    When both tokens are present, removes all content between start and end tokens.
+
+    Args:
+        text (str): Input text containing reasoning tags.
+        think_start_token (str, optional): Start token for reasoning section. Defaults to '<think>'.
+        think_end_token (str, optional): End token for reasoning section. Defaults to '</think>'.
+
+    Returns:
+        str: Processed text after removing reasoning sections.
+
+    Examples:
+        >>> # When only end token exists
+        >>> text = "This is a test.</think> How are you?"
+        >>> extract_non_reasoning_content(text)
+        'How are you?'
+
+        >>> # When both tokens exist
+        >>> text = "Start<think>reasoning here</think> End"
+        >>> extract_non_reasoning_content(text)
+        'Start End'
+    """
+    # If text contains only end token, split by end token and take the last part
+    if think_start_token not in text and think_end_token in text:
+        return text.split(think_end_token)[-1].strip()
+
+    # Original behavior for complete tag pairs
+    reasoning_regex = re.compile(rf'{think_start_token}(.*?){think_end_token}',
+                                 re.DOTALL)
+    non_reasoning_content = reasoning_regex.sub('', text).strip()
+    return non_reasoning_content
+
+
+def parse_bracketed_answer(text: str, options: str) -> str:
+    match = re.search(rf'<({options})>', text)
+    if match:
+        return match.group(1)
+    return ''

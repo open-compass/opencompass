@@ -73,12 +73,13 @@ for _name in subjective_all_sets:
                 ]),
             ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=4096),
+            inferencer=dict(type=GenInferencer),
         )
 
     subjective_eval_cfg = dict(
         evaluator=dict(
             type=LMEvaluator,
+            
             prompt_template=dict(
                 type=PromptTemplate,
                 template=dict(
@@ -111,6 +112,6 @@ for _name in subjective_all_sets:
             mode='m2n',
             infer_order='random',
             base_models=gpt4,
+            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}],
             summarizer=dict(type=AlpacaSummarizer, judge_type='v2'),
-            given_pred = [{'abbr':'gpt4-turbo', 'path':'./data/subjective/alpaca_eval/gpt4-turbo'}]
         ))
