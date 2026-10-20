@@ -29,7 +29,8 @@ class TestMiniMaxChatCompletionV2(unittest.TestCase):
         }).encode()
         # Inspect the serialized request after Requests prepares it, without
         # sending credentials or prompts to a real endpoint.
-        with patch('requests.sessions.Session.send', return_value=response) as send:
+        with patch('requests.sessions.Session.send',
+                   return_value=response) as send:
             result = model.generate([prompt], max_out_len=max_out_len)
         self.assertEqual(result, ['answer'])
         send.assert_called_once()
@@ -80,7 +81,8 @@ class TestMiniMaxChatCompletionV2(unittest.TestCase):
             ('MiniMax-M2.7',
              'https://api.minimax.io/v1/text/chatcompletion_v2'),
             ('MiniMax-M3', 'https://api.minimaxi.com/v1/chat/completions'),
-            ('saved-custom-model', 'https://gateway.example/v1/chat/completions'),
+            ('saved-custom-model',
+             'https://gateway.example/v1/chat/completions'),
         ]:
             with self.subTest(model=name):
                 model = self._build_model(path=name, key='saved-key', url=url,

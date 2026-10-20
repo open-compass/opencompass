@@ -186,7 +186,8 @@ class MiniMax(BaseAPIModel):
 class MiniMaxChatCompletionV2(BaseAPIModel):
     """Model wrapper around MiniMax ChatCompletionV2.
 
-    Documentation: https://platform.minimax.io/docs/api-reference/text-openai-api
+    Documentation:
+        https://platform.minimax.io/docs/api-reference/text-openai-api
 
     Args:
         path (str): The name of MiniMax model. Defaults to
