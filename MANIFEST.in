@@ -1,0 +1,3 @@
+recursive-include opencompass/configs *.py *.yml *.json *.txt *.md
+recursive-include opencompass/openicl/icl_evaluator/hf_metrics *.py
+recursive-include opencompass/datasets *.py *.yml *.json *.txt *.md *.yaml

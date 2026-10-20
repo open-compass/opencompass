@@ -2,6 +2,7 @@
 import ast
 import json
 import os
+from os import environ
 
 import pandas as pd
 import tiktoken
@@ -279,8 +280,15 @@ def load_dataset(dataset_name,
                  end_of_example='\n',
                  chat_mode=False,
                  verbose=False):
-    test_path = os.path.join(parent_path, dataset_name + '.jsonl')
-    loaded_jsonl = read_jsonl(test_path)
+
+    if environ.get('DATASET_SOURCE') == 'ModelScope':
+        from modelscope import MsDataset
+        loaded_jsonl = MsDataset.load(parent_path,
+                                      subset_name=dataset_name,
+                                      split='test')
+    else:
+        test_path = os.path.join(parent_path, dataset_name + '.jsonl')
+        loaded_jsonl = read_jsonl(test_path)
     processed = []
     if setting_name == 'few-shot-CoT' or setting_name == 'few-shot':
         # process demo once if it is few-shot-CoT
@@ -356,8 +364,15 @@ def generate_second_stage_input(dataset_name,
 
 
 def load_dataset_as_result_schema(dataset_name, parent_path):
-    test_path = os.path.join(parent_path, dataset_name + '.jsonl')
-    loaded_jsonl = read_jsonl(test_path)
+
+    if environ.get('DATASET_SOURCE') == 'ModelScope':
+        from modelscope import MsDataset
+        loaded_jsonl = MsDataset.load(parent_path,
+                                      subset_name=dataset_name,
+                                      split='test')
+    else:
+        test_path = os.path.join(parent_path, dataset_name + '.jsonl')
+        loaded_jsonl = read_jsonl(test_path)
 
     processed = []
     for i, line in enumerate(loaded_jsonl):

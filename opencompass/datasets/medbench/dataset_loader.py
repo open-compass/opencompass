@@ -11,30 +11,30 @@ from .constructions import ChatGPTSchema, ResultsForHumanSchema
 from .utils import extract_answer, read_jsonl, save_jsonl
 
 # define the datasets
-medbench_multiple_choices_sets = ['Health_exam', 'DDx-basic', 'DDx-advanced_pre', 'DDx-advanced_final', 'SafetyBench'] # 选择题，用acc判断
+medbench_multiple_choices_sets = ['Med-Exam', 'DDx-basic', 'DDx-advanced', 'DDx-advanced', 'SafetyBench'] # 选择题，用acc判断
 
-medbench_qa_sets = ['Health_Counseling', 'Medicine_Counseling', 'MedDG', 'MedSpeQA', 'MedTreat', 'CMB-Clin'] # 开放式QA，有标答
+medbench_qa_sets = ['MedHC', 'MedMC', 'MedDG', 'MedSpeQA', 'MedTreat', 'CMB-Clin'] # 开放式QA，有标答
 
-medbench_cloze_sets = ['Triage'] # 限定域QA，有标答
+medbench_cloze_sets = ['MedHG'] # 限定域QA，有标答
 
-medbench_single_choice_sets = ['Medicine_attack'] # 正确与否判断，有标答
+medbench_single_choice_sets = ['DrugCA'] # 正确与否判断，有标答
 
-medbench_ie_sets = ['EMR', 'CMeEE'] # 判断识别的实体是否一致，用F1评价
+medbench_ie_sets = ['DBMHG', 'CMeEE', 'CMeIE', 'CHIP-CDEE', 'CHIP-CDN', 'CHIP-CTC', 'SMDoc', 'IMCS-V2-MRG'] # 判断识别的实体是否一致，用F1评价
 
 def convert_zero_shot(line, dataset_name):
     # passage = line['passage'] if line['passage'] is not None else ''
-    if dataset_name in medbench_qa_sets:
-        return line['question']
-    elif dataset_name in medbench_cloze_sets:
-        return '问题：' + line['question'] + '\n答案：'
-    elif dataset_name in medbench_multiple_choices_sets:
-        return '问题：' + line['question'] + ' ' \
-            + '选项：' + ' '.join(line['options']) + '\n从A到G，我们应该选择'
-    else:
-        return line['question']
+    # if dataset_name in medbench_qa_sets:
+    #     return line['question']
+    # elif dataset_name in medbench_cloze_sets:
+    #     return '问题：' + line['question'] + '\n答案：'
+    # elif dataset_name in medbench_multiple_choices_sets:
+    #     return '问题：' + line['question'] + ' ' \
+    #         + '选项：' + ' '.join(line['options']) + '\n从A到G，我们应该选择' 
+    # else:
+    #     return line['question']
+    return line['question']
 
 prefix = '该问题为单选题，所有选项中必有一个正确答案，且只有一个正确答案。\n'
-
 
 # def convert_zero_shot_CoT_stage1(line, dataset_name):
 #     try:

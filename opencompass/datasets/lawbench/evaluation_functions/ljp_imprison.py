@@ -1,9 +1,11 @@
 import math
-import cn2an
+
 import re
 
 #法律判决预测-刑期预测
 def compute_ljp_imprison(data_dict):
+    import cn2an
+
     score_list, abstentions = [], 0
 
     for example in data_dict:
@@ -41,9 +43,12 @@ def compute_ljp_imprison(data_dict):
             score_list.append(abs(math.log(answer_digit + 1) - math.log(prediction_digit_month + 1)))
         else:
             score_list.append(math.log(216))
-
-    # compute the average of score_list (log distance)
-    log_distance = sum(score_list) / len(score_list)
-    # normalize the score to between 0 and 1
-    log_distance = (math.log(216) - log_distance)/math.log(216)
+    
+    if abstentions == len(score_list):
+        log_distance = 0
+    else:
+        # compute the average of score_list (log distance)
+        log_distance = sum(score_list) / len(score_list)
+        # normalize the score to between 0 and 1
+        log_distance = (math.log(216) - log_distance)/math.log(216)
     return {"score": log_distance, "abstention_rate": abstentions/len(data_dict)}

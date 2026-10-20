@@ -1,11 +1,11 @@
 import fnmatch
 import os
-from typing import List, Union
+from typing import List, Tuple, Union
 
 
 def match_files(path: str,
                 pattern: Union[str, List],
-                fuzzy: bool = False) -> List:
+                fuzzy: bool = False) -> List[Tuple[str, str]]:
     if isinstance(pattern, str):
         pattern = [pattern]
     if fuzzy:
@@ -15,7 +15,7 @@ def match_files(path: str,
         for name in files:
             for p in pattern:
                 if fnmatch.fnmatch(name.lower(), p.lower()):
-                    files_list.append([name[:-3], os.path.join(root, name)])
+                    files_list.append((name[:-3], os.path.join(root, name)))
                     break
 
     return sorted(files_list, key=lambda x: x[0])

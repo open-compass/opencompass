@@ -15,7 +15,7 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
-METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
+METRIC_WHITELIST = ['pass@1', 'score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
 
 class PretrainSummarizer:
@@ -94,7 +94,8 @@ class PretrainSummarizer:
             dataset_abbr = dataset_abbr_from_cfg(dataset)
             if 'GenInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
-            elif 'PPLInferencer' in inferencer:
+            elif ('PPLInferencer' in inferencer
+                  or 'PPLOnlyInferencer' in inferencer):
                 dataset_eval_mode[dataset_abbr] = 'ppl'
             else:
                 dataset_eval_mode[dataset_abbr] = 'unknown'
@@ -164,8 +165,11 @@ class PretrainSummarizer:
         time = now.strftime('%m/%d %H:%M')
         times = [time] * len(model_abbrs)
         table.append(header)
-        table.append(['dataset', 'version', 'metric', 'mode'] + times)
-        table.append(['dataset', 'version', 'metric', 'mode']+ checkpoints)
+        table.append(['time', 'version', 'metric', 'mode'] + times)
+        table.append(['checkpoint', 'version', 'metric', 'mode']+ checkpoints)
+        # check long bench
+        max_seq_lens = [str(model_cfg.max_seq_len) for model_cfg in model_cfgs]
+        table.append(['max_seq_len', 'version', 'metric', 'mode']+ max_seq_lens)
         dataset_score = [0]* len(model_abbrs)
         dataset_num = [0]  * len(model_abbrs)
 
@@ -187,11 +191,9 @@ class PretrainSummarizer:
                 row = [dataset_abbr, prompt_version.get(dataset_abbr, '-'), metric, dataset_eval_mode.get(dataset_abbr, '-')]
             for i, model_abbr in enumerate(model_abbrs):
                 if dataset_abbr in parsed_results[model_abbr]:
-                    if index == 0:
-                        row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][index]))
-                        dataset_score[i] += parsed_results[model_abbr][dataset_abbr][index]
-                        dataset_num[i] += 1
-                    # row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][index]))
+                    row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][index]))
+                    dataset_score[i] += parsed_results[model_abbr][dataset_abbr][index]
+                    dataset_num[i] += 1
                 else:
                     if dataset_abbr.startswith('---') and dataset_num[i] != 0:
                         row.append('{:.02f}'.format(dataset_score[i] / dataset_num[i]))
@@ -255,14 +257,13 @@ class PretrainSummarizer:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
 
-
         summary_groups = summarizer_cfg.get('summary_groups', [])
         for sg in summary_groups:
             for model_abbr in model_abbrs:
                 results = {}
                 eval_modes = []
                 for dataset_abbr in sg['subsets']:
-                    if dataset_abbr in parsed_results[model_abbr]:
+                    if dataset_abbr in parsed_results[model_abbr] and len(parsed_results[model_abbr][dataset_abbr]) > 1:
                         results[dataset_abbr] = (parsed_results[model_abbr][dataset_abbr][-1],parsed_results[model_abbr][dataset_abbr][-2])
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
 
@@ -326,8 +327,9 @@ class PretrainSummarizer:
             for model_abbr in model_abbrs:
                 if dataset_abbr in parsed_results[model_abbr]:
                     if incorrect_bpb != -1 and correct_bpb != -1:
-                        row.append('{:.02f}/{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][correct_bpb],
-                                                            parsed_results[model_abbr][dataset_abbr][incorrect_bpb]))
+                        right_bpb = parsed_results[model_abbr][dataset_abbr][correct_bpb]
+                        wrong_bpb = parsed_results[model_abbr][dataset_abbr][incorrect_bpb]
+                        row.append('{:.02f}/{:.02f}/{:.02f}'.format(right_bpb,wrong_bpb,wrong_bpb-right_bpb))
                     else:
                         row.append('{:.02f}'.format(-1))
                 else:

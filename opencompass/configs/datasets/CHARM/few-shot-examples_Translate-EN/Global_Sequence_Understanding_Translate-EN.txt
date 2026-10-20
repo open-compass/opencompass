@@ -1,0 +1,25 @@
+Choose the correct answer based on the context
+
+Q:Which of the following lists is correct in chronological order? Options:
+(A) University, M.A., Ph.D., Post-doctoral
+(B) University, Ph.D., M.Phil, Post Ph.D.
+(C) University, High School, Post-doctoral, Doctoral
+(D) Post-doctoral, University, Master's, PhD
+A: Let's think step by step.
+The options in the question introduce the concept of four qualifications "University, Masters, PhD, Post-doctoral" and in the order in which these qualifications were obtained, the first qualification obtained is University, followed by Masters, then PhD and finally Post-doctoral. So the answer is (A).
+
+Q:Which of the following list is correct in chronological order? Options:
+(A) May 1, July 15, August 12, June 14
+(B) July 15, August 12, May 1, June 14
+(C) August 12, May 1, July 15, June 14
+(D) May 1, June 14, July 15, August 12
+A: Let's think step by step.
+The question option introduces four dates which are May 1, June 14, July 15, August 12 in chronological order of the year. So the answer is (D).
+
+Q:Which of the following lists is correct in chronological order? Options:
+(A) Countdown to Heaven, Magicians at the End of the Century, The Undead of Baker Street, Detectives' Requiem
+(B) The Magician at the End of the Century, The Undead of Baker Street, Countdown to Heaven, The Detectives' Requiem
+(C) The Magician at the End of the Century, Countdown to Heaven, The Undead of Baker Street, The Detectives' Requiem
+(D) The Magician at the End of the Century, The Undead of Baker Street, The Detectives' Requiem, The Countdown to Heaven
+A: Let's think step by step.
+The options mention the names of the four Conan theatrical releases. The Magician at the End of the Century was released in 1999, The Undead of Baker Street was released in 2002, Countdown to Heaven was released in 2001, and The Detectives' Requiem was released in 2006, so in chronological order it's The Magician at the End of the Century, Countdown to Heaven, The Undead of Baker Street, and The Detectives' Requiem. So the answer is (C).

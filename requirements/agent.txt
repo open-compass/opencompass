@@ -1,0 +1,13 @@
+antlr4-python3-runtime==4.11
+ipykernel
+ipython
+json5
+jupyter
+jupyter_client
+jupytext
+-e git+https://github.com/open-compass/lagent-cibench.git#egg=lagent
+lightgbm==4.1.0
+networkx
+scikit-image
+sympy==1.12
+tensorflow==2.14.0

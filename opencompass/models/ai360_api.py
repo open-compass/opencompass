@@ -1,4 +1,3 @@
-import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Union
 
@@ -60,13 +59,13 @@ class AI360GPT(BaseAPIModel):
 
     def generate(
         self,
-        inputs: List[str or PromptList],
+        inputs: List[PromptType],
         max_out_len: int = 512,
     ) -> List[str]:
         """Generate results given a list of inputs.
 
         Args:
-            inputs (List[str or PromptList]): A list of strings or PromptDicts.
+            inputs (List[PromptType]): A list of strings or PromptDicts.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -83,13 +82,13 @@ class AI360GPT(BaseAPIModel):
 
     def _generate(
         self,
-        input: str or PromptList,
+        input: PromptType,
         max_out_len: int = 512,
     ) -> str:
         """Generate results given an input.
 
         Args:
-            inputs (str or PromptList): A string or PromptDict.
+            inputs (PromptType): A string or PromptDict.
                 The PromptDict should be organized in OpenCompass'
                 API format.
             max_out_len (int): The maximum length of the output.
@@ -126,10 +125,16 @@ class AI360GPT(BaseAPIModel):
         while max_num_retries < self.retry:
             self.acquire()
             # payload = json.dumps(data)
-            raw_response = requests.request('POST',
-                                            url=self.url,
-                                            headers=self.headers,
-                                            json=data)
+            try:
+                raw_response = requests.request('POST',
+                                                url=self.url,
+                                                headers=self.headers,
+                                                json=data)
+            except Exception as e:
+                self.release()
+                print(e)
+                max_num_retries += 1
+                continue
             response = raw_response.json()
             self.release()
 
@@ -141,29 +146,32 @@ class AI360GPT(BaseAPIModel):
                 self.wait()
                 continue
             if raw_response.status_code == 200:
-                try:
-                    msg = response['choices'][0]['message']['content'].strip()
-                    return msg
-
-                except KeyError:
-                    if 'error' in response:
-                        # tpm(token per minitue) limit
-                        if response['erro']['code'] == '1005':
-                            time.sleep(1)
-                            continue
-
-                        self.logger.error('Find error message in response: ',
-                                          str(response['error']))
+                msg = response['choices'][0]['message']['content'].strip()
+                self.logger.debug(f'Generated: {msg}')
+                return msg
 
             # sensitive content, prompt overlength, network error
             # or illegal prompt
-            if (raw_response.status_code == 400
-                    or raw_response.status_code == 401
-                    or raw_response.status_code == 402
-                    or raw_response.status_code == 429
-                    or raw_response.status_code == 500):
-                print(raw_response.text)
-                continue
+            if raw_response.status_code in [400, 401, 402, 429, 500]:
+                if 'error' not in response:
+                    print(raw_response.status_code)
+                    print(raw_response.text)
+                    continue
+                print(response)
+                # tpm(token per minitue) limit
+                if response['error']['code'] == '1005':
+                    self.logger.debug('tpm limit, ignoring')
+                    continue
+                elif response['error']['code'] == '1001':
+                    msg = '参数错误:messages参数过长或max_tokens参数值过大'
+                    self.logger.debug(f'Generated: {msg}')
+                    return msg
+                else:
+                    print(response)
+
+                self.logger.error('Find error message in response: ',
+                                  str(response['error']))
+
             print(raw_response)
             max_num_retries += 1
 

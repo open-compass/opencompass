@@ -2,6 +2,8 @@ import json
 
 from datasets import Dataset, DatasetDict
 
+from opencompass.utils import get_data_path
+
 from .base import BaseDataset
 
 
@@ -9,6 +11,7 @@ class CommonsenseQADataset_CN(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         datasetdict = DatasetDict()
         for split in ['train', 'validation']:
             data = []

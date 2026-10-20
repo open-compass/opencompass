@@ -5,6 +5,7 @@ from datasets import Dataset
 from sklearn.metrics import classification_report
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
 from .math_equivalence import is_equiv
@@ -12,7 +13,7 @@ from .post_process import parse_math_answer, parse_qa_multiple_answer
 
 import evaluate
 from nltk.translate.bleu_score import sentence_bleu
-# from bert_score import score
+# # from bert_score import score
 import re
 from transformers import BasicTokenizer
 from rouge_chinese import Rouge
@@ -23,6 +24,7 @@ class MedBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, name: str, setting_name: str):
+        path = get_data_path(path, local_mode=True)
         from .dataset_loader import load_dataset, load_dataset_as_result_schema
 
         assert setting_name in 'zero-shot', 'only support zero-shot setting'
@@ -35,33 +37,6 @@ class MedBenchDataset(BaseDataset):
                 'problem_input': d1['context'],
                 'label': d2.label,
             })
-        dataset = Dataset.from_list(dataset)
-        return dataset
-
-
-@LOAD_DATASET.register_module()
-class MedBenchDataset_v2(BaseDataset):
-
-    @staticmethod
-    def load(path: str, name: str, setting_name: str):
-        assert setting_name in 'zero-shot', 'only support zero-shot setting'
-        filename = osp.join(path, name + '.jsonl')
-        with open(filename, encoding='utf-8') as f:
-            data = [json.loads(line.strip()) for line in f]
-        dataset = []
-        for item in data:
-            passage = item['passage'] if item['passage'] else ''
-            question = passage + item['question']
-            options = '\n'.join(item['options']) if item['options'] else ''
-            if item['label']:
-                if isinstance(item['label'], list):
-                    label = ''.join(item['label'])
-                else:
-                    label = item['label']
-            else:
-                label = item['answer']
-            d = {'question': question, 'options': options, 'label': label}
-            dataset.append(d)
         dataset = Dataset.from_list(dataset)
         return dataset
 
@@ -82,59 +57,39 @@ class MedBenchEvaluator(BaseEvaluator):
                 detail['correct'] = True
             details.append(detail)
         score = cnt / len(predictions) * 100
-        #输出字典类型 {'score':'', 'details'}
         return {'Accuracy': score, 'details': details}
 
-
-@ICL_EVALUATORS.register_module()
-class MedBenchEvaluator_mcq(BaseEvaluator):
-
-    def score(self, predictions, references):
-        if len(predictions) != len(references):
-            return {
-                'error': 'predictions and references have different '
-                'length'
-            }
-        details = []
-        cnt = 0
-        for pred, ref in zip(predictions, references):
-            detail = {'pred': pred, 'answer': ref, 'correct': False}
-            if pred == ref:
-                cnt += 1
-                detail['correct'] = True
-            details.append(detail)
-
-        score = cnt / len(predictions) * 100
-
-        return {'score': score, 'details': details}
-
 def process_generated_results_CMeEE(pred_file):
+    #   实体每类占一行，每行格式为 "[类型名称]实体：实体名称1，实体名称2，实体名称3\n"
+    #                多个实体，用 ，符号分割
     structured_output = []
     answer_choices = ['药物', '设备', '医院科室', '微生物类', '身体部位', '医疗操作', '医学检验项目', '症状', '疾病']
     for pred in pred_file:
         list_entities = []
         for choice in answer_choices:
-            for piece in re.split('[,|.|。|；|\n]', pred):
+            for piece in re.split('\n', pred):
                 if piece.startswith(f"{choice}"):
-                    mentions = piece.replace(f"{choice}实体为", "").replace(f"{choice}实体是", "").replace(f"{choice}实体：", "").split("，")
+                    mentions = re.split(r"[,，]", piece.replace(f"{choice}:", "").replace(f"{choice}：", ""))
                     for ment in mentions:
-                        list_entities.append({'entity':ment, 'type':choice})
+                        list_entities.append({'type':choice, 'entity':ment})
         structured_output.append(list_entities)
     return structured_output
 
 def process_generated_results_EMR(pred_file):
     structured_output = []
-    answer_choices = ['主诉', '现病史', '既往史', '个人史', '婚育史', '家族史']
-    for pred in pred_file:
-        list_entities = []
-        for choice in answer_choices:
-            for piece in re.split('[,|.|?|;|，|。|；|\n]', pred):
-                if piece.startswith(f"{choice}"):
-                    mentions = piece.replace(f"{choice}：", "").split("，")
-                    mentions = [w.strip() for w in mentions if len(w.strip()) > 0]
-                    for ment in mentions:
-                        list_entities.append({ment: choice})
-        structured_output.append(list_entities)
+    regex = r"^(主诉|现病史|既往史|个人史|婚育史|家族史)[:：]([\s\S]+)$"
+    for prediction in pred_file:
+        entities: dict = {}
+        if "\n\n" in prediction:
+            blocks = prediction.split("\n\n")
+        else:
+            blocks = prediction.splitlines()
+        for line in blocks:
+            if match := re.match(regex, line.strip()):
+                type_ = match[1]
+                mention = match[2].strip()
+                entities[type_] = mention
+        structured_output.append(entities)
     return structured_output
 
 def process_generated_results_CMeIE(pred_file):
@@ -142,46 +97,29 @@ def process_generated_results_CMeIE(pred_file):
     for line in pred_file:
         gen_output = line
 
-        # 答案格式：
-        #   每个关系类型占一行，格式为
-        #         "具有{lab}关系的头尾实体对如下：头实体为str，尾实体为str；头实体为str，尾实体为str；"
-
         answer_choices = "相关（导致）、鉴别诊断、遗传因素、发病性别倾向、相关（症状）、手术治疗、预防、辅助检查、筛查、阶段、临床表现、风险评估因素、同义词、发病年龄、预后生存率、病史、传播途径、治疗后症状、药物治疗、辅助治疗、化疗、死亡率、放射治疗、病因、组织学检查、内窥镜检查、多发群体、并发症、实验室检查、就诊科室、病理生理、高危因素、发病率、多发地区、病理分型、影像学检查、转移部位、发病部位、相关（转化）、外侵部位、预后状况、发病机制、多发季节"
-        answer_choices = answer_choices.split('、')
+        re_choices = "|".join(re.escape(choice) for choice in answer_choices.split('、'))
+        regex = (
+        rf'关系[:：]["“]({re_choices})["”][,，]'
+        r'头实体[:：]["“]([^"”]+)["”][,，]尾实体[:：]["“]([^"”]+)["”]'
+        )
+
         list_spos = []
-        assert isinstance(answer_choices, list)
         list_answer_strs = gen_output.split("\n")
-
         for line in list_answer_strs:
-            # 首先是解析出label:
-            predicate = line.split("关系的头尾实体对")[0][2: ].strip()
-            line = line.replace(f"具有{predicate}关系的头尾实体对如下：", "")
-            for spo_str in line.split("。"):
-                if len(spo_str.split("，尾实体为")) < 2:
-                    continue
-
-                head_mention_str, tail_mention_str = spo_str.split("，尾实体为")[:2]
-                head_mention_str = head_mention_str.replace("头实体为", "").strip()
-                tail_mention_str = tail_mention_str.replace("尾实体为", "").strip()
-
-                list_spos.append(
-                    {
-                        "predicate": predicate,
-                        "subject": head_mention_str,
-                        "object": tail_mention_str,
-                    }
-                )
+            for item in re.finditer(regex, line):
+                print(item)
+            for match in re.finditer(regex, line):
+                list_spos.append({"predicate": match[1], "subject": match[2], "object": match[3]})
+                
         structured_output.append(list_spos)
     return structured_output
 
 def process_generated_results_CDN(pred_file):
     structured_output = []
-    answer_choices = json.load(open('./data/MedBench/CHIP_CDN/CHIP-CDN_entity.json', 'r'))
+    answer_choices = json.load(open('./opencompass/datasets/medbench/entity_list.jsonl', 'r'))
     for line in pred_file:
         gen_output = line
-
-            # 答案格式：
-            #   多个选中的标准化实体，用 ， 符号分割
 
         answer_str = gen_output.split("\n")[-1]
         answers = answer_str.split("，")
@@ -200,46 +138,34 @@ def process_generated_results_CDN(pred_file):
     return structured_output
 
 def process_generated_results_CDEE(pred_file):
-
     structured_output = []
-    for line in pred_file:
-        gen_output = line
-            # 答案格式：
-            #   第一行：引导词
-            #   每个事件占一行，事件字段用 ； 分隔， 然后每个字段是 字段名：字段值的格式"
-            #                                  字段值有多个，则用 ，符号分隔
-        keys = ["主体词", "发生状态", "描述词", "解剖部位"]
-
-        list_answer_strs = gen_output.split("\n")
-        list_events = []
-        for ans_str in list_answer_strs:
-            if '主体词' in ans_str:
-                event_info = {}
-                ans_attrs = ans_str.split("；")
-                for a_attr in ans_attrs:
-                    for key in keys:
-                        if a_attr.startswith(f"{key}："):
-                            a_attr = a_attr.replace(f"{key}：", "").strip()
-                            if key in ["描述词", "解剖部位"]:
-                                a_attr_split = a_attr.split("，")
-                                a_attr_split = [w.strip() for w in a_attr_split if len(w.strip()) > 0]
-                                event_info[key] = a_attr_split
-                            else:
-                                event_info[key] = a_attr
-
-                for key in keys:
-                    if key not in event_info:
-                        if key in ["描述词", "解剖部位"]:
-                            event_info[key] = []
-                        else:
-                            event_info[key] = ""
-
-                list_events.append(event_info)
-
-        structured_output.append(list_events)
+    for prediction in pred_file:
+        events: list[dict] = []
+        for line in prediction.splitlines():
+            if "主体词" in line:
+                line = line.rstrip("。")
+                kvs = line.split("；")
+                kv_dict = dict(kv.split("：", maxsplit=1) for kv in kvs if "：" in kv)
+                events.append({
+                    "主体词": kv_dict.get("主体词", ""),
+                    "发生状态": (
+                        v
+                        if (v := kv_dict.get("发生状态", "不确定")) in ("不确定", "否定")
+                        else ""
+                    ),
+                    "描述词": (
+                        v.split("，") if (v := kv_dict.get("描述词", "空")) != "空" else []
+                    ),
+                    "解剖部位": (
+                        v.split("，")
+                        if (v := kv_dict.get("解剖部位", "空")) != "空"
+                        else []
+                    ),
+                })
+        structured_output.append(events)
     return structured_output
 
-def process_generated_results_CTC(pred_file, task_dataset):
+def process_generated_results_CTC(pred_file):
     structured_output = []
 
     for line in pred_file:
@@ -250,83 +176,102 @@ def process_generated_results_CTC(pred_file, task_dataset):
     return structured_output
 
 def process_generated_results_doc_parsing(pred_file):
+    float_field_regex = r"(体温|脉搏|心率|收缩压|舒张压|呼吸)[^\d]*(\d+(?:\.\d+)?)"
+
     output = []
-    for line in pred_file:
-        structured_output = {'体温':'', '脉搏':'', '心率':'', '收缩压':'', '舒张压':'', '呼吸':'', '上腹部深压痛':'', '腹部反跳痛':'', '上腹部肿块':''}
-        sentence_list = line.strip().split('，|。|\n')
-        for sentence in sentence_list:
-            if '体温' in sentence:
-                temp_value = re.search('[0-9]+', sentence)
-                if temp_value:
-                    structured_output['体温'] = temp_value.group(0)
+    for prediction in pred_file:
+        entities = {
+        "体温": "未扪及",
+        "脉搏": "未扪及",
+        "心率": "未扪及",
+        "收缩压": "未扪及",
+        "舒张压": "未扪及",
+        "呼吸": "未扪及",
+        "是否上腹部深压痛": None,
+        "是否腹部反跳痛": None,
+        "上腹部肿块": None,
+    }
+        for sentence in re.split("[，|。|\n]", prediction):
+            for match in re.finditer(float_field_regex, prediction):
+                entities[match[1]] = match[2]
+            if "上腹部深压痛" in sentence:
+                if re.search("是(?!否)|(?:^|[^不])存在|有", sentence):
+                    entities["是否上腹部深压痛"] = "是"
                 else:
-                    structured_output['体温'] = '未扪及'
-            elif '脉搏' in sentence:
-                temp_value = re.search('[0-9]+', sentence)
-                if temp_value:
-                    structured_output['脉搏'] = temp_value.group(0)
+                    entities["是否上腹部深压痛"] = "否"
+            elif "腹部反跳痛" in sentence:
+                if re.search("是(?!否)|(?:^|[^不])存在|有", sentence):
+                    entities["是否腹部反跳痛"] = "是"
                 else:
-                    structured_output['脉搏'] = '未扪及'
-            elif '心率' in sentence:
-                temp_value = re.search('[0-9]+', sentence)
-                if temp_value:
-                    structured_output['心率'] = temp_value.group(0)
+                    entities["是否腹部反跳痛"] = "否"
+            elif "上腹部肿块" in sentence:
+                if re.search("是(?!否)|(?:^|[^不])存在|有", sentence):
+                    entities["上腹部肿块"] = "扪及"
                 else:
-                    structured_output['心率'] = '未扪及'
-            elif '收缩压' in sentence:
-                temp_value = re.search('[0-9]+', sentence)
-                if temp_value:
-                    structured_output['收缩压'] = temp_value.group(0)
-                else:
-                    structured_output['收缩压'] = '未扪及'
-            elif '舒张压' in sentence:
-                temp_value = re.search('[0-9]+', sentence)
-                if temp_value:
-                    structured_output['舒张压'] = temp_value.group(0)
-                else:
-                    structured_output['舒张压'] = '未扪及'
-            elif '呼吸' in sentence:
-                temp_value = re.search('[0-9]+', sentence)
-                if temp_value:
-                    structured_output['呼吸'] = temp_value.group(0)
-                else:
-                    structured_output['呼吸'] = '未扪及'
-            elif '上腹部深压痛' in sentence:
-                if re.search('是|存在|有', sentence):
-                    structured_output['是否上腹部深压痛'] = '是'
-                else:
-                    structured_output['是否上腹部深压痛'] = '否'
-            elif '腹部反跳痛' in sentence:
-                if re.search('是|存在|有', sentence):
-                    structured_output['是否腹部反跳痛'] = '是'
-                else:
-                    structured_output['是否腹部反跳痛'] = '否'
-            elif '上腹部肿块' in sentence:
-                if re.search('是|存在|有', sentence):
-                    structured_output['上腹部肿块'] = '扪及'
-                else:
-                    structured_output['上腹部肿块'] = '未扪及'
-        output.append(structured_output)
+                    entities["上腹部肿块"] = "未扪及"
+        result = [
+            {
+                "type": "体温(℃)",
+                "entity": entities["体温"],
+            },
+            {
+                "type": "脉搏(次/分)",
+                "entity": entities["脉搏"],
+            },
+            {
+                "type": "心率(次/分)",
+                "entity": entities["心率"],
+            },
+            {
+                "type": "收缩压(mmHg)",
+                "entity": entities["收缩压"],
+            },
+            {
+                "type": "舒张压(mmHg)",
+                "entity": entities["舒张压"],
+            },
+            {
+                "type": "呼吸(次/分)",
+                "entity": entities["呼吸"],
+            },
+        ]
+        if entities["是否上腹部深压痛"]:
+            result.append({
+                "type": "是否上腹部深压痛",
+                "entity": entities["是否上腹部深压痛"],
+            })
+        if entities["是否腹部反跳痛"]:
+            result.append({
+                "type": "是否腹部反跳痛",
+                "entity": entities["是否腹部反跳痛"],
+            })
+        if entities["上腹部肿块"]:
+            result.append({
+                "type": "上腹部肿块",
+                "entity": entities["上腹部肿块"],
+            })
+
+        output.append(result)
     return output
 
 def process_generated_results_mrg(pred_file):
     structured_output = []
-    answer_choices = ['主诉', '现病史', '既往史', '辅助检查', '诊断']
-    for pred in pred_file:
-        list_entities = []
-        for choice in answer_choices:
-            for piece in re.split('[,|.|?|;|，|。|；|\n]', pred):
-                if piece.startswith(f"{choice}实体"):
-                    mentions = piece.replace(f"{choice}实体：", "").split("，")
-                    mentions = [w.strip() for w in mentions if len(w.strip()) > 0]
-                    for ment in mentions:
-                        list_entities.append({ment: choice})
-        structured_output.append(list_entities)
+    regex = r"^(主诉|现病史|辅助检查|既往史|诊断|建议)[:：]([\s\S]+)$"
+    for prediction in pred_file:
+        entities = {}
+        if "\n\n" in prediction:
+            blocks = prediction.split("\n\n")
+        else:
+            blocks = prediction.splitlines()
+        for line in blocks:
+            if match := re.match(regex, line.strip()):
+                type_ = match[1]
+                mention = match[2].strip()
+                entities[type_] = mention
+        structured_output.append(entities)
     return structured_output
 
-
-def calc_info_extract_task_scores(list_structured_golden,
-                                  list_structured_predict):
+def calc_info_extract_task_scores(list_structured_predict, list_structured_golden):
 
     assert len(list_structured_golden) == len(list_structured_predict)
 
@@ -334,12 +279,11 @@ def calc_info_extract_task_scores(list_structured_golden,
     fp = 0
     fn = 0
     for samp_golden, samp_predict in zip(list_structured_golden, list_structured_predict):
-
+        # samp_golden: [[{}]]
         answer_golden = samp_golden
         answer_predict = samp_predict
-
-        assert isinstance(answer_golden, list)
-        assert isinstance(answer_predict, list), "sample format is wrong!"
+        # assert isinstance(answer_golden, list)
+        # assert isinstance(answer_predict, list), "sample format is wrong!"
 
         set_golden = set()
         for inst in answer_golden:
@@ -356,17 +300,10 @@ def calc_info_extract_task_scores(list_structured_golden,
         for inst in answer_predict:
             assert isinstance(inst, dict)
             keys = sorted(list(inst.keys()))
-            # inst = tuple([inst[w] for w in keys])
+
             inst = tuple([json.dumps(inst[w], ensure_ascii=False) for w in keys])
 
-            # inst = list(inst.items())
-            # inst.sort()
-            # inst = tuple(inst)
-
             set_predict.add(inst)
-
-        # print("set_predict: ", set_predict)
-        # print("set_golden: ", set_golden)
 
         tp += len(set_golden.intersection(set_predict))
         fp += len(set_predict.difference(set_golden))
@@ -402,7 +339,9 @@ def calc_cls_task_scores(list_structured_golden,
 
         pred_label = pred_samp
         gt_label = gt_samp
-        assert gt_label != ""
+        # assert gt_label != ""
+        if gt_label == "":
+            get_label = list_labels[0]
         if pred_label == "":
             pred_label = list_labels[0]
 
@@ -434,16 +373,10 @@ def calc_nlg_task_scores(list_structured_golden, list_structured_predict):
     references = []
     details = []
     for samp_golden, samp_predict in zip(list_structured_golden, list_structured_predict):
-        # print("samp_golden: ", samp_golden)
-        # print("samp_predict: ", samp_predict)
 
-        # assert samp_golden["sample_id"] == samp_predict["sample_id"], "sample ordering is wrong!"
         answer_golden = samp_golden
         answer_predict = samp_predict
 
-        print('#')
-        print(answer_golden)
-        print(answer_predict)
         if not (answer_predict and answer_golden):
             continue
 
@@ -456,8 +389,6 @@ def calc_nlg_task_scores(list_structured_golden, list_structured_predict):
             answer_golden = "无 。"
         if answer_predict.strip() == "":
             answer_predict = "无 。"
-        # print("answer_predict: ", answer_predict)
-        # print("answer_golden: ", answer_golden)
 
         predictions.append(answer_predict)
         references.append(answer_golden)
@@ -487,7 +418,7 @@ def calc_scores_f1(dict_gt, dict_pred):
         details = []
         for gt, pred in zip(dict_gt, dict_pred):
             details.append({'pred':pred, 'answer':gt, 'correct':None})
-
+        
         precision, recall, f1 = calc_info_extract_task_scores(dict_gt, dict_pred)
         return {'F1':f1, 'details':details}
 
@@ -498,7 +429,7 @@ def calc_scores_ctc(dict_gt, dict_pred):
 
     gts = dict_gt
     preds = dict_pred
-
+    
     precision, recall, f1 = calc_cls_task_scores(
         gts,
         preds,
@@ -520,9 +451,9 @@ def calc_scores_ctc(dict_gt, dict_pred):
         return_macro=True,
     )
     return {'Macro-F1':f1, 'details':details}
-
+    
 def calc_scores_nlg(dict_gt, dict_pred):
-
+    
         # scores = {}
         scores = {'score':0, 'details':[]}
         success_flag = 1
@@ -532,7 +463,7 @@ def calc_scores_nlg(dict_gt, dict_pred):
         # if not len(gts) == len(preds):
         #     success_flag = 0
         # try:
-        return calc_nlg_task_scores(gts, preds)
+        return calc_nlg_task_scores(gts, preds)    
 
 @ICL_EVALUATORS.register_module()
 class MedBenchEvaluator_CMeEE(BaseEvaluator):
@@ -542,18 +473,24 @@ class MedBenchEvaluator_CMeEE(BaseEvaluator):
         return calc_scores_f1(predictions, references)
 
 @ICL_EVALUATORS.register_module()
-class MedBenchEvaluator_EMR(BaseEvaluator):
+class MedBenchEvaluator_DBMHG(BaseEvaluator):
 
     def score(self, predictions, references):
         predictions = process_generated_results_EMR(predictions)
         return calc_scores_f1(predictions, references)
 
 @ICL_EVALUATORS.register_module()
-class MedBenchEvaluator_MRG(BaseEvaluator):
+class MedBenchEvaluator_IMCS_V2_MRG(BaseEvaluator):
 
     def score(self, predictions, references):
-        predictions = process_generated_results_mrg(predictions)
-        return calc_scores_f1(predictions, references)
+        # predictions = process_generated_results_mrg(predictions)
+        references_revise = []
+        for item in references:
+            temp_ref = ''
+            for sub_item in item:
+                temp_ref += sub_item['type'] + '：' + sub_item['entity'] + '\n'
+            references_revise.append(temp_ref)
+        return calc_nlg_task_scores(references_revise, predictions)
 
 @ICL_EVALUATORS.register_module()
 class MedBenchEvaluator_CMeIE(BaseEvaluator):
@@ -581,14 +518,20 @@ class MedBenchEvaluator_CHIP_CTC(BaseEvaluator):
 
     def score(self, predictions, references):
         predictions = process_generated_results_CTC(predictions)
-        return calc_scores_ctc(predictions, references)[0]
+        return calc_scores_ctc(predictions, references)
 
 @ICL_EVALUATORS.register_module()
 class MedBenchEvaluator_Doc_parsing(BaseEvaluator):
 
     def score(self, predictions, references):
-        predictions = process_generated_results_doc_parsing(predictions)
-        return calc_scores_f1(predictions, references)
+        # predictions = process_generated_results_doc_parsing(predictions)
+        references_revise = []
+        for item in references:
+            temp_ref = ''
+            for sub_item in item:
+                temp_ref += sub_item['type'] + '：' + sub_item['entity'] + '\n'
+            references_revise.append(temp_ref)
+        return calc_nlg_task_scores(references_revise, predictions)
 
 @ICL_EVALUATORS.register_module()
 class MedBenchEvaluator_NLG(BaseEvaluator):
@@ -609,7 +552,7 @@ class MedBenchEvaluator_Cloze(BaseEvaluator):
 
         for pred, ref in zip(predictions, references):
             detail = {'pred':pred, 'answer':ref, 'correct':False}
-
+            
             if sum([item in pred for item in ref]) == len(ref):
                 cnt += 1
                 detail['correct'] = True
@@ -628,7 +571,7 @@ class MedBenchEvaluator_TF(BaseEvaluator):
         cnt = 0
 
         for pred, ref in zip(predictions, references):
-
+            
             if '不' in pred or '否' in pred:
                 cur_pred = '不可以'
             else:
@@ -639,7 +582,7 @@ class MedBenchEvaluator_TF(BaseEvaluator):
             if cur_pred == ref:
                 cnt += 1
                 detail['correct'] = True
-
+            
             details.append(detail)
 
         score = cnt / len(predictions) * 100

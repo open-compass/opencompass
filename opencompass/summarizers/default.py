@@ -16,8 +16,15 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
 
-METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth']
-METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len']
+METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match', 'extract_rate']
+METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type']
+
+def model_abbr_from_cfg_used_in_summarizer(model):
+    if model.get('summarizer_abbr', None):
+        return model['summarizer_abbr']
+    else:
+        return model_abbr_from_cfg(model)
+
 
 class DefaultSummarizer:
     """Default summarizer in OpenCompass.
@@ -49,7 +56,13 @@ class DefaultSummarizer:
         self.model_cfgs = self.cfg['models']
         self.dataset_cfgs = self.cfg['datasets']
         self.work_dir = self.cfg['work_dir']
-        self.model_abbrs = [model_abbr_from_cfg(model) for model in self.model_cfgs]
+        model_abbrs = []
+        for model in self.model_cfgs:
+            model_abbr = model_abbr_from_cfg_used_in_summarizer(model)
+            if model_abbr in model_abbrs:
+                continue
+            model_abbrs.append(model_abbr)
+        self.model_abbrs = model_abbrs
 
     def _pick_up_results(self):
         """The function reads the numerical results of evaluations from the
@@ -71,9 +84,9 @@ class DefaultSummarizer:
         dataset_metrics : Dict[str, List[str]] = {}
 
         for model in self.model_cfgs:
-            model_abbr = model_abbr_from_cfg(model)
-            parsed_results[model_abbr] = {}
-            raw_results[model_abbr] = {}
+            model_abbr = model_abbr_from_cfg_used_in_summarizer(model)
+            parsed_results.setdefault(model_abbr, {})
+            raw_results.setdefault(model_abbr, {})
             for dataset in self.dataset_cfgs:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 filepath = get_infer_output_path(model, dataset, osp.join(self.work_dir, 'results'))
@@ -112,8 +125,11 @@ class DefaultSummarizer:
             dataset_abbr = dataset_abbr_from_cfg(dataset)
             if 'GenInferencer' in inferencer:
                 dataset_eval_mode[dataset_abbr] = 'gen'
-            elif 'PPLInferencer' in inferencer:
+            elif ('PPLInferencer' in inferencer
+                  or 'PPLOnlyInferencer' in inferencer):
                 dataset_eval_mode[dataset_abbr] = 'ppl'
+            elif 'LLInferencer' in inferencer:
+                dataset_eval_mode[dataset_abbr] = 'll'
             else:
                 dataset_eval_mode[dataset_abbr] = 'unknown'
                 self.logger.warning(f'unknown inferencer: {inferencer} - {dataset_abbr}')
@@ -152,8 +168,12 @@ class DefaultSummarizer:
                     need_smart_metric = True
                     if sg.get('std', False):
                         default_metric = 'standard_deviation'
+                    elif sg.get('sum', False):
+                        default_metric = 'sum'
                     elif sg.get('weights', []):
                         default_metric = 'weighted_average'
+                    elif sg.get('harmonic_mean', False):
+                        default_metric = 'harmonic_mean'
                     else:
                         default_metric = 'naive_average'
 
@@ -165,54 +185,83 @@ class DefaultSummarizer:
                 if all(isinstance(dataset_abbr, (list, tuple)) for dataset_abbr in sg['subsets']):
                     group_metrics = [default_metric]
                     for dataset_abbr, metric in sg['subsets']:
-                        scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
+                        scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
-                    if need_smart_metric and len(group_metrics) > 1:
-                        for metric in group_metrics:
-                            for dataset_abbr in sg['subsets']:
-                                scores.setdefault(metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
-                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
-                    else:
-                        group_metrics = [default_metric]
+                    group_metrics.append(default_metric)
+                    for metric in group_metrics:
                         for dataset_abbr in sg['subsets']:
-                            metric = dataset_metrics[dataset_abbr][0]
-                            scores.setdefault(default_metric, {})[dataset_abbr] = parsed_results[model_abbr][dataset_abbr][metric]
-                            eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
+                            if metric == default_metric:
+                                metric_default = dataset_metrics[dataset_abbr][0]
+                                scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric_default] = \
+                                parsed_results[model_abbr][dataset_abbr][metric_default]
+                                eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
+                            else:
+                                scores.setdefault(metric, {})[dataset_abbr + '@' + metric] = \
+                                parsed_results[model_abbr][dataset_abbr][metric]
+                                eval_modes.append(dataset_eval_mode.get(sg['subsets'][0], 'unknown'))
 
-                result = parsed_results[model_abbr].get(sg['name'], {})
+                # Apply per-subset transforms before aggregation
+                transforms = sg.get('transforms', {})
+                if transforms:
+                    for metric in scores:
+                        for key in list(scores[metric].keys()):
+                            subset_name = key.split('@')[0]
+                            if subset_name in transforms:
+                                x = scores[metric][key]
+                                scores[metric][key] = eval(transforms[subset_name])
+
+                result = {}
                 for metric in scores:
                     if default_metric == 'standard_deviation':
                         avg = sum(scores[metric].values()) / len(scores[metric])
                         variance = sum((scores[metric][k] - avg) ** 2 for k in scores[metric]) / len(scores[metric])
                         scores[metric] = result[metric] = math.sqrt(variance)
+                    elif default_metric == 'harmonic_mean':
+                        # Check for non-positive values that would cause issues in harmonic mean
+                        if any(scores[metric][k] <= 0 for k in scores[metric]):
+                            self.logger.warning(f'Non-positive values found when calculating harmonic mean for {sg["name"]}')
+                            # Handle non-positive values (either skip or use a small positive value)
+                            numerator = len(scores[metric])
+                            denominator = sum(1 / max(scores[metric][k], 1) for k in scores[metric])
+                        else:
+                            numerator = len(scores[metric])
+                            denominator = sum(1 / scores[metric][k] for k in scores[metric])
+                        scores[metric] = result[metric] = numerator / denominator
                     else:
                         if sg.get('weights', []):
                             # check sg['weights'][k] != 0 in case of scores[metric][k] is NaN
-                            numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
+                            try:
+                                numerator = sum(scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
+                            except KeyError:
+                                tmp_scores = {metric: {k.split('@')[0]: v for k, v in scores[metric].items()}}
+                                numerator = sum(tmp_scores[metric][k] * sg['weights'][k] for k in sg['weights'] if sg['weights'][k] != 0)
                             denominator = sum(sg['weights'].values())
                         else:
                             numerator = sum(scores[metric].values())
                             denominator = len(scores[metric])
-                        scores[metric] = result[metric] = numerator / denominator
+                        if default_metric == 'sum':
+                            scores[metric] = result[metric] = numerator
+                        else:
+                            scores[metric] = result[metric] = numerator / denominator
                     eval_modes = list(set(eval_modes))
                     eval_mode = eval_modes[0] if len(eval_modes) == 1 else 'mixed'
 
                 # add to global results
-                raw_results[model_abbr][sg['name']] = scores
-                parsed_results[model_abbr][sg['name']] = result
-                dataset_metrics[sg['name']] = group_metrics
+                raw_results[model_abbr].setdefault(sg['name'], {}).update(scores)
+                parsed_results[model_abbr].setdefault(sg['name'], {}).update(result)
+                dataset_metrics.setdefault(sg['name'], []).extend(group_metrics)
                 dataset_eval_mode[sg['name']] = eval_mode
 
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode
 
-    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode):
+    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=None, skip_all_slash=False):
         dataset_abbrs = [dataset_abbr_from_cfg(dataset) for dataset in self.dataset_cfgs]
         prompt_version = {dataset_abbr_from_cfg(d): get_prompt_hash(d)[:6] for d in self.dataset_cfgs}
 
         summarizer_dataset_abbrs = []
-        if self.dataset_abbrs is None:
+        if required_dataset_abbrs is None:
             # display all dataset metrics included in the config
             for dataset_abbr in dataset_abbrs:
                 if dataset_abbr in dataset_metrics:
@@ -227,7 +276,7 @@ class DefaultSummarizer:
                         summarizer_dataset_abbrs.append((dataset_abbr, metric))
         else:
             # follow the required order
-            for item in self.dataset_abbrs:
+            for item in required_dataset_abbrs:
                 if isinstance(item, str):
                     summarizer_dataset_abbrs.append((item, None))
                 elif isinstance(item, (list, tuple)):
@@ -238,14 +287,16 @@ class DefaultSummarizer:
         table.append(header)
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
-                table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
+                if not skip_all_slash:
+                    table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
                 continue
             if metric is None:
                 metric = dataset_metrics[dataset_abbr][0]
             elif metric in dataset_metrics[dataset_abbr]:
                 pass
             else:
-                table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
+                if not skip_all_slash:
+                    table.append([dataset_abbr, '-', '-', '-'] + ['-'] * len(self.model_abbrs))
                 continue
 
             row = [dataset_abbr, prompt_version.get(dataset_abbr, '-'), metric, dataset_eval_mode.get(dataset_abbr, '-')]
@@ -273,27 +324,49 @@ class DefaultSummarizer:
         raw_txts = '\n'.join(raw_txts)
         return raw_txts
 
+    @staticmethod
+    def _format_md_table(table):
+        table_head_str = '| ' + ' | '.join(table[0]) + ' |\n'
+        table_mid_list = ['-----' for _ in range(len(table[0]))]
+        table_mid_str = '|' + ' | '.join(table_mid_list) + '|\n'
+
+        md_table_str = table_head_str + table_mid_str
+        for row in table[1:]:
+            curr_str = '| ' + ' | '.join(row) + ' |\n'
+            md_table_str += curr_str
+        return md_table_str
+
     def _output_to_file(self, output_path, time_str, table, raw_txts):
         # output to file
         if output_path is None:
             output_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.txt')
             output_csv_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.csv')
+            output_md_path = osp.join(self.work_dir, 'summary', f'summary_{time_str}.md')
         else:
             output_csv_path = output_path.replace('.txt', '.csv')
+            output_md_path = output_path.replace('.txt', '.md')
 
         output_dir = osp.split(output_path)[0]
         mmengine.mkdir_or_exist(output_dir)
+
+        # process md table
+        md_table = self._format_md_table(table)
+
         with open(output_path, 'w', encoding='utf-8') as f:
             text = f'{time_str}\n' + \
                     'tabulate format\n' + \
                     '^' * 128 + '\n' + \
-                    tabulate.tabulate(table, headers='firstrow') + '\n' + \
+                    tabulate.tabulate(table, headers='firstrow', floatfmt='.2f') + '\n' + \
                     '$' * 128 + '\n\n' + \
                     '-' * 128 + ' THIS IS A DIVIDER ' + '-' * 128 + '\n\n' + \
                     'csv format\n' + \
                     '^' * 128 + '\n' + \
                     '\n'.join([','.join(row) for row in table]) + '\n' + \
                     '$' * 128 + '\n\n' + \
+                    'markdown format\n' + \
+                    '^' * 128 + '\n' + \
+                    md_table + '\n' + \
+                    '$' * 128 + '\n' + \
                     '-' * 128 + ' THIS IS A DIVIDER ' + '-' * 128 + '\n\n' + \
                     'raw format\n' + \
                     '^' * 128 + '\n' + \
@@ -302,9 +375,15 @@ class DefaultSummarizer:
             f.write(text)
         self.logger.info(f'write summary to {osp.abspath(output_path)}')
 
+        table = [[col.replace(',', ' ') if isinstance(col, str) else col for col in row] for row in table]
         with open(output_csv_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join([','.join(row) for row in table]) + '\n')
         self.logger.info(f'write csv to {osp.abspath(output_csv_path)}')
+
+        with open(output_md_path, 'w', encoding='utf-8') as f:
+            f.write(md_table)
+        print(f'\n\nThe markdown format results is as below:\n\n{md_table}')
+        self.logger.info(f'write markdown summary to {osp.abspath(output_md_path)}')
 
     def summarize(
         self,
@@ -319,13 +398,13 @@ class DefaultSummarizer:
             self._calculate_group_metrics(raw_results, parsed_results, dataset_metrics, dataset_eval_mode)
 
         # format table
-        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode)
+        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=self.dataset_abbrs)
 
         # format raw txt
         raw_txts = self._format_raw_txt(raw_results)
 
         # output to screen
-        print(tabulate.tabulate(table, headers='firstrow'))
+        print(tabulate.tabulate(table, headers='firstrow', floatfmt='.2f'))
 
         # output to .text / .csv files
         self._output_to_file(output_path, time_str, table, raw_txts)

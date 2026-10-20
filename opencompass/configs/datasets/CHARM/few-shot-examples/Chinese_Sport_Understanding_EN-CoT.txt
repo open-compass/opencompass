@@ -1,0 +1,22 @@
+判断一句人为构造的关于体育的句子是否可信。
+
+Q: 下面的句子可信吗? "运动员张培萌一传稳定如山，使得进攻端占据着主动"
+选项：
+(A)可信
+(B)不可信
+A: Let's think step by step.
+Zhang Peimeng is an athlete from China who competes in track and field. First pass is a term in volleyball. Since he is not a volleyball player, he won't be involved in the passing part of a volleyball game. So the answer is (B).
+
+Q: 下面的句子可信吗? "运动员郭艾伦打入任意球"
+选项：
+(A)可信
+(B)不可信
+A: Let's think step by step.
+Guo Ailun is a Chinese basketball player, and "free kick" is a term used in soccer. Since he is not a soccer player, he won't be involved in the free kick phase of a soccer match. Therefore, So the answer is (B).
+
+Q: 下面的句子可信吗? "运动员范智毅射门得分"
+选项：
+(A)可信
+(B)不可信
+A: Let's think step by step.
+Fan Zhiyi is a Chinese football player, and "scoring a goal" is a term used in football. Since he is a professional football player, he is very likely to score a goal. So the answer is (A).

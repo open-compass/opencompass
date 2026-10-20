@@ -3,6 +3,7 @@ import json
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -12,6 +13,7 @@ class CMRCDataset(BaseDataset):
 
     @staticmethod
     def load(path: str):
+        path = get_data_path(path)
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         # 将原始数据转换为所需的格式

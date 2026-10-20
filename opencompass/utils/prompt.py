@@ -19,6 +19,17 @@ def safe_format(input_str: str, **kwargs) -> str:
     Returns:
         str: The formatted string.
     """
+    # import re
+    # segs = [input_str]
+    # for k, v in kwargs.items():
+    #     regex = re.compile(f'(?<={{{k}}})(?={{{k}}})|({{{k}}})')
+    #     segs = [regex.split(seg) for seg in segs]
+    #     segs = sum(segs, [])
+    # replace_dict = {f'{{{k}}}': str(v) for k, v in kwargs.items()}
+    # segs = [replace_dict.get(seg, seg) for seg in segs]
+    # output_str = ''.join(segs)
+    # return output_str
+
     for k, v in kwargs.items():
         input_str = input_str.replace(f'{{{k}}}', str(v))
     return input_str
@@ -73,7 +84,7 @@ class PromptList(list):
 
         Args:
             src (str): The string to be replaced.
-            dst (str or PromptList): The string or PromptList to replace with.
+            dst (PromptType): The string or PromptList to replace with.
 
         Returns:
             PromptList: A new PromptList with 'src' replaced by 'dst'.
@@ -98,7 +109,7 @@ class PromptList(list):
 
         Args:
             src (str): The string to be replaced.
-            dst (str or PromptList): The string or PromptList to replace with.
+            dst (PromptType): The string or PromptList to replace with.
 
         Returns:
             PromptList: A new PromptList with 'src' replaced by 'dst'.
@@ -139,7 +150,7 @@ class PromptList(list):
         """Adds a string or another PromptList to this PromptList.
 
         Args:
-            other (str or PromptList): The string or PromptList to be added.
+            other (PromptType): The string or PromptList to be added.
 
         Returns:
             PromptList: A new PromptList that is the result of the addition.
@@ -156,7 +167,7 @@ class PromptList(list):
         '+' operator.
 
         Args:
-            other (str or PromptList): The string or PromptList to be added.
+            other (PromptType): The string or PromptList to be added.
 
         Returns:
             PromptList: A new PromptList that is the result of the addition.
@@ -172,7 +183,7 @@ class PromptList(list):
         """Implements in-place addition for the PromptList.
 
         Args:
-            other (str or PromptList): The string or PromptList to be added.
+            other (PromptType): The string or PromptList to be added.
 
         Returns:
             PromptList: The updated PromptList.

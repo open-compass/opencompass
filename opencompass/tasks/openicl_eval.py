@@ -1,28 +1,31 @@
+# flake8: noqa
+
 import argparse
 import copy
-import fnmatch
 import math
+import os
 import os.path as osp
+import random
 import statistics
+import sys
 import time
-from collections import Counter
+from collections import defaultdict
 from inspect import signature
-from shutil import which
-from typing import List, Optional
+from typing import Iterable, List
 
 import mmengine
+from datasets import Dataset
 from mmengine.config import Config, ConfigDict
 from mmengine.utils import mkdir_or_exist
 
 from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
                                   TEXT_POSTPROCESSORS)
-from opencompass.tasks.base import BaseTask
-from opencompass.utils import (build_dataset_from_cfg, dataset_abbr_from_cfg,
-                               get_infer_output_path, get_logger,
-                               task_abbr_from_cfg)
+from opencompass.tasks.base import BaseTask, extract_role_pred
+from opencompass.utils import (build_dataset_from_cfg, get_infer_output_path,
+                               get_logger)
 
 
-@TASKS.register_module(force=(__name__ == '__main__'))  # A hack for script run
+@TASKS.register_module()
 class OpenICLEvalTask(BaseTask):
     """OpenICL Evaluation Task.
 
@@ -36,15 +39,42 @@ class OpenICLEvalTask(BaseTask):
 
     def __init__(self, cfg: ConfigDict):
         super().__init__(cfg)
-        self.num_gpus = 0
         self.logger = get_logger()
-        self.dump_details = cfg.get('eval', {}).get('runner', {}).get(
-            'task', {}).get('dump_details', False)
+        self.num_gpus = max(
+            max(
+                c.get('eval_cfg', {}).get('num_gpus', 0),
+                c.get('eval_cfg', {}).get('evaluator', {}).get(
+                    'judge_cfg', {}).get('run_cfg', {}).get('num_gpus', 0),
+                c.get('eval_cfg', {}).get('evaluator', {}).get(
+                    'llm_evaluator', {}).get('judge_cfg', {}).get(
+                        'run_cfg', {}).get('num_gpus', 0),
+                next(
+                    iter(
+                        c.get('eval_cfg', {}).get('evaluator', {}).get(
+                            'judge_cfg', {}).get('judgers', [])), {}).get(
+                                'run_cfg', {}).get('num_gpus', 0))
+            for c in sum(self.dataset_cfgs, []))
+        self.num_procs = max(
+            c.get('eval_cfg', {}).get('evaluator', {}).get(
+                'judge_cfg', {}).get('run_cfg', {}).get('num_procs', 1)
+            for c in sum(self.dataset_cfgs, []))
+        self.dump_details = (cfg.get('eval', {}).get('runner', {}).get(
+            'task', {}).get('dump_details', False))
+        self.cal_extract_rate = (cfg.get('eval', {}).get('runner', {}).get(
+            'task', {}).get('cal_extract_rate', False))
 
     def get_command(self, cfg_path, template):
+        sys.path.append(os.getcwd())
         script_path = __file__
-        python = 'python3' if which('python3') else 'python'
-        command = f'{python} {script_path} {cfg_path}'
+        python = sys.executable
+        if self.num_gpus > 1:
+            port = random.randint(12000, 32000)
+            command = (
+                f'{python} -m torch.distributed.run --master_port={port} '
+                f'--nproc_per_node {self.num_procs} '
+                f'{script_path} {cfg_path}')
+        else:
+            command = f'{python} {script_path} {cfg_path}'
         return template.format(task_cmd=command)
 
     def run(self):
@@ -54,197 +84,382 @@ class OpenICLEvalTask(BaseTask):
                 self.dataset_cfg = dataset_cfg
 
                 # Load Dataset
-                self.eval_cfg = self.dataset_cfg.get('eval_cfg')
-                self.output_column = dataset_cfg['reader_cfg']['output_column']
-
-                # overwrite postprocessor if the model has specified one
-                ds_abbr = dataset_abbr_from_cfg(self.dataset_cfg)
-                model_postprocessors = self.model_cfg.get(
-                    'pred_postprocessor', {})
-                for pattern in model_postprocessors.keys():
-                    if fnmatch.fnmatch(ds_abbr, pattern):
-                        self.eval_cfg[
-                            'pred_postprocessor'] = model_postprocessors[
-                                pattern]  # noqa
-                        break
+                self.eval_cfg = copy.deepcopy(dataset_cfg.get('eval_cfg'))
+                self.output_column = copy.deepcopy(
+                    dataset_cfg['reader_cfg']['output_column'])
 
                 out_path = get_infer_output_path(
-                    self.model_cfg, self.dataset_cfg,
-                    osp.join(self.work_dir, 'results'))
+                    self.model_cfg,
+                    self.dataset_cfg,
+                    osp.join(self.work_dir, 'results'),
+                )
                 if osp.exists(out_path):
                     continue
                 self._score()
 
     def _score(self):
+        # Load and preprocess test data
+        test_set = self._load_and_preprocess_test_data()
+        # Load predictions
+        pred_dicts, pred_strs = self._load_predictions()
+
+        if pred_strs is not None and all(
+                isinstance(item, dict) and 'rollout' in item
+                for item in pred_strs):
+            # Sum rollout
+            result = self._sum_rollout(
+                pred_strs,
+                test_set,
+                pred_dicts,
+            )
+
+            # Save results
+            self._save_results(result)
+
+        else:
+            # Process predictions
+            pred_strs = self._process_predictions(pred_strs)
+
+            # Evaluate predictions
+            result = self._evaluate_predictions(
+                pred_strs,
+                test_set,
+                pred_dicts,
+            )
+
+            # Save results
+            self._save_results(result)
+
+    def _load_and_preprocess_test_data(self):
+        """Load test dataset and apply postprocessing if needed."""
         test_set = build_dataset_from_cfg(self.dataset_cfg).test
         # Postprocess dataset if necessary
         if 'dataset_postprocessor' in self.eval_cfg:
-            proc = self.eval_cfg['dataset_postprocessor']['type']
+            kwargs = copy.deepcopy(self.eval_cfg['dataset_postprocessor'])
+            proc = kwargs.pop('type')
             if isinstance(proc, str):
                 proc = TEXT_POSTPROCESSORS.get(proc)
 
             def postprocess(sample):
                 s = sample[self.output_column]
-                sample[self.output_column] = proc(s)
+                sample[self.output_column] = proc(s, **kwargs)
                 return sample
 
             test_set = test_set.map(postprocess)
 
-        # Load predictions
+        return test_set
+
+    def _load_predictions(self):
+        """Load model predictions from files."""
         filename = get_infer_output_path(
-            self.model_cfg, self.dataset_cfg,
-            osp.join(self.work_dir, 'predictions'))
+            self.model_cfg,
+            self.dataset_cfg,
+            osp.join(self.work_dir, 'predictions'),
+        )
         # in case the prediction is partial
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
 
-        # Get sc_size if use Self-Consistency
-        sc_size = self.eval_cfg.get('sc_size')
-
         if not osp.exists(osp.realpath(filename)) and not osp.exists(
                 osp.realpath(partial_filename)):
-            result = {'error': 'No predictions found.'}
+            raise FileNotFoundError(
+                f'Prediction files not found: neither {filename} '
+                f'nor {partial_filename} exists')
+
+        if osp.exists(osp.realpath(filename)):
+            preds = mmengine.load(filename)
+            preds = [preds[str(i)] for i in range(len(preds))]
         else:
-            if osp.exists(osp.realpath(filename)):
-                preds = mmengine.load(filename)
-                preds = [preds[str(i)] for i in range(len(preds))]
-            else:
-                filename = partial_filename
-                preds = []
-                i = 1
-                while osp.exists(osp.realpath(filename)):
+            filename = partial_filename
+            preds = []
+            i = 1
+            while osp.exists(osp.realpath(filename)):
+                try:
                     sub_preds = mmengine.load(filename)
                     preds.extend(
                         [sub_preds[str(i)] for i in range(len(sub_preds))])
                     filename = root + f'_{i}' + ext
                     i += 1
-            pred_dicts = copy.deepcopy(preds)
-            preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
+                except Exception as e:
+                    self.logger.error(
+                        f'Error loading prediction file {filename}: {e}')
+                    break
 
-            pred_strs = preds.pop('prediction')
-            pred_list_flag = isinstance(pred_strs[0], list)
-            if ('pred_role' in self.eval_cfg
-                    and 'meta_template' in self.model_cfg
-                    and not MODELS.get(self.model_cfg['type']).is_api):
-                # Create a prompt template for role config parsing
-                from opencompass.models.base import LMTemplateParser
-                parser = LMTemplateParser(self.model_cfg['meta_template'])
-                role = parser.roles[self.eval_cfg['pred_role']]
-                if sc_size is not None:
-                    assert pred_list_flag, (
-                        'The prediction for Self-Consistency'
-                        'must be list.')
-                if pred_list_flag:
-                    pred_strs = [[
-                        self._extract_role_pred(_pred, role.get('begin', None),
-                                                role.get('end', None))
-                        for _pred in pred
-                    ] for pred in pred_strs]
-                else:
-                    pred_strs = [
-                        self._extract_role_pred(pred, role.get('begin', None),
-                                                role.get('end', None))
-                        for pred in pred_strs
-                    ]
+        pred_dicts = copy.deepcopy(preds)
+        preds = {k: [pred.get(k) for pred in preds] for k in preds[0]}
 
-            # Postprocess predictions if necessary
-            if 'pred_postprocessor' in self.eval_cfg:
-                kwargs = self.eval_cfg['pred_postprocessor']
-                proc = kwargs.pop('type')
-                if isinstance(proc, str):
-                    proc = TEXT_POSTPROCESSORS.get(proc)
-                if pred_list_flag:
-                    pred_strs = [[proc(s, **kwargs) for s in preds]
-                                 for preds in pred_strs]
-                else:
-                    pred_strs = [proc(s, **kwargs) for s in pred_strs]
+        pred_strs = preds.pop('prediction', None)
 
-            # Get majority voting predictions if use self-consistency
-            if sc_size is not None:
+        return pred_dicts, pred_strs
+
+    def _process_predictions(self, pred_strs):
+        """Apply various processing steps to predictions."""
+        if pred_strs is None:
+            return pred_strs
+
+        # Check if we're dealing with a list of lists (pred_list_flag)
+        pred_list_flag = pred_strs is not None and isinstance(
+            pred_strs[0], list)
+
+        # Extract role predictions if needed
+        if ('pred_role' in self.eval_cfg and 'meta_template' in self.model_cfg
+                and not MODELS.get(self.model_cfg['type']).is_api):
+            # Create a prompt template for role config parsing
+            from opencompass.models.base import LMTemplateParser
+
+            parser = LMTemplateParser(self.model_cfg['meta_template'])
+            role = parser.roles[self.eval_cfg['pred_role']]
+            if pred_list_flag:
+                pred_strs = [[
+                    extract_role_pred(
+                        _pred,
+                        role.get('begin', None),
+                        role.get('end', None),
+                    ) for _pred in pred
+                ] for pred in pred_strs]
+            else:
                 pred_strs = [
-                    Counter(s).most_common(1)[0][0] for s in pred_strs
+                    extract_role_pred(
+                        pred,
+                        role.get('begin', None),
+                        role.get('end', None),
+                    ) for pred in pred_strs
                 ]
 
-            icl_evaluator = ICL_EVALUATORS.build(self.eval_cfg['evaluator'])
-
-            preds['predictions'] = pred_strs
-            preds['references'] = (test_set[self.output_column]
-                                   if self.output_column else None)
-            preds['test_set'] = test_set
-            preds = {
-                k: preds[k]
-                for k in signature(icl_evaluator.score).parameters
-            }
-            result = icl_evaluator.score(**preds)
-
-            if self.dump_details:
-                try:
-                    details = result.pop('details', None)
-                    result['details'] = self.format_details(
-                        pred_strs, test_set[self.output_column], details,
-                        pred_dicts)
-                    result['type'] = result['details'].pop('type', None)
-
-                    if 'PPL' in str(
-                            self.dataset_cfg.infer_cfg.inferencer.type):
-                        result['correct_bpb'], result[
-                            'incorrect_bpb'] = self.calculate_bpb(pred_dicts)
-                    else:
-                        result['incorrect_bpb'] = result['correct_bpb'] = -1
-                except Exception:
-                    result['incorrect_bpb'] = result['correct_bpb'] = -1
+        # Apply postprocessors if configured
+        # Postprocess predictions if necessary
+        # Model Specified Postprocessor
+        if 'pred_postprocessor' in self.model_cfg:
+            kwargs = copy.deepcopy(self.model_cfg['pred_postprocessor'])
+            proc = kwargs.pop('type')
+            if isinstance(proc, str):
+                proc = TEXT_POSTPROCESSORS.get(proc)
+            if pred_list_flag:
+                pred_strs = [[proc(s, **kwargs) for s in preds]
+                             for preds in pred_strs]
             else:
-                result.pop('details', None)
+                pred_strs = [proc(s, **kwargs) for s in pred_strs]
 
-        if 'error' in result:
-            self.logger.error(
-                f'Task {task_abbr_from_cfg(self.cfg)}: {result["error"]}')
-            return
+        # Dataset Specified Postprocessor
+        if 'pred_postprocessor' in self.eval_cfg:
+            kwargs = copy.deepcopy(self.eval_cfg['pred_postprocessor'])
+            proc = kwargs.pop('type')
+            if isinstance(proc, str):
+                proc = TEXT_POSTPROCESSORS.get(proc)
+            if pred_list_flag:
+                pred_strs = [[proc(s, **kwargs) for s in preds]
+                             for preds in pred_strs]
+            else:
+                pred_strs = [proc(s, **kwargs) for s in pred_strs]
+
+        return pred_strs
+
+    def _evaluate_predictions(
+        self,
+        pred_strs,
+        test_set,
+        pred_dicts,
+    ):
+        """Evaluate predictions using the configured evaluator."""
+        # Get references from test set
+        references = (None if self.output_column is None else
+                      [sample[self.output_column] for sample in test_set])
+        # Build evaluator from config
+        evaluator_cfg = self.eval_cfg.get('evaluator', {})
+        evaluator_type = evaluator_cfg.get('type')
+        if isinstance(evaluator_type, str):
+            evaluator_type = ICL_EVALUATORS.get(evaluator_type)
+
+        # Prepare evaluator inputs
+        evaluator_cfg_copy = copy.deepcopy(evaluator_cfg)
+        evaluator_cfg_copy.pop('type', None)
+        # Initialize evaluator with appropriate parameters
+        sig = signature(evaluator_type)
+        if 'predictions' in sig.parameters and 'references' in sig.parameters:
+            evaluator = evaluator_type(
+                predictions=pred_strs,
+                references=references,
+                **evaluator_cfg_copy,
+            )
         else:
-            result_wo_details = {
-                i: result[i]
-                for i in result if i != 'details'
-            }
-            self.logger.info(
-                f'Task {task_abbr_from_cfg(self.cfg)}: {result_wo_details}')
+            evaluator = evaluator_type(**evaluator_cfg_copy)
 
-        # Save result
-        out_path = get_infer_output_path(self.model_cfg, self.dataset_cfg,
-                                         osp.join(self.work_dir, 'results'))
+        # Set output directory for the evaluator
+        out_path = get_infer_output_path(
+            self.model_cfg,
+            self.dataset_cfg,
+            osp.join(self.work_dir, 'results'),
+        )
+        evaluator._out_dir = osp.splitext(out_path)[0]  # strip extension
+
+        # If preds contains keys that match the score method
+        # parameters, include them
+        if pred_dicts:
+            preds = {
+                k: [pred.get(k) for pred in pred_dicts]
+                for k in pred_dicts[0]
+            }
+        # Add predictions and references if they're expected
+        # by the score method
+        preds['predictions'] = pred_strs
+        preds['references'] = (test_set[self.output_column]
+                               if self.output_column else None)
+        preds['test_set'] = test_set
+        if 'origin_prompt' not in preds:
+            try:
+                preds['origin_prompt'] = [None for _ in range(len(pred_strs))]
+            except TypeError:
+                preds['origin_prompt'] = None
+        preds = {k: preds[k] for k in signature(evaluator.score).parameters}
+        # Call evaluate with the appropriate parameters
+        k = self.dataset_cfg.get('k', 1)
+        n = self.dataset_cfg.get('n', 1)
+        result = evaluator.evaluate(k, n, copy.deepcopy(test_set), **preds)
+
+        # Format details if needed
+        if self.dump_details:
+            # Get detailed results if available
+            details = result.get('details', None)
+            if details is None and pred_strs is not None:
+                self.logger.info(
+                    'Details is not give by evaluator, try to format it')
+                try:
+                    result['details'] = self.format_details(
+                        pred_strs,
+                        references,
+                        details,
+                        pred_dicts,
+                    )
+
+                    # Calculate extraction rate if needed
+                    if self.cal_extract_rate and details is not None:
+                        result['extract_rate'] = self.extract_rate(result)
+
+                    # Calculate BPB if applicable
+                    if pred_dicts and 'BPB' in pred_dicts[0].get(
+                            list(pred_dicts[0].keys())[0], {}):
+                        correct_bpb, incorrect_bpb = self.calculate_bpb(
+                            pred_dicts)
+                        result['correct_bpb'] = correct_bpb
+                        result['incorrect_bpb'] = incorrect_bpb
+                except Exception as e:
+                    self.logger.warning(f'Skip dumping details due to: {e}.')
+        else:
+            result.pop('details', None)
+        return result
+
+    def _sum_rollout(
+        self,
+        pred_strs,
+        test_set,
+        pred_dicts,
+    ):
+
+        # breakpoint()
+        n = self.dataset_cfg.get('n', 1)
+        real_size = len(test_set) // n
+
+        def select_fn(i, real_size, x):
+            if isinstance(x, Dataset):
+                return x.select(range(i * real_size, (i + 1) * real_size))
+            elif isinstance(x, Iterable):
+                return x[i * real_size:(i + 1) * real_size]
+            else:
+                return x
+
+        total_neg_logprob = 0.0
+        total_tokens = 0
+        finish_counts = defaultdict(int)
+        successful_samples = 0
+
+        result = {}
+
+        for i in range(n):
+            replica_pred_strs = select_fn(i, real_size, pred_strs)
+            replica_total_neg_logprob = 0.0
+            replica_total_tokens = 0
+            replica_finish_counts = defaultdict(int)
+            replica_successful_samples = 0
+
+            for pred_sample in replica_pred_strs:
+                replica_total_neg_logprob += pred_sample['rollout'][
+                    'sum_neg_logprob']
+                replica_total_tokens += pred_sample['rollout']['num_tokens']
+                replica_finish_counts[pred_sample['rollout']
+                                      ['finish_reason']] += 1
+                if pred_sample['rollout']['num_tokens'] > 0:
+                    replica_successful_samples += 1
+
+            replica_entropy_nats = replica_total_neg_logprob / replica_total_tokens
+            replica_avg_length = replica_total_tokens / replica_successful_samples if replica_successful_samples > 0 else 0.0
+
+            result[f'{i}_th rollout results'] = dict(
+                total_neg_logprob=replica_total_neg_logprob,
+                total_tokens=replica_total_tokens,
+                finish_reason=replica_finish_counts,
+                successful_samples=replica_successful_samples,
+                entropy_nats=replica_entropy_nats,
+                replica_avg_length=replica_avg_length,
+            )
+
+            total_neg_logprob += replica_total_neg_logprob
+            total_tokens += replica_total_tokens
+            for reason, count in replica_finish_counts.items():
+                finish_counts[reason] += count
+            successful_samples += replica_successful_samples
+
+        entropy_nats = total_neg_logprob / total_tokens
+        avg_length = total_tokens / successful_samples if successful_samples > 0 else 0.0
+
+        result['total rollout results'] = dict(
+            total_neg_logprob=total_neg_logprob,
+            total_tokens=total_tokens,
+            finish_reason=finish_counts,
+            successful_samples=successful_samples,
+            entropy_nats=entropy_nats,
+            replica_avg_length=avg_length,
+        )
+
+        result['total predictions'] = pred_dicts
+
+        return result
+
+    def _save_results(self, result):
+        """Save evaluation results to file."""
+        out_path = get_infer_output_path(
+            self.model_cfg,
+            self.dataset_cfg,
+            osp.join(self.work_dir, 'results'),
+        )
         mkdir_or_exist(osp.split(out_path)[0])
         mmengine.dump(result, out_path, ensure_ascii=False, indent=4)
 
-    def _extract_role_pred(self, s: str, begin_str: Optional[str],
-                           end_str: Optional[str]) -> str:
-        """Extract the role prediction from the full prediction string. The
-        role prediction may be the substring between the begin and end string.
+    def extract_rate(self, results):
+        """This function is designed for calculating the extraction rate.
 
         Args:
-            s (str): Full prediction string.
-            begin_str (str): The beginning string of the role
-            end_str (str): The ending string of the role.
-
-        Returns:
-            str: The extracted role prediction.
+            results (dict): The result dict, include the information
         """
-        start = 0
-        end = len(s)
+        details = results['details']
+        details_list = list(details.values())
+        invalid_extractions = []
+        for item in details_list:
+            try:
+                invalid_extractions.extend(
+                    [item] if not item['predictions'] else [])
+            except KeyError as e:
+                self.logger.warning(f'Skip {e} due to: {item}')
+                raise KeyError
+        success_rate = 100 - len(invalid_extractions) / len(details) * 100
+        return success_rate
 
-        if begin_str:
-            begin_idx = s.find(begin_str)
-            if begin_idx != -1:
-                start = begin_idx + len(begin_str)
-
-        if end_str:
-            # TODO: Support calling tokenizer for the accurate eos token
-            # and avoid such hardcode
-            end_idx = s.find(end_str, start)
-            if end_idx != -1:
-                end = end_idx
-
-        return s[start:end]
-
-    def format_details(self, predictions, references, details, pred_dicts):
+    def format_details(
+        self,
+        predictions,
+        references,
+        details,
+        pred_dicts,
+    ):
         """This function is responsible for formatting prediction details.
 
         Args:
@@ -281,13 +496,19 @@ class OpenICLEvalTask(BaseTask):
                 result['predictions'] = str(predictions[i])
                 result['references'] = str(references[i])
                 result['correct'] = str(predictions[i]) == str(references[i])
-            else:
+            elif details is not None:
                 results['type'] = 'GEN'
                 result['prompt'] = origin_prediction['origin_prompt']
                 result['origin_prediction'] = pred_dicts[i]['prediction']
                 result['predictions'] = details[i]['pred']
                 result['references'] = details[i]['answer']
                 result['correct'] = details[i]['correct']
+            else:
+                results['type'] = 'GEN'
+                result['prompt'] = origin_prediction['origin_prompt']
+                result['origin_prediction'] = pred_dicts[i]['prediction']
+                result['predictions'] = str(predictions[i])
+                result['references'] = str(references[i])
             results[str(i)] = result
         return results
 
@@ -348,4 +569,4 @@ if __name__ == '__main__':
     inferencer = OpenICLEvalTask(cfg)
     inferencer.run()
     end_time = time.time()
-    get_logger().info(f'time elapsed: {end_time - start_time:.2f}s')
+    get_logger().info(f'time elapsed: {end_time - start_time: .2f}s')

@@ -1,10 +1,15 @@
 """Direct Generation Inferencer."""
-
+import copy
+import inspect
+import json
 import os
 import os.path as osp
+import re
+import time
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from pathlib import Path
 from typing import List, Optional
 
-import mmengine
 import torch
 from tqdm import tqdm
 
@@ -28,6 +33,8 @@ class GenInferencer(BaseInferencer):
         model (:obj:`BaseModelWrapper`, optional): The module to inference.
         max_seq_len (:obj:`int`, optional): Maximum number of tokenized words
             allowed by the LM.
+        min_out_len (:obj:`int`, optional): Minimum number of generated tokens
+            by the LM
         batch_size (:obj:`int`, optional): Batch size for the
             :obj:`DataLoader`.
         output_json_filepath (:obj:`str`, optional): File path for output
@@ -46,12 +53,15 @@ class GenInferencer(BaseInferencer):
             self,
             model: BaseModel,
             max_out_len: int,
+            stopping_criteria: List[str] = [],
             max_seq_len: Optional[int] = None,
+            min_out_len: Optional[int] = None,
             batch_size: Optional[int] = 1,
             gen_field_replace_token: Optional[str] = '',
             output_json_filepath: Optional[str] = './icl_inference_output',
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = 1,
+            multiround: bool = False,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -64,6 +74,13 @@ class GenInferencer(BaseInferencer):
 
         self.gen_field_replace_token = gen_field_replace_token
         self.max_out_len = max_out_len
+        self.min_out_len = min_out_len
+        self.stopping_criteria = stopping_criteria
+        self.multiround = multiround
+        self.dump_timer = kwargs.get('dump_timer', False)
+        self.dump_res_length = kwargs.get('dump_res_length', False)
+        self.dump_only_message_path = kwargs.get('dump_only_message_path',
+                                                 None)
 
         if self.model.is_api and save_every is None:
             save_every = 1
@@ -104,23 +121,23 @@ class GenInferencer(BaseInferencer):
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            # TODO: move resume to output handler
-            try:
-                tmp_result_dict = mmengine.load(tmp_json_filepath)
-            except Exception:
-                pass
-            else:
-                output_handler.results_dict = tmp_result_dict
-                index = len(tmp_result_dict)
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
+        logger.info('Starting build dataloader')
         dataloader = self.get_dataloader(prompt_list[index:], self.batch_size)
 
         # 5. Inference for prompts in each batch
         logger.info('Starting inference process...')
+
+        start_time_stamp = time.time()
+        num_sample = 0
+        first_dump = True
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             if ds_reader.output_column:
                 entry, golds = list(zip(*datum))
@@ -128,43 +145,235 @@ class GenInferencer(BaseInferencer):
                 entry = datum
                 golds = [None for _ in range(len(entry))]
             # 5-1. Inference with local model
+            extra_gen_kwargs = {}
+            sig = inspect.signature(self.model.generate)
+            if 'stopping_criteria' in sig.parameters:
+                extra_gen_kwargs['stopping_criteria'] = self.stopping_criteria
+            if 'min_out_len' in sig.parameters:
+                extra_gen_kwargs['min_out_len'] = self.min_out_len
             with torch.no_grad():
                 parsed_entries = self.model.parse_template(entry, mode='gen')
-                results = self.model.generate_from_template(
-                    entry, max_out_len=self.max_out_len)
-                generated = results
+                if self.dump_only_message_path:
+                    save_path = os.path.basename(
+                        output_json_filepath.rstrip('/'))
+                    os.makedirs(os.path.join(self.dump_only_message_path,
+                                             save_path),
+                                exist_ok=True)
+                    save_name = re.sub(r'_(\d+)?(?=\.\w+$)',
+                                       '', output_json_filename).rsplit(
+                                           '.', 1)[0] + '.jsonl'
+                    with open(os.path.join(self.dump_only_message_path,
+                                           save_path, save_name),
+                              'w' if first_dump else 'a',
+                              encoding='utf-8') as f:
+                        for i in range(len(parsed_entries)):
+                            f.write(
+                                json.dumps(
+                                    {
+                                        'message': parsed_entries[i],
+                                        'gold': golds[i]
+                                    },
+                                    ensure_ascii=False) + '\n')
+                    first_dump = False
+                    logger.info('Save message successfully')
+                    continue
+                if self.multiround:
+                    generated = self._generate_multiround(
+                        entry, extra_gen_kwargs)
+                else:
+                    results = self.model.generate_from_template(
+                        entry,
+                        max_out_len=self.max_out_len,
+                        **extra_gen_kwargs)
+                    generated = results
 
             num_return_sequences = getattr(self.model, 'generation_kwargs',
                                            {}).get('num_return_sequences', 1)
             # 5-3. Save current output
-            for prompt, prediction, gold in zip(
-                    parsed_entries, batched(generated, num_return_sequences),
-                    golds):
+            for batch_idx, (prompt, prediction, gold) in enumerate(
+                    zip(parsed_entries, batched(generated,
+                                                num_return_sequences), golds)):
                 if num_return_sequences == 1:
                     prediction = prediction[0]
-                output_handler.save_results(prompt,
-                                            prediction,
-                                            index,
-                                            gold=gold)
+
+                if self.dump_res_length:
+                    if self.multiround and isinstance(prompt, list):
+                        input_length = self._compute_multiround_input_lengths(
+                            entry[batch_idx])
+                    elif isinstance(prompt, str):
+                        input_length = self.model.get_token_len(prompt)
+                    elif isinstance(prompt, list):
+                        input_length = 0
+                        for i in range(len(prompt)):
+                            if 'prompt' in prompt[i]:
+                                prompt[i][
+                                    'input_length'] = self.model.get_token_len(
+                                        prompt[i]['prompt'])
+                            elif 'content' in prompt[i]:
+                                prompt[i][
+                                    'input_length'] = self.model.get_token_len(
+                                        prompt[i]['content'])
+                            else:
+                                logger.error(
+                                    'Cannot find prompt field in the message!')
+                            input_length += prompt[i]['input_length']
+
+                    pred_str = copy.deepcopy(prediction)
+                    if isinstance(pred_str, dict):
+                        pred_str = pred_str['prediction']
+
+                    if isinstance(pred_str, str):
+                        res_length = self.model.get_token_len(pred_str)
+                    else:
+                        res_length = [
+                            self.model.get_token_len(pred) for pred in pred_str
+                        ]
+                    output_handler.save_results(prompt,
+                                                prediction,
+                                                index,
+                                                gold=gold,
+                                                res_length=res_length,
+                                                input_length=input_length)
+                else:
+                    output_handler.save_results(prompt,
+                                                prediction,
+                                                index,
+                                                gold=gold)
                 index = index + 1
 
             # 5-4. Save intermediate results
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
-                output_handler.write_to_json(output_json_filepath,
-                                             'tmp_' + output_json_filename)
+                output_handler.write_to_jsonl(output_json_filepath,
+                                              tmp_jsonl_filename)
+            num_sample += len(datum)
+
+        end_time_stamp = time.time()
+
+        if self.dump_only_message_path:
+            return []
 
         # 6. Output
         if self.is_main_process:
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
+
+        if self.dump_timer and self.is_main_process:
+            timer_filepath = os.path.join(output_json_filepath, 'timer',
+                                          'time.jsonl')
+            os.makedirs(os.path.dirname(timer_filepath), exist_ok=True)
+            time_dict = {
+                'dataset_name': output_json_filename.removesuffix('.json'),
+                'time': end_time_stamp - start_time_stamp,
+                'num_sample': num_sample
+            }
+            with open(timer_filepath, 'a') as f:
+                f.write(json.dumps(time_dict) + '\n')
 
         return [
             sample['prediction']
             for sample in output_handler.results_dict.values()
+        ]
+
+    def _compute_multiround_input_lengths(self, chat: List) -> List[int]:
+        """Compute cumulative input token length at each generation turn.
+
+        Expects ``chat`` to be the filled multi-round conversation where
+        assistant slots already contain the generated responses. Returns a
+        list of cumulative token counts, one per generation turn, i.e. the
+        input length the model actually sees when generating each turn.
+        """
+        input_lengths = []
+        cumulative = 0
+        for msg in chat:
+            if isinstance(msg, dict):
+                role = msg.get('role', '')
+                content = msg.get('content', msg.get('prompt', ''))
+            else:
+                role, content = '', msg
+            if not isinstance(content, str):
+                content = str(content)
+            if role == 'assistant':
+                input_lengths.append(cumulative)
+            cumulative += self.model.get_token_len(content)
+        return input_lengths
+
+    def _generate_multiround(self, entry: List,
+                             extra_gen_kwargs: dict) -> List[List[str]]:
+        """Multi-turn generation with dynamic turn-level scheduling.
+
+        All chats advance through their turns independently. A shared
+        ThreadPoolExecutor (max_workers from model) ensures concurrency
+        matches non-multiround mode. No turn-level synchronization barrier.
+        """
+        max_workers = self.batch_size
+
+        chat_gen_indices = []
+        for chat in entry:
+            gen_indices = [
+                i for i, msg in enumerate(chat)
+                if isinstance(msg, dict) and msg.get('role') == 'assistant'
+                and not msg.get('content', '')
+            ]
+            chat_gen_indices.append(gen_indices)
+
+        def _gen_turn(chat_idx, step):
+            msg_idx = chat_gen_indices[chat_idx][step]
+            history = entry[chat_idx][:msg_idx]
+            output = self.model.generate_from_template(
+                [history],
+                max_out_len=self.max_out_len,
+                **extra_gen_kwargs,
+            )[0]
+            entry[chat_idx][msg_idx]['content'] = output
+
+        next_step = [0] * len(entry)
+        in_flight = {}
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            for chat_idx in range(len(entry)):
+                if chat_gen_indices[chat_idx]:
+                    in_flight[executor.submit(_gen_turn, chat_idx,
+                                              0)] = chat_idx
+                    next_step[chat_idx] = 1
+
+            while in_flight:
+                done, _ = wait(set(in_flight), return_when=FIRST_COMPLETED)
+                for f in done:
+                    chat_idx = in_flight.pop(f)
+                    f.result()
+                    ns = next_step[chat_idx]
+                    if ns < len(chat_gen_indices[chat_idx]):
+                        in_flight[executor.submit(_gen_turn, chat_idx,
+                                                  ns)] = chat_idx
+                        next_step[chat_idx] = ns + 1
+
+        return [[
+            msg['content'] for msg in chat
+            if isinstance(msg, dict) and msg.get('role') == 'assistant'
+        ] for chat in entry]
+
+    def _fill_single_chat_turns(self, chat: List,
+                                extra_gen_kwargs: dict) -> List[str]:
+        """Fill all empty assistant slots in a single chat, sequentially."""
+        gen_indices = [
+            i for i, msg in enumerate(chat) if isinstance(msg, dict)
+            and msg.get('role') == 'assistant' and not msg.get('content', '')
+        ]
+        for i in gen_indices:
+            history = chat[:i]
+            output = self.model.generate_from_template(
+                [history],
+                max_out_len=self.max_out_len,
+                **extra_gen_kwargs,
+            )[0]
+            chat[i]['content'] = output
+        return [
+            msg['content'] for msg in chat
+            if isinstance(msg, dict) and msg.get('role') == 'assistant'
         ]
 
     def get_generation_prompt_list_from_retriever_indices(
@@ -187,7 +396,14 @@ class GenInferencer(BaseInferencer):
             if max_seq_len is not None:
                 prompt_token_num = self.model.get_token_len_from_template(
                     prompt, mode='gen')
-                while len(ice_idx) > 0 and prompt_token_num > max_seq_len:
+
+                if isinstance(prompt_token_num, list):
+                    total_prompt_token_num = sum(prompt_token_num)
+                else:
+                    total_prompt_token_num = prompt_token_num
+
+                while len(
+                        ice_idx) > 0 and total_prompt_token_num > max_seq_len:
                     ice_idx = ice_idx[:-1]
                     ice = retriever.generate_ice(ice_idx,
                                                  ice_template=ice_template)
@@ -199,6 +415,12 @@ class GenInferencer(BaseInferencer):
                         prompt_template=prompt_template)
                     prompt_token_num = self.model.get_token_len_from_template(
                         prompt, mode='gen')
+
+                    if isinstance(prompt_token_num, list):
+                        total_prompt_token_num = sum(prompt_token_num)
+                    else:
+                        total_prompt_token_num = prompt_token_num
+
             prompt_list.append(prompt)
         return prompt_list
 

@@ -9,6 +9,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator.icl_hf_evaluator import AccEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -208,6 +209,7 @@ class TabMWPDataset(BaseDataset):
     # https://github.com/lupantech/PromptPG/tree/main
     @staticmethod
     def load(path: str):
+        path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         for split in ['dev', 'test', 'train']:
             raw_data = []

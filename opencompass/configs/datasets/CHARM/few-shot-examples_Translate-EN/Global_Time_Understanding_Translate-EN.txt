@@ -1,0 +1,30 @@
+Infer dates from context.
+
+Q: Choose the correct answer according to the question. Today is Christmas Eve 1937. What is the date 10 days ago? Options:
+(A) December 14, 1988
+(B)December 14, 2026
+(C)December 14, 1950
+(D)July 14, 1938
+(E)December 14, 1937
+(F) December 14, 2007
+A: Let's think step by step.
+If today is Christmas Eve, 1937, then today's date is December 24, 1937. The 10 days before today is December 14, 1937, which is 12/14/1937. so the answer is (E).
+
+Q: Select the correct answer as per the question. Tomorrow is 12/11/2019. What is the date one year ago? Options:
+(A) August 25, 2018
+(B)November 04, 2018
+(C)November 02, 2018
+(D)November 11, 2018
+(E) September 04, 2018
+A: Let's think step by step.
+If tomorrow is November 12, 2019, then today is November 11, 2019. This day last year from today is November 11, 2018 So the answer is (D).
+
+Q: Select the correct answer according to the question. Li Jing and Wang Wei were married on 2/1/1958. Today is their 5th anniversary. What is the date for tomorrow, please? Options:
+(A) January 18th, 1961
+(B)January 03, 1982
+(C)January 11, 1961
+(D)October 14, 1960
+(E)January 03, 1963
+(F) December 03, 1960
+A: Let's think step by step.
+If Li Jing and Wang Wei were married on January 2, 1958, then today's date would be January 2, 1963 if today is their fifth wedding anniversary. Tomorrow's date will be January 3, 1963, which is January 03, 1961. So the answer is (E).

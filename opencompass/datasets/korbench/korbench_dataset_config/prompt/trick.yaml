@@ -1,0 +1,20 @@
+prompt_format:
+  - |
+    You are an intelligent assistant specializing in solving custom puzzle problems. Below is a specific rule defined for a custom puzzle. Your task is to apply this rule accurately to the provided question.
+
+    ### Instructions:
+
+    1. Thoroughly understand the rule provided. If needed, break down the rule into simpler components or steps.
+    2. Apply the rule carefully to address the question presented.
+    3. Verify your answer to ensure it aligns with the rule and the context of the puzzle.
+
+    ### Puzzle Rule:
+
+    {}
+
+    ### Question:
+    {}
+
+    {}
+
+    ### Answer:

@@ -4,6 +4,7 @@ from typing import List, Union
 from datasets import Dataset, concatenate_datasets
 
 from opencompass.openicl.icl_evaluator import AccEvaluator
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -51,6 +52,7 @@ class AdvDataset(BaseDataset):
     def load(self, path):
         """Load dataset and aug with original dataset."""
 
+        path = get_data_path(path)
         with open(path, 'r') as f:
             raw_data = json.load(f)
             subset = raw_data[self.subset]

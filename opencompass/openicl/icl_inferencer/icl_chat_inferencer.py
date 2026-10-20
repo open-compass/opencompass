@@ -1,9 +1,9 @@
 """Chat Inferencer."""
 import os
 import os.path as osp
+from pathlib import Path
 from typing import List, Optional, Union
 
-import mmengine
 from mmengine import is_list_of
 from tqdm import tqdm
 
@@ -16,7 +16,7 @@ from opencompass.utils.prompt import PromptList
 from ..icl_prompt_template import PromptTemplate
 from ..icl_retriever import BaseRetriever
 from ..utils.logging import get_logger
-from .icl_base_inferencer import BaseInferencer, dump_results_dict
+from .icl_base_inferencer import BaseInferencer, ChatOutputHandler
 
 logger = get_logger(__name__)
 
@@ -68,11 +68,11 @@ class LMTemplateParser:
         prompt = ''
         if self.roles:
             for dialog in chat:
-                role_cfg = self.roles.get(dialog['role'])
-                prompt += role_cfg['begin']
+                role_cfg = self.roles.get(dialog['role'], {})
+                prompt += (role_cfg.get('begin') or '')
                 prompt += (dialog.get('content') or '')
-                prompt += role_cfg['end']
-            prompt += self.roles['assistant']['begin']
+                prompt += (role_cfg.get('end') or '')
+            prompt += (self.roles['assistant'].get('begin') or '')
         else:
             # in case the model does not have any meta template
             last_sep = ''
@@ -123,45 +123,6 @@ class APITemplateParser:
         return PromptList(prompt)
 
 
-class ChatOutputHandler:
-
-    def __init__(self) -> None:
-        self.results_dict = {}
-
-    def write_to_json(self, save_dir: str, filename: str):
-        """Dump the result to a json file."""
-        dump_results_dict(self.results_dict, osp.join(save_dir, filename))
-
-    def save_results(self,
-                     origin_prompt: list,
-                     prediction: str,
-                     idx: int,
-                     gold: str = None):
-        result_dict = {}
-        if gold:
-            result_dict['gold'] = gold
-        result_dict.update({
-            'prediction': prediction,
-            'origin_prompt': origin_prompt,
-        })
-        self.results_dict[str(idx)] = result_dict
-
-    def save_multiround_results(self,
-                                origin_prompt: list,
-                                prediction: str,
-                                idx: int,
-                                gold: str = None):
-        result_dict = self.results_dict.get(str(idx), {
-            'gold': [],
-            'prediction': [],
-            'origin_prompt': [],
-        })
-        result_dict['gold'].append(gold)
-        result_dict['prediction'].append(prediction)
-        result_dict['origin_prompt'].append(origin_prompt)
-        self.results_dict[str(idx)] = result_dict
-
-
 @ICL_INFERENCERS.register_module()
 class ChatInferencer(BaseInferencer):
     HandlerType = ChatOutputHandler
@@ -173,6 +134,7 @@ class ChatInferencer(BaseInferencer):
             output_json_filename: Optional[str] = 'predictions',
             save_every: Optional[int] = 1,
             infer_mode: str = 'last',
+            max_out_len: int = 512,
             **kwargs) -> None:
         super().__init__(
             model=model,
@@ -188,6 +150,8 @@ class ChatInferencer(BaseInferencer):
         if self.model.is_api and save_every is None:
             save_every = 1
         self.save_every = save_every
+        self.dialogue_mode = False
+        self.max_out_len = max_out_len
 
     def _set_meta_template(self, model):
         origin = model.template_parser
@@ -223,13 +187,12 @@ class ChatInferencer(BaseInferencer):
         # Create tmp json file for saving intermediate results and future
         # resuming
         index = 0
-        tmp_json_filepath = os.path.join(output_json_filepath,
-                                         'tmp_' + output_json_filename)
-        if osp.exists(tmp_json_filepath):
-            # TODO: move resume to output handler
-            tmp_result_dict = mmengine.load(tmp_json_filepath)
-            output_handler.results_dict = tmp_result_dict
-            index = len(tmp_result_dict)
+        tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
+            '.jsonl').name
+        tmp_jsonl_filepath = Path(output_json_filepath) / tmp_jsonl_filename
+        tmp_result_dict = output_handler.restore_from_jsonl(
+            output_json_filepath, tmp_jsonl_filename)
+        index = len(tmp_result_dict)
 
         # 4. Wrap prompts with Dataloader
         dataloader = self.get_dataloader(chat_list[index:], batch_size=1)
@@ -238,7 +201,6 @@ class ChatInferencer(BaseInferencer):
         logger.info('Starting inference process...')
         for datum in tqdm(dataloader, disable=not self.is_main_process):
             chat = datum[0]
-
             if self.infer_mode == 'last':
                 self.infer_last(chat, index, output_handler)
             elif self.infer_mode == 'every':
@@ -258,8 +220,8 @@ class ChatInferencer(BaseInferencer):
             os.makedirs(output_json_filepath, exist_ok=True)
             output_handler.write_to_json(output_json_filepath,
                                          output_json_filename)
-            if osp.exists(tmp_json_filepath):
-                os.remove(tmp_json_filepath)
+            if osp.exists(tmp_jsonl_filepath):
+                os.remove(tmp_jsonl_filepath)
 
         return output_handler.results_dict
 
@@ -310,6 +272,9 @@ class ChatInferencer(BaseInferencer):
                     item[input_columns[0]], dict):
                 # Single input column and it's already a chat.
                 chat = item[input_columns[0]]
+            elif 'dialogue' in input_columns:
+                chat = item['dialogue']
+                self.dialogue_mode = True
             else:
                 raise ValueError('Cannot construct chat from the dataset.')
 
@@ -322,8 +287,8 @@ class ChatInferencer(BaseInferencer):
         ]
 
         history = chat[:assistant_indices[-1]]
-        output = self.model.generate_from_template([history],
-                                                   max_out_len=512)[0]
+        output = self.model.generate_from_template(
+            [history], max_out_len=self.max_out_len)[0]
         output_handler.save_results(
             origin_prompt=history,
             prediction=output,
@@ -335,19 +300,39 @@ class ChatInferencer(BaseInferencer):
         assistant_indices = [
             i for i, item in enumerate(chat) if item['role'] == 'assistant'
         ]
+        index_copy = index
 
         for i in assistant_indices:
             history = chat[:i]
-            output = self.model.generate_from_template([history],
-                                                       max_out_len=512)[0]
-            output_handler.save_multiround_results(
-                origin_prompt=history[-1]['content'],
-                prediction=output,
-                idx=index,
-                gold=chat[i]['content'],
-            )
+            output = self.model.generate_from_template(
+                [history], max_out_len=self.max_out_len)[0]
             chat[i]['content'] = output
-            index += 1
+            if not self.dialogue_mode:
+                output_handler.save_multiround_results(
+                    origin_prompt=history[-1]['content'],
+                    prediction=output,
+                    idx=index,
+                    gold=chat[i]['content'],
+                )
+                # index += 1
+        if self.dialogue_mode:
+            # dialogue mode for subjective evaluation
+            assert len(chat) % 2 == 0
+            round_num = int(len(chat) / 2)
+            preds_list = []
+            for i in range(round_num):
+                temp_dict = {
+                    'round': i + 1,
+                    'user': chat[i * 2]['content'],
+                    'assistant': chat[i * 2 + 1]['content']
+                }
+                preds_list.append(temp_dict)
+            output_handler.save_results(
+                origin_prompt=None,
+                prediction=preds_list,
+                idx=index_copy,
+                gold=None,
+            )
 
     def infer_every_with_gt(self, chat: List[dict], index: int,
                             output_handler):
@@ -357,8 +342,8 @@ class ChatInferencer(BaseInferencer):
 
         for i in assistant_indices:
             history = chat[:i]
-            output = self.model.generate_from_template([history],
-                                                       max_out_len=512)[0]
+            output = self.model.generate_from_template(
+                [history], max_out_len=self.max_out_len)[0]
             output_handler.save_multiround_results(
                 origin_prompt=history[-1]['content'],
                 prediction=output,

@@ -1,10 +1,11 @@
 import os
 import random
-from typing import List
+from typing import List, Optional
 
 import evaluate
 import numpy as np
 from datasets import Dataset
+from mmengine.config import ConfigDict
 
 from opencompass.registry import ICL_EVALUATORS
 
@@ -19,12 +20,17 @@ class HuggingfaceEvaluator(BaseEvaluator):
         seed (int): There exists some randomness during the calculation of some
             metrics, thus we set a fixed random seed for reproducing. Defaults
             to 0.
+        pred_postprocessor (optional): Function or configuration for prediction
+            post-processing.
     """
 
-    def __init__(self, metric: str, seed: int = 0) -> None:
+    def __init__(self,
+                 metric: str,
+                 seed: int = 0,
+                 pred_postprocessor=None) -> None:
         self.metric = metric
         self.seed = seed
-        super().__init__()
+        super().__init__(pred_postprocessor=pred_postprocessor)
 
     def _preprocess(self, predictions: List, references: List) -> dict:
         """Preprocess the final predictions and references to needed format.
@@ -52,7 +58,10 @@ class HuggingfaceEvaluator(BaseEvaluator):
         """
         return scores
 
-    def score(self, predictions: List, references: List) -> dict:
+    def score(self,
+              predictions: List,
+              references: List,
+              test_set=None) -> dict:
         """Calculate scores.
 
         Args:
@@ -92,10 +101,15 @@ class HuggingfaceEvaluator(BaseEvaluator):
 class AccEvaluator(HuggingfaceEvaluator):
     """Accuracy evaluator."""
 
-    def __init__(self) -> None:
-        super().__init__(metric='accuracy')
+    def __init__(self,
+                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
+        super().__init__(metric='accuracy',
+                         pred_postprocessor=pred_postprocessor)
 
-    def _preprocess(self, predictions: List, references: List) -> dict:
+    def _preprocess(self,
+                    predictions: List,
+                    references: List,
+                    test_set=None) -> dict:
         """Preprocess the final predictions and references to needed format.
 
         Args:
@@ -187,8 +201,9 @@ class RougeEvaluator(HuggingfaceEvaluator):
     Note: this evaluator is not suitable for chinese datasets.
     """
 
-    def __init__(self) -> None:
-        super().__init__(metric='rouge')
+    def __init__(self,
+                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
+        super().__init__(metric='rouge', pred_postprocessor=pred_postprocessor)
 
     def _postprocess(self, scores: dict) -> dict:
         """Postprocess for final scores.
@@ -206,8 +221,24 @@ class RougeEvaluator(HuggingfaceEvaluator):
 class BleuEvaluator(HuggingfaceEvaluator):
     """Bleu evaluator."""
 
+    def __init__(self,
+                 pred_postprocessor: Optional[ConfigDict] = None) -> None:
+        super().__init__(metric='sacrebleu',
+                         pred_postprocessor=pred_postprocessor)
+
+
+class BleuFloresEvaluator(HuggingfaceEvaluator):
+    """Bleu evaluator using flores200 tokenize."""
+
     def __init__(self) -> None:
         super().__init__(metric='sacrebleu')
+
+    def _preprocess(self, predictions: List, references: List) -> dict:
+        return {
+            'predictions': predictions,
+            'references': references,
+            'tokenize': 'flores200',
+        }
 
 
 @ICL_EVALUATORS.register_module()
@@ -328,3 +359,29 @@ class EDAccEvaluator(AccEvaluator):
             'predictions': preds,
             'references': golds,
         }
+
+
+@ICL_EVALUATORS.register_module()
+class AccwithDetailsEvaluator(BaseEvaluator):
+
+    def score(self, predictions, references, origin_prompt) -> dict:
+
+        if len(predictions) != len(references):
+            return {'error': 'preds and refrs have different length.'}
+
+        details = {}
+        correct, total = 0, 0
+        for index, (pred, ref) in enumerate(zip(predictions, references)):
+            is_correct = pred == ref
+            correct += is_correct
+            details[str(index)] = {
+                'prompt': origin_prompt[index],
+                'pred': pred,
+                'refr': ref,
+                'is_correct': is_correct,
+            }
+            total += 1
+
+        results = {'accuracy': correct / total * 100, 'details': details}
+
+        return results

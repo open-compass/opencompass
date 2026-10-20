@@ -1,0 +1,60 @@
+根据上下文选择正确答案
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下哪个列表按照时间顺序排列正确？选项：
+(A) 大学，硕士，博士，博士后
+(B) 大学，博士，硕士，博士后
+(C) 大学，高中，博士后，博士
+(D) 博士后，大学，硕士，博士
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request:Which of the following lists is correct in chronological order? Options:
+(A) University, M.A., Ph.D., Post-doctoral
+(B) University, Ph.D., M.Phil, Post Ph.D.
+(C) University, High School, Post-doctoral, Doctoral
+(D) Post-doctoral, University, Master's, PhD
+Step-by-step answer:
+1.The title options introduce four educational concepts: university, master's degree, doctoral degree, and postdoctoral degree.
+2.They are ranked in the order of obtaining these degrees. The first one obtained is a university degree, followed by a master's degree, then a doctoral degree, and finally a postdoctoral degree.
+So the answer is (A).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下哪个列表按照时间顺序排列正确？选项：
+(A) 五月一日，七月十五日，八月十二日，六月十四日
+(B) 七月十五日，八月十二日，五月一日，六月十四日
+(C) 八月十二日，五月一日，七月十五日，六月十四日
+(D) 五月一日，六月十四日，七月十五日，八月十二日
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request:Which of the following list is correct in chronological order? Options:
+(A) May 1, July 15, August 12, June 14
+(B) July 15, August 12, May 1, June 14
+(C) August 12, May 1, July 15, June 14
+(D) May 1, June 14, July 15, August 12
+Step-by-step answer:
+1.The question options introduce four dates, sorted in chronological order of the year as May 1st, June 14th, July 15th, and August 12th. 
+So the answer is (D).
+
+I want you to act as a commonsense reasoning expert for Chinese.
+Request：以下哪个列表按时间顺序排列正确？选项：
+(A) 通往天国的倒计时，世纪末的魔术师，贝克街的亡灵，侦探们的镇魂歌
+(B) 世纪末的魔术师，贝克街的亡灵，通往天国的倒计时，侦探们的镇魂歌
+(C) 世纪末的魔术师，通往天国的倒计时，贝克街的亡灵，侦探们的镇魂歌
+(D) 世纪末的魔术师，贝克街的亡灵，侦探们的镇魂歌，通往天国的倒计时
+You should retell the request in English.
+You should do the answer step by step to choose the right answer.
+You should step-by-step answer the request.
+You should tell me the answer in this format 'So the answer is'.
+Request:Which of the following lists is correct in chronological order? Options:
+(A) Countdown to Heaven, Magicians at the End of the Century, The Undead of Baker Street, Detectives' Requiem
+(B) The Magician at the End of the Century, The Undead of Baker Street, Countdown to Heaven, The Detectives' Requiem
+(C) The Magician at the End of the Century, Countdown to Heaven, The Undead of Baker Street, The Detectives' Requiem
+(D) The Magician at the End of the Century, The Undead of Baker Street, The Detectives' Requiem, The Countdown to Heaven
+Step-by-step answer:
+1.The options mention the names of four Conan theater versions, among which the Magician of the End of the Century was released in 1999, the Undead on Baker Street was released in 2002, the Countdown to Heaven was released in 2001, and the Souls of Detectives was released in 2006. 
+2.Therefore, in chronological order, they are the Magician of the End of the Century, the Countdown to Heaven, the Undead on Baker Street, and the Souls of Detectives.
+So the answer is (C).

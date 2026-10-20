@@ -21,6 +21,7 @@ from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -99,6 +100,7 @@ class DS1000Dataset(BaseDataset):
                 are supported. Defaults to `Insertion`.
         """
 
+        path = get_data_path(path, local_mode=True)
         if isinstance(libs, str):
             libs = [libs]
 
@@ -137,6 +139,17 @@ def ds1000_postprocess(text: str) -> str:
         text = match.group(1)
 
     match = re.search('BEGIN SOLUTION(.*?)END SOLUTION', text, re.DOTALL)
+    if match:
+        text = match.group(1)
+
+    return text
+
+
+@TEXT_POSTPROCESSORS.register_module('ds1000_completion')
+def ds1000_completion_postprocess(text: str) -> str:
+    text += '</code>'
+
+    match = re.search('(.*?)</code>', text, re.DOTALL)
     if match:
         text = match.group(1)
 
@@ -353,8 +366,8 @@ class DS1000ServiceEvaluator(BaseEvaluator):
     def __init__(self,
                  lib: str,
                  ip_address='localhost',
-                 port=5000,
-                 timeout=180) -> None:
+                 port='',
+                 timeout=600) -> None:
         assert lib in _LIBRARY_NAME_LIST, (
             f' lib must be in {_LIBRARY_NAME_LIST}')
         self.lib = lib
@@ -367,6 +380,8 @@ class DS1000ServiceEvaluator(BaseEvaluator):
         processed_predictions = {}
         assert len(predictions) == len(references)
         for i, (pred, gold) in enumerate(zip(predictions, references)):
+            if len(pred) > 10000:
+                pred = ''
             processed_predictions[str(i)] = {'prediction': pred, 'gold': gold}
 
         with tempfile.TemporaryDirectory() as tmp_dir:
@@ -406,9 +421,14 @@ class DS1000ServiceEvaluator(BaseEvaluator):
         Returns:
             tuple[bool, str]: Whether the access is successful and the output.
         """
+        if self.port:
+            eval_server_url = f'{self.ip_address}:{self.port}/evaluate'
+        else:
+            eval_server_url = f'{self.ip_address}/evaluate'
+
         exec_result = subprocess.run([
             'curl', '-X', 'POST', '-F', f'file=@{file_path}',
-            f'{self.ip_address}:{self.port}/evaluate'
+            f'{eval_server_url}'
         ],
                                      timeout=self.timeout,
                                      capture_output=True)

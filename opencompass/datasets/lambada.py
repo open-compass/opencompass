@@ -1,11 +1,13 @@
 import json
 import re
 import string
+from os import environ
 
 from datasets import Dataset, DatasetDict
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 from opencompass.utils.text_postprocessors import general_postprocess
 
 from .base import BaseDataset
@@ -16,12 +18,18 @@ class lambadaDataset(BaseDataset):
 
     @staticmethod
     def load(path):
-        dataset = []
-        with open(path, 'r', encoding='utf-8') as f:
-            for line in f:
-                dataset.append(json.loads(line))
-        dataset = Dataset.from_list(dataset)
-        return DatasetDict({'test': dataset})
+        path = get_data_path(path)
+        if environ.get('DATASET_SOURCE') == 'ModelScope':
+            from modelscope import MsDataset
+            dataset = MsDataset.load(path)
+            return dataset
+        else:
+            dataset = []
+            with open(path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    dataset.append(json.loads(line))
+            dataset = Dataset.from_list(dataset)
+            return DatasetDict({'test': dataset})
 
 
 @ICL_EVALUATORS.register_module()

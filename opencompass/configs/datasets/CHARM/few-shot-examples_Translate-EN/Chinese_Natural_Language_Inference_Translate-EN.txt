@@ -1,0 +1,28 @@
+Choose the correct answer based on the relationship between the two sentences in the question.
+
+Q:Statement 1: Xiaoming has just gone ice-skating in Shichahai
+Statement 2: It's winter in Beijing
+What is the relationship between these two statements?
+(A) Implicit
+(B) Contradictory
+(C) Irrelevant
+A: Let's think step by step.
+The first sentence mentions that Xiaoming went ice-skating in Shichahai, which is usually done in winter, and Shichahai is located in Beijing, which implies the information in the second sentence, that is, it is winter at present. So the answer is (A).
+
+Q:Statement 1：Next week, a heavy rainfall will affect the whole Hebei province
+Statement 2: Next week, the weather in Shanghai will be fine.
+What is the relationship between these two statements?
+(A) Implied
+(B) Contradictory
+(C) Irrelevant
+A: Let's think step by step.
+These two sentences describe the weather in two geographical locations, one in Hebei Province and the other in Shanghai. Hebei Province and Shanghai are geographically far apart, so the weather conditions in these two places are not necessarily directly related. Therefore, the relationship between the two sentences is irrelevant. So the answer is (C).
+
+Q:Statement 1: Yesterday, Xiao Ming watched the sunset on a hill and exclaimed, "The sunset is infinite, but it's just near dusk"
+Statement 2: Yesterday it rained and Ming didn't go out
+What is the relationship between these two statements?
+(A) implied
+(B) contradictory
+(C) Irrelevant
+A: Let's think step by step.
+The first sentence says that Ming saw the sunset on the mountain yesterday, while the second sentence says that it rained yesterday and Ming didn't go out. There is a contradiction between these two sentences because if Ming didn't go out, then he couldn't have seen the sunset on the mountain. So there is a contradiction between these two sentences. So the answer is (B).

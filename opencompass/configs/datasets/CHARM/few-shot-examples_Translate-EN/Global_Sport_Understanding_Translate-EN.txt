@@ -1,0 +1,22 @@
+Determine whether a human-constructed sentence about sports is plausible.
+
+Q: Is the following sentence credible? "Tyson threw a right straight punch."
+Options:
+(A) Credible
+(B) Not credible
+A: Let's think step by step.
+Tyson is an American professional boxer. The right straight punch is a common move in boxing. It's quite normal for a boxer to throw a right straight punch, so this sentence is credible. The correct answer should be (A).
+
+Q: Is the following sentence credible? "Beckham completed a slam dunk."
+Options:
+(A) Credible
+(B) Not credible
+A: Let's think step by step.
+Beckham is an English professional footballer. A slam dunk is a technical move in basketball. Therefore, this sentence is not credible. The correct answer should be (B).
+
+Q: Is the following sentence credible? "LeBron James made an eagle."
+Options:
+(A) Credible
+(B) Not credible
+A: Let's think step by step.
+LeBron James is a well-known American professional basketball player. An eagle is a term in golf, meaning two strokes under par. Therefore, this sentence is not credible. The correct answer should be (B).

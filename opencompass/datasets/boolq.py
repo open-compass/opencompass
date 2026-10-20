@@ -3,6 +3,7 @@ import json
 from datasets import Dataset, load_dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -12,6 +13,8 @@ class BoolQDataset(BaseDataset):
 
     @staticmethod
     def load(**kwargs):
+        if 'data_files' in kwargs:
+            kwargs['data_files'] = get_data_path(kwargs['data_files'])
         dataset = load_dataset(**kwargs)
 
         def preprocess(example):
@@ -26,10 +29,11 @@ class BoolQDataset(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class BoolQDataset_V2(BaseDataset):
+class BoolQDatasetV2(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path)
         dataset = []
         with open(path, 'r') as f:
             for line in f:
@@ -40,10 +44,11 @@ class BoolQDataset_V2(BaseDataset):
 
 
 @LOAD_DATASET.register_module()
-class BoolQDataset_V3(BaseDataset):
+class BoolQDatasetV3(BaseDataset):
 
     @staticmethod
     def load(path):
+        path = get_data_path(path, local_mode=True)
         dataset = []
         with open(path, 'r') as f:
             for line in f:

@@ -1,19 +1,13 @@
 import copy
 import io
-import signal
+import multiprocessing
 from contextlib import redirect_stdout
 from typing import Any, Optional
 
 from lagent.actions.base_action import BaseAction
 from lagent.schema import ActionReturn, ActionStatusCode
 
-
-class TimeoutError(Exception):
-    pass
-
-
-def handler(signum, frame):
-    raise TimeoutError()
+from opencompass.datasets.mbpp import TimeOutException, swallow_io, time_limit
 
 
 class GenericRuntime:
@@ -90,55 +84,73 @@ class PythonInterpreter(BaseAction):
         self.answer_from_stdout = answer_from_stdout
         self.timeout = timeout
 
+    @staticmethod
+    def extract_code(command: str) -> str:
+        if '```python' in command:
+            command = command.split('```python')[1].split('```')[0]
+        elif '```' in command:
+            command = command.split('```')[1].split('```')[0]
+        command = command.split('\n')
+        return command
+
     def __call__(self, command: str) -> ActionReturn:
-        self.runtime = GenericRuntime()
-        signal.signal(signal.SIGALRM, handler)
-        signal.alarm(self.timeout)
-        try:
-            tool_return = self._call(command)
-        except TimeoutError as e:
-            tool_return = ActionReturn(url=None, args=None, type=self.name)
-            tool_return.errmsg = repr(e)
-            tool_return.state = ActionStatusCode.API_ERROR
-        finally:
-            signal.alarm(0)
-        return tool_return
+        """Execution function for running generation code.
 
-    def _call(self, command: str) -> ActionReturn:
-        tool_return = ActionReturn(url=None, args=None, type=self.name)
-        try:
-            if '```python' in command:
-                command = command.split('```python')[1].split('```')[0]
-            elif '```' in command:
-                command = command.split('```')[1].split('```')[0]
-            tool_return.args = dict(text='```python\n' + command + '\n```')
-            command = command.split('\n')
+        Args:
+            command(str): Python code to be executed.
+        """
+        extracted_command = self.extract_code(command)
+        tool_return = ActionReturn(url=None,
+                                   args=dict(text=command,
+                                             extract_code=extracted_command),
+                                   type=self.name)
 
-            if self.answer_from_stdout:
-                program_io = io.StringIO()
-                with redirect_stdout(program_io):
-                    self.runtime.exec_code('\n'.join(command))
-                program_io.seek(0)
-                res = program_io.readlines()[-1]
-            elif self.answer_symbol:
-                self.runtime.exec_code('\n'.join(command))
-                res = self.runtime._global_vars[self.answer_symbol]
-            elif self.answer_expr:
-                self.runtime.exec_code('\n'.join(command))
-                res = self.runtime.eval_code(self.answer_expr)
-            else:
-                self.runtime.exec_code('\n'.join(command[:-1]))
-                res = True
-        except Exception as e:
-            tool_return.errmsg = repr(e)
-            tool_return.type = self.name
+        def _execution(q, command, tool_return):
+            try:
+                with swallow_io():
+                    # leave 1s for multiprocess
+                    with time_limit(self.timeout - 1):
+                        res = self._call(command)
+                        tool_return.result = dict(text=str(res))
+                        tool_return.state = ActionStatusCode.SUCCESS
+            except TimeOutException:
+                tool_return.errmsg = f'Time out after {self.timeout} seconds.'
+                tool_return.state = ActionStatusCode.API_ERROR
+            except BaseException as e:
+                tool_return.errmsg = f'Failed. {e}.'
+                tool_return.state = ActionStatusCode.API_ERROR
+            q.put(tool_return)
+
+        # `signal` cannot be used in child thread, therefore, we
+        # need to create a process.
+        q = multiprocessing.Queue()
+        p = multiprocessing.Process(target=_execution,
+                                    args=(q, extracted_command, tool_return))
+        p.start()
+        p.join(timeout=self.timeout)
+        if p.is_alive():
+            p.kill()
+            # return timeout due to some unknown error
+            tool_return.errmsg = f'Time out after {self.timeout} seconds.'
             tool_return.state = ActionStatusCode.API_ERROR
             return tool_return
-        try:
-            tool_return.result = dict(text=str(res))
-            tool_return.state = ActionStatusCode.SUCCESS
-        except Exception as e:
-            tool_return.errmsg = repr(e)
-            tool_return.type = self.name
-            tool_return.state = ActionStatusCode.API_ERROR
-        return tool_return
+        return q.get()
+
+    def _call(self, command: str) -> ActionReturn:
+        self.runtime = GenericRuntime()
+        if self.answer_from_stdout:
+            program_io = io.StringIO()
+            with redirect_stdout(program_io):
+                self.runtime.exec_code('\n'.join(command))
+            program_io.seek(0)
+            res = program_io.readlines()[-1]
+        elif self.answer_symbol:
+            self.runtime.exec_code('\n'.join(command))
+            res = self.runtime._global_vars[self.answer_symbol]
+        elif self.answer_expr:
+            self.runtime.exec_code('\n'.join(command))
+            res = self.runtime.eval_code(self.answer_expr)
+        else:
+            self.runtime.exec_code('\n'.join(command[:-1]))
+            res = True
+        return res
