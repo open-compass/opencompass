@@ -4,18 +4,18 @@ from opencompass.openicl.icl_inferencer import PPLInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import LogiQADataset
 
-_hint = "以下是中国国家公务员考试的逻辑推理题，请选出其中的正确答案。\n"
+_hint = '以下是中国国家公务员考试的逻辑推理题，请选出其中的正确答案。\n'
 LogiQA_zh_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
         template=
-        "上下文信息: {context}\n提问: {query}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n答案: {correct_option}",
+        '上下文信息: {context}\n提问: {query}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n答案: {correct_option}',
     ),
     prompt_template=dict(
         type=PromptTemplate,
         template={
             answer:
-            f"{_hint}</E>上下文信息: {{context}}\n提问: {{query}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n答案: {answer}"
+            f'{_hint}</E>上下文信息: {{context}}\n提问: {{query}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n答案: {answer}'
             for answer in ['A', 'B', 'C', 'D']
         },
         ice_token='</E>',
@@ -26,7 +26,7 @@ LogiQA_zh_infer_cfg = dict(
 LogiQA_zh_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 LogiQA_zh_datasets = []
-for _split in ["validation", "test"]:
+for _split in ['validation', 'test']:
 
     LogiQA_zh_reader_cfg = dict(
         input_columns=['context', 'query', 'A', 'B', 'C', 'D'],

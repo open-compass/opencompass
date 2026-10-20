@@ -5,19 +5,19 @@ from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.datasets import LogiQADataset
 
 
-_hint = "The following are logical reasoning questions from the Chinese National " \
-    "Civil Service Examination. Please choose the correct answer.\n"
+_hint = 'The following are logical reasoning questions from the Chinese National ' \
+    'Civil Service Examination. Please choose the correct answer.\n'
 LogiQA_en_infer_cfg = dict(
     ice_template=dict(
         type=PromptTemplate,
         template=
-        "Context: {context}\nQuery: {query}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: {correct_option}",
+        'Context: {context}\nQuery: {query}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\nAnswer: {correct_option}',
     ),
     prompt_template=dict(
         type=PromptTemplate,
         template={
             answer:
-            f"{_hint}</E>Context: {{context}}\nQuery: {{query}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: {answer}"
+            f'{_hint}</E>Context: {{context}}\nQuery: {{query}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\nAnswer: {answer}'
             for answer in ['A', 'B', 'C', 'D']
         },
         ice_token='</E>',
@@ -28,7 +28,7 @@ LogiQA_en_infer_cfg = dict(
 LogiQA_en_eval_cfg = dict(evaluator=dict(type=AccEvaluator), )
 
 LogiQA_en_datasets = []
-for _split in ["validation", "test"]:
+for _split in ['validation', 'test']:
 
     LogiQA_en_reader_cfg = dict(
         input_columns=['context', 'query', 'A', 'B', 'C', 'D'],
