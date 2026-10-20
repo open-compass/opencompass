@@ -116,6 +116,7 @@ from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
 from .livestembench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
+from .logiqa import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .longbenchv2 import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
