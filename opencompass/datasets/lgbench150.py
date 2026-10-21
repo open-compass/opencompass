@@ -8,12 +8,12 @@ import numpy as np
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
-
+from opencompass.utils import get_data_path
 
 DOMAINS = ('medical', 'biology', 'chemistry')
-DATA_DIR = Path(__file__).resolve().parent / 'lgbench150_data'
-QUESTION_FILE = DATA_DIR / 'questions.jsonl'
-GRAPH_FILE = DATA_DIR / 'graph.jsonl'
+DATASET_PATH = 'opencompass/lgbench150'
+QUESTION_FILE = 'questions.jsonl'
+GRAPH_FILE = 'graph.jsonl'
 ANSWER_PATTERN = re.compile(
     r'(?:^|\b)(?:FINAL\s+ANSWER|ANSWER|OPTION|CHOICE)\s*[:：-]?\s*'
     r'\(?([A-D])\)?\b', re.IGNORECASE)
@@ -80,8 +80,8 @@ def _load_graph(path, categories, threshold):
     if np.any(src < 0) or np.any(dst < 0) or np.any(src >= count) or np.any(
             dst >= count):
         raise ValueError('Graph endpoints must reference question IDs')
-    edge_keys = np.minimum(src, dst).astype(np.int64) * (count + 1) + np.maximum(
-        src, dst)
+    edge_keys = np.minimum(src, dst).astype(
+        np.int64) * (count + 1) + np.maximum(src, dst)
     if len(np.unique(edge_keys)) != len(edge_keys):
         raise ValueError('The graph contains duplicate undirected edges')
     return src, dst, weight
@@ -99,19 +99,17 @@ def _score_scope(correct, categories, src, dst, weight, domain=None):
 
     scope_src, scope_dst, scope_weight = (src[edge_scope], dst[edge_scope],
                                           weight[edge_scope])
-    numerator = (np.bincount(scope_src,
-                             scope_weight * correct[scope_dst],
-                             minlength=len(correct)) + np.bincount(
-                                 scope_dst,
-                                 scope_weight * correct[scope_src],
-                                 minlength=len(correct)))
-    denominator = (np.bincount(scope_src, scope_weight,
-                               minlength=len(correct)) + np.bincount(
-                                   scope_dst,
-                                   scope_weight,
-                                   minlength=len(correct)))
+    numerator = (np.bincount(
+        scope_src, scope_weight * correct[scope_dst], minlength=len(correct)) +
+                 np.bincount(scope_dst,
+                             scope_weight * correct[scope_src],
+                             minlength=len(correct)))
+    denominator = (
+        np.bincount(scope_src, scope_weight, minlength=len(correct)) +
+        np.bincount(scope_dst, scope_weight, minlength=len(correct)))
     if np.any(denominator[scope] == 0):
-        raise ValueError(f'Isolated questions found in scope {domain or "overall"}')
+        raise ValueError(
+            f'Isolated questions found in scope {domain or "overall"}')
     coherence = numerator[scope] / denominator[scope]
     scoped_correct = correct[scope]
     return {
@@ -126,12 +124,18 @@ class LGBench150Evaluator(BaseEvaluator):
     """Calculate Acc, GCS, and KBS on the bundled 150-question subset."""
 
     def __init__(self,
-                 questions_path=QUESTION_FILE,
-                 graph_path=GRAPH_FILE,
+                 data_dir=DATASET_PATH,
+                 questions_path=None,
+                 graph_path=None,
                  threshold=0.4):
         super().__init__()
-        self.questions_path = Path(questions_path)
-        self.graph_path = Path(graph_path)
+        if questions_path is None or graph_path is None:
+            resolved_data_dir = Path(get_data_path(data_dir))
+        self.questions_path = (Path(questions_path) if questions_path
+                               is not None else resolved_data_dir /
+                               QUESTION_FILE)
+        self.graph_path = (Path(graph_path) if graph_path is not None else
+                           resolved_data_dir / GRAPH_FILE)
         self.threshold = float(threshold)
         if not np.isfinite(self.threshold):
             raise ValueError('Edge threshold must be finite')
@@ -143,8 +147,8 @@ class LGBench150Evaluator(BaseEvaluator):
             raise ValueError(
                 f'Predictions, references, and dataset must each contain '
                 f'{len(questions)} rows')
-        if [int(row['id']) for row in test_set] != [row['id']
-                                                    for row in questions]:
+        if [int(row['id'])
+                for row in test_set] != [row['id'] for row in questions]:
             raise ValueError('Dataset order does not match graph question IDs')
 
         gold = [row['answer'].strip().upper() for row in questions]
@@ -162,11 +166,14 @@ class LGBench150Evaluator(BaseEvaluator):
         src, dst, weight = _load_graph(self.graph_path, categories,
                                        self.threshold)
 
-        metrics = {'overall': _score_scope(correct, categories, src, dst, weight)}
+        metrics = {
+            'overall': _score_scope(correct, categories, src, dst, weight)
+        }
         for domain in DOMAINS:
             metrics[domain] = _score_scope(correct, categories, src, dst,
-                                            weight, domain)
+                                           weight, domain)
         return {
             f'{scope}/{metric}': round(value, 6)
-            for scope, scores in metrics.items() for metric, value in scores.items()
+            for scope, scores in metrics.items()
+            for metric, value in scores.items()
         }
