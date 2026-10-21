@@ -67,6 +67,7 @@ from .ds1000_interpreter import *  # noqa: F401, F403
 from .Earth_Silver import *  # noqa: F401, F403
 from .eese.eese import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
+from .ethics import *  # noqa: F401, F403
 from .fake_alignment import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
@@ -115,6 +116,7 @@ from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
 from .livestembench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
+from .logiqa import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .longbenchv2 import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
@@ -212,6 +214,7 @@ from .wic import *  # noqa: F401, F403
 from .wikibench import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
+from .wmt19 import *  # noqa: F401, F403
 from .wnli import wnliDataset  # noqa: F401, F403
 from .wsc import *  # noqa: F401, F403
 from .xcopa import *  # noqa: F401, F403
