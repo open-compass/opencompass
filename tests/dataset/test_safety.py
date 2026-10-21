@@ -6,6 +6,8 @@ from unittest.mock import patch
 from datasets import Dataset, DatasetDict
 
 from opencompass.datasets.safety import SafetyDataset
+from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_retriever import ZeroRetriever
 
 
 class TestSafetyDataset(unittest.TestCase):
@@ -51,6 +53,30 @@ class TestSafetyDataset(unittest.TestCase):
                    return_value=str(self.path)):
             with self.assertRaises(FileNotFoundError):
                 SafetyDataset.load('local-safety-prompts')
+
+    def test_dataset_initialization_reader_and_prompt_template(self):
+        self.path.write_text(
+            '  first prompt  \n\n\u4f60\u597d\uff0c\u4e16\u754c\n',
+            encoding='utf-8')
+        dataset = SafetyDataset(path=str(self.path),
+                                abbr='safety',
+                                reader_cfg=dict(input_columns=['prompt'],
+                                                output_column='idx',
+                                                train_split='test',
+                                                test_split='test'))
+
+        self.assertEqual(len(dataset.train), 2)
+        self.assertEqual(len(dataset.test), 2)
+        self.assertEqual(dataset.test['idx'], [0, 1])
+        self.assertEqual(dataset.test['subdivision'], ['safety_test'] * 2)
+        self.assertEqual(
+            dataset.reader.generate_input_field_corpus(dataset.reader.dataset,
+                                                       split='test'),
+            ['first prompt', '\u4f60\u597d\uff0c\u4e16\u754c'])
+        template = PromptTemplate(template='{prompt}')
+        self.assertEqual(template.generate_item(dataset.test[0]),
+                         'first prompt')
+        self.assertEqual(ZeroRetriever(dataset).retrieve(), [[], []])
 
 
 if __name__ == '__main__':
