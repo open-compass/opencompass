@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/lgbench150": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/lgbench150_data",
+    },
     "opencompass/AA-LCR":{
         "ms_id": None,
         "hf_id": None,
@@ -702,6 +707,11 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/lgbench150_data": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lgbench150_data.zip",
+        "md5": "9013a5c35d2ad5ff1bf5960c26d290cc",
+    },
     "/AA-LCR": {
         "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aa_lcr.zip",
         "md5":"d795853a0897f69afa23df955ea8f68f",
