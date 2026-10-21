@@ -106,6 +106,7 @@ from .judge import *  # noqa: F401, F403
 from .kaoshi import KaoshiDataset, KaoshiEvaluator  # noqa: F401, F403
 from .korbench import *  # noqa: F401, F403
 from .lambada import *  # noqa: F401, F403
+from .lgbench150 import LGBench150Evaluator  # noqa: F401
 from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
