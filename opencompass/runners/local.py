@@ -62,6 +62,7 @@ class LocalRunner(BaseRunner):
                  lark_bot_url: str = None,
                  keep_tmp_file: bool = False,
                  tmp_dir: str = 'tmp',
+                 retry: int = 0,
                  **kwargs):
         super().__init__(task=task,
                          debug=debug,
@@ -70,6 +71,7 @@ class LocalRunner(BaseRunner):
         self.max_num_workers = max_num_workers
         self.max_workers_per_gpu = max_workers_per_gpu
         self.keep_tmp_file = keep_tmp_file
+        self.retry = retry
         logger = get_logger()
         for k, v in kwargs.items():
             logger.warning(f'Ignored argument in {self.__module__}: {k}={v}')
@@ -235,7 +237,8 @@ class LocalRunner(BaseRunner):
             logger = get_logger()
             logger.debug(f'Running command: {cmd}')
 
-            # Run command
+            # Run command, and retry the same task on failure, matching
+            # the retry semantics of SlurmRunner / DLCRunner.
             out_path = task.get_log_path(file_extension='out')
             mmengine.mkdir_or_exist(osp.split(out_path)[0])
             stdout = open(out_path, 'w', encoding='utf-8')
@@ -245,6 +248,20 @@ class LocalRunner(BaseRunner):
                                     text=True,
                                     stdout=stdout,
                                     stderr=stdout)
+            stdout.close()
+
+            retry = self.retry
+            while result.returncode != 0 and retry > 0:
+                retry -= 1
+                logger.warning(f'task {task_name} failed, '
+                               f'retrying... ({retry} retries left)')
+                stdout = open(out_path, 'a', encoding='utf-8')
+                result = subprocess.run(cmd,
+                                        shell=True,
+                                        text=True,
+                                        stdout=stdout,
+                                        stderr=stdout)
+                stdout.close()
 
             if result.returncode != 0:
                 logger.error(f'task {task_name} fail, see\n{out_path}')
