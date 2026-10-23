@@ -98,11 +98,12 @@ runner=dict(
     type=LocalRunner,
     max_num_workers=16,  # Maximum parallel task count; default 16
     max_workers_per_gpu=1,
+    retry=2,             # Retry count after task failure; default 0
     task=dict(type=OpenICLInferTask),
 )
 ```
 
-Actual parallel task count is limited by both available GPU resources and `max_num_workers`.
+Actual parallel task count is limited by both available GPU resources and `max_num_workers`. Failed tasks are relaunched up to `retry` times, matching the semantics of SlurmRunner and DLCRunner; the `--retry` CLI flag applies to local runs as well.
 
 ### SlurmRunner
 
