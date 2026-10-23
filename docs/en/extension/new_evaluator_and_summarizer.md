@@ -109,6 +109,10 @@ When a summarizer configuration omits `type`, it uses `DefaultSummarizer`. It re
 
 The following self-contained example is based on the repository's InverseIFEval configuration and extracts its overall score, Chinese group, and macro average. The actual group definitions are in [`opencompass/configs/summarizers/groups/inverse_ifeval.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/summarizers/groups/inverse_ifeval.py):
 
+### Comparability Metadata
+
+Each result file records `num_samples` (the number of test samples a single evaluation run saw, i.e. the dataset size after `test_range` / `n` handling) and, when configured, the `reader_cfg`'s `test_range`. The default summarizer uses this metadata to mark comparability: when models being compared on the same dataset were evaluated on different sample sizes or test ranges, the dataset row is suffixed with `*` and a footnote is appended stating that the scores are not directly comparable. A score computed on 5 samples and one computed on the full split therefore can no longer be read side by side as if they were comparable.
+
 ```python
 inverse_ifeval_instruction_type_abbrs = [
     'QC', 'ITF', 'CC', 'CCF', 'DIA', 'II', 'MIM', 'CA'
