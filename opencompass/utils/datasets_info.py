@@ -248,11 +248,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/mbpp_plus/mbpp_plus.jsonl",
     },
-    # 'opencompass/mbpp': {
-    #     'ms_id': 'opencompass/mbpp',
-    #     'hf_id': 'opencompass/mbpp',
-    #     'local': './data/mbpp/mbpp.jsonl',
-    # },
+    "opencompass/mbpp_cn": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mbpp_cn/mbpp_cn.jsonl",
+    },
     "opencompass/sanitized_mbpp": {
         "ms_id": "opencompass/mbpp",
         "hf_id": "opencompass/mbpp",
@@ -844,6 +844,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_plus.zip",
         "md5": "a1a2207e449462849024660b29e67dde",
+    },
+    "/mbpp_cn/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_cn.zip",
+        "md5": "7f449cf86c2e1593a3e6bff700a98bad",
     },
     "/mbpp/": {
         "url":
