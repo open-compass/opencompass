@@ -109,7 +109,7 @@ class reasonzooEvaluator(BaseEvaluator):
 
         # Evaluate based on different prompt_mode
         if prompt_mode == '0_shot':
-            evaluation_results = evaluate_responses(data, '0_shot')
+            evaluation_results = evaluate_responses(data)
         else:
             raise ValueError(f'Unsupported prompt_mode: {prompt_mode}')
 
