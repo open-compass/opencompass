@@ -10,14 +10,15 @@ from mmengine.config import ConfigDict
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.registry import (DICT_POSTPROCESSORS, ICL_PROMPT_TEMPLATES,
-                                  TEXT_POSTPROCESSORS)
+from opencompass.registry import (DICT_POSTPROCESSORS, ICL_EVALUATORS,
+                                  ICL_PROMPT_TEMPLATES, TEXT_POSTPROCESSORS)
 from opencompass.utils import build_dataset_from_cfg, build_model_from_cfg
 from opencompass.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
 
+@ICL_EVALUATORS.register_module()
 class GenericLLMEvaluator(BaseEvaluator):
     """Generic LLM evaluator.
 
@@ -71,6 +72,8 @@ class GenericLLMEvaluator(BaseEvaluator):
         # Build LLM Inference
         max_out_len = self.judge_cfg.get('max_out_len', None)
         batch_size = self.judge_cfg.get('batch_size', None)
+        self.judge_pred_postprocessor = self.judge_cfg.get(
+            'pred_postprocessor', None)
 
         model = build_model_from_cfg(model_cfg=self.judge_cfg)
 
@@ -162,6 +165,7 @@ class GenericLLMEvaluator(BaseEvaluator):
                                   prompt_template=self.prompt_template)
 
         output = mmengine.load(self.output_path)
+        output = self._judge_postprocess(output)
         return self.output_postprocess(output, dataset)
 
     def pred_postprocess(self, predictions: List) -> Dict:
@@ -190,6 +194,22 @@ class GenericLLMEvaluator(BaseEvaluator):
                             **kwargs)
             else:
                 return proc(output, self.output_path, **kwargs)
+
+    def _judge_postprocess(self, output: Dict) -> Dict:
+        """
+        Apply judge_cfg.pred_postprocessor to the judge model's raw output.
+        """
+        proc_cfg = getattr(self, 'judge_pred_postprocessor', None)
+        if not proc_cfg:
+            return output
+        kwargs = deepcopy(proc_cfg)
+        proc = kwargs.pop('type')
+        if isinstance(proc, str):
+            proc = TEXT_POSTPROCESSORS.get(proc)
+        for v in output.values():
+            if isinstance(v, dict) and 'prediction' in v:
+                v['prediction'] = proc(v['prediction'], **kwargs)
+        return output
 
     @property
     def default_judge_cfg(self):
