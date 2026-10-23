@@ -38,8 +38,8 @@ for _split in ['validation', 'test']:
     LogiQA_en_datasets.append(
         dict(abbr=f'LogiQA_en-{_split}',
              type=LogiQADataset,
-             path='lucasmccabe/logiqa',
-             trust_remote_code=True,
+             path='lgw863/LogiQA-dataset',
+             name='en',
              reader_cfg=LogiQA_en_reader_cfg,
              infer_cfg=LogiQA_en_infer_cfg,
              eval_cfg=LogiQA_en_eval_cfg))

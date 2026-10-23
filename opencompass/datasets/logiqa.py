@@ -1,3 +1,4 @@
+import os.path as osp
 import re
 
 from datasets import (Dataset, DatasetDict, DownloadConfig, DownloadManager,
@@ -7,24 +8,25 @@ from opencompass.registry import LOAD_DATASET
 
 from .base import BaseDataset
 
-# The HF mirrors below only host a loading script that downloads the original
-# txt files from https://github.com/lgw863/LogiQA-dataset. Their
-# `_process_answer` strips option labels with a fixed `answer[3:]`, which drops
-# the first character of options written as `A.20...` or `A．一...`. We
-# reproduce the scripts here with the label stripping fixed.
-_URL = 'https://raw.githubusercontent.com/lgw863/LogiQA-dataset/master'
-_HF_SCRIPTS = {
-    'lucasmccabe/logiqa': {
+# Original release: https://github.com/lgw863/LogiQA-dataset
+_REPO = 'lgw863/LogiQA-dataset'
+_URL = f'https://raw.githubusercontent.com/{_REPO}/master'
+_FILES = {
+    'en': {
         'train': 'Train.txt',
         'validation': 'Eval.txt',
         'test': 'Test.txt',
     },
-    'jiacheng-ye/logiqa-zh': {
+    'zh': {
         'train': 'zh_train.txt',
         'validation': 'zh_eval.txt',
         'test': 'zh_test.txt',
     },
 }
+# HF mirrors used by earlier configs. They only host a loading script whose
+# `answer[3:]` drops the first character of options written as `A.20...` or
+# `A．一...`, so we map them to the original files.
+_LEGACY_IDS = {'lucasmccabe/logiqa': 'en', 'jiacheng-ye/logiqa-zh': 'zh'}
 
 
 def _process_sentences(text):
@@ -95,18 +97,35 @@ def _parse(path):
 class LogiQADataset(BaseDataset):
 
     @staticmethod
-    def load(path: str, **kwargs):
-        if path in _HF_SCRIPTS:
-            # Same URLs and download manager as the HF scripts; files are
-            # cached under the HF datasets cache.
-            # use_etag=False lets later runs (incl. offline) hit the cache
-            # without a HEAD request.
-            dl_manager = DownloadManager(download_config=DownloadConfig(
-                use_etag=False))
-            files = dl_manager.download_and_extract({
-                split: f'{_URL}/{name}'
-                for split, name in _HF_SCRIPTS[path].items()
-            })
+    def load(path: str, name: str = None, **kwargs):
+        """Load LogiQA.
+
+        Args:
+            path: ``'lgw863/LogiQA-dataset'`` to download the original
+                release, or a local directory holding its txt files. The
+                legacy HF ids are mapped to the original release.
+            name: ``'en'`` or ``'zh'``.
+        """
+        if path in _LEGACY_IDS:
+            name = name or _LEGACY_IDS[path]
+            path = _REPO
+        if path == _REPO or osp.isdir(path):
+            if name not in _FILES:
+                raise ValueError(f"name must be 'en' or 'zh', got {name!r}")
+            if path == _REPO:
+                # Cached in the HF datasets cache; use_etag=False lets later
+                # runs (incl. offline) hit the cache without a HEAD request.
+                dl_manager = DownloadManager(download_config=DownloadConfig(
+                    use_etag=False))
+                files = dl_manager.download_and_extract({
+                    split: f'{_URL}/{file_name}'
+                    for split, file_name in _FILES[name].items()
+                })
+            else:
+                files = {
+                    split: osp.join(path, file_name)
+                    for split, file_name in _FILES[name].items()
+                }
             return DatasetDict({
                 split: Dataset.from_list(_parse(file))
                 for split, file in files.items()

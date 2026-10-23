@@ -2,7 +2,7 @@ import unittest
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from opencompass.datasets.logiqa import (_HF_SCRIPTS, LogiQADataset, _parse,
+from opencompass.datasets.logiqa import (_FILES, LogiQADataset, _parse,
                                          _strip_labels)
 
 # Blocks in the format of the original LogiQA txt files. The HF mirror scripts
@@ -68,21 +68,50 @@ class TestLogiQADataset(unittest.TestCase):
         self.assertEqual(data[0]['C'], 'A. B and C are players.')
         self.assertEqual(data[0]['correct_option'], 'A')
 
-    @patch('opencompass.datasets.logiqa.DownloadManager')
-    def test_load_hf_id_reads_original_files(self, mock_dm):
-        with TemporaryDirectory() as root:
-            path = self._write(root, _ZH)
-            mock_dm.return_value.download_and_extract.side_effect = \
-                lambda urls: {split: path for split in urls}
-            ds = LogiQADataset.load(path='jiacheng-ye/logiqa-zh',
-                                    trust_remote_code=True)
-        urls = mock_dm.return_value.download_and_extract.call_args[0][0]
-        self.assertEqual(set(urls), set(_HF_SCRIPTS['jiacheng-ye/logiqa-zh']))
-        self.assertTrue(urls['test'].endswith('/zh_test.txt'))
+    def _check_zh(self, ds):
+        self.assertEqual(set(ds), {'train', 'validation', 'test'})
         ex = ds['test'][0]
         self.assertEqual([ex[o] for o in 'ABCD'],
                          ['一般来说.', '谁如果.', '答题之前.', '由于.'])
         self.assertEqual(ex['correct_option'], 'B')
+
+    def _load_with_mock_download(self, mock_dm, **kwargs):
+        with TemporaryDirectory() as root:
+            path = self._write(root, _ZH)
+            mock_dm.return_value.download_and_extract.side_effect = \
+                lambda urls: {split: path for split in urls}
+            ds = LogiQADataset.load(**kwargs)
+        urls = mock_dm.return_value.download_and_extract.call_args[0][0]
+        self.assertEqual(
+            urls['test'], 'https://raw.githubusercontent.com/'
+            'lgw863/LogiQA-dataset/master/zh_test.txt')
+        return ds
+
+    @patch('opencompass.datasets.logiqa.DownloadManager')
+    def test_load_original_release(self, mock_dm):
+        self._check_zh(
+            self._load_with_mock_download(mock_dm,
+                                          path='lgw863/LogiQA-dataset',
+                                          name='zh'))
+
+    @patch('opencompass.datasets.logiqa.DownloadManager')
+    def test_legacy_hf_id_maps_to_original_release(self, mock_dm):
+        self._check_zh(
+            self._load_with_mock_download(mock_dm,
+                                          path='jiacheng-ye/logiqa-zh',
+                                          trust_remote_code=True))
+
+    def test_load_local_dir(self):
+        with TemporaryDirectory() as root:
+            for file_name in _FILES['zh'].values():
+                with open(f'{root}/{file_name}', 'w', encoding='utf-8') as f:
+                    f.write(_ZH)
+            ds = LogiQADataset.load(path=root, name='zh')
+        self._check_zh(ds)
+
+    def test_invalid_name_raises(self):
+        with self.assertRaises(ValueError):
+            LogiQADataset.load(path='lgw863/LogiQA-dataset', name='fr')
 
 
 if __name__ == '__main__':
