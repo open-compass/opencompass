@@ -89,14 +89,14 @@ After assembling the arguments, the evaluation task calls base-class `evaluate(k
 
 1. Divides repeated inference results for the same Dataset into `n` independent batches, each containing the arguments for one complete run over the Dataset.
 2. Applies the Evaluator-level `pred_postprocessor` to each batch of predictions, then calls `score()`.
-3. Collects numeric metrics from all batches. When `n > 1`, it calculates their means and appends `(n runs average)` to their names. However, the current implementation returns these aggregated results only when every `score()` call returns complete, non-empty `details`; otherwise, it returns the last batch's result.
-4. Removes and aggregates `details`, grouping entries for the same sample across runs.
+3. Collects numeric metrics from all batches. When `n > 1`, it calculates their means and appends `(n runs average)` to their names.
+4. Removes and aggregates `details`, grouping entries for the same sample across runs. If any run omits details, or the details are not aligned one-to-one with the batch samples, the base class logs a warning and skips cross-run detail aggregation (such as G-Pass@k and mG-Pass@k); the averaged numeric metrics are still returned.
 
 ### `score()` Return Format
 
 - Return `dict[metric name, value]`, where values must be `int` / `float`. Summarization retains numeric results only and silently drops other types. A result containing an `'error'` key is skipped entirely and logged.
 - Metric names should be stable and readable. Common names such as `accuracy`, `exact_match`, `f1`, and `rouge1` sort before uncommon names in summary tables.
-- `'details'` (`list[dict]`) is optional at the interface level, but the current implementation has a limitation: when `n > 1` and the cross-run mean metrics are required, every `score()` call must return complete, non-empty `details` aligned one-to-one with the samples in the current batch. Otherwise, only the last batch's result is returned. The base class aggregates `details` across repeated runs and writes them to the result file for sample-by-sample review with `--dump-eval-details`. Individual entries need not include a correctness field; `correct`, `is_correct`, or `cascade_correct` booleans are required only to calculate cross-run metrics such as G-Pass@k and mG-Pass@k.
+- `'details'` (`list[dict]`) is optional at the interface level. When `n > 1`, every `score()` call must return complete, non-empty `details` aligned one-to-one with the samples in the current batch for the base class to aggregate `details` across repeated runs and write them to the result file for sample-by-sample review with `--dump-eval-details`. If any run omits details, the base class logs a warning and returns the `n`-run averaged metrics without cross-run detail aggregation. Individual entries need not include a correctness field; `correct`, `is_correct`, or `cascade_correct` booleans are required only to calculate cross-run metrics such as G-Pass@k and mG-Pass@k.
 - A custom class should not override `evaluate()` unless repeated-run partition semantics genuinely need to change.
 
 Return stable metric names and test normal input, empty input, parse failure, boundary values, and multiple references. An evaluator accessing the network, invoking a Judge, or executing code must define timeouts, error recording, and isolation.
