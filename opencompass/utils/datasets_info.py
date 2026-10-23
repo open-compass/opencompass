@@ -304,6 +304,12 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/korbench",
     },
+    #ReasonZoo
+    "opencompass/reasonzoo": {
+        "ms_id": "opencompass/ReasonZoo",
+        "hf_id": "opencompass/ReasonZoo",
+        "local": "./data/reasonzoo",
+    },
     # Lambada
     "opencompass/lambada": {
         "ms_id": "opencompass/lambada",
@@ -707,6 +713,11 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/reasonzoo": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/reasonzoo.zip",
+        "md5": "f4a410c98a8f8c9206c2799ebc9b133d",
+    },
     "/lgbench150_data": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lgbench150_data.zip",
