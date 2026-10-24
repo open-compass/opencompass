@@ -238,7 +238,7 @@ class TestHuggingFace(unittest.TestCase):
         """Test generate with batch_padding=True."""
         mock_tokenizer = MagicMock()
         mock_tokenizer.pad_token_id = 0
-        mock_tokenizer.batch_encode_plus.return_value = {
+        mock_tokenizer.return_value = {
             'input_ids': [[1, 2, 3], [4, 5, 6]],
             'attention_mask': [[1, 1, 1], [1, 1, 1]]
         }
