@@ -73,6 +73,16 @@ class TestTextPostprocessors(unittest.TestCase):
         text = 'Start<think>reasoning</think> End'
         self.assertEqual(tp.extract_non_reasoning_content(text), 'Start End')
 
+    def test_extract_non_reasoning_content_regex_special_tokens(self):
+        text = '[THINK]2 + 2 = 4[/THINK]The answer is 4.'
+        self.assertEqual(
+            tp.extract_non_reasoning_content(text, '[THINK]', '[/THINK]'),
+            'The answer is 4.')
+        text = '<|begin_of_thought|>hmm<|end_of_thought|>Final: 4'
+        self.assertEqual(
+            tp.extract_non_reasoning_content(text, '<|begin_of_thought|>',
+                                             '<|end_of_thought|>'), 'Final: 4')
+
 
 if __name__ == '__main__':
     unittest.main()
