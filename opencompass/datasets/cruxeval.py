@@ -1,5 +1,6 @@
 # flake8: noqa
 # yapf: disable
+import ast
 import multiprocessing
 from typing import Dict, List
 
@@ -7,30 +8,62 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.utils.code_execution import (TYPE_AWARE_EQUAL_NAME,
+                                              make_assertions_type_aware,
+                                              type_aware_equal)
 
 from .base import BaseDataset
 
 CRUXEVAL_INPUT_FIELDS = ['code', 'input']
 
 
-def _cruxeval_exec(code, queue):
+def _cruxeval_exec(code, test_case, queue):
     """Execute code in a subprocess to allow timeout."""
     try:
-        exec(code, {'__builtins__': __builtins__})
+        exec_globals = {'__builtins__': __builtins__}
+        exec(code, exec_globals)
+        exec_globals[TYPE_AWARE_EQUAL_NAME] = type_aware_equal
+        exec(test_case, exec_globals)
         queue.put(True)
     except Exception:
         queue.put(False)
 
 
-def _check_correctness(code: str, timeout: int = 3) -> bool:
-    """Check if ``assert {output} == {prediction}`` holds given the code.
+def _make_type_aware_test_case(output: str, prediction: str) -> str:
+    """Build an assertion without interpolating untrusted source around it."""
+    output_expr = ast.parse(output, mode='eval').body
+    prediction_expr = ast.parse(prediction, mode='eval').body
+    assertion = ast.Module(
+        body=[
+            ast.Assert(
+                test=ast.Compare(
+                    left=output_expr,
+                    ops=[ast.Eq()],
+                    comparators=[prediction_expr],
+                ),
+                msg=None,
+            )
+        ],
+        type_ignores=[],
+    )
+    ast.fix_missing_locations(assertion)
+    return make_assertions_type_aware(ast.unparse(assertion))
+
+
+def _check_correctness(code: str,
+                       output: str,
+                       prediction: str,
+                       timeout: int = 3) -> bool:
+    """Check a type-aware equality assertion against the provided code.
 
     Follows the official CRUXEval evaluation logic.
     """
     try:
+        test_case = _make_type_aware_test_case(output, prediction)
         ctx = multiprocessing.get_context('fork')
         queue = ctx.Queue()
-        proc = ctx.Process(target=_cruxeval_exec, args=(code, queue))
+        proc = ctx.Process(target=_cruxeval_exec,
+                           args=(code, test_case, queue))
         proc.start()
         proc.join(timeout)
         if proc.is_alive():
@@ -74,6 +107,10 @@ class CRUXEvalOEvaluator(BaseEvaluator):
         {code}
         assert {output} == {prediction}
 
+    The equality assertion is rewritten to require recursively matching
+    concrete types, preventing predictions from forging equality through a
+    custom ``__eq__`` implementation.
+
     A prediction is also rejected (anti-cheat) when it simply echoes
     ``f({input})`` instead of computing the real value, following the
     official implementation.
@@ -104,9 +141,8 @@ class CRUXEvalOEvaluator(BaseEvaluator):
                 # anti-cheat: skip if model just echoes f(input)
                 if f'f({inp})' in g:
                     continue
-                code_to_execute = f'{code}\nassert {out} == {g}'
                 execution_results.append(
-                    _check_correctness(code_to_execute, self.timeout))
+                    _check_correctness(code, out, g, self.timeout))
 
             if True not in execution_results:
                 execution_results = [False] * len(preds)
