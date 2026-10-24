@@ -1,3 +1,4 @@
+from __future__ import annotations
 # Copyright (c) 2024, BigCodeBench and its contributors.
 # Copyright (c) 2023, OpenCompass and its contributors.
 

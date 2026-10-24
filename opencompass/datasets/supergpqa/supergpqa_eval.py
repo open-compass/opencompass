@@ -1,3 +1,4 @@
+from __future__ import annotations
 # flake8: noqa: W605
 import re
 
