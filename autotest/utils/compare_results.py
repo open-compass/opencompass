@@ -102,6 +102,7 @@ def _normalize_lcb_results(obj: Any) -> Any:
             key: (_normalize_final_metadata(val)
                   if key == 'final_metadata' else _normalize_lcb_results(val))
             for key, val in obj.items()
+            if key != 'lcb_executor'  # host-local provenance, not in baselines
         }
     if isinstance(obj, list):
         return [_normalize_lcb_results(item) for item in obj]
