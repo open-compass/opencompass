@@ -346,7 +346,59 @@ class OpenICLEvalTask(BaseTask):
                     self.logger.warning(f'Skip dumping details due to: {e}.')
         else:
             result.pop('details', None)
+        if self.dump_details and result.get('details') is not None:
+            self._attach_origin_prompt_hash(result['details'], pred_dicts)
         return result
+
+    def _attach_origin_prompt_hash(self, details, pred_dicts):
+        """Attach ``origin_prompt_hash`` (from the prediction records) to every
+        detail record.
+
+        Handles both detail layouts produced by the pipeline:
+
+        * Path A (evaluator-provided details): a ``list`` of dicts, each keyed
+          by ``example_abbr`` with the format ``'{subdivision}_{idx}'``.
+        * Path B (``format_details`` fallback): a ``dict`` keyed by ``str(idx)``.
+
+        The hash is looked up by sample index, which is the last underscore
+        segment of ``example_abbr`` (always an integer) or the dict key.
+        """
+        if not details or not pred_dicts:
+            return details
+
+        def _safe_get(idx):
+            if isinstance(idx, int) and 0 <= idx < len(pred_dicts):
+                return pred_dicts[idx].get('origin_prompt_hash')
+            return None
+
+        if isinstance(details, list):
+            # Path A
+            for detail in details:
+                if not isinstance(detail, dict):
+                    continue
+                example_abbr = detail.get('example_abbr')
+                if example_abbr is None:
+                    continue
+                try:
+                    idx = int(str(example_abbr).rsplit('_', 1)[1])
+                except (ValueError, IndexError):
+                    continue
+                origin_prompt_hash = _safe_get(idx)
+                if origin_prompt_hash is not None:
+                    detail['origin_prompt_hash'] = origin_prompt_hash
+        elif isinstance(details, dict):
+            # Path B
+            for key, detail in details.items():
+                if not isinstance(detail, dict):
+                    continue
+                try:
+                    idx = int(key)
+                except (ValueError, TypeError):
+                    continue
+                origin_prompt_hash = _safe_get(idx)
+                if origin_prompt_hash is not None:
+                    detail['origin_prompt_hash'] = origin_prompt_hash
+        return details
 
     def _sum_rollout(
         self,
