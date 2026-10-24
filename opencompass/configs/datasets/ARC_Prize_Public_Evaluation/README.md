@@ -40,7 +40,29 @@ Here is an example of a simple ARC-AGI task that has three training pairs along 
 }
 ```
 
+#### Evaluation protocol
+
+The default ARC-AGI-1 and ARC-AGI-2 configs follow the ARC Prize
+[benchmarking harness](https://github.com/arcprize/arc-agi-benchmarking/tree/688c9be4fb270ad7eede09fe8bba6f8187be3bed):
+
+- every test pair in a task is evaluated;
+- prompts use the ARC Prize baseline template and JSON grids;
+- the final boxed grid is preferred, otherwise the response is scanned from
+  the end for the final complete JSON grid;
+- if the first response cannot be parsed, the evaluated model is called once
+  more with the ARC Prize JSON-extraction prompt;
+- ARC-AGI-1 uses one attempt per test pair, while ARC-AGI-2 uses two attempts
+  and accepts either exact match;
+- pair scores are averaged within each task, then task scores are averaged.
+
+The archived `arc_prize_public_evaluation_gen_fedd04.py` config intentionally
+keeps the earlier OpenCompass prompt, first-test-pair loader, and parser for
+reproducing legacy results.
+
 #### Performance
+
+The following scores were produced by the legacy OpenCompass protocol and are
+not directly comparable with results from the aligned default configs.
 
 | Qwen2.5-72B-Instruct | LLaMA3.1-70B-Instruct | gemma-2-27b-it | 
 | ----- | ----- |  ----- | 
