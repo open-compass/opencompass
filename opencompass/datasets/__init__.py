@@ -79,7 +79,6 @@ from .generic import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
 from .grand_physics import *  # noqa: F401, F403
-from .mmlu_redux import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .healthbench.healthbench import *  # noqa: F401, F403
@@ -139,6 +138,7 @@ from .mgsm import *  # noqa: F401, F403
 from .mmlu import *  # noqa: F401, F403
 from .mmlu_cf import *  # noqa: F401, F403
 from .mmlu_pro import *  # noqa: F401, F403
+from .mmlu_redux import *  # noqa: F401, F403
 from .MMLUArabic import *  # noqa: F401, F403
 from .mmmlu import *  # noqa: F401, F403
 from .mol_instructions_chem import *  # noqa: F401, F403

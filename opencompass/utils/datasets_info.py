@@ -637,11 +637,6 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/GrandPhysics_50_questions.json",
     },
-    "fxmarty/mmlu-redux-2.0-ok": {
-        "ms_id": "",
-        "hf_id": "fxmarty/mmlu-redux-2.0-ok",
-        "local": "",
-    },
     "opencompass/Chem_exam_gaokao":{
         "ms_id": "",
         "hf_id": "",
