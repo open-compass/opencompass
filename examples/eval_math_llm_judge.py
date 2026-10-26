@@ -4,7 +4,7 @@ from mmengine.config import read_base
 with read_base():
     from opencompass.configs.models.hf_llama.hf_llama3_8b_instruct import models as hf_llama3_8b_instruct_model  # noqa: F401, F403
     from opencompass.configs.models.hf_llama.hf_llama3_70b_instruct import models as hf_llama3_70b_instruct_model  # noqa: F401, F403
-    from opencompass.configs.datasets.math.math_llm_judge import math_datasets  # noqa: F401, F403
+    from opencompass.configs.datasets.math.math_llm_judge_gen import math_datasets  # noqa: F401, F403
 
 from opencompass.datasets import math_judement_preprocess
 from opencompass.openicl.icl_evaluator import LMEvaluator
