@@ -118,6 +118,49 @@ class TestVLLMwithChatTemplate(unittest.TestCase):
         self.assertEqual(results[0], 'Generated response')
         mock_model.generate.assert_called_once()
 
+    @patch('opencompass.models.vllm_with_tf_above_v4_33._convert_chat_messages'
+           )
+    @patch('opencompass.models.vllm_with_tf_above_v4_33.SamplingParams')
+    def test_generate_preserves_bos_token_with_token_ids(
+            self, mock_sampling_params_class, mock_convert_messages):
+        """Test BOS token is preserved in vLLM prompts."""
+        model = VLLMwithChatTemplate.__new__(VLLMwithChatTemplate)
+        model.fastchat_template = None
+        model.chat_template_kwargs = {}
+        model.generation_kwargs = {}
+        model.stop_words = []
+        model.lora_path = None
+        model.logger = MagicMock()
+        mock_model = MagicMock()
+        mock_tokenizer = MagicMock()
+        mock_tokenizer.bos_token = '<bos>'
+        mock_tokenizer.eos_token = None
+        mock_tokenizer.apply_chat_template.return_value = '<bos>Formatted prompt'
+        mock_tokenizer.encode.return_value = [1, 2, 3]
+        model.tokenizer = mock_tokenizer
+        model.model = mock_model
+
+        mock_convert_messages.return_value = [{
+            'role': 'user',
+            'content': 'Hello'
+        }]
+        mock_output = MagicMock()
+        mock_output.outputs = [MagicMock(text='Generated response')]
+        mock_model.generate.return_value = [mock_output]
+        mock_sampling_params = MagicMock()
+        mock_sampling_params_class.return_value = mock_sampling_params
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Generated response'])
+        mock_tokenizer.encode.assert_called_once_with(
+            '<bos>Formatted prompt', add_special_tokens=False)
+        prompts = mock_model.generate.call_args[0][0]
+        self.assertEqual(prompts, [{
+            'prompt': '<bos>Formatted prompt',
+            'prompt_token_ids': [1, 2, 3],
+        }])
+
     @patch('opencompass.models.vllm_with_tf_above_v4_33.LLM')
     @patch('transformers.AutoTokenizer')
     @patch(

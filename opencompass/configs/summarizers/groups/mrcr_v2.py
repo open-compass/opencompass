@@ -14,7 +14,9 @@ ranges = [
 mrcr_v2_summary_groups = [
     {
         'name': 'MRCR_v2_full',
-        'subsets': [f'mrcr_v2_{n}_{r}' for n in needles for r in ranges],
+        'subsets': [
+            f'mrcr_v2_{n}_{r}_full' for n in needles for r in ranges
+        ],
     },
     {
         'name': 'MRCR_v2_upto128k',

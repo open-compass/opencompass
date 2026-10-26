@@ -1,3 +1,4 @@
+import difflib
 import filecmp
 import json
 import os
@@ -12,6 +13,19 @@ _SUMMARY_COMPARE_EXTS = ('csv', 'md')
 _LCB_PATH_MARKERS = ('lcb', 'livecodebench', 'livecodebench_pro')
 _TRACEBACK_OBJ_RE = re.compile(r'<traceback object at 0x[0-9a-fA-F]+>')
 _MEM_ADDR_RE = re.compile(r'0x[0-9a-fA-F]+')
+_VALUE_PREVIEW_MAX = 512
+_TEXT_DIFF_MAX_LINES = 2
+
+
+def _file_pair_abs_paths(path1: str, path2: str) -> str:
+    """Absolute paths for a compared pair (for manual inspection)."""
+    return (f'  left:  {os.path.abspath(path1)}\n'
+            f'  right: {os.path.abspath(path2)}')
+
+
+def _with_file_paths(message: str, path1: str, path2: str) -> str:
+    """Append absolute paths of both files under a diff/mismatch message."""
+    return f'{message}\n{_file_pair_abs_paths(path1, path2)}'
 
 
 def _load_json(path: str) -> Any:
@@ -114,6 +128,74 @@ def _emit_factory(lines: List[str], max_lines: int, path_prefix: str):
     return emit
 
 
+def _preview_value(value: Any, max_len: int = _VALUE_PREVIEW_MAX) -> str:
+    """Compact single-line preview of a value for diff messages."""
+    if isinstance(value, str):
+        text = value.replace('\n', '\\n').replace('\r', '\\r')
+    else:
+        try:
+            text = json.dumps(value, ensure_ascii=False, sort_keys=True)
+        except (TypeError, ValueError):
+            text = repr(value)
+        text = text.replace('\n', ' ')
+    if len(text) > max_len:
+        return text[:max_len - 3] + '...'
+    return text
+
+
+def _append_value_diff(
+    lines: List[str],
+    max_lines: int,
+    path: str,
+    left: Any,
+    right: Any,
+    note: str = 'value differs',
+) -> None:
+    """Append path note plus up to two preview lines (-left / +right)."""
+    if len(lines) >= max_lines:
+        return
+    lines.append(f'{path}: {note}' if path else note)
+    if len(lines) < max_lines:
+        lines.append('  - ' + _preview_value(left))
+    if len(lines) < max_lines:
+        lines.append('  + ' + _preview_value(right))
+
+
+def _text_diff_snippet(
+    path1: str,
+    path2: str,
+    max_diff_lines: int = _TEXT_DIFF_MAX_LINES,
+) -> str:
+    """Short unified-diff style snippet for two text files (1-2 +/- lines)."""
+    try:
+        with open(path1, encoding='utf-8', errors='replace') as f1:
+            lines1 = f1.read().splitlines()
+        with open(path2, encoding='utf-8', errors='replace') as f2:
+            lines2 = f2.read().splitlines()
+    except OSError as e:
+        return _with_file_paths(
+            f'Content differs (could not read for diff: {e})', path1, path2)
+
+    if lines1 == lines2:
+        return _with_file_paths(
+            'Content differs (byte-level; text lines equal)', path1, path2)
+
+    diff_lines: List[str] = []
+    for line in difflib.unified_diff(lines1, lines2, lineterm='', n=0):
+        if line.startswith(('+++', '---', '@@')):
+            continue
+        if line.startswith(('+', '-')):
+            preview = line if len(line) <= _VALUE_PREVIEW_MAX else (
+                line[:_VALUE_PREVIEW_MAX - 3] + '...')
+            diff_lines.append(preview)
+            if len(diff_lines) >= max_diff_lines:
+                break
+    if not diff_lines:
+        return _with_file_paths('Content differs', path1, path2)
+    return _with_file_paths('Content differs:\n' + '\n'.join(diff_lines),
+                            path1, path2)
+
+
 def _key_structure_equal(a: Any, b: Any) -> bool:
     """True if types, dict keys, and list lengths match recursively; ignore leaves."""  # noqa: F401, E501
     if type(a) != type(b):
@@ -201,6 +283,10 @@ def json_semantic_diff_lines(
 
     if type(left) != type(right):
         emit(f'type mismatch {type(left).__name__} vs {type(right).__name__}')
+        if len(lines) < max_lines:
+            lines.append('  - ' + _preview_value(left))
+        if len(lines) < max_lines:
+            lines.append('  + ' + _preview_value(right))
         return lines
 
     if isinstance(left, dict):
@@ -225,10 +311,12 @@ def json_semantic_diff_lines(
                             label1=label1,
                             label2=label2,
                         ))
-                    if len(lines) == before and len(lines) < max_lines:
-                        lines.append(f'{sub}: value differs (semantic)')
-                elif len(lines) < max_lines:
-                    lines.append(f'{sub}: value differs (semantic)')
+                    if len(lines) == before:
+                        _append_value_diff(lines, max_lines, sub, left[k],
+                                           right[k])
+                else:
+                    _append_value_diff(lines, max_lines, sub, left[k],
+                                       right[k])
         return lines
 
     if isinstance(left, list):
@@ -251,17 +339,26 @@ def json_semantic_diff_lines(
                             label1=label1,
                             label2=label2,
                         ))
-                    if len(lines) == before and len(lines) < max_lines:
-                        lines.append(f'{sub}: value differs (semantic)')
-                elif len(lines) < max_lines:
-                    lines.append(f'{sub}: value differs (semantic)')
+                    if len(lines) == before:
+                        _append_value_diff(lines, max_lines, sub, left[i],
+                                           right[i])
+                else:
+                    _append_value_diff(lines, max_lines, sub, left[i],
+                                       right[i])
         if len(left) > len(right) and len(lines) < max_lines:
             emit(f'indices {len(right)}..{len(left) - 1} only in {label1}')
         elif len(right) > len(left) and len(lines) < max_lines:
             emit(f'indices {len(left)}..{len(right) - 1} only in {label2}')
         return lines
 
-    emit('scalar / leaf value differs under canonicalization')
+    _append_value_diff(
+        lines,
+        max_lines,
+        path_prefix,
+        left,
+        right,
+        note='scalar / leaf value differs',
+    )
     return lines
 
 
@@ -277,9 +374,9 @@ def _json_pair_compare_reason(
         left = _load_json(path1)
         right = _load_json(path2)
     except json.JSONDecodeError as e:
-        return f'Invalid JSON: {e}'
+        return _with_file_paths(f'Invalid JSON: {e}', path1, path2)
     except OSError as e:
-        return f'Could not read JSON file: {e}'
+        return _with_file_paths(f'Could not read JSON file: {e}', path1, path2)
 
     if _path_is_lcb_results(rel_path, compare_type):
         left = _normalize_lcb_results(left)
@@ -304,7 +401,7 @@ def _json_pair_compare_reason(
         header = (
             'JSON key/shape mismatch (do_sample path; leaf values ignored). '
             'Details:\n')
-        return header + '\n'.join(detail)
+        return _with_file_paths(header + '\n'.join(detail), path1, path2)
 
     if _semantic_equal(left, right):
         return None
@@ -320,7 +417,11 @@ def _json_pair_compare_reason(
         detail = [
             '(no per-key diff lines; structure may be non-dict/non-list)'
         ]
-    return 'JSON semantic mismatch. Details:\n' + '\n'.join(detail)
+    return _with_file_paths(
+        'JSON semantic mismatch. Details:\n' + '\n'.join(detail),
+        path1,
+        path2,
+    )
 
 
 def _is_json_file(name: str) -> bool:
@@ -388,20 +489,28 @@ def compare_summary_folders(
             if path1 is None and path2 is None:
                 continue
             if path1 is None:
-                diff_files.append(
-                    (rel_name, f'No summary_*.{ext} in first folder'))
-                continue
-            if path2 is None:
-                diff_files.append(
-                    (rel_name, f'No summary_*.{ext} in second folder'))
-                continue
-            rel_path1 = os.path.relpath(path1, folder1)
-            rel_path2 = os.path.relpath(path2, folder2)
-            if not filecmp.cmp(path1, path2, shallow=False):
                 diff_files.append((
                     rel_name,
-                    f'Content differs ({rel_path1} vs {rel_path2})',
+                    _with_file_paths(
+                        f'No summary_*.{ext} in first folder',
+                        os.path.join(folder1, rel_dir or '.'),
+                        path2,
+                    ),
                 ))
+                continue
+            if path2 is None:
+                diff_files.append((
+                    rel_name,
+                    _with_file_paths(
+                        f'No summary_*.{ext} in second folder',
+                        path1,
+                        os.path.join(folder2, rel_dir or '.'),
+                    ),
+                ))
+                continue
+            if not filecmp.cmp(path1, path2, shallow=False):
+                snippet = _text_diff_snippet(path1, path2)
+                diff_files.append((rel_name, snippet))
 
     if diff_files:
         header = (
@@ -423,17 +532,18 @@ def compare_results(
     raise_on_diff: bool = True,
     json_diff_max_lines: int = 10,
 ) -> Optional[List[Tuple[str, str]]]:
-    """Entry for scripts: take first subpath under each root, then compare compare_type."""  # noqa: F401, E501
+    """Pick a stable workdir under each root, then compare compare_type."""
     if results_ignore_list is None:
         results_ignore_list = ['srbench.json']
 
     assert os.path.isdir(folder1), f'Folder does not exist: {folder1}'
     assert os.path.isdir(folder2), f'Folder does not exist: {folder2}'
 
-    sub_folder1 = get_all_subpaths(folder1)[0]
-    sub_folder2 = get_all_subpaths(folder2)[0]
-
+    sub_folder1 = pick_compare_workdir(folder1)
+    sub_folder2 = pick_compare_workdir(folder2)
     print(f'compare {compare_type}')
+    print(f'  workdir1: {sub_folder1}')
+    print(f'  workdir2: {sub_folder2}')
     target1 = os.path.join(sub_folder1, compare_type)
     target2 = os.path.join(sub_folder2, compare_type)
     if compare_type == 'summary':
@@ -486,7 +596,11 @@ def compare_folders(
             path2 = os.path.join(folder2, rel_path)
 
             if not os.path.exists(path2):
-                diff_files.append((rel_path, 'File missing in second folder'))
+                diff_files.append((
+                    rel_path,
+                    _with_file_paths('File missing in second folder', path1,
+                                     path2),
+                ))
                 continue
 
             if _is_json_file(file):
@@ -500,7 +614,7 @@ def compare_folders(
                 if reason is not None:
                     diff_files.append((rel_path, reason))
             elif not filecmp.cmp(path1, path2, shallow=False):
-                diff_files.append((rel_path, 'Content differs'))
+                diff_files.append((rel_path, _text_diff_snippet(path1, path2)))
 
     for root, _dirs, files in os.walk(folder2):
         for file in files:
@@ -508,8 +622,13 @@ def compare_folders(
                 continue
             rel_path = os.path.relpath(os.path.join(root, file), folder2)
             path1 = os.path.join(folder1, rel_path)
+            path2 = os.path.join(root, file)
             if not os.path.exists(path1):
-                diff_files.append((rel_path, 'File missing in first folder'))
+                diff_files.append((
+                    rel_path,
+                    _with_file_paths('File missing in first folder', path1,
+                                     path2),
+                ))
 
     if diff_files:
         error_msg = 'Found differences in files:\n' + '\n'.join(
@@ -532,6 +651,40 @@ def get_all_subpaths(directory: str) -> List[str]:
         for file_name in files:
             subpaths.append(os.path.join(root, file_name))
     return subpaths
+
+
+_WORKDIR_MARKERS = ('predictions', 'results', 'summary')
+
+
+def _has_compare_markers(path: str) -> bool:
+    return any(
+        os.path.isdir(os.path.join(path, marker))
+        for marker in _WORKDIR_MARKERS)
+
+
+def pick_compare_workdir(root: str) -> str:
+    """Pick OpenCompass workdir under root for predictions/results/summary.
+
+    Prefers immediate child dirs that contain predictions/results/summary.
+    If several match, choose the newest by mtime. If root itself already has
+    markers, use root. Falls back to newest immediate subdirectory.
+    """
+    if not os.path.isdir(root):
+        raise ValueError(f'Directory does not exist: {root}')
+    if _has_compare_markers(root):
+        return root
+
+    children = [
+        os.path.join(root, name) for name in os.listdir(root)
+        if os.path.isdir(os.path.join(root, name)) and not name.startswith('.')
+        and not name.endswith('.bak') and '.bak_' not in name
+    ]
+    marked = [p for p in children if _has_compare_markers(p)]
+    pool = marked or children
+    if not pool:
+        raise ValueError(f'No workdir with {_WORKDIR_MARKERS} under {root}')
+    pool.sort(key=lambda p: (os.path.getmtime(p), p))
+    return pool[-1]
 
 
 if __name__ == '__main__':

@@ -1,4 +1,24 @@
 DATASETS_MAPPING = {
+    "opencompass/lgbench150": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/lgbench150_data",
+    },
+    "opencompass/AA-LCR":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/aa_lcr",
+    },
+    "opencompass/QASPER":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/QASPER/qasper-dev-v0.3.json",
+    },
+    "opencompass/MultiIF":{
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/MultiIF/multiIF_20241018.csv",
+    },
     "opencompass/mp20":{
         "ms_id": None,
         "hf_id": None,
@@ -43,6 +63,16 @@ DATASETS_MAPPING = {
         "ms_id": None,
         "hf_id": None,
         "local": "./data/IFBench/IFBench_test.jsonl",
+    },
+    "opencompass/fake_alignment/safety.jsonl": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/fake_alignment/safety.jsonl",
+    },
+    "opencompass/fake_alignment/dna_training_set.jsonl": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/fake_alignment/dna_training_set.jsonl",
     },
     "opencompass/lcb_pro": {
         "ms_id": None,
@@ -213,11 +243,16 @@ DATASETS_MAPPING = {
         "hf_id": "opencompass/mbpp",
         "local": "./data/mbpp/mbpp.jsonl",
     },
-    # 'opencompass/mbpp': {
-    #     'ms_id': 'opencompass/mbpp',
-    #     'hf_id': 'opencompass/mbpp',
-    #     'local': './data/mbpp/mbpp.jsonl',
-    # },
+    "opencompass/mbpp_plus": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mbpp_plus/mbpp_plus.jsonl",
+    },
+    "opencompass/mbpp_cn": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mbpp_cn/mbpp_cn.jsonl",
+    },
     "opencompass/sanitized_mbpp": {
         "ms_id": "opencompass/mbpp",
         "hf_id": "opencompass/mbpp",
@@ -268,6 +303,12 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/korbench",
+    },
+    #ReasonZoo
+    "opencompass/reasonzoo": {
+        "ms_id": "opencompass/ReasonZoo",
+        "hf_id": "opencompass/ReasonZoo",
+        "local": "./data/reasonzoo",
     },
     # Lambada
     "opencompass/lambada": {
@@ -552,6 +593,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
+    "opencompass/maritimebench": {
+        "ms_id": "HiDolphin/MaritimeBench",
+        "hf_id": "Hi-Dolphin/MaritimeBench",
+        "local": "./data/maritimebench",
+    },
     "opencompass/ClimaQA-Gold": {
         "ms_id": "",
         "hf_id": "",
@@ -596,6 +642,11 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
+    },
+    "opencompass/GrandPhysics": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/GrandPhysics_50_questions.json",
     },
     "opencompass/Chem_exam_gaokao":{
         "ms_id": "",
@@ -662,9 +713,28 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/reasonzoo": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/reasonzoo.zip",
+        "md5": "f4a410c98a8f8c9206c2799ebc9b133d",
+    },
+    "/lgbench150_data": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lgbench150_data.zip",
+        "md5": "9013a5c35d2ad5ff1bf5960c26d290cc",
+    },
+    "/AA-LCR": {
+        "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aa_lcr.zip",
+        "md5":"d795853a0897f69afa23df955ea8f68f",
+    },
     "/IFbench": {
         "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/IFBench.zip",
         "md5":"b1c63b31e3312f929c6318977de4cdd3",
+    },
+    "/fake_alignment/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/fake_alignment.zip",
+        "md5": "5172cf0d86f8fb9ab36cec003a86ff3a",
     },
     "/NPHardEval/": {
         "url":
@@ -781,6 +851,16 @@ DATASETS_URL = {
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ifeval.zip",
         "md5": "64d98b6f36b42e7390c9cef76cace75f",
     },
+    "/mbpp_plus/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_plus.zip",
+        "md5": "a1a2207e449462849024660b29e67dde",
+    },
+    "/mbpp_cn/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_cn.zip",
+        "md5": "7f449cf86c2e1593a3e6bff700a98bad",
+    },
     "/mbpp/": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp.zip",
@@ -790,6 +870,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmmlu.zip",
         "md5": "a59f4003d6918509a719ce3bc2a5d5bc",
+    },
+    "/ceval/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/ceval.zip",
+        "md5": "3889202085aebd28b596b98bee43e1aa",
     },
     "/math/": {
         "url":
@@ -1112,5 +1197,9 @@ DATASETS_URL = {
     "/imo-bench-answerbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/imo-bench-answerbench.zip",
         "md5": "34b814c97344016d5b597d75a8fff7be",
+    },
+    "/GrandPhysics": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GrandPhysics_50_questions.zip",
+        "md5": "06e37ec7676c800d3c0010ee4cb93765",
     }
 }

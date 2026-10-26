@@ -88,8 +88,11 @@ class BaseInferencer:
         raise NotImplementedError("Method hasn't been implemented yet")
 
     @staticmethod
-    def get_dataloader(datalist: List[List], batch_size: int) -> DataLoader:
+    def get_dataloader(datalist: List[List],
+                       batch_size: Optional[int]) -> DataLoader:
         """Return a dataloader of the input data list."""
+        if batch_size is None:
+            batch_size = 1
         dataloader = DataLoader(datalist,
                                 batch_size=batch_size,
                                 collate_fn=lambda x: x)
@@ -134,11 +137,12 @@ class GenInferencerOutputHandler:
         if path.exists():
             try:
                 result_dict = {}
-                for line in path.read_text().splitlines():
-                    if line.strip():
-                        item = json.loads(line)
-                        idx = item.pop('idx')
-                        result_dict[idx] = item
+                with path.open(encoding='utf-8') as json_file:
+                    for line in json_file:
+                        if line.strip():
+                            item = json.loads(line)
+                            idx = item.pop('idx')
+                            result_dict[idx] = item
             except Exception:
                 bak_file = path.with_name(path.name + '.bak')
                 shutil.move(path, bak_file)
@@ -166,9 +170,9 @@ class GenInferencerOutputHandler:
         }
         if gold:
             self.results_dict[str(idx)]['gold'] = gold
-        if res_length:
+        if res_length is not None:
             self.results_dict[str(idx)]['res_length'] = res_length
-        if input_length:
+        if input_length is not None:
             self.results_dict[str(idx)]['all_input_length'] = input_length
 
 
@@ -201,11 +205,12 @@ class ChatOutputHandler:
         if path.exists():
             try:
                 result_dict = {}
-                for line in path.read_text().splitlines():
-                    if line.strip():
-                        item = json.loads(line)
-                        idx = item.pop('idx')
-                        result_dict[idx] = item
+                with path.open(encoding='utf-8') as json_file:
+                    for line in json_file:
+                        if line.strip():
+                            item = json.loads(line)
+                            idx = item.pop('idx')
+                            result_dict[idx] = item
             except Exception:
                 bak_file = path.with_name(path.name + '.bak')
                 shutil.move(path, bak_file)

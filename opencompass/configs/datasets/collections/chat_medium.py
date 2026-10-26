@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from ..mmlu.mmlu_gen_4d595a import mmlu_datasets
     from ..ceval.ceval_gen_5f30c7 import ceval_datasets
-    from ..agieval.agieval_gen_64afd3 import agieval_datasets
+    from ..agieval.agieval_gen_f84832 import agieval_datasets
     from ..GaokaoBench.GaokaoBench_gen_5cfe9e import GaokaoBench_datasets
     from ..bbh.bbh_gen_5b92b0 import bbh_datasets
     from ..humaneval.humaneval_gen_8e312c import humaneval_datasets

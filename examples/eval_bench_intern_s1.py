@@ -41,7 +41,7 @@ with read_base():
     )
 
     # Models
-    from opencompass.configs.models.interns1.intern_s1 import \
+    from opencompass.configs.models.intern_s.intern_s1 import \
         models as interns1_model
 
 #######################################################################
