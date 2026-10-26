@@ -30,6 +30,18 @@ class TestEESEScore(unittest.TestCase):
         self.assertEqual(result['details']['0']['score'], 6)
         self.assertEqual(result['overall_score'], 60)
 
+    def test_worded_verdicts_are_graded_by_keyword(self):
+        for prediction, score in [('Correct', 10), ('Incorrect', 0),
+                                  ('no verdict given', 0)]:
+            with self.subTest(prediction=prediction):
+                self.assertIsNone(extract_first_numeric_score(prediction))
+                result = eese_score_postprocess_dict(
+                    {'0': {
+                        'prediction': prediction
+                    }}, '')
+                self.assertEqual(result['details']['0']['score'], score)
+                self.assertEqual(result['overall_score'], score * 10)
+
 
 if __name__ == '__main__':
     unittest.main()
