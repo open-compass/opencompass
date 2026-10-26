@@ -33,6 +33,8 @@ class SlurmRunner(BaseRunner):
         lark_bot_url (str): Lark bot url. Defaults to None.
         extra_command (List, optional): Extra slurm command.
             For example ['-c 12', '-w node1']. Defaults to None.
+        tmp_dir (str): The directory to store temporary files.
+            Defaults to 'tmp'.
     """
 
     def __init__(self,
@@ -44,8 +46,12 @@ class SlurmRunner(BaseRunner):
                  qos: str = None,
                  debug: bool = False,
                  lark_bot_url: str = None,
-                 extra_command: Optional[List[str]] = None):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+                 extra_command: Optional[List[str]] = None,
+                 tmp_dir: str = 'tmp'):
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.max_num_workers = max_num_workers
         self.retry = retry
         self.partition = partition
@@ -93,8 +99,9 @@ class SlurmRunner(BaseRunner):
         task_name = task.name
 
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
-        param_file = f'tmp/{os.getpid()}_params.py'
+        mmengine.mkdir_or_exist(self.tmp_dir)
+        param_file = f'{os.getpid()}_params.py'
+        param_file = osp.join(self.tmp_dir, param_file)
         try:
             cfg.dump(param_file)
 

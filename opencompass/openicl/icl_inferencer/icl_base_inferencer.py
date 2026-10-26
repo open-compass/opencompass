@@ -137,11 +137,12 @@ class GenInferencerOutputHandler:
         if path.exists():
             try:
                 result_dict = {}
-                for line in path.read_text().splitlines():
-                    if line.strip():
-                        item = json.loads(line)
-                        idx = item.pop('idx')
-                        result_dict[idx] = item
+                with path.open(encoding='utf-8') as json_file:
+                    for line in json_file:
+                        if line.strip():
+                            item = json.loads(line)
+                            idx = item.pop('idx')
+                            result_dict[idx] = item
             except Exception:
                 bak_file = path.with_name(path.name + '.bak')
                 shutil.move(path, bak_file)
@@ -204,11 +205,12 @@ class ChatOutputHandler:
         if path.exists():
             try:
                 result_dict = {}
-                for line in path.read_text().splitlines():
-                    if line.strip():
-                        item = json.loads(line)
-                        idx = item.pop('idx')
-                        result_dict[idx] = item
+                with path.open(encoding='utf-8') as json_file:
+                    for line in json_file:
+                        if line.strip():
+                            item = json.loads(line)
+                            idx = item.pop('idx')
+                            result_dict[idx] = item
             except Exception:
                 bak_file = path.with_name(path.name + '.bak')
                 shutil.move(path, bak_file)

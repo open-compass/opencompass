@@ -25,6 +25,7 @@ def extract_first_numeric_score(score_text):
 
         if match:
             return int(match.group())
+        # A missing number is not a score of 0. The caller maps words.
         return None
 
 
