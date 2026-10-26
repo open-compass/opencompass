@@ -18,10 +18,11 @@ def eese_score_postprocess_dict(output: dict, output_path: str) -> dict:
             else:
                 # 如果没有找到数字，尝试解析其他格式
                 prediction_lower = prediction.strip().lower()
-                if 'correct' in prediction_lower or 'right' in prediction_lower or '10' in prediction_lower:
-                    value['score'] = 10
-                elif 'incorrect' in prediction_lower or 'wrong' in prediction_lower or '0' in prediction_lower:
+                # "incorrect" contains "correct", so the negative word has to win.
+                if 'incorrect' in prediction_lower or 'wrong' in prediction_lower or '0' in prediction_lower:
                     value['score'] = 0
+                elif 'correct' in prediction_lower or 'right' in prediction_lower or '10' in prediction_lower:
+                    value['score'] = 10
                 else:
                     value['score'] = 0  # 默认返回0分
 
