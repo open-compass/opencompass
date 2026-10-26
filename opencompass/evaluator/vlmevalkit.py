@@ -40,9 +40,6 @@ class VLMEvalKitEvaluator(BaseEvaluator):
         if len(predictions) != len(test_set):
             raise ValueError(
                 'VLMEvalKit predictions and test set have different lengths.')
-        if any(prediction is None or not str(prediction).strip()
-               for prediction in predictions):
-            raise ValueError('Missing VLMEvalKit prediction.')
 
         sample_id = list(test_set['sample_id'])
         vlmeval_index = list(test_set['vlmeval_index'])

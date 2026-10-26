@@ -611,10 +611,6 @@ class TestVLMEvalKitEvaluator(unittest.TestCase):
                                     101], 'Duplicate VLMEvalKit sample_id'),
             (['A', 'B'], [self.ids[0], 'MMBench_DEV_EN:999'], [101, 999],
              'Unknown VLMEvalKit sample_id'),
-            ([None, 'B'], self.ids, [101,
-                                     202], 'Missing VLMEvalKit prediction'),
-            ([' ', 'B'], self.ids, [101,
-                                    202], 'Missing VLMEvalKit prediction'),
             (['A', 'B'], self.ids, [999, 202], 'VLMEvalKit index mismatch'),
         ]
         with tempfile.TemporaryDirectory() as temp_dir, patch(
@@ -624,6 +620,23 @@ class TestVLMEvalKitEvaluator(unittest.TestCase):
                 with self.subTest(message=message):
                     with self.assertRaisesRegex(ValueError, message):
                         self._score(temp_dir, predictions, sample_ids, indexes)
+
+    def test_empty_predictions_are_forwarded_to_vlmevalkit(self):
+        written = []
+
+        def to_excel(frame, path, index=False):
+            written.append(frame.copy())
+            Path(path).touch()
+
+        with tempfile.TemporaryDirectory() as temp_dir, patch(
+                'opencompass.evaluator.vlmevalkit.build_vlmeval_dataset',
+                return_value=self.fake), patch.object(pd.DataFrame,
+                                                      'to_excel',
+                                                      new=to_excel):
+            self._score(temp_dir, predictions=['', ' '])
+
+        self.assertEqual(written[0]['prediction'].tolist(), ['', ' '])
+        self.assertEqual(len(self.fake.evaluate_calls), 1)
 
     def test_sample_limit_evaluates_matching_subset(self):
         evaluator = VLMEvalKitEvaluator(
