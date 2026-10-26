@@ -2,7 +2,9 @@ import json
 
 from datasets import Dataset
 
-from opencompass.registry import LOAD_DATASET, TEXT_POSTPROCESSORS
+from opencompass.openicl.icl_evaluator import BaseEvaluator
+from opencompass.registry import (ICL_EVALUATORS, LOAD_DATASET,
+                                  TEXT_POSTPROCESSORS)
 from opencompass.utils import get_data_path
 
 from .base import BaseDataset
@@ -40,6 +42,50 @@ class CMRCDataset(BaseDataset):
         })
 
         return dataset
+
+
+@ICL_EVALUATORS.register_module()
+class CMRCEvaluator(BaseEvaluator):
+    """Exact match using the CMRC 2018 normalization rules.
+
+    See ``ymcui/cmrc2018/baseline/cmrc2018_evaluate.py`` on GitHub.
+    Preserve the complete answer and internal whitespace, including ASCII
+    periods and commas, while lowercasing and removing selected punctuation.
+    """
+
+    _PUNCTUATION_TABLE = str.maketrans('', '',
+                                       '-:_*^/\\~`+=，。：？！“”；’《》·、「」（）－～『』')
+
+    @classmethod
+    def _normalize(cls, text):
+        return text.lower().strip().translate(cls._PUNCTUATION_TABLE)
+
+    def score(self, predictions, references):
+        if len(predictions) != len(references):
+            return {
+                'error': 'predictions and references have different length'
+            }
+        if not predictions:
+            return {'error': 'predictions and references must not be empty'}
+
+        details = []
+        for prediction, answers in zip(predictions, references):
+            pred = self._normalize(prediction)
+            normalized_answers = [
+                self._normalize(answer) for answer in answers
+            ]
+            details.append({
+                'pred':
+                pred,
+                'answer':
+                list(dict.fromkeys(normalized_answers + answers)),
+                'correct':
+                pred in normalized_answers,
+            })
+
+        score = sum(detail['correct']
+                    for detail in details) / len(details) * 100
+        return {'score': score, 'details': details}
 
 
 @TEXT_POSTPROCESSORS.register_module('cmrc')
