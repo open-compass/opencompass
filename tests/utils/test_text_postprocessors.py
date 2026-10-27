@@ -39,6 +39,15 @@ class TestTextPostprocessors(unittest.TestCase):
         text = '答案是 B'
         self.assertEqual(tp.first_option_postprocess(text, 'ABCD'), 'B')
 
+    def test_first_option_postprocess_without_cushion(self):
+        self.assertEqual(
+            tp.first_option_postprocess('只有选项 B 是对', 'ABCD', cushion=False),
+            'B')
+        self.assertEqual(
+            tp.first_option_postprocess('reason A because',
+                                        'ABCD',
+                                        cushion=False), 'A')
+
     def test_last_option_postprocess(self):
         text = 'A then C then B'
         self.assertEqual(tp.last_option_postprocess(text, 'ABC'), 'B')
