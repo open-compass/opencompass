@@ -1,4 +1,9 @@
 DATASETS_MAPPING = {
+    "opencompass/LogiQA": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/LogiQA",
+    },
     "opencompass/lgbench150": {
         "ms_id": None,
         "hf_id": None,
@@ -713,6 +718,10 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/LogiQA": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LogiQA.zip",
+        "md5": "98bb4e8bf45a9f84008429110644d37f",
+    },
     "/reasonzoo": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/reasonzoo.zip",
