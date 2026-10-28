@@ -71,13 +71,16 @@ class HumanevalDataset(BaseDataset):
 class HumanEvalEvaluator(BaseEvaluator):
     """Evaluator for HumanEval or EvalPlus."""
 
-    def __init__(self, k: List[int] = [1, 10, 100]) -> None:
+    def __init__(self,
+                 k: List[int] = [1, 10, 100],
+                 ignore_incomplete: bool = False) -> None:
         try:
             import human_eval
         except ImportError:
             raise ImportError(HUMANEVAL_IMPORT_ERROR)
 
         self.k = k
+        self.ignore_incomplete = ignore_incomplete
         super().__init__()
 
     def score(self, predictions, references, test_set):
@@ -101,7 +104,13 @@ class HumanEvalEvaluator(BaseEvaluator):
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             write_jsonl(out_dir, humaneval_preds)
-            score = evaluate_functional_correctness(out_dir, self.k, n_workers=4, timeout=3.0, problem_file=HUMAN_EVAL)
+            score = evaluate_functional_correctness(
+                out_dir,
+                self.k,
+                n_workers=4,
+                timeout=3.0,
+                problem_file=HUMAN_EVAL,
+                ignore_incomplete=self.ignore_incomplete)
 
             detail_path = osp.join(tmp_dir, 'human_eval.json_results.jsonl')
             details = {}
