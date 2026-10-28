@@ -36,7 +36,7 @@ for _split in ['validation', 'test']:
     LogiQA_zh_datasets.append(
         dict(abbr=f'LogiQA_zh-{_split}',
              type=LogiQADataset,
-             path='lgw863/LogiQA-dataset',
+             path='opencompass/LogiQA',
              name='zh',
              reader_cfg=LogiQA_zh_reader_cfg,
              infer_cfg=LogiQA_zh_infer_cfg,
