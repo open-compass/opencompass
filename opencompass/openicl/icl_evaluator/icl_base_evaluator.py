@@ -72,8 +72,9 @@ class BaseEvaluator:
 
     def reduce(self, details: List[Dict[str, Any]]) -> Dict[str, Any]:
         g_passk_details = OrderedDict()
+        # group() appends the sample index after the full subdivision name.
         all_subdivisions = set(
-            [detail['example_abbr'].split('_')[0] for detail in details])
+            [detail['example_abbr'].rsplit('_', 1)[0] for detail in details])
         all_metrics = list(details[0].keys())
 
         for subdivision in sorted(list(all_subdivisions)):
@@ -82,7 +83,7 @@ class BaseEvaluator:
                     continue
                 g_passk_details[f'{subdivision}/{metric}'] = 100 * np.mean([
                     detail[metric] for detail in details
-                    if detail['example_abbr'].split('_')[0] == subdivision
+                    if detail['example_abbr'].rsplit('_', 1)[0] == subdivision
                 ])
 
         for metric in all_metrics:
