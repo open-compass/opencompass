@@ -75,6 +75,7 @@ class TydiQAEvaluator(BaseEvaluator):
             }
         for prediction, reference in zip(predictions, references):
             prediction = re.split(r'[\n]', prediction, 1)[0].lower()
+            reference = [ref.lower() for ref in reference]
             exact_match += self.metric_max_over_ground_truths(
                 self.exact_match_score, prediction, reference)
             f1 += self.metric_max_over_ground_truths(self.f1_score, prediction,
