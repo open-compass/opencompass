@@ -62,7 +62,42 @@ jobs:
           conda activate ${{env.CONDA_ENV}}
           pip list
           NS=${{ env.KUBEBRAIN_NAMESPACE }}
-          rjob submit --metadata-name=${{ env.JOB_NAME }} --charged-group=llmeval_gpu --private-machine=group --group=llmeval_gpu --namespace=${NS} --gpu=2 --cpu=32 --memory=32568 --private-machine=group --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken --env=HF_ENDPOINT=https://hf-mirror.com --env=HF_DATASETS_CACHE=${{env.HF_DATASETS_CACHE}} --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub --env=CUDA_MODULE_LOADING=EAGER --env=HF_DATASETS_OFFLINE=1 --env=TRANSFORMERS_OFFLINE=1 --env=HF_EVALUATE_OFFLINE=1 --env=HF_HUB_OFFLINE=1 --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights -- bash -exc 'OUT="${{env.REPORT_ROOT}}/${{ github.run_id }}"; set +e; /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/pr_test_new.sh "$OUT"; status=$?; chmod -R a+rwX "$OUT" 2>/dev/null || true; exit $status'
+          rjob submit \
+            --metadata-name=${{ env.JOB_NAME }} \
+            --charged-group=llmeval_gpu \
+            --private-machine=group \
+            --group=llmeval_gpu \
+            --namespace=${NS} \
+            --gpu=2 \
+            --cpu=32 \
+            --memory=32568 \
+            --image=registry.h.pjlab.org.cn/ailab-puyu/xpuyu:torch-2.6.0-45d96d5f-0607 \
+            --env=COMPASS_DATA_CACHE=${{env.COMPASS_DATA_CACHE}} \
+            --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken \
+            --env=HF_ENDPOINT=https://hf-mirror.com \
+            --env=HF_DATASETS_CACHE=${{env.HF_DATASETS_CACHE}} \
+            --env=HF_HUB_CACHE=/mnt/shared-storage-user/large-model-center-share-weights/hf_hub \
+            --env=CUDA_MODULE_LOADING=EAGER \
+            --env=HF_DATASETS_OFFLINE=1 \
+            --env=TRANSFORMERS_OFFLINE=1 \
+            --env=HF_EVALUATE_OFFLINE=1 \
+            --env=HF_HUB_OFFLINE=1 \
+            --env=GITHUB_WORKSPACE=${{github.workspace}} \
+            --mount=gpfs://gpfs1/qa-llm-cicd:/mnt/shared-storage-user/qa-llm-cicd \
+            --mount=gpfs://gpfs1/opencompass-shared:/mnt/shared-storage-user/opencompass-shared \
+            --mount=gpfs://gpfs1/auto-eval-pipeline:/mnt/shared-storage-user/auto-eval-pipeline \
+            --mount=gpfs://gpfs1/large-model-center-share-weights:/mnt/shared-storage-user/large-model-center-share-weights \
+            -- bash -exc '
+              source "${{env.CONDA_PATH}}/bin/activate"
+              conda activate "${{env.CONDA_ENV}}"
+              cd "$GITHUB_WORKSPACE"
+              export PYTHONPATH="$GITHUB_WORKSPACE${PYTHONPATH:+:$PYTHONPATH}"
+              OUT="${{env.REPORT_ROOT}}/${{ github.run_id }}"
+              status=0
+              bash .github/scripts/run_cmd_tests.sh "$OUT" || status=$?
+              chmod -R a+rwX "$OUT" 2>/dev/null || true
+              exit "$status"
+            '
 
           for i in {1..300}; do
             current_status=$(rjob get --namespace=${NS} ${{ env.JOB_NAME }} | grep -oP 'rjob [^:]+: \K[^ ]+' || true)
