@@ -1191,6 +1191,12 @@
     paper: ''
     configpath: ''
     configpath_llmjudge: opencompass/configs/datasets/GrandPhysics/GrandPhysics_llm_judge_gen.py
+- mmlu_redux:
+    name: MMLU-Redux
+    category: Understanding
+    paper: https://arxiv.org/abs/2406.04127
+    configpath: opencompass/configs/datasets/mmlu-redux/mmlu_redux_gen.py
+    configpath_llmjudge: ''
 - phybench:
     name: PHYBench
     category: Science /Physics
