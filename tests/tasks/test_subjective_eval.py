@@ -15,8 +15,8 @@ def test_load_sampled_prediction_keeps_dataset_abbr(tmp_path):
     prediction_dir = tmp_path / 'predictions' / 'mock_test'
     prediction_dir.mkdir(parents=True)
     mmengine.dump({str(i): {
-                       'prediction': f'answer-{i}'
-                   }
+        'prediction': f'answer-{i}'
+    }
                    for i in range(12)},
                   prediction_dir / 'alignment_bench_v1_1.json')
 
@@ -35,8 +35,8 @@ def test_load_sampled_given_prediction_keeps_dataset_abbr(tmp_path):
     given_dir = tmp_path / 'given'
     given_dir.mkdir()
     mmengine.dump({str(i): {
-                       'prediction': f'given-{i}'
-                   }
+        'prediction': f'given-{i}'
+    }
                    for i in range(12)}, given_dir / 'arena_hard.json')
 
     task = _make_task(tmp_path)

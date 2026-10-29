@@ -3,7 +3,7 @@ from mmengine.config import read_base
 with read_base():
     from autotest.all.config import models  # noqa: F401
     from autotest.all.config import MOCK_API_MAX_WORKERS
-    from autotest.all.config import common_eval as eval  # noqa: F401
+    from autotest.all.config import concurrent_eval as eval  # noqa: F401
     from autotest.all.config import concurrent_infer as infer  # noqa: F401
     from autotest.all.config import set_mock_test_range
     from opencompass.configs.datasets.aa_lcr.aa_lcr_gen import aa_lcr_datasets
@@ -32,12 +32,9 @@ with read_base():
     from opencompass.configs.summarizers.needlebench import \
         needlebench_8k_summarizer
 
-# The 8K NeedleBench config expands to hundreds of depth/length combinations.
 needlebench_8k_datasets = needlebench_8k_datasets[:1]
 needlebench_first_abbr = needlebench_8k_datasets[0]['abbr']
 
-# MRCR expands to multiple needle counts and context ranges. The first entry is
-# its shortest two-needle subset and is enough to exercise the mock path.
 mrcr_datasets = mrcr_datasets[:1]
 mrcr_first_abbr = mrcr_datasets[0]['abbr']
 
@@ -46,7 +43,6 @@ datasets = sum(
     [],
 )
 
-# The mock endpoint is shared with two other suite processes.
 for model in models:
     model['max_workers'] = min(
         int(model.get('max_workers') or MOCK_API_MAX_WORKERS),
@@ -108,9 +104,6 @@ for item in datasets:
 set_mock_test_range(datasets)
 del set_mock_test_range
 
-# Repeated evaluation and an outer test_range interact poorly: repetition is
-# applied before sampling, while GenericLLMEvaluator reloads ten source rows.
-# Mock regression only needs one deterministic pass through the judge path.
 for item in aa_lcr_datasets:
     item['n'] = 1
     item['k'] = 1

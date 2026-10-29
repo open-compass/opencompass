@@ -191,6 +191,12 @@ jobs:
             BASELINE="${{env.REPORT_ROOT}}/${{env.BASELINE_DIR}}/$func_type"
             echo "Current run: $CURRENT"
             echo "Baseline:    $BASELINE"
+            STATUS_FILE="${{env.REPORT_ROOT}}/${{ github.run_id }}/mock_api_logs/${func_type}.status"
+            if [[ ! -f "$STATUS_FILE" || "$(<"$STATUS_FILE")" != 0 ]]; then
+              echo "Suite $func_type did not finish successfully; see Run test and mock_api_logs/${func_type}.log for the original error."
+              overall_status=1
+              continue
+            fi
             if [[ ! -d "$CURRENT" || ! -d "$BASELINE" ]]; then
               echo "Missing current output or baseline for $func_type"
               overall_status=1

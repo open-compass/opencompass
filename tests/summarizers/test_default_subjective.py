@@ -3,8 +3,8 @@ from unittest.mock import MagicMock, patch
 
 from mmengine.config import ConfigDict
 
-from opencompass.summarizers.default_subjective import (
-    DefaultSubjectiveSummarizer, )
+from opencompass.summarizers.default_subjective import \
+    DefaultSubjectiveSummarizer
 
 
 def test_pick_up_results_keeps_non_numeric_diagnostics(tmp_path):

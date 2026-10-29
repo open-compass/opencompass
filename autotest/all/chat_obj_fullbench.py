@@ -2,12 +2,10 @@ from mmengine.config import read_base
 import copy as _copy
 
 with read_base():
-    # CI runtime configuration. Keep these imports in the same read_base block
-    # as the datasets so MMEngine resolves model configs eagerly.
-    from autotest.all.config import common_eval as eval  # noqa: F401
-    from autotest.all.config import common_infer as infer  # noqa: F401
+    from autotest.all.config import concurrent_eval as eval  # noqa: F401
+    from autotest.all.config import concurrent_infer as infer  # noqa: F401
     from autotest.all.config import raw_template_models as models  # noqa: F401
-    from autotest.all.config import MOCK_API_MAX_WORKERS, set_mock_test_range
+    from autotest.all.config import MOCK_API_MAX_WORKERS, MOCK_TEST_RANGE, set_mock_test_range
 
     # Datasets
     # Instruct Following
@@ -174,32 +172,28 @@ with read_base():
     from opencompass.configs.summarizers.groups.s2_tomg_bench import (
         s2_tomg_bench_summary_groups)
 
-# Each of the three mock suites runs in its own process against one API server.
-# Bound each process so their combined request load remains below the server
-# concurrency limit.
 for model in models:
     model['max_workers'] = min(
         int(model.get('max_workers') or MOCK_API_MAX_WORKERS),
         MOCK_API_MAX_WORKERS,
     )
 
-# Add latest LCB versions.
 LCBCodeGeneration_v6_datasets = _copy.deepcopy(LCBCodeGeneration_dataset)
-LCBCodeGeneration_v6_datasets["abbr"] = "lcb_code_generation_v6"
-LCBCodeGeneration_v6_datasets["release_version"] = "v6"
-LCBCodeGeneration_v6_datasets["eval_cfg"]["evaluator"][
-    "release_version"] = "v6"
-LCBCodeGeneration_v6_datasets["eval_cfg"]["evaluator"][
-    "extractor_version"] = "v2"
+LCBCodeGeneration_v6_datasets['abbr'] = 'lcb_code_generation_v6'
+LCBCodeGeneration_v6_datasets['release_version'] = 'v6'
+LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
+    'release_version'] = 'v6'
+LCBCodeGeneration_v6_datasets['eval_cfg']['evaluator'][
+    'extractor_version'] = 'v2'
 LCBCodeGeneration_v6_datasets = [LCBCodeGeneration_v6_datasets]
 
 LCBCodeGeneration_v5_datasets = _copy.deepcopy(LCBCodeGeneration_dataset)
-LCBCodeGeneration_v5_datasets["abbr"] = "lcb_code_generation_v5"
-LCBCodeGeneration_v5_datasets["release_version"] = "v5"
-LCBCodeGeneration_v5_datasets["eval_cfg"]["evaluator"][
-    "release_version"] = "v5"
-LCBCodeGeneration_v5_datasets["eval_cfg"]["evaluator"][
-    "extractor_version"] = "v2"
+LCBCodeGeneration_v5_datasets['abbr'] = 'lcb_code_generation_v5'
+LCBCodeGeneration_v5_datasets['release_version'] = 'v5'
+LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
+    'release_version'] = 'v5'
+LCBCodeGeneration_v5_datasets['eval_cfg']['evaluator'][
+    'extractor_version'] = 'v2'
 LCBCodeGeneration_v5_datasets = [LCBCodeGeneration_v5_datasets]
 
 math_datasets[0]['abbr'] = 'math500_prm800k'
@@ -213,6 +207,13 @@ chatml_datasets = sum(
     (v for k, v in locals().items() if k.endswith('_chatml')),
     [],
 )
+
+for dataset in chatml_datasets:
+    # The CLI reads the sampling range from the custom config's top level.
+    dataset['test_range'] = MOCK_TEST_RANGE
+    if dataset['abbr'] == 'UGD_hard_repeat_8':
+        dataset['abbr'] = 'UGD_hard'
+del dataset
 
 summary_groups = sum(
     [v for k, v in locals().items() if k.endswith('_summary_groups')], [])
@@ -394,9 +395,6 @@ summarizer = dict(
     summary_groups=summary_groups,
 )
 
-# CI runtime configuration. Dataset selection and summarization above mirror
-# the fullbench_v2_0 objective settings; only the mock-compatible runner and
-# model definitions are supplied by the imports at the top of this file.
 obj_llm_judge_cfg = models[0]
 for item in datasets:
     try:
@@ -423,9 +421,6 @@ set_mock_test_range(datasets)
 set_mock_test_range(chatml_datasets)
 del set_mock_test_range
 
-# Repeated evaluations require complete n-sized groups. A ten-sample mock
-# slice cannot preserve the production repeat counts (4/8/32), so exercise
-# each evaluator once in CI.
 for dataset in datasets + chatml_datasets:
     if 'n' in dataset:
         dataset['n'] = 1

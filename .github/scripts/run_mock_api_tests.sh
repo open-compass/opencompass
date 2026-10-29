@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-# Run the three mock suites concurrently in one rjob.  Each suite has its own
-# process, output tree, and dataset-size cache namespace.
 set -u -o pipefail
 
 REPORT_ROOT="${REPORT_ROOT:-${REPORT_DIR:?REPORT_ROOT or REPORT_DIR is required}}"
@@ -19,6 +17,7 @@ export LMUData="${LMUData:-/mnt/shared-storage-user/auto-eval-pipeline/vlmeval/L
 
 RUN_ROOT="$REPORT_ROOT/$RUN_ID"
 LOG_ROOT="$RUN_ROOT/mock_api_logs"
+mock_start_seconds=$SECONDS
 mkdir -p "$LOG_ROOT"
 export REPORT_DIR="$RUN_ROOT"
 if [[ ! -d "$WORKSPACE" ]]; then
@@ -37,6 +36,17 @@ if [[ ! -f "$MOCK_API" ]]; then
   echo "Mock API server script not found: $MOCK_API" >&2
   exit 1
 fi
+
+HF_DATASETS_CACHE_SOURCE="$HF_DATASETS_CACHE"
+hf_cache_root="$(mktemp -d /tmp/opencompass-mock-hf.XXXXXX)"
+if ! python .github/scripts/prepare_hf_cache.py \
+  "$HF_DATASETS_CACHE_SOURCE" "$hf_cache_root/datasets"; then
+  echo 'Failed to prepare writable HF dataset cache.' >&2
+  exit 1
+fi
+export HF_DATASETS_CACHE="$hf_cache_root/datasets"
+echo "HF dataset cache source: $HF_DATASETS_CACHE_SOURCE"
+echo "HF dataset cache writes: $HF_DATASETS_CACHE"
 
 server_pid=''
 data_link_created=0
@@ -100,9 +110,6 @@ elif [[ -L "$WORKSPACE/data" ]]; then
     exit 1
   fi
 elif [[ -d "$WORKSPACE/data" ]]; then
-  # Some persistent workspaces already contain unrelated data (for example,
-  # reasonzoo). Preserve it and only add links for cache entries that are
-  # absent. The EXIT trap removes only the links created by this invocation.
   while IFS= read -r -d '' cache_entry; do
     name="${cache_entry##*/}"
     link="$WORKSPACE/data/$name"
@@ -146,6 +153,7 @@ run_suite() {
   local suite="$1"
   local log="$LOG_ROOT/${suite}.log"
   local out="$RUN_ROOT/$suite"
+  local start_seconds=$SECONDS
 
   echo "Starting $suite (output: $out)"
   CHAT_TYPE="$suite" \
@@ -154,12 +162,19 @@ run_suite() {
     >"$log" 2>&1
   local status=$?
   if [[ "$status" -eq 0 ]] && grep -Eq \
-    'failed with code [1-9][0-9]*| - ERROR - .*task .* fail' "$log"; then
-    echo "Detected failed OpenCompass child task in $suite log" >>"$log"
+    'failed with code [1-9][0-9]*| - ERROR - .*task .* fail|Skip eval for .* due to incomplete infer tasks\.' "$log"; then
+    echo "Detected failed or incomplete OpenCompass child task in $suite log" >>"$log"
+    status=1
+  fi
+  if [[ "$status" -eq 0 && -d "$out" ]] && grep -REn --include='*.out' \
+    'Skip eval for .* due to incomplete infer tasks\.' "$out" >>"$log"; then
+    echo "Detected incomplete Watch evaluation in $suite task logs" >>"$log"
     status=1
   fi
   chmod -R a+rwX "$out" 2>/dev/null || true
   echo "$status" >"$LOG_ROOT/${suite}.status"
+  echo "$((SECONDS - start_seconds))" >"$LOG_ROOT/${suite}.seconds"
+  echo "$suite finished in $((SECONDS - start_seconds))s (exit $status)"
   return "$status"
 }
 
@@ -195,4 +210,6 @@ done
 if [[ "$overall_status" -ne 0 ]]; then
   echo 'At least one mock API suite failed.'
 fi
+echo "$((SECONDS - mock_start_seconds))" >"$LOG_ROOT/total.seconds"
+echo "Total mock API test time: $((SECONDS - mock_start_seconds))s"
 exit "$overall_status"
