@@ -3,7 +3,6 @@ output_*/
 outputs/
 scripts/
 !.github/scripts/
-!.github/scripts/run_mock_api_tests.sh
 icl_inference_output/
 .vscode/
 tmp/
