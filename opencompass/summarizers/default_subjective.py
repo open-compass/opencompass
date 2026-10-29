@@ -125,11 +125,7 @@ class DefaultSubjectiveSummarizer:
                         raw_results[model_abbr][dataset_abbr] = result
                     else:
                         for key, value in result.items():
-                            previous = raw_results[model_abbr][dataset_abbr].get(key)
-                            if isinstance(previous, (int, float)) and isinstance(value, (int, float)):
-                                raw_results[model_abbr][dataset_abbr][key] = (previous * idx + value) / (idx + 1)
-                            elif key not in raw_results[model_abbr][dataset_abbr]:
-                                raw_results[model_abbr][dataset_abbr][key] = value
+                            raw_results[model_abbr][dataset_abbr][key] = (raw_results[model_abbr][dataset_abbr][key] * idx + value) / (idx + 1)
 
 
                     if 'error' in result:
