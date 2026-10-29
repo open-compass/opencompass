@@ -174,8 +174,8 @@ jobs:
             --group=llmeval_gpu \
             --namespace=${NS} \
             --gpu=0 \
-            --cpu=34 \
-            --memory=130272 \
+            --cpu=32 \
+            --memory=32568 \
             --image=registry.h.pjlab.org.cn/ailab-puyu-puyu_gpu/lmdeploy:v0.12.0-cu12.8 \
             --env=COMPASS_DATA_CACHE=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache \
             --env=TIKTOKEN_CACHE_DIR=/mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/share_tiktoken \
