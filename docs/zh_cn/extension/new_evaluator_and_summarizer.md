@@ -89,14 +89,14 @@ class MyEvaluator(BaseEvaluator):
 
 1. 按 `n` 将同一数据集的多轮推理结果划分为独立批次，每批包含一轮完整数据集对应的参数；
 2. 对每份预测应用 Evaluator 内部的 `pred_postprocessor`，再调用 `score()`；
-3. 汇总各份的数值指标，`n > 1` 时计算均值并在指标名后追加 `(n runs average)`；但当前实现只有在 `score()` 每次调用都返回完整且非空的 `details` 时才会返回该聚合结果，否则最终返回最后一份的评分结果；
-4. 弹出并聚合 `details`，跨份按样本分组。
+3. 汇总各份的数值指标，`n > 1` 时计算均值并在指标名后追加 `(n runs average)`；
+4. 弹出并聚合 `details`，跨份按样本分组。若某次运行未返回 `details`，或 `details` 与当前批次样本不一一对应，基类会记录警告并跳过跨次明细聚合（如 G-Pass@k、mG-Pass@k），但仍会返回跨次平均后的数值指标；
 
 ### score() 方法的格式
 
 - 返回 `dict[指标名, 数值]`，数值必须是 `int` / `float`——汇总阶段只保留数值型结果，其他类型会被静默丢弃；返回含 `'error'` 键时整条结果被跳过并在日志中记录；
 - 指标名要稳定、可读。常见名称（`accuracy`、`exact_match`、`f1`、`rouge1` 等）在汇总表中排序靠前，冷门名称排在白名单之后；
-- `'details'`（`list[dict]`）在接口形式上可选，但当前实现存在限制：当 `n > 1` 且需要正确返回跨份平均指标时，`score()` 每次调用都必须返回与当前批次样本一一对应的完整且非空 `details`；否则最终只会返回最后一份的评分结果。基类会将 `details` 跨重复运行聚合并写回结果文件，供 `--dump-eval-details` 逐条复核。每条 detail 不必包含正确性字段；只有计算 G-Pass@k、mG-Pass@k 等跨次指标时，才需要提供 `correct` / `is_correct` / `cascade_correct` 布尔字段；
+- `'details'`（`list[dict]`）在接口形式上可选。当 `n > 1` 时，`score()` 每次调用都必须返回与当前批次样本一一对应的完整且非空 `details`，基类才会将 `details` 跨重复运行聚合并写回结果文件，供 `--dump-eval-details` 逐条复核；若某次运行未返回 `details`，基类会记录警告并返回跨次平均后的数值指标（不包含跨次明细聚合）。每条 detail 不必包含正确性字段；只有计算 G-Pass@k、mG-Pass@k 等跨次指标时，才需要提供 `correct` / `is_correct` / `cascade_correct` 布尔字段；
 - 自定义类不应重写 `evaluate()`，除非确有必要改变重复运行的切分语义。
 
 实现时应返回稳定的指标名称，并针对正常、空输入、解析失败、边界值及多参考答案编写测试。若评测器会访问网络、调用 Judge 或执行代码，必须提供超时、错误记录和隔离策略。
