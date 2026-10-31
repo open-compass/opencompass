@@ -647,8 +647,8 @@ def _fill_abnormal_predictions(
 
 
 def _format_analysis_summary_table(report: Dict[str, Any]) -> List[List[str]]:
-    with_reasoning = 'reasoning_length' in list(
-        report['benchmark_stats'].values())[0]
+    with_reasoning = 'reasoning_length' in next(
+        iter(report['benchmark_stats'].values()), {})
 
     if with_reasoning:
         abnormal_counts = defaultdict(
