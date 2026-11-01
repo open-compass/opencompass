@@ -99,8 +99,8 @@ class LLMCompressionSummarizer(DefaultSummarizer):
         Returns:
             pd.DataFrame: Summary dataframe sorted by ascending average BPC
         """
-        headers = table.pop(0)
-        table_df = pd.DataFrame(table, columns=headers)\
+        headers = table[0]
+        table_df = pd.DataFrame(table[1:], columns=headers)\
             .drop(columns=['mode'])
 
         dataset_names = {
