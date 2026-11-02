@@ -1,11 +1,13 @@
 import csv
 import zipfile
+from unittest.mock import patch
 
 from datasets import Dataset
 
 from opencompass.configs.datasets.aa_lcr.aa_lcr_gen import \
     AA_LCR_JUDGE_TEMPLATE
 from opencompass.datasets.aa_lcr import (AALCRDataset,
+                                         _resolve_data_path,
                                          aa_lcr_llmjudge_postprocess)
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 
@@ -101,6 +103,44 @@ def test_aa_lcr_local_loader_recovers_zip_filename_mojibake(tmp_path):
     sample = AALCRDataset.load(path=str(tmp_path))['test'][0]
 
     assert 'BEGIN DOCUMENT 1:\nrecovered text' in sample['prompt']
+
+
+def test_aa_lcr_data_path_falls_back_when_cache_resolution_fails():
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               side_effect=AssertionError):
+        path = _resolve_data_path(
+            'ArtificialAnalysis/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
+
+
+def test_aa_lcr_data_path_falls_back_when_local_data_is_incomplete(tmp_path):
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               return_value=str(tmp_path)):
+        path = _resolve_data_path(
+            'ArtificialAnalysis/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
+
+
+def test_aa_lcr_data_path_falls_back_when_resolved_path_does_not_exist(
+        tmp_path):
+    missing_path = tmp_path / 'missing'
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               return_value=str(missing_path)):
+        path = _resolve_data_path(
+            'ArtificialAnalysis/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
 
 
 def test_aa_lcr_llmjudge_postprocess():

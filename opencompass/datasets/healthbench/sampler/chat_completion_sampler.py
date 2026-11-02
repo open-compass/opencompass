@@ -22,6 +22,7 @@ class ChatCompletionSampler(SamplerBase):
         system_message: str | None = None,
         temperature: float = 0.5,
         max_tokens: int = 1024,
+        max_attempts: int = 5,
     ):
         self.api_key_name = 'OPENAI_API_KEY'
         self.client = OpenAI(
@@ -32,6 +33,7 @@ class ChatCompletionSampler(SamplerBase):
         self.system_message = system_message
         self.temperature = temperature
         self.max_tokens = max_tokens
+        self.max_attempts = max_attempts
         self.image_format = 'url'
 
     def _handle_image(
@@ -41,10 +43,11 @@ class ChatCompletionSampler(SamplerBase):
         format: str = 'png',
         fovea: int = 768,
     ):
+        image_url = 'data:image/{};{},{}'.format(format, encoding, image)
         new_image = {
             'type': 'image_url',
             'image_url': {
-                'url': f'data:image/{format};{encoding},{image}',
+                'url': image_url,
             },
         }
         return new_image
@@ -54,6 +57,20 @@ class ChatCompletionSampler(SamplerBase):
 
     def _pack_message(self, role: str, content: Any):
         return {'role': str(role), 'content': content}
+
+    def _format_exception(self, e: Exception) -> str:
+        parts = [f'type={type(e).__name__}', f'error={str(e)!r}']
+        status_code = getattr(e, 'status_code', None)
+        if status_code is not None:
+            parts.append(f'status_code={status_code}')
+        code = getattr(e, 'code', None)
+        if code is not None:
+            parts.append(f'code={code!r}')
+        response = getattr(e, 'response', None)
+        response_text = getattr(response, 'text', None)
+        if response_text:
+            parts.append(f'response_text={response_text[:1000]!r}')
+        return ', '.join(parts)
 
     def __call__(self, message_list: MessageList) -> SamplerResponse:
         if self.system_message:
@@ -78,17 +95,34 @@ class ChatCompletionSampler(SamplerBase):
                     actual_queried_message_list=message_list,
                 )
             except openai.BadRequestError as e:
-                print('Bad Request Error', e)
+                print(
+                    'Judge request bad request: '
+                    f'model={self.model}, {self._format_exception(e)}',
+                    flush=True,
+                )
                 return SamplerResponse(
                     response_text='No response (bad request).',
                     response_metadata={'usage': None},
                     actual_queried_message_list=message_list,
                 )
             except Exception as e:
-                exception_backoff = 2**trial  # expontial back off
+                trial += 1
+                error_msg = self._format_exception(e)
+                if trial >= self.max_attempts:
+                    print(
+                        'Judge request failed permanently: '
+                        f'model={self.model}, '
+                        f'attempt={trial}/{self.max_attempts}, {error_msg}',
+                        flush=True,
+                    )
+                    raise RuntimeError('OpenAI API judge request failed after '
+                                       f'{self.max_attempts} attempts') from e
+                exception_backoff = 2**(trial - 1)  # expontial back off
                 print(
-                    f'Rate limit exception so wait and retry {trial} after {exception_backoff} sec',  # noqa: E501
-                    e,
+                    'Judge request failed, retrying: '
+                    f'model={self.model}, '
+                    f'attempt={trial}/{self.max_attempts}, '
+                    f'backoff={exception_backoff}s, {error_msg}',
+                    flush=True,
                 )
                 time.sleep(exception_backoff)
-                trial += 1

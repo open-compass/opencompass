@@ -76,6 +76,12 @@
     paper: https://arxiv.org/pdf/2410.06526v1
     configpath: opencompass/configs/datasets/korbench/korbench_gen.py
     configpath_llmjudge: opencompass/configs/datasets/korbench/korbench_llm_judge_gen.py
+- reasonzoo:
+    name: ReasonZoo
+    category: Reasoning
+    paper: https://arxiv.org/abs/2508.15754
+    configpath: opencompass/configs/datasets/reasonzoo/reasonzoo_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/reasonzoo/reasonzoo_llm_judge_gen.py
 - lawbench:
     name: LawBench
     category: Knowledge / Law
@@ -767,6 +773,12 @@
     paper: https://arxiv.org/pdf/2009.03300
     configpath: opencompass/configs/datasets/mmlu/mmlu_gen.py
     configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
+- PromptCBLUE:
+    name: PromptCBLUE
+    category: Understanding
+    paper: https://arxiv.org/pdf/2310.14151
+    configpath: opencompass/configs/datasets/PromptCBLUE/PromptCBLUE_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/PromptCBLUE/PromptCBLUE_llmjudge_gen.py
 - SciEval:
     name: SciEval
     category: Understanding
@@ -1173,6 +1185,12 @@
     paper: https://arxiv.org/pdf/2203.14371
     configpath: opencompass/configs/datasets/medmcqa/medmcqa_gen.py
     configpath_llmjudge: opencompass/configs/datasets/medmcqa/medmcqa_llmjudge_gen.py
+- grand_physics:
+    name: GrandPhysics
+    category: Science
+    paper: ''
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/GrandPhysics/GrandPhysics_llm_judge_gen.py
 - phybench:
     name: PHYBench
     category: Science /Physics
@@ -1404,4 +1422,10 @@
     category: Reasoning
     paper: https://arxiv.org/abs/2502.01100
     configpath: opencompass/configs/datasets/ZebraLogic/zebralogic_rawprompt_gen_9446ef.py
+    configpath_llmjudge: ''
+- lgbench150:
+    name: LG-Bench 150
+    category: Science
+    paper: https://arxiv.org/abs/2610.26787
+    configpath: opencompass/configs/datasets/lgbench150/lgbench150_gen.py
     configpath_llmjudge: ''

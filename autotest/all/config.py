@@ -7,9 +7,28 @@ from opencompass.tasks import (OpenICLEvalTask, OpenICLEvalWatchTask,
                                OpenICLInferConcurrentTask, OpenICLInferTask)
 from opencompass.utils.text_postprocessors import extract_non_reasoning_content
 
-API_BASE = 'http://localhost:26333/v1'
+API_BASE = f"http://localhost:{os.environ.get('MOCK_API_PORT', '26333')}/v1"
 MODEL_PATH = 'mock_test'
 TOKENIZER_PATH = 'Qwen/Qwen3-8B'
+
+# The three mock API suites share one server. Keep their aggregate request
+# concurrency below the server's limit_concurrency=200.
+MOCK_API_MAX_WORKERS = 32
+MOCK_TEST_RANGE = '[0:10]'
+
+
+def set_mock_test_range(config):
+    """Limit every dataset reader in a mock suite to its first ten samples."""
+    if isinstance(config, dict):
+        for key, value in config.items():
+            if key == 'reader_cfg' and isinstance(value, dict):
+                value['test_range'] = MOCK_TEST_RANGE
+            else:
+                set_mock_test_range(value)
+    elif isinstance(config, (list, tuple)):
+        for value in config:
+            set_mock_test_range(value)
+
 
 models = [
     dict(
@@ -28,7 +47,7 @@ models = [
         temperature=0,
         batch_size=1024,
         max_workers=1024,
-        max_seq_len=524288,
+        max_seq_len=1024 * 1024,
         mode='none',
         retry=3,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
@@ -52,7 +71,7 @@ judge_models = [
         temperature=0,
         batch_size=1024,
         query_per_second=256,
-        max_seq_len=524288,
+        max_seq_len=1024 * 1024,
         mode='none',
         retry=3,
         pred_postprocessor=dict(type=extract_non_reasoning_content),
@@ -78,7 +97,7 @@ raw_template_models = [
         temperature=0,
         batch_size=1024,
         query_per_second=256,
-        max_seq_len=524288,
+        max_seq_len=1024 * 1024,
         mode='none',
         retry=3,
         pred_postprocessor=dict(type=extract_non_reasoning_content),

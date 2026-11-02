@@ -161,6 +161,8 @@ class LocalAPIRunner(BaseRunner):
             Defaults to 16.
         debug (bool): Whether to run in debug mode.
         lark_bot_url (str): Lark bot url.
+        tmp_dir (str): The directory to store temporary files.
+            Defaults to 'tmp'.
     """
 
     def __init__(self,
@@ -168,8 +170,12 @@ class LocalAPIRunner(BaseRunner):
                  concurrent_users: int,
                  max_num_workers: int = 16,
                  debug: bool = False,
-                 lark_bot_url: str = None):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+                 lark_bot_url: str = None,
+                 tmp_dir: str = 'tmp'):
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.max_num_workers = max_num_workers
         self.concurrent_users = concurrent_users
         assert task['type'] in [
@@ -194,8 +200,9 @@ class LocalAPIRunner(BaseRunner):
                 task = TASKS.build(dict(cfg=task, type=self.task_cfg['type']))
                 task_name = task.name
                 # get cmd
-                mmengine.mkdir_or_exist('tmp/')
-                param_file = f'tmp/{os.getpid()}_params.py'
+                mmengine.mkdir_or_exist(self.tmp_dir)
+                param_file = f'{os.getpid()}_params.py'
+                param_file = osp.join(self.tmp_dir, param_file)
                 try:
                     task.cfg.dump(param_file)
                     cmd = task.get_command(cfg_path=param_file,

@@ -52,9 +52,10 @@ jobs:
       - name: Install opencompass dependencies
         run: |
           python -m pip install -r requirements.txt
-          python -m pip install huggingface-hub==1.15.0
       - name: Build and install
         run: python -m pip install -e .
+      - name: Check dependency consistency
+        run: python -m pip check
       - name: Prepare dataset
         run: |
           wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
@@ -106,9 +107,10 @@ jobs:
       - name: Install opencompass dependencies
         run: |
           python -m pip install -r requirements.txt
-          python -m pip install huggingface-hub==1.15.0
       - name: Build and install
         run: python -m pip install -e .
+      - name: Check dependency consistency
+        run: python -m pip check
       - name: Prepare dataset
         run: |
           wget https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip
@@ -136,9 +138,10 @@ jobs:
       - name: Install opencompass dependencies
         run: |
           pip install -r requirements.txt
-          pip install huggingface-hub==1.15.0
       - name: Build and install
         run: pip install -e .
+      - name: Check dependency consistency
+        run: python -m pip check
       - name: Prepare dataset
         run: |
           Invoke-WebRequest -Uri https://github.com/open-compass/opencompass/releases/download/0.2.2.rc1/OpenCompassData-core-20240207.zip -OutFile OpenCompassData-core-20240207.zip

@@ -1,4 +1,6 @@
 from .aa_lcr import AALCRDataset, aa_lcr_llmjudge_postprocess  # noqa: F401
+from .aa_omniscience import AAOmniscienceDataset  # noqa: F401
+from .aa_omniscience import aa_omniscience_llmjudge_postprocess  # noqa: F401
 from .advancedIF import AdvancedIFDataset  # noqa: F401
 from .advancedIF import advancedif_rubric_postprocess  # noqa: F401
 from .advglue import *  # noqa: F401, F403
@@ -49,6 +51,7 @@ from .codecompass import *  # noqa: F401, F403
 from .commonsenseqa import *  # noqa: F401, F403
 from .commonsenseqa_cn import *  # noqa: F401, F403
 from .copa import *  # noqa: F401, F403
+from .critpt import *  # noqa: F401, F403
 from .crowspairs import *  # noqa: F401, F403
 from .crowspairs_cn import *  # noqa: F401, F403
 from .cruxeval import *  # noqa: F401, F403
@@ -64,15 +67,19 @@ from .ds1000_interpreter import *  # noqa: F401, F403
 from .Earth_Silver import *  # noqa: F401, F403
 from .eese.eese import *  # noqa: F401, F403
 from .eprstmt import *  # noqa: F401, F403
+from .ethics import *  # noqa: F401, F403
 from .fake_alignment import *  # noqa: F401, F403
 from .FinanceIQ import *  # noqa: F401, F403
 from .flores import *  # noqa: F401, F403
 from .game24 import *  # noqa: F401, F403
 from .gaokao_math import *  # noqa: F401, F403
 from .GaokaoBench import *  # noqa: F401, F403
+from .general365 import General365Dataset  # noqa: F401
+from .general365 import general365_llmjudge_postprocess  # noqa: F401
 from .generic import *  # noqa: F401, F403
 from .govrepcrs import *  # noqa: F401, F403
 from .gpqa import *  # noqa: F401, F403
+from .grand_physics import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
 from .healthbench.healthbench import *  # noqa: F401, F403
@@ -103,15 +110,18 @@ from .lawbench import *  # noqa: F401, F403
 from .LCBench import *  # noqa: F401, F403
 from .lcsts import *  # noqa: F401, F403
 from .leval import *  # noqa: F401, F403
+from .lgbench150 import LGBench150Evaluator  # noqa: F401
 from .livecodebench import *  # noqa: F401, F403
 from .livecodebench_pro import *  # noqa: F401, F403
 from .livemathbench import *  # noqa: F401, F403
 from .livereasonbench import *  # noqa: F401, F403
 from .livestembench import *  # noqa: F401, F403
 from .llm_compression import LLMCompressionDataset  # noqa: F401, F403
+from .logiqa import *  # noqa: F401, F403
 from .longbench import *  # noqa: F401, F403
 from .longbenchv2 import *  # noqa: F401, F403
 from .lveval import *  # noqa: F401, F403
+from .maritime_bench import *  # noqa: F401, F403
 from .mastermath2024v1 import *  # noqa: F401, F403
 from .matbench import *  # noqa: F401, F403
 from .math import *  # noqa: F401, F403
@@ -158,6 +168,7 @@ from .physics import *  # noqa: F401, F403
 from .PI_LLM import PILLMDataset  # noqa: F401
 from .piqa import *  # noqa: F401, F403
 from .ProcessBench import *  # noqa: F401, F403
+from .PromptCBLUE import *  # noqa: F401, F403
 from .ProteinLMBench import *  # noqa: F401, F403
 from .py150 import *  # noqa: F401, F403
 from .qasper import *  # noqa: F401, F403
@@ -167,6 +178,7 @@ from .race import *  # noqa: F401, F403
 from .rbench import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
+from .reasonzoo import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .ruler import *  # noqa: F401, F403
 from .s2_tomg_bench import *  # noqa: F401, F403
@@ -199,10 +211,12 @@ from .triviaqa import *  # noqa: F401, F403
 from .triviaqarc import *  # noqa: F401, F403
 from .truthfulqa import *  # noqa: F401, F403
 from .tydiqa import *  # noqa: F401, F403
+from .vlmevalkit import VLMEvalKitDataset  # noqa: F401
 from .wic import *  # noqa: F401, F403
 from .wikibench import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403
 from .winogrande import *  # noqa: F401, F403
+from .wmt19 import *  # noqa: F401, F403
 from .wnli import wnliDataset  # noqa: F401, F403
 from .wsc import *  # noqa: F401, F403
 from .xcopa import *  # noqa: F401, F403

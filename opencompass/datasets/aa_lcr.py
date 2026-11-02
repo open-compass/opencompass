@@ -10,6 +10,7 @@ from typing import Dict, List, Optional, Tuple
 from datasets import Dataset, DatasetDict
 
 from opencompass.registry import DICT_POSTPROCESSORS, LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
 
@@ -73,6 +74,29 @@ def _resolve_data_files(path: str, csv_filename: str,
     return csv_path, zip_path
 
 
+def _resolve_data_path(path: str, csv_filename: str, zip_filename: str) -> str:
+    """Prefer OpenCompass data cache and fall back to the AA-LCR Hub repo."""
+    try:
+        resolved_path = get_data_path(path)
+    except Exception:
+        return DEFAULT_REPO_ID
+
+    if os.path.isdir(resolved_path):
+        csv_path = _resolve_local_file(resolved_path, csv_filename)
+        zip_path = _resolve_local_file(resolved_path, zip_filename)
+        if not (csv_path and zip_path):
+            return DEFAULT_REPO_ID
+    elif os.path.isfile(resolved_path):
+        zip_path = _resolve_local_file(os.path.dirname(resolved_path),
+                                       zip_filename)
+        if zip_path is None:
+            return DEFAULT_REPO_ID
+    elif resolved_path != path:
+        return DEFAULT_REPO_ID
+
+    return resolved_path
+
+
 def _doc_name(category: str, set_id: str, filename: str) -> str:
     return posixpath.join('lcr', category, set_id, filename)
 
@@ -123,6 +147,7 @@ class AALCRDataset(BaseDataset):
     def load(path: str = DEFAULT_REPO_ID,
              csv_filename: str = DEFAULT_CSV_FILENAME,
              zip_filename: str = DEFAULT_ZIP_FILENAME):
+        path = _resolve_data_path(path, csv_filename, zip_filename)
         csv_path, zip_path = _resolve_data_files(path, csv_filename,
                                                  zip_filename)
 
