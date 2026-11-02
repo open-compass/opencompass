@@ -4,6 +4,7 @@ import os
 import re
 from collections import defaultdict
 from multiprocessing.pool import ThreadPool
+from threading import Lock
 from typing import Any, Callable, Literal
 
 import numpy as np
@@ -224,7 +225,7 @@ def _compute_clipped_stats(
         ]
         return np.std(bootstrap_means)
     else:
-        raise ValueError(f'Unknown {stat =}')
+        raise ValueError(f'Unknown {stat=}')
 
 
 def _aggregate_get_clipped_mean(
@@ -245,7 +246,7 @@ def _aggregate_get_clipped_mean(
     final_metrics = {}
     for name, values in name2values.items():
         for stat in ['mean', 'n_samples', 'bootstrap_std']:
-            key = name if stat == 'mean' else f'{name}:{stat}'
+            key = name if stat == 'mean' else '{}:{}'.format(name, stat)
             final_metrics[key] = _compute_clipped_stats(values, stat)
     return EvalResult(
         score=final_metrics.pop('score', None),
@@ -285,15 +286,121 @@ class HealthBenchEvaluator(BaseEvaluator):
         subset_name=Literal['hard', 'consensus'] | None,
         n_repeats=1,
         n_threads=1,
+        sampler_retry=5,
+        evaluator_retry=5,
     ) -> None:  # noqa: E501
         self.n_repeats = n_repeats
         self.n_threads = n_threads
+        self.sampler_retry = sampler_retry
+        self.evaluator_retry = evaluator_retry
         self.subset_name = subset_name
         self.grader_model = ChatCompletionSampler(
             model=os.environ['OC_JUDGE_MODEL'],
             system_message=OPENAI_SYSTEM_MESSAGE_API,
             max_tokens=2048,
+            max_attempts=sampler_retry,
         )  # noqa: E501
+
+    def _judge_cache_path(self) -> str | None:
+        out_dir = getattr(self, '_out_dir', None)
+        if not out_dir:
+            return None
+        return f'{out_dir}_cache.jsonl'
+
+    def _completion_id(self, prompt_id: str, response_text: str) -> str:
+        return hashlib.sha256(
+            (prompt_id + response_text).encode('utf-8')).hexdigest()
+
+    def _single_eval_result_to_dict(
+            self, result: SingleEvalResult) -> dict[str, Any]:
+        return {
+            'html': result.html,
+            'score': result.score,
+            'convo': result.convo,
+            'metrics': result.metrics,
+            'example_level_metadata': result.example_level_metadata,
+        }
+
+    def _single_eval_result_from_dict(
+            self, result: dict[str, Any]) -> SingleEvalResult:
+        return SingleEvalResult(
+            html=result.get('html'),
+            score=result.get('score'),
+            convo=result.get('convo'),
+            metrics=result.get('metrics', {}),
+            example_level_metadata=result.get('example_level_metadata'),
+        )
+
+    def _load_judge_cache(self) -> dict[str, SingleEvalResult]:
+        cache_path = self._judge_cache_path()
+        if cache_path is None or not os.path.exists(cache_path):
+            return {}
+
+        cached_results = {}
+        with open(cache_path, encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    item = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                completion_id = item.get('completion_id')
+                result = item.get('result')
+                if not completion_id or not isinstance(result, dict):
+                    continue
+                cached_results[completion_id] = (
+                    self._single_eval_result_from_dict(result))
+        return cached_results
+
+    def _append_judge_cache(
+        self,
+        idx: int,
+        prompt_id: str,
+        completion_id: str,
+        result: SingleEvalResult,
+    ) -> None:
+        cache_path = self._judge_cache_path()
+        if cache_path is None:
+            return
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+        item = {
+            'idx': idx,
+            'prompt_id': prompt_id,
+            'completion_id': completion_id,
+            'result': self._single_eval_result_to_dict(result),
+        }
+        with open(cache_path, 'a', encoding='utf-8') as f:
+            f.write(json.dumps(item, ensure_ascii=False) + '\n')
+
+    def _build_single_eval_result(
+        self,
+        prompt: list[dict[str, str]],
+        response_text: str,
+        prompt_id: str,
+        completion_id: str,
+        metrics: dict[str, float],
+        rubric_items_with_grades: list[dict],
+    ) -> SingleEvalResult:
+        score = metrics['overall_score']
+        convo = prompt + [dict(content=response_text, role='assistant')]
+        return SingleEvalResult(
+            html=None,
+            score=score,
+            convo=convo,
+            metrics=metrics,
+            example_level_metadata={
+                'score': score,
+                'usage': get_usage_dict(None),
+                'rubric_items': rubric_items_with_grades,
+                'prompt': prompt,
+                'completion': [dict(content=response_text,
+                                    role='assistant')],  # noqa: E501
+                'prompt_id': prompt_id,
+                'completion_id': completion_id,
+            },
+        )
 
     def grade_sample(
         self,
@@ -315,20 +422,31 @@ class HealthBenchEvaluator(BaseEvaluator):
                                                         '<<rubric_item>>',
                                                         str(rubric_item))
             messages: MessageList = [dict(content=grader_prompt, role='user')]
-            while True:
+            max_attempts = self.evaluator_retry
+            grading_response = ''
+            for attempt in range(max_attempts):
                 sampler_response = self.grader_model(messages)
                 grading_response = sampler_response.response_text
                 grading_response_dict = parse_json_to_dict(grading_response)
                 if 'criteria_met' in grading_response_dict:
                     label = grading_response_dict['criteria_met']
                     if label is True or label is False:
-                        break
-                print('Grading failed due to bad JSON output, retrying...')
-            return grading_response_dict
+                        return grading_response_dict
+                print(
+                    'Grading failed due to bad JSON output, retrying '
+                    f'{attempt + 1}/{max_attempts}. '
+                    f'response_preview={grading_response[:1000]!r}',
+                    flush=True,
+                )
+            raise ValueError(
+                'Grading failed due to bad JSON output after '
+                f'{max_attempts} attempts. '
+                f'last_response_preview={grading_response[:1000]!r}')
 
         grading_response_list = map_with_progress(
             grade_rubric_item,
             rubric_items,
+            num_threads=1,
             pbar=False,
         )
 
@@ -395,12 +513,21 @@ class HealthBenchEvaluator(BaseEvaluator):
             return {
                 'error': 'preds and refrs have different length'
             }  # noqa: W291, E501
-        for idx, (i, j) in enumerate(zip(predictions, references)):
-            response_usage = None
+        cached_results = self._load_judge_cache()
+        cache_lock = Lock()
+
+        def eval_one_sample(idx_prediction) -> SingleEvalResult:
+            idx, response_text = idx_prediction
             actual_queried_prompt_messages = test_set[idx]['prompt']
-            response_text = i
             row = test_set[idx]  # noqa: W291
-            metrics, readable_explanation_str, rubric_items_with_grades = (
+            prompt_id = row['prompt_id']
+            completion_id = self._completion_id(prompt_id, response_text)
+            with cache_lock:
+                cached_result = cached_results.get(completion_id)
+            if cached_result is not None:
+                return cached_result
+
+            metrics, _readable_explanation_str, rubric_items_with_grades = (
                 self.grade_sample(
                     prompt=actual_queried_prompt_messages,
                     response_text=response_text,
@@ -409,40 +536,36 @@ class HealthBenchEvaluator(BaseEvaluator):
                     ],  # noqa: E501
                     example_tags=row['example_tags'],
                 ))
+            result = self._build_single_eval_result(
+                prompt=actual_queried_prompt_messages,
+                response_text=response_text,
+                prompt_id=prompt_id,
+                completion_id=completion_id,
+                metrics=metrics,
+                rubric_items_with_grades=rubric_items_with_grades,
+            )
+            with cache_lock:
+                cached_result = cached_results.get(completion_id)
+                if cached_result is not None:
+                    return cached_result
+                cached_results[completion_id] = result
+                self._append_judge_cache(
+                    idx=idx,
+                    prompt_id=prompt_id,
+                    completion_id=completion_id,
+                    result=result,
+                )
+            return result
 
-            score = metrics['overall_score']
-            convo = actual_queried_prompt_messages + [
-                dict(content=response_text, role='assistant')
-            ]
-            results.append(
-                SingleEvalResult(
-                    html=None,
-                    score=score,
-                    convo=convo,
-                    metrics=metrics,
-                    example_level_metadata={
-                        'score':
-                        score,
-                        'usage':
-                        get_usage_dict(response_usage),
-                        'rubric_items':
-                        rubric_items_with_grades,
-                        'prompt':
-                        actual_queried_prompt_messages,
-                        'completion':
-                        [dict(content=response_text,
-                              role='assistant')],  # noqa: E501
-                        'prompt_id':
-                        row['prompt_id'],
-                        'completion_id':
-                        hashlib.sha256(
-                            (row['prompt_id'] +
-                             response_text).encode('utf-8')).hexdigest(),
-                    },
-                ))
+        results = map_with_progress(
+            eval_one_sample,
+            list(enumerate(predictions)),
+            num_threads=self.n_threads,
+            pbar=True,
+        )
         results = _aggregate_get_clipped_mean(results)
         assert results.metrics is not None
         metrics = results.metrics | {'score': results.score}
         metrics = dict(sorted(metrics.items()))
         acc = metrics.get('f1_score', metrics.get('score', None))
-        return {'accuracy': acc}
+        return {'accuracy': acc * 100}

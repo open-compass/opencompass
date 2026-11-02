@@ -42,6 +42,21 @@ class TestClaudeSDK(unittest.TestCase):
             api_key='test-key', base_url='https://proxy.example/v1')
         self.assertEqual(model.base_url, 'https://proxy.example/v1')
 
+    @patch.dict('os.environ', {}, clear=True)
+    def test_extra_headers_are_passed_to_client(self):
+        """Test extra_headers are passed to the Anthropic SDK client."""
+        headers = {
+            'anthropic-beta': 'prompt-caching-2024-07-31',
+            'x-provider-region': 'test-region',
+        }
+        _, anthropic_cls, _ = self.build_model(
+            base_url='https://proxy.example/v1', extra_headers=headers)
+
+        anthropic_cls.assert_called_once_with(
+            api_key='test-key',
+            base_url='https://proxy.example/v1',
+            default_headers=headers)
+
     @patch.dict('os.environ',
                 {
                     'ANTHROPIC_API_KEY': 'env-key',

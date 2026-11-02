@@ -21,7 +21,8 @@ env:
   CONDA_PATH: /mnt/shared-storage-user/opencompass-shared/qa-llm-cicd/miniconda3
   COMPASS_DATA_CACHE: /mnt/shared-storage-user/auto-eval-pipeline/opencompass/llmeval/compass_data_cache
   KUBEBRAIN_CLUSTER_ENTRY: https://h.pjlab.org.cn
-  KUBEBRAIN_NAMESPACE: ailab-opencompass
+  # Kept for env consistency with other CI; this job does not submit rjob.
+  KUBEBRAIN_NAMESPACE: ailab-llmeval
   JOB_NAME: unit-test-${{ github.run_id }}-${{ github.run_attempt }}
 
 jobs:

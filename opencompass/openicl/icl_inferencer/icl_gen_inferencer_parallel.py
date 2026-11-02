@@ -133,13 +133,18 @@ class ParallelGenInferencer(GenInferencer):
 
         def _infer_one(entry, gold, idx):
             parsed_entry = self.model.parse_template(entry, mode='gen')
-            generated = self.model.generate_from_template(
-                [entry], max_out_len=self.max_out_len, **extra_gen_kwargs)
 
-            if num_return_sequences == 1:
-                prediction = generated[0]
+            if self.multiround:
+                prediction = self._fill_single_chat_turns(
+                    entry, extra_gen_kwargs)
             else:
-                prediction = list(batched(generated, num_return_sequences))[0]
+                generated = self.model.generate_from_template(
+                    [entry], max_out_len=self.max_out_len, **extra_gen_kwargs)
+                if num_return_sequences == 1:
+                    prediction = generated[0]
+                else:
+                    prediction = list(batched(generated,
+                                              num_return_sequences))[0]
 
             res_dict = dict(
                 origin_prompt=parsed_entry,
@@ -149,21 +154,32 @@ class ParallelGenInferencer(GenInferencer):
             )
 
             if self.dump_res_length:
-                input_length = 0
-                if isinstance(parsed_entry, str):
+                if self.multiround and isinstance(parsed_entry, list):
+                    input_length = self._compute_multiround_input_lengths(
+                        entry)
+                elif isinstance(parsed_entry, str):
                     input_length = self.model.get_token_len(parsed_entry)
                 elif isinstance(parsed_entry, list):
+                    input_length = 0
                     for i in range(len(parsed_entry)):
-                        parsed_entry[i][
-                            'input_length'] = self.model.get_token_len(
-                                parsed_entry[i]['prompt'])
+                        if 'prompt' in parsed_entry[i]:
+                            parsed_entry[i][
+                                'input_length'] = self.model.get_token_len(
+                                    parsed_entry[i]['prompt'])
+                        elif 'content' in parsed_entry[i]:
+                            parsed_entry[i][
+                                'input_length'] = self.model.get_token_len(
+                                    parsed_entry[i]['content'])
+                        else:
+                            logger.error(
+                                'Cannot find prompt field in the message!')
                         input_length += parsed_entry[i]['input_length']
 
                 pred_str = copy.deepcopy(prediction)
                 if isinstance(pred_str, dict):
                     pred_str = pred_str['prediction']
 
-                if num_return_sequences == 1:
+                if isinstance(pred_str, str):
                     res_length = self.model.get_token_len(pred_str)
                 else:
                     res_length = [
