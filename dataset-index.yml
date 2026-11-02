@@ -1429,3 +1429,9 @@
     paper: https://arxiv.org/abs/2610.26787
     configpath: opencompass/configs/datasets/lgbench150/lgbench150_gen.py
     configpath_llmjudge: ''
+- chhallu-src-v1:
+    name: CHHallu-Src v1 (Chinese history hallucination & source attribution)
+    category: Knowledge / Hallucination
+    paper: https://huggingface.co/datasets/lizhuojun/chhallu-src-v1
+    configpath: opencompass/configs/datasets/chhallu_src/chhallu_src_gen.py
+    configpath_llmjudge: ''
