@@ -32,6 +32,7 @@ from .charm import *  # noqa: F401, F403
 from .chatml import *  # noqa: F401, F403
 from .chem_exam import *  # noqa: F401, F403
 from .chembench import *  # noqa: F401, F403
+from .chhallu_src import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .chinese_simpleqa import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
@@ -224,4 +225,3 @@ from .xiezhi import XiezhiDataset, XiezhiRetriever  # noqa: F401, F403
 from .xlsum import *  # noqa: F401, F403
 from .xsum import *  # noqa: F401, F403
 from .zebralogic import *  # noqa: F401, F403
-from .chhallu_src import *  # noqa: F401, F403
