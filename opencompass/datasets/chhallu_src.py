@@ -109,7 +109,10 @@ def _score_one(row, pred_text):
     # crossbook: recall==1 and no era-impossible over-prediction
     gold = {_norm_book(b) for b in row["answer"]["books"]} - {None}
     pred_raw = (parsed or {}).get("books", []) if isinstance(parsed, dict) else []
-    pred = {_norm_book(b) for b in (pred_raw if isinstance(pred_raw, list) else [])} - {None}
+    if not isinstance(pred_raw, list) or any(
+            not isinstance(b, str) for b in pred_raw):
+        return False
+    pred = {_norm_book(b) for b in pred_raw} - {None}
     if gold - pred:
         return False
     ew = (row.get("grounding") or {}).get("era_window")

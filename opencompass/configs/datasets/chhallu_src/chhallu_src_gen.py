@@ -16,7 +16,7 @@ chhallu_src_infer_cfg = dict(
         template=dict(round=[dict(role="HUMAN", prompt="{prompt}")]),
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=256),
+    inferencer=dict(type=GenInferencer),
 )
 
 chhallu_src_eval_cfg = dict(
