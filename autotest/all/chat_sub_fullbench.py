@@ -22,8 +22,6 @@ with read_base():
         followbench_llmeval_datasets
     from opencompass.configs.datasets.subjective.multiround.mtbench101_judge_new_rawprompt import \
         mtbench101_datasets
-    from opencompass.configs.datasets.subjective.wildbench.wildbench_pair_judge_rawprompt import \
-        wildbench_datasets
 
 datasets = []
 
@@ -35,12 +33,11 @@ for model in models + judge_models:
 
 datasets += sum(
     (v for k, v in locals().items() if k.endswith('_datasets')
-     and 'mtbench101' not in k and 'wildbench' not in k),
+     and 'mtbench101' not in k),
     [],
 )
 
 datasets += mtbench101_datasets
-datasets += wildbench_datasets
 set_mock_test_range(datasets)
 del set_mock_test_range
 
@@ -69,7 +66,6 @@ summarizer = dict(
         ['Followbench', 'naive_average'],
         ['FoFo', 'naive_average'],
         ['mtbench101', 'avg'],
-        ['wildbench', 'average'],
         ['simpleqa', 'accuracy_given_attempted'],
         ['chinese_simpleqa', 'given_attempted_accuracy'],
         '',
