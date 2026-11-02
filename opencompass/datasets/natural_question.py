@@ -95,7 +95,9 @@ class NQEvaluator(BaseEvaluator):
         for pred, cand_ans in zip(processed_predictions, processed_answers):
             detail = {'pred': pred, 'answer': cand_ans, 'correct': False}
             # is_correct = any([cand == pred for cand in cand_ans])
-            is_correct = any([cand in pred for cand in cand_ans])
+            # Skip references that normalize to an empty string; otherwise
+            # ``'' in pred`` is always True and marks every prediction correct.
+            is_correct = any([cand in pred for cand in cand_ans if cand])
             cnt += int(is_correct)
             detail['correct'] = is_correct
             details.append(detail)
