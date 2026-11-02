@@ -20,8 +20,9 @@ class CEvalDataset(BaseDataset):
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            dataset = MsDataset.load(
-                dataset_name=path, subset_name=name, trust_remote_code=True)
+            dataset = MsDataset.load(dataset_name=path,
+                                     subset_name=name,
+                                     trust_remote_code=True)
         else:
             for split in ['dev', 'val', 'test']:
                 filename = osp.join(path, split, f'{name}_{split}.csv')
@@ -73,8 +74,9 @@ class CEvalDatasetClean(BaseDataset):
         dataset = {}
         if environ.get('DATASET_SOURCE') == 'ModelScope':
             from modelscope import MsDataset
-            dataset = MsDataset.load(
-                dataset_name=path, subset_name=name, trust_remote_code=True)
+            dataset = MsDataset.load(dataset_name=path,
+                                     subset_name=name,
+                                     trust_remote_code=True)
             # 向该数据添加 'is_clean' 字段
             annotations = CEvalDatasetClean.load_contamination_annotations(
                 path, 'val')
