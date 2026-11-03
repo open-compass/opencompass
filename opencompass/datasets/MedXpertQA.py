@@ -79,6 +79,7 @@ def answer_cleansing(
 
     if len(prediction) == 0:
         prediction = []
+        return prediction
     else:
         # If there is a "label" and its length is 1,
         # process prediction accordingly
