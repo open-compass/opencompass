@@ -4,11 +4,9 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-# Official public v1.1 release: 300 questions in the test split.
 DATASET_PATH = 'ArtificialAnalysis/AA-Omniscience-Public-v1.1'
 DATASET_REVISION = '1f9cbcec472000b28f9782205f1ef9498b45bd21'
 
-# Answer/judge prompts and metric definitions are unchanged from v1.0.
 OMNISCIENCE_ANSWER_PROMPT = """You are answering questions about {domain}, and in particular {subtopic}.
 You will be given a question, answer with JUST the answer (no explanation).
 If you do not know the answer, or you need more context or tools to answer the question,
@@ -145,14 +143,11 @@ aa_omniscience_v1_1_eval_cfg = dict(
             reader_cfg=aa_omniscience_v1_1_reader_cfg,
         ),
         judge_cfg=dict(),
-        # GenericLLMEvaluator resolves this by its registry name.
         dict_postprocessor=dict(type='aa_omniscience_llmjudge_postprocess'),
     ),
     pred_role='BOT',
 )
 
-# The official v1.1 judge is GPT-5.6 Luna (medium); supply judge_cfg in the
-# evaluation config, as with the v1.0 integration.
 aa_omniscience_v1_1_datasets = [
     dict(
         abbr='AA-Omniscience-Public-v1.1',

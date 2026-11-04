@@ -4,7 +4,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-# Official v1.1 release: same questions/documents, 16 corrected answer keys.
 DATASET_REVISION = '9a77ef56b717057ade24ceab4d273712a0b4f19e'
 
 AA_LCR_V1_1_JUDGE_SYSTEM_PROMPT = """Decide whether the CANDIDATE ANSWER is correct or incorrect against the OFFICIAL ANSWER.
@@ -80,8 +79,6 @@ aa_lcr_v1_1_eval_cfg = dict(
     pred_role='BOT',
 )
 
-# The official v1.1 judge is GPT-5.6 Luna (medium). Supply judge_cfg in the
-# evaluation config, as with the v1.0 integration.
 aa_lcr_v1_1_datasets = [
     dict(
         abbr='AA-LCR-v1.1',

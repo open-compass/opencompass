@@ -4,7 +4,6 @@ from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-# HLEDataset keeps only rows with image == '' and renames question to problem.
 hle_reader_cfg = dict(input_columns=['problem'], output_column='answer')
 
 hle_infer_cfg = dict(
