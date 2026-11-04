@@ -1,11 +1,11 @@
 from opencompass.datasets.reasonzoo.reasonzoo import reasonzooDataset, reasonzooEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_evaluator import LMEvaluator
 from opencompass.datasets import generic_llmjudge_postprocess
 
-categories = ['communication_code', 'number_calculation', 'gradeschoolmath', 'formal_language', 'operation_research', 'puzzle_and_code','physics','dailylogic','boolean_logic'] 
+categories = ['communication_code', 'number_calculation', 'gradeschoolmath', 'formal_language', 'operation_research', 'puzzle_and_code','physics','dailylogic','boolean_logic']
 
 
 GRADER_TEMPLATE = """
@@ -38,21 +38,8 @@ reasonzoo_0shot_single_datasets = []
 for category in categories:
     # Prompt template
     prompt_template = dict(
-        type=PromptTemplate,
-        template=dict(
-            begin=[
-                dict(
-                    role='HUMAN',
-                    prompt=''
-                )
-            ],
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{prompt}' # f-string
-                )
-            ]
-        )
+        type=RawPromptTemplate,
+        messages=[dict(role='user', content='{prompt}')],
     )
 
     # Reader configuration
@@ -73,20 +60,14 @@ for category in categories:
         evaluator=dict(
             type=LMEvaluator,
             prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                begin=[
+                type=RawPromptTemplate,
+                messages=[
                     dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.")
-                ],
-                    round=[
-                    dict(
-                        role='HUMAN',
-                        prompt = GRADER_TEMPLATE
+                        role='system',
+                        content="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
                     ),
-                ]),
+                    dict(role='user', content=GRADER_TEMPLATE),
+                ],
             ),
             dict_postprocessor=dict(type=generic_llmjudge_postprocess),
         ),

@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
@@ -49,10 +49,8 @@ promptcblue_llm_datasets = []
 for name in PromptCBLUE_lifescience_sets:
     infer_cfg = dict(
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(round=[
-                dict(role='HUMAN', prompt=QUERY_TEMPLATE),
-            ]),
+            type=RawPromptTemplate,
+            messages=[dict(role='user', content=QUERY_TEMPLATE)],
         ),
         retriever=dict(type=ZeroRetriever),
         inferencer=dict(type=GenInferencer),
@@ -62,19 +60,14 @@ for name in PromptCBLUE_lifescience_sets:
         evaluator=dict(
             type=GenericLLMEvaluator,
             prompt_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                    begin=[
-                        dict(
-                            role='SYSTEM',
-                            fallback_role='HUMAN',
-                            prompt='You are an expert judge for medical term normalization tasks.',
-                        )
-                    ],
-                    round=[
-                        dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                    ],
-                )
+                type=RawPromptTemplate,
+                messages=[
+                    dict(
+                        role='system',
+                        content='You are an expert judge for medical term normalization tasks.',
+                    ),
+                    dict(role='user', content=GRADER_TEMPLATE),
+                ],
             ),
             dataset_cfg=dict(
                 type=PromptCBLUEDataset,

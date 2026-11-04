@@ -2,7 +2,7 @@
 
 from opencompass.datasets import CustomDataset, LGBench150Evaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 
@@ -14,14 +14,14 @@ reader_cfg = dict(
 )
 infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
+        type=RawPromptTemplate,
+        messages=[
             dict(
-                role='HUMAN',
-                prompt=('{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n'
-                        'Answer with exactly one letter: A, B, C, or D.'),
+                role='user',
+                content=('{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n'
+                         'Answer with exactly one letter: A, B, C, or D.'),
             )
-        ]),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),

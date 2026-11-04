@@ -14,6 +14,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/aa_lcr",
     },
+    "opencompass/AA-LCR-v1.1": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/aa_lcr_v1_1",
+    },
     "opencompass/QASPER":{
         "ms_id": None,
         "hf_id": None,
