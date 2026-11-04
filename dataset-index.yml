@@ -155,9 +155,15 @@
 - medfailbench:
     name: MedFailBench
     category: Safety / Medicine
-    paper: https://github.com/goktugozkanmd/medical-ai-failure-atlas
+    paper: https://arxiv.org/abs/2607.15166
     configpath: ''
     configpath_llmjudge: opencompass/configs/datasets/MedFailBench/medfailbench_llmjudge_gen.py
+- medfailbench_tr_preprint:
+    name: MedFailBench-TR-Preprint
+    category: Safety / Medicine
+    paper: https://arxiv.org/abs/2607.15166
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/MedFailBench/medfailbench_tr_preprint_llmjudge_gen.py
 - MedXpertQA:
     name: MedXpertQA
     category: Knowledge / Medicine
