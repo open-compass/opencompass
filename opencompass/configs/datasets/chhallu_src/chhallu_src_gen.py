@@ -5,15 +5,15 @@ Use in a run config:  from opencompass.configs.datasets.chhallu_src.chhallu_src_
 """
 from opencompass.datasets import CHHalluSrcDataset, CHHalluSrcEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 chhallu_src_reader_cfg = dict(input_columns=['prompt'], output_column='row')
 
 chhallu_src_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[dict(role='HUMAN', prompt='{prompt}')]),
+        type=RawPromptTemplate,
+        messages=[dict(role='user', content='{prompt}')],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
