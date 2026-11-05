@@ -1,4 +1,3 @@
-from __future__ import annotations
 # flake8: noqa
 # NC-I2S NC-S2I task
 # https://github.com/OSU-NLP-Group/LLM4Chem
