@@ -17,10 +17,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.9', '3.10', '3.12']
         include:
-          - torch: 2.9.0
+          # torch 2.9.0 requires Python >= 3.10; 2.8.0 is the last release with cp39 wheels.
+          - python-version: '3.9'
+            torch: 2.8.0
+          - python-version: '3.10'
+            torch: 2.9.0
+          - python-version: '3.12'
+            torch: 2.9.0
     steps:
       - name: Free disk space
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # main
