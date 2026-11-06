@@ -55,6 +55,12 @@ def parse_requirements(fname='requirements.txt', with_version=True):
             target = line.split(' ')[1]
             for info in parse_require_file(target):
                 yield info
+        elif re.match(r'^[^\s@]+\s*@\s*[A-Za-z+]+://', line):
+            import warnings
+            warnings.warn(
+                f'Skipping direct URL requirement {line!r}: PyPI does not '
+                'allow it in package metadata. Install it manually.',
+                RuntimeWarning)
         else:
             info = {'line': line}
             if line.startswith('-e '):
