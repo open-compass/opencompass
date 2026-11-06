@@ -128,7 +128,7 @@ def do_setup():
         maintainer='OpenCompass Authors',
         cmdclass={'download_nltk': DownloadNLTK},
         setup_requires=['nltk==3.8'],
-        python_requires='>=3.8.0',
+        python_requires='>=3.9.0',
         install_requires=parse_requirements('requirements/runtime.txt'),
         extras_require={
             'lmdeploy':
@@ -160,7 +160,6 @@ def do_setup():
             'llm',
         ],
         classifiers=[
-            'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
             'Programming Language :: Python :: 3.12',

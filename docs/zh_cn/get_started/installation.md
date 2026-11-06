@@ -1,6 +1,6 @@
 # 安装与环境准备
 
-OpenCompass 要求 Python 3.8 或更高版本。不同模型后端对 PyTorch、CUDA 和推理框架有各自的版本约束；准备 GPU 环境时，应先按模型与后端要求安装匹配的 PyTorch，再安装 OpenCompass。
+OpenCompass 要求 Python 3.9 或更高版本。不同模型后端对 PyTorch、CUDA 和推理框架有各自的版本约束；准备 GPU 环境时，应先按模型与后端要求安装匹配的 PyTorch，再安装 OpenCompass。
 
 ## 创建独立环境
 

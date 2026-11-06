@@ -1,6 +1,6 @@
 # Installation and Environment Setup
 
-OpenCompass requires Python 3.8 or later. Model backends impose their own version constraints on PyTorch, CUDA, and inference frameworks. When preparing a GPU environment, first install a PyTorch build compatible with the model and backend, then install OpenCompass.
+OpenCompass requires Python 3.9 or later. Model backends impose their own version constraints on PyTorch, CUDA, and inference frameworks. When preparing a GPU environment, first install a PyTorch build compatible with the model and backend, then install OpenCompass.
 
 ## Creating an Isolated Environment
 
