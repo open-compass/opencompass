@@ -23,6 +23,7 @@ from opencompass.registry import (ICL_EVALUATORS, MODELS, TASKS,
 from opencompass.tasks.base import BaseTask, extract_role_pred
 from opencompass.utils import (build_dataset_from_cfg, get_infer_output_path,
                                get_logger)
+from opencompass.utils.result import RESULT_METADATA_KEY, SAMPLE_COUNT_KEY
 
 
 @TASKS.register_module()
@@ -113,9 +114,6 @@ class OpenICLEvalTask(BaseTask):
                 pred_dicts,
             )
 
-            # Save results
-            self._save_results(result)
-
         else:
             # Process predictions
             pred_strs = self._process_predictions(pred_strs)
@@ -127,8 +125,19 @@ class OpenICLEvalTask(BaseTask):
                 pred_dicts,
             )
 
-            # Save results
-            self._save_results(result)
+        self._record_result_metadata(result, len(test_set))
+
+        # Save results
+        self._save_results(result)
+
+    @staticmethod
+    def _record_result_metadata(result, num_samples):
+        """Record lightweight metadata needed by result consumers."""
+        metadata = result.get(RESULT_METADATA_KEY)
+        if not isinstance(metadata, dict):
+            metadata = {}
+        metadata.setdefault(SAMPLE_COUNT_KEY, num_samples)
+        result[RESULT_METADATA_KEY] = metadata
 
     def _load_and_preprocess_test_data(self):
         """Load test dataset and apply postprocessing if needed."""
