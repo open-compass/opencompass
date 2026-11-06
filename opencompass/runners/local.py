@@ -225,6 +225,7 @@ class LocalRunner(BaseRunner):
         param_file = f'{uuid_str}_params.py'
         param_file = osp.join(self.tmp_dir, param_file)
         try:
+            object.__setattr__(task.cfg, "_format_python_code", False)
             task.cfg.dump(param_file)
             tmpl = get_command_template(gpu_ids)
             get_cmd = partial(task.get_command,
