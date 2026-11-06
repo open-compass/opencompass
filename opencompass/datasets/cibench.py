@@ -240,9 +240,9 @@ class CIBenchEvaluator(BaseEvaluator):
             try:
                 from vlmeval.config import supported_VLM
             except ImportError as e:
-                raise ImportError(
-                    f'{e}. Please install vlmeval following: https://github.com/open-compass/VLMEvalKit'  # noqa
-                )
+                from opencompass.datasets.vlmevalkit.builder import (
+                    _VLMEVAL_INSTALL)
+                raise ImportError(f'{e}. {_VLMEVAL_INSTALL}') from e
             assert vis_evaluator['type'] in supported_VLM, ''
             self.vis_evaluator = supported_VLM[vis_evaluator.pop('type')](
                 **vis_evaluator)
