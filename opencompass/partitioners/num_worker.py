@@ -131,7 +131,7 @@ class NumWorkerPartitioner(BasePartitioner):
             cfg = copy.deepcopy(dataset_cfg)
             cfg['abbr'] = abbr + f'_{part}'
             test_range = cfg['reader_cfg'].get('test_range', '')
-            cfg['reader_cfg']['test_range'] = f'{test_range}[{i}:{i+step}]'
+            cfg['reader_cfg']['test_range'] = f'{test_range}[{i}: {i + step}]'
             split_configs.append(cfg)
         return split_configs
 
@@ -145,8 +145,10 @@ class NumWorkerPartitioner(BasePartitioner):
                                f'{test_range})')
             return actual_size
 
-        # Otherwise, rebuild the dataset to get its size
-        dataset = build_dataset_from_cfg(dataset)
+        # Cache the full test split, before the reader applies test_range.
+        dataset_cfg = copy.deepcopy(dataset)
+        dataset_cfg.reader_cfg.pop('test_range', None)
+        dataset = build_dataset_from_cfg(dataset_cfg)
         self.dataset_size[dataset_abbr] = len(dataset.test)
 
         # Save to cache file

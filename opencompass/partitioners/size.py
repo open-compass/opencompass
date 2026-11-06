@@ -244,7 +244,10 @@ class SizePartitioner(BasePartitioner):
                 return actual_size, factor
             return factor * actual_size
 
-        dataset = build_dataset_from_cfg(dataset)
+        # The cache stores the full test split; apply test_range only below.
+        dataset_cfg = copy.deepcopy(dataset)
+        dataset_cfg.reader_cfg.pop('test_range', None)
+        dataset = build_dataset_from_cfg(dataset_cfg)
         self.dataset_size[dataset_abbr] = len(dataset.test)
 
         tmp_dir_root = osp.dirname(self.dataset_size_path)
