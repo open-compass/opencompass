@@ -634,12 +634,13 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
                 not needed.
 
         Returns:
-            List[float]: A list of perplexity scores.
+            List[float]: Mean negative log-likelihood over scored next tokens
+                for each input. Padding and masked prefix targets are excluded
+                from both the loss and its denominator.
         """
         assert self.tokenizer.pad_token
         import torch
         import torch.nn.functional as F
-        pad_token_id = self.tokenizer.pad_token_id
         messages = _convert_base_messages(inputs)
 
         tokenize_kwargs = dict(
@@ -666,22 +667,20 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
         batch_size, seq_len, vocab_size = outputs.shape
         shift_logits = outputs[:, :-1, :].contiguous().float()
         shift_labels = tokens['input_ids'][:, 1:].contiguous()
+        attention_mask = tokens.get('attention_mask', torch.ones_like(tokens['input_ids'])).bool()
+        # A target needs both a real token and a real preceding token.
+        loss_mask = attention_mask[:, :-1] & attention_mask[:, 1:]
+        if mask_length is not None:
+            # Prefix lengths count unpadded tokens, regardless of padding side.
+            token_positions = attention_mask.long().cumsum(-1) - 1
+            prefix_lengths = torch.as_tensor(mask_length, device=shift_labels.device)
+            loss_mask &= token_positions[:, 1:] >= prefix_lengths[:, None]
+        shift_labels = shift_labels.masked_fill(~loss_mask, -100)
         loss = F.cross_entropy(
             shift_logits.view(-1, vocab_size),
             shift_labels.view(-1),
-            ignore_index=pad_token_id,
             reduction='none').view(batch_size, seq_len - 1)
-        lens = (tokens['input_ids'] != pad_token_id).sum(-1).cpu().numpy()
-
-        if mask_length is not None:
-            import numpy as np
-            mask = torch.zeros_like(shift_labels)  # [batch,seqlen]
-            for i in range(len(mask)):
-                for j in range(mask_length[i] - 1, len(mask[i])):
-                    mask[i][j] = 1
-            loss = loss * mask
-            lens -= np.array(mask_length)
-
+        lens = loss_mask.sum(-1).cpu().numpy()
         ce_loss = loss.float().sum(-1).cpu().detach().numpy() / lens
         return ce_loss
 
