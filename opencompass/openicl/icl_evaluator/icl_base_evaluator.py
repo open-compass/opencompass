@@ -230,8 +230,14 @@ class BaseEvaluator:
                 detail.pop('predictions')
             return eval_results
 
-        # If there are no details, return results
-        return results
+        # Without details there is nothing to add per example, but the
+        # replica scores still have to be averaged when n > 1
+        if n == 1:
+            return results
+        for single_replica_results in all_results:
+            if 'error' in single_replica_results:
+                return single_replica_results
+        return eval_results
 
     def score(self):
         raise NotImplementedError("Method hasn't been implemented yet")
