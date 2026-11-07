@@ -439,6 +439,7 @@ def fill_infer_cfg(cfg, args):
         new_cfg['infer']['runner']['type'] = get_config_type(LocalRunner)
         new_cfg['infer']['runner'][
             'max_workers_per_gpu'] = args.max_workers_per_gpu
+        new_cfg['infer']['runner']['retry'] = args.retry
     cfg.merge_from_dict(new_cfg)
 
 
@@ -466,6 +467,7 @@ def fill_eval_cfg(cfg, args):
         new_cfg['eval']['runner']['type'] = get_config_type(LocalRunner)
         new_cfg['eval']['runner'][
             'max_workers_per_gpu'] = args.max_workers_per_gpu
+        new_cfg['eval']['runner']['retry'] = args.retry
     cfg.merge_from_dict(new_cfg)
 
 def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
