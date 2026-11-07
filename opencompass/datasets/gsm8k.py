@@ -43,6 +43,10 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
     text = text.split('Question:')[0]
+    # Models commonly format thousands separators as `8,000` or `8{,}000`.
+    # Remove separators that occur inside a numeric token before extracting
+    # the final number; otherwise the regex would return only the suffix.
+    text = re.sub(r'(?<=\d),(?=\d)|(?<=\d)\{,\}(?=\d)', '', text)
     numbers = re.findall(r'\-?\d+\.\d+|\-?\d+', text)
     if not numbers:
         return 'NULL'
