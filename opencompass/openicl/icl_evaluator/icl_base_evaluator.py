@@ -1,8 +1,11 @@
 """Base Evaluator."""
 
+import time
 from collections import OrderedDict
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from copy import deepcopy
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 
 import numpy as np
 from datasets import Dataset
@@ -44,9 +47,93 @@ def compute_mg_pass_at_k(n, c, k):
 
 class BaseEvaluator:
 
-    def __init__(self, pred_postprocessor=None) -> None:
+    def __init__(self,
+                 pred_postprocessor=None,
+                 timeout: Optional[float] = None,
+                 failure_mode: str = 'count',
+                 max_failure_ratio: Optional[float] = None) -> None:
         self.pred_postprocessor = pred_postprocessor
         self._dataset_replica_idx = 0  # Default value for dataset_replica_idx
+        # Robustness facilities: per-sample timeout, failure recording and
+        # isolation. See docs/en/extension/new_evaluator_and_summarizer.md:
+        # evaluators accessing the network, invoking a Judge, or executing
+        # code must define timeouts, error recording, and isolation.
+        self.timeout = timeout
+        self.failure_mode = failure_mode
+        self.max_failure_ratio = max_failure_ratio
+        self._failures: List[Dict[str, Any]] = []
+        self._sample_count = 0
+
+    def protected_sample(self, fn: Callable, idx: int,
+                         *args) -> Dict[str, Any]:
+        """Run a single-sample hook with error recording and isolation.
+
+        Exceptions (and optionally timeouts) raised by ``fn`` are recorded
+        into ``self._failures`` and returned as ``{'error': ...}`` instead
+        of propagating, so a single failing sample cannot crash the batch
+        or silently pollute the metrics.
+
+        Args:
+            fn: The per-sample callable to run.
+            idx: Index of the sample, stored in the failure record.
+            *args: Arguments forwarded to ``fn``.
+
+        Returns:
+            Whatever ``fn`` returns on success, or a dict with an
+            ``'error'`` key on failure.
+        """
+        self._sample_count += 1
+        start = time.time()
+        executor = None
+        try:
+            if self.timeout is not None:
+                executor = ThreadPoolExecutor(max_workers=1)
+                future = executor.submit(fn, *args)
+                result = future.result(timeout=self.timeout)
+            else:
+                result = fn(*args)
+        except FuturesTimeoutError:
+            elapsed = round(time.time() - start, 3)
+            self._failures.append({
+                'idx': idx,
+                'error': f'TimeoutError: exceeded {self.timeout}s',
+                'elapsed': elapsed
+            })
+            if self.failure_mode == 'raise':
+                raise
+            return {'error': f'timeout after {self.timeout}s'}
+        except Exception as e:  # noqa: BLE001
+            elapsed = round(time.time() - start, 3)
+            self._failures.append({
+                'idx': idx,
+                'error': f'{type(e).__name__}: {e}',
+                'elapsed': elapsed
+            })
+            if self.failure_mode == 'raise':
+                raise
+            return {'error': f'{type(e).__name__}: {e}'}
+        finally:
+            if executor is not None:
+                # Do not wait for the lingering (timed-out) thread.
+                executor.shutdown(wait=False)
+        return result
+
+    def failure_summary(self) -> Dict[str, Any]:
+        """Aggregate statistics of the samples isolated so far."""
+        ratio = (len(self._failures) / self._sample_count
+                 if self._sample_count else 0.0)
+        return {
+            'count': len(self._failures),
+            'ratio': ratio,
+            'max_failure_ratio_exceeded':
+            self.max_failure_ratio is not None
+            and ratio > self.max_failure_ratio,
+        }
+
+    def export_failures(self) -> List[Dict[str, Any]]:
+        """Return structured records of every isolated failing sample."""
+        return deepcopy(self._failures)
+
 
     @property
     def output_dir(self):
@@ -120,6 +207,8 @@ class BaseEvaluator:
         real_size = len(original_dataset) // n  # dataset size of each replica
         all_details = []
         all_results = []
+        self._failures = []
+        self._sample_count = 0
 
         # Run evaluation for each replica
         for i in range(n):
@@ -150,6 +239,24 @@ class BaseEvaluator:
                 all_details.extend(details)
             all_results.append(results)
 
+        # Batch-level guard: if too many samples were isolated, fail the
+        # batch loudly instead of reporting a score computed from a small,
+        # unrepresentative subset of samples.
+        if self.max_failure_ratio is not None and self._sample_count > 0:
+            failure_stats = self.failure_summary()
+            if failure_stats['max_failure_ratio_exceeded']:
+                logger.warning(
+                    f'Failure ratio {failure_stats["ratio"]:.2f} '
+                    f'({failure_stats["count"]}/{self._sample_count} '
+                    f'samples) exceeded max_failure_ratio '
+                    f'{self.max_failure_ratio}.')
+                return {
+                    'error': f'failure ratio {failure_stats["ratio"]:.2f} '
+                    f'({failure_stats["count"]}/{self._sample_count} '
+                    f'samples) exceeded max_failure_ratio '
+                    f'{self.max_failure_ratio}'
+                }
+
         eval_results = {}
         for single_replica_results in all_results:
             for key in single_replica_results:
@@ -165,6 +272,13 @@ class BaseEvaluator:
                     eval_results.pop(key)
                 else:
                     eval_results[key] = np.mean(eval_results[key])
+
+        # Expose per-sample failure statistics so a score computed after
+        # isolating failures can be judged on its representativeness.
+        if self._failures:
+            failure_stats = self.failure_summary()
+            eval_results['failure_stats'] = failure_stats
+            results['failure_stats'] = deepcopy(failure_stats)
 
         # Calculate the additional metrics
         grouped_examples = self.group(n, all_details, original_dataset)
