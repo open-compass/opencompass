@@ -266,10 +266,11 @@ class DatasetEncoder(torch.utils.data.Dataset):
 
     def init_dataset(self):
         for idx, data in enumerate(self.datalist):
-            tokenized_data = self.tokenizer.encode_plus(data,
-                                                        truncation=True,
-                                                        return_tensors='pt',
-                                                        verbose=False)
+            # (tokenizer.__call__ instead of encode_plus, which was removed in transformers 5.x)
+            tokenized_data = self.tokenizer(data,
+                                            truncation=True,
+                                            return_tensors='pt',
+                                            verbose=False)
             self.encode_dataset.append({
                 'input_ids':
                 tokenized_data.input_ids[0],
