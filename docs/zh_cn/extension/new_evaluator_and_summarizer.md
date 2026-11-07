@@ -107,6 +107,10 @@ class MyEvaluator(BaseEvaluator):
 
 汇总器配置不写 `type` 时默认使用 `DefaultSummarizer`。它从 `<work_dir>/results/` 读取各个 Dataset 的数值指标，根据 `summary_groups` 生成分组指标，再把表格写到 `<work_dir>/summary/` 下。
 
+### 可比性元数据
+
+每个结果文件会记录 `num_samples`（单次评测实际覆盖的测试样本数，即经过 `test_range` / `n` 处理后的数据集大小），配置了 `reader_cfg` 的 `test_range` 时还会一并记录。默认汇总器利用该元数据做可比性标注：同一数据集上被比较的各模型若在不同的样本数或 `test_range` 上评测，该数据集行会追加 `*` 后缀，并在表尾附注说明这些分数不可直接比较——5 条样本上算出的分数与全量分数不会再被并排当作可比结果阅读。
+
 下面以仓库中的 InverseIFEval 配置为基础，抽取总分、中文分组和宏平均三组，组成一个可独立理解的完整例子。实际分组定义位于 [`opencompass/configs/summarizers/groups/inverse_ifeval.py`](https://github.com/open-compass/opencompass/blob/main/opencompass/configs/summarizers/groups/inverse_ifeval.py)：
 
 ```python
