@@ -215,6 +215,7 @@ class SubjectiveSizePartitioner(SubjectiveNaivePartitioner):
         step = math.ceil(dataset_size / math.ceil(dataset_size / step))
         for part, i in enumerate(range(0, dataset_size, step)):
             cfg = copy.deepcopy(dataset_cfg)
+            cfg['infer_cfg']['origin_dataset_abbr'] = abbr
             cfg['abbr'] = abbr + f'_{part}'
             test_range = cfg['reader_cfg'].get('test_range', '')
             cfg['reader_cfg']['test_range'] = f'{test_range}[{i}:{i+step}]'
