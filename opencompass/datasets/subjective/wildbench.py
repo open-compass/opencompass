@@ -412,8 +412,9 @@ def wildbench_bradleyterry_postprocess(
         cur_dict['primary_tag'] = reference['primary_tag']
         # Extract first tag from list and set as categorical level.
         # Can be used as categorical variable in Bradley-Terry model
-        cur_dict['secondary_tag'] = (reference['secondary_tag'][0] if len(
-            reference['secondary_tag']) > 0 else 'Others')
+        cur_dict['secondary_tag'] = (reference['secondary_tag'][0]
+                                     if len(reference['secondary_tag']) > 0
+                                     else 'Others')
         # Keep original secondary tag list for reference
         cur_dict['secondary_tags'] = reference['secondary_tag']
         cur_dict['model_a'] = reference['answer1']
