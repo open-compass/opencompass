@@ -40,11 +40,6 @@ class TestTextPostprocessors(unittest.TestCase):
         self.assertEqual(tp.first_option_postprocess(text, 'ABCD'), 'B')
 
     def test_first_option_postprocess_merged_pattern_regression(self):
-        # Regression: a missing trailing comma implicitly concatenated the
-        # '故选X' pattern with the '只有选项X是对' pattern into a single 2-group
-        # regex, so the '只有选项X是对' extraction was destroyed. cushion=False
-        # disables the loose fallback, so a broken pattern surfaces as ''
-        # instead of the real answer (with cushion it returns a distractor).
         self.assertEqual(
             tp.first_option_postprocess('题目提到A和B，但只有选项B是对的',
                                         'ABCD',
@@ -53,6 +48,15 @@ class TestTextPostprocessors(unittest.TestCase):
             tp.first_option_postprocess('排除A、D后，只有选项C是对',
                                         'ABCD',
                                         cushion=False), 'C')
+    
+    def test_first_option_postprocess_without_cushion(self):
+        self.assertEqual(
+            tp.first_option_postprocess('只有选项 B 是对', 'ABCD', cushion=False),
+            'B')
+        self.assertEqual(
+            tp.first_option_postprocess('reason A because',
+                                        'ABCD',
+                                        cushion=False), 'A')
 
     def test_last_option_postprocess(self):
         text = 'A then C then B'

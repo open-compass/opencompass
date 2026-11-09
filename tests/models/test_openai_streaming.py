@@ -126,6 +126,52 @@ class TestOpenAISDKStreaming(unittest.TestCase):
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('openai.OpenAI')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_multimodal_messages(self, mock_openai_class,
+                                           mock_tiktoken):
+        """Test multimodal messages are converted before streaming."""
+        setup_tiktoken_mock(mock_tiktoken)
+
+        final_chunk = MagicMock()
+        final_chunk.choices = [MagicMock()]
+        final_chunk.choices[0].delta.content = 'A'
+        final_chunk.choices[0].delta.reasoning_content = None
+        final_chunk.choices[0].finish_reason = 'stop'
+
+        mock_fresh_client = MagicMock()
+        mock_fresh_client.chat.completions.create.return_value = iter(
+            [final_chunk])
+
+        with patch.object(OpenAISDKStreaming,
+                          '_create_fresh_client') as mock_create_client:
+            mock_create_client.return_value = mock_fresh_client
+            mock_openai_class.return_value = MagicMock()
+
+            model = OpenAISDKStreaming(path='gpt-4o', stream=True)
+            results = model.generate([[
+                dict(role='user',
+                     content=[
+                         dict(type='text', text='Question'),
+                         dict(type='image',
+                              image_url='data:image/png;base64,AAAA'),
+                     ])
+            ]],
+                                     max_out_len=100)
+
+        self.assertEqual(results, ['A'])
+        messages = mock_fresh_client.chat.completions.create.call_args.kwargs[
+            'messages']
+        self.assertEqual(messages[0]['content'][0],
+                         dict(type='text', text='Question'))
+        self.assertEqual(messages[0]['content'][1], {
+            'type': 'image_url',
+            'image_url': {
+                'url': 'data:image/png;base64,AAAA'
+            }
+        })
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_with_streaming_reasoning_content(self, mock_openai_class,
                                                        mock_tiktoken):
         """Test generate with streaming and reasoning content."""
@@ -184,6 +230,52 @@ class TestOpenAISDKStreaming(unittest.TestCase):
 
             self.assertEqual(len(results), 1)
             self.assertEqual(results[0], 'Thinking process</think>Answer')
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('openai.OpenAI')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_with_streaming_reasoning_fallback(
+            self, mock_openai_class, mock_tiktoken):
+        """Test streaming vLLM ``reasoning`` field fallback."""
+        mock_enc = MagicMock()
+        mock_enc.encode.return_value = [1, 2, 3]
+        mock_tiktoken.encoding_for_model.return_value = mock_enc
+
+        chunks = []
+        for reasoning, content, finish_reason in [
+            ('Thinking', None, None),
+            (' process', None, None),
+            (None, 'Answer', None),
+            (None, None, 'stop'),
+        ]:
+            chunk = MagicMock()
+            chunk.choices = [MagicMock()]
+            chunk.choices[0].delta.reasoning_content = None
+            chunk.choices[0].delta.reasoning = reasoning
+            chunk.choices[0].delta.content = content
+            chunk.choices[0].finish_reason = finish_reason
+            chunks.append(chunk)
+
+        mock_fresh_client = MagicMock()
+        mock_fresh_client.chat.completions.create.return_value = iter(chunks)
+        mock_fresh_client._client = MagicMock()
+        mock_fresh_client._client.close = MagicMock()
+
+        with patch.object(OpenAISDKStreaming,
+                          '_create_fresh_client') as mock_create_client:
+            mock_create_client.return_value = mock_fresh_client
+            mock_openai_class.return_value = MagicMock()
+
+            model = OpenAISDKStreaming(
+                path='gpt-3.5-turbo',
+                max_seq_len=16384,
+                stream=True,
+                think_tag='</think>',
+            )
+
+            results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Thinking process</think>Answer'])
 
     @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('openai.OpenAI')
