@@ -154,10 +154,13 @@ class ParallelGenInferencer(GenInferencer):
             )
 
             if self.dump_res_length:
-                input_length = 0
-                if isinstance(parsed_entry, str):
+                if self.multiround and isinstance(parsed_entry, list):
+                    input_length = self._compute_multiround_input_lengths(
+                        entry)
+                elif isinstance(parsed_entry, str):
                     input_length = self.model.get_token_len(parsed_entry)
                 elif isinstance(parsed_entry, list):
+                    input_length = 0
                     for i in range(len(parsed_entry)):
                         if 'prompt' in parsed_entry[i]:
                             parsed_entry[i][
