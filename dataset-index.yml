@@ -1520,7 +1520,8 @@
     paper: https://aclanthology.org/W19-5301/
     configpath: opencompass/configs/datasets/wmt19/wmt19_gen.py
     configpath_llmjudge: ''
-- weddoo_bench:/n    name: WeddooBench
+- weddoo_bench:
+    name: WeddooBench
     category: Knowledge / Wedding Industry
     paper: ''
     configpath: ''

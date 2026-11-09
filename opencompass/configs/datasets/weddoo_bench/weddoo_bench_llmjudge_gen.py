@@ -2,7 +2,7 @@ from opencompass.datasets import (WeddooBenchDataset,
                                   generic_llmjudge_postprocess)
 from opencompass.evaluator import GenericLLMEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
 QUERY_TEMPLATE = """
@@ -55,36 +55,31 @@ weddoo_bench_reader_cfg = dict(
 
 weddoo_bench_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(role='HUMAN', prompt=QUERY_TEMPLATE),
-        ], ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(role='user', content=QUERY_TEMPLATE),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
-    inferencer=dict(type=GenInferencer, max_out_len=1024),
+    inferencer=dict(type=GenInferencer),
 )
 
 weddoo_bench_eval_cfg = dict(
     evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt='你是一位严谨的评审专家，只按评分标准判定，不重新回答问题。',
-                    )
-                ],
-                round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
-            ),
+            type=RawPromptTemplate,
+            messages=[
+                dict(
+                    role='system',
+                    content='你是一位严谨的评审专家，只按评分标准判定，不重新回答问题。',
+                ),
+                dict(role='user', content=GRADER_TEMPLATE),
+            ],
         ),
         dataset_cfg=dict(
             type=WeddooBenchDataset,
-            path='data/weddoo_bench/weddoo_bench_v1.jsonl',
+            path='opencompass/WeddooBench',
             reader_cfg=weddoo_bench_reader_cfg,
         ),
         judge_cfg=dict(),
@@ -97,7 +92,7 @@ weddoo_bench_datasets = [
     dict(
         abbr='WeddooBench',
         type=WeddooBenchDataset,
-        path='data/weddoo_bench/weddoo_bench_v1.jsonl',
+        path='opencompass/WeddooBench',
         reader_cfg=weddoo_bench_reader_cfg,
         infer_cfg=weddoo_bench_infer_cfg,
         eval_cfg=weddoo_bench_eval_cfg,

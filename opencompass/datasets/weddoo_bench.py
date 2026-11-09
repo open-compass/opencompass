@@ -1,11 +1,15 @@
 import json
+import os
 from typing import List
 
 from datasets import Dataset
 
 from opencompass.registry import LOAD_DATASET
+from opencompass.utils import get_data_path
 
 from .base import BaseDataset
+
+DEFAULT_FILENAME = 'weddoo_bench_v1.jsonl'
 
 
 def _format_key_points(key_points: List[str]) -> str:
@@ -37,15 +41,11 @@ class WeddooBenchDataset(BaseDataset):
 
     @staticmethod
     def load(path: str, **kwargs) -> Dataset:
-        """Load the dataset and return a HuggingFace ``Dataset``.
 
-        Args:
-            path (str): Path to the ``.jsonl`` data file.
+        path = get_data_path(path)
+        if os.path.isdir(path):
+            path = os.path.join(path, DEFAULT_FILENAME)
 
-        Returns:
-            Dataset: One row per question, with ``question``/``answer``
-            as the reference columns and ``key_points`` as the criteria.
-        """
         data = []
         with open(path, encoding='utf-8') as f:
             for line in f:
