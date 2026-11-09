@@ -48,7 +48,7 @@ class TestTextPostprocessors(unittest.TestCase):
             tp.first_option_postprocess('排除A、D后，只有选项C是对',
                                         'ABCD',
                                         cushion=False), 'C')
-    
+
     def test_first_option_postprocess_without_cushion(self):
         self.assertEqual(
             tp.first_option_postprocess('只有选项 B 是对', 'ABCD', cushion=False),
