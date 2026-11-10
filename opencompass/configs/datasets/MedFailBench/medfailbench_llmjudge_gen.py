@@ -84,7 +84,7 @@ medfailbench_eval_cfg = dict(
 
 medfailbench_datasets = [
     dict(
-        abbr='MedFailBench',
+        abbr='MedFailBench-LLMJudge',
         type=MedFailBenchDataset,
         path=MEDFAILBENCH_DATA_PATH,
         reader_cfg=medfailbench_reader_cfg,

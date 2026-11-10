@@ -176,6 +176,24 @@ class TestMedFailBenchConfigBoundary(unittest.TestCase):
                       text)
         self.assertIn('two distinct data artefacts', text)
 
+    def test_llm_judge_configs_do_not_use_the_official_name(self):
+        for name, abbr in (
+            ('medfailbench_llmjudge_gen.py', 'MedFailBench-LLMJudge'),
+            ('medfailbench_tr_preprint_llmjudge_gen.py',
+             'MedFailBench-TR-Preprint-LLMJudge'),
+        ):
+            text = (CONFIG_DIR / name).read_text(encoding='utf-8')
+            self.assertIn(f"abbr='{abbr}'", text)
+            self.assertNotIn("abbr='MedFailBench'", text)
+
+    def test_dataset_index_reserves_the_official_name(self):
+        lines = Path('dataset-index.yml').read_text(
+            encoding='utf-8').splitlines()
+        names = [line.strip() for line in lines]
+        self.assertIn('name: MedFailBench-LLMJudge', names)
+        self.assertIn('name: MedFailBench-TR-Preprint-LLMJudge', names)
+        self.assertNotIn('name: MedFailBench', names)
+
 
 if __name__ == '__main__':
     unittest.main()

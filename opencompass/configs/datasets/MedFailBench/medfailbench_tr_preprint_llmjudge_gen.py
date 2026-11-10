@@ -84,7 +84,7 @@ medfailbench_tr_preprint_eval_cfg = dict(
 
 medfailbench_tr_preprint_datasets = [
     dict(
-        abbr='MedFailBench-TR-Preprint',
+        abbr='MedFailBench-TR-Preprint-LLMJudge',
         type=MedFailBenchTRPreprintDataset,
         path=MEDFAILBENCH_TR_PREPRINT_DATA_PATH,
         reader_cfg=medfailbench_tr_preprint_reader_cfg,

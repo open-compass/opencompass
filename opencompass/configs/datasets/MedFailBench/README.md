@@ -12,19 +12,24 @@ with different schemas, different sizes, and different evaluation scopes. They
 must not be treated as interchangeable, and neither one is a subset of the
 other.
 
+**Naming.** Both configs end in `-LLMJudge` because their scores come from
+an OpenCompass-native LLM judge, not from the official rule-based MedFailBench
+scorer. The bare `MedFailBench` name is reserved for a config that uses the
+official scorer; this adapter does not ship one.
+
 | Abbreviation | Dataset | Rows | Languages | Role |
 | --- | --- | --- | --- | --- |
-| `MedFailBench` | MedFailBench v0.2 prompt set | 222 | en (136), tr (86) | Backs the official MedFailBench leaderboard |
-| `MedFailBench-TR-Preprint` | Turkish safety-layer evidence subset v0.1 | 44 | tr | Preprint evidence set; **not** the leaderboard data file |
+| `MedFailBench-LLMJudge` | MedFailBench v0.2 prompt set | 222 | en (136), tr (86) | Same data as the official MedFailBench leaderboard; LLM-judge scoring |
+| `MedFailBench-TR-Preprint-LLMJudge` | Turkish safety-layer evidence subset v0.1 | 44 | tr | Preprint evidence set; **not** the leaderboard data file |
 
 Two clarifications that matter for how results should be read:
 
-- **`MedFailBench` evaluates the leaderboard data file.** It loads the same
+- **`MedFailBench-LLMJudge` evaluates the leaderboard data file.** It loads the same
   `leaderboard/medfailbench_prompts_v0_2.jsonl` (222 rows) used by the LM
   Evaluation Harness task and the public leaderboard config. The data is the
   same; the OpenCompass judge is not the official scorer, so LLM-judge scores
   from this adapter are not itself an official leaderboard score.
-- **`MedFailBench-TR-Preprint` uses a different file.** Its 44 rows come from
+- **`MedFailBench-TR-Preprint-LLMJudge` uses a different file.** Its 44 rows come from
   `data/tr_medllm_synthetic_eval_set_v0_3.jsonl` and are exported for
   adapter-level transparency. The upstream README describes these cases as the
   preprint evidence set, which is cited separately from the broader benchmark
@@ -35,7 +40,8 @@ contains patient data, and this adapter does not claim clinical validation,
 model superiority, institutional endorsement, or deployment readiness.
 
 Note on scoring: exact prompt text overlap between the two files is zero. Do not
-report a `MedFailBench-TR-Preprint` score as a `MedFailBench` score, and do not
+report a `MedFailBench-TR-Preprint-LLMJudge` score as a `MedFailBench-LLMJudge`
+score, and do not
 average the two.
 
 ## Official Links
@@ -85,10 +91,10 @@ is not an exact-match medical QA score.
 
 Per dataset:
 
-- `MedFailBench` compares the answer against `safe_answer_hint` and prompts with
+- `MedFailBench-LLMJudge` compares the answer against `safe_answer_hint` and prompts with
   the row's own `prompt` field, which is already in that row's language
   (Turkish or English).
-- `MedFailBench-TR-Preprint` compares the answer against `target` and prompts
+- `MedFailBench-TR-Preprint-LLMJudge` compares the answer against `target` and prompts
   with the row's own `question` field, which is Turkish.
 
 ## Usage
@@ -101,8 +107,8 @@ python run.py --datasets medfailbench_llmjudge_gen --models <your_model>
 python run.py --datasets medfailbench_tr_preprint_llmjudge_gen --models <your_model>
 ```
 
-The configuration keys are `MedFailBench` and `MedFailBench-TR-Preprint`
-respectively.
+The configuration keys are `MedFailBench-LLMJudge` and
+`MedFailBench-TR-Preprint-LLMJudge` respectively.
 
 ## Citation
 
