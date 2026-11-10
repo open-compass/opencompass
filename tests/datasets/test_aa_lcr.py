@@ -1,11 +1,16 @@
 import csv
 import zipfile
+from unittest.mock import call, patch
 
+import pytest
 from datasets import Dataset
+from mmengine.config import Config
 
 from opencompass.configs.datasets.aa_lcr.aa_lcr_gen import \
     AA_LCR_JUDGE_TEMPLATE
-from opencompass.datasets.aa_lcr import (AALCRDataset,
+from opencompass.datasets.aa_lcr import (AALCRDataset, _parse_aa_lcr_judgement,
+                                         _resolve_data_files,
+                                         _resolve_data_path,
                                          aa_lcr_llmjudge_postprocess)
 from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 
@@ -103,6 +108,140 @@ def test_aa_lcr_local_loader_recovers_zip_filename_mojibake(tmp_path):
     assert 'BEGIN DOCUMENT 1:\nrecovered text' in sample['prompt']
 
 
+def test_aa_lcr_data_path_falls_back_when_cache_resolution_fails():
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               side_effect=AssertionError):
+        path = _resolve_data_path(
+            'opencompass/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
+
+
+def test_aa_lcr_data_path_falls_back_when_local_data_is_incomplete(tmp_path):
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               return_value=str(tmp_path)):
+        path = _resolve_data_path(
+            'opencompass/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
+
+
+def test_aa_lcr_data_path_falls_back_when_resolved_path_does_not_exist(
+        tmp_path):
+    missing_path = tmp_path / 'missing'
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               return_value=str(missing_path)):
+        path = _resolve_data_path(
+            'opencompass/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
+
+
+def test_aa_lcr_explicit_hub_repo_bypasses_unversioned_cache(tmp_path):
+    with patch('opencompass.datasets.aa_lcr.get_data_path',
+               return_value=str(tmp_path)) as get_data_path:
+        path = _resolve_data_path(
+            'ArtificialAnalysis/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+        )
+
+    assert path == 'ArtificialAnalysis/AA-LCR'
+    get_data_path.assert_not_called()
+
+
+@pytest.mark.parametrize('revision', [
+    'bdae010bbce259820c0e34c1d7cce210d966fb75',
+    '9a77ef56b717057ade24ceab4d273712a0b4f19e',
+])
+def test_aa_lcr_hub_files_use_the_same_revision(revision):
+    with patch('huggingface_hub.hf_hub_download',
+               side_effect=['/tmp/questions.csv', '/tmp/documents.zip']) as dl:
+        files = _resolve_data_files(
+            'ArtificialAnalysis/AA-LCR',
+            'AA-LCR_Dataset.csv',
+            'extracted_text/AA-LCR_extracted-text.zip',
+            revision=revision,
+        )
+
+    assert files == ('/tmp/questions.csv', '/tmp/documents.zip')
+    assert dl.call_args_list == [
+        call(repo_id='ArtificialAnalysis/AA-LCR',
+             filename='AA-LCR_Dataset.csv',
+             repo_type='dataset',
+             revision=revision),
+        call(repo_id='ArtificialAnalysis/AA-LCR',
+             filename='extracted_text/AA-LCR_extracted-text.zip',
+             repo_type='dataset',
+             revision=revision),
+    ]
+
+
+@pytest.mark.parametrize(('response', 'expected'), [
+    ('CORRECT', 'CORRECT'),
+    ('INCORRECT', 'INCORRECT'),
+    ('{"verdict": "CORRECT"}', 'CORRECT'),
+    ('{"verdict": "INCORRECT"}', 'INCORRECT'),
+    ('```json\n{"verdict": "correct"}\n```', 'CORRECT'),
+    ('{"reason": "Not INCORRECT", "verdict": "CORRECT"}', 'CORRECT'),
+    ('{"reason": "Some steps are CORRECT", "verdict": "INCORRECT"}',
+     'INCORRECT'),
+    ('{"reason": "CORRECT", "verdict": "UNKNOWN"}', 'UNKNOWN'),
+    ('{"reason": "CORRECT"}', 'UNKNOWN'),
+    ('No verdict', 'UNKNOWN'),
+])
+def test_aa_lcr_judgement_parses_json_verdict_before_explanation(
+        response, expected):
+    assert _parse_aa_lcr_judgement(response) == expected
+
+
+def test_aa_lcr_v1_1_config_keeps_inference_and_updates_judging():
+    old_cfg = Config.fromfile(
+        'opencompass/configs/datasets/aa_lcr/aa_lcr_gen.py')
+    new_cfg = Config.fromfile(
+        'opencompass/configs/datasets/aa_lcr/aa_lcr_v1_1_gen.py')
+    old = old_cfg.aa_lcr_datasets[0]
+    new = new_cfg.aa_lcr_v1_1_datasets[0]
+    assert old.revision == 'bdae010bbce259820c0e34c1d7cce210d966fb75'
+    assert old.eval_cfg.evaluator.dataset_cfg.revision == old.revision
+    assert new.revision == '9a77ef56b717057ade24ceab4d273712a0b4f19e'
+    assert new.eval_cfg.evaluator.dataset_cfg.revision == new.revision
+    assert new.path == 'opencompass/AA-LCR-v1.1'
+    assert new.eval_cfg.evaluator.dataset_cfg.path == new.path
+    assert new.abbr != old.abbr
+    assert new.type is old.type is AALCRDataset
+    assert new.n == old.n == 3
+    assert new.reader_cfg == old.reader_cfg
+    assert new.infer_cfg == old.infer_cfg
+    assert new.eval_cfg.evaluator.type is old.eval_cfg.evaluator.type
+    assert new.eval_cfg.evaluator.dict_postprocessor == (
+        old.eval_cfg.evaluator.dict_postprocessor)
+
+    template = RawPromptTemplate(
+        messages=new.eval_cfg.evaluator.prompt_template.messages)
+    messages = template.generate_item({
+        'question': 'What percentage?',
+        'answer': ['65.8%'],
+        'prediction': '65.8%',
+    })
+    assert [message['role'] for message in messages] == ['system', 'user']
+    assert '0.675, "67.5%"' in messages[0]['content']
+    assert 'it must commit to one' in messages[0]['content']
+    assert 'START QUESTION What percentage?' in messages[1]['content']
+    assert "The OFFICIAL ANSWER: ['65.8%']" in messages[1]['content']
+    assert '\n65.8%\n' in messages[1]['content']
+    assert 'Reply as JSON, with a verdict' in messages[1]['content']
+
+
 def test_aa_lcr_llmjudge_postprocess():
     test_set = Dataset.from_list([
         {
@@ -134,10 +273,10 @@ def test_aa_lcr_llmjudge_postprocess():
     scores = aa_lcr_llmjudge_postprocess(
         {
             '0': {
-                'prediction': 'CORRECT'
+                'prediction': '{"reason": "Not INCORRECT", "verdict": "CORRECT"}'
             },
             '1': {
-                'prediction': 'INCORRECT'
+                'prediction': '{"verdict": "INCORRECT"}'
             },
         },
         output_path='unused.json',

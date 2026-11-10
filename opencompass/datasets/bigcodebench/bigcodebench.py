@@ -1,5 +1,4 @@
-# Copyright (c) 2024, BigCodeBench and its contributors.
-# Copyright (c) 2023, OpenCompass and its contributors.
+from __future__ import annotations
 
 import os
 import time
@@ -16,6 +15,9 @@ from opencompass.utils import (check_url_accessibility, get_data_path,
 
 from ..base import BaseDataset
 from .extractor import extract_code_generation
+
+# Copyright (c) 2024, BigCodeBench and its contributors.
+# Copyright (c) 2023, OpenCompass and its contributors.
 
 
 class BigCodeBenchDataset(BaseDataset):
