@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -108,7 +110,7 @@ class TurboMindAPIModel(BaseModel):
             temperature (float): What sampling temperature to use,
                 between 0 and 2. Higher values like 0.8 will make the output
                 more random, while lower values like 0.2 will make it more
-                focused and deterministic. Defaults to 0.7.
+                focused and deterministic. Defaults to 1.0.
             end_str (str, optional): Whether to trim generated strings
                 with end_str if the model has special ending strings
                 that are not handled well.

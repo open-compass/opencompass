@@ -1,8 +1,23 @@
 DATASETS_MAPPING = {
+    "opencompass/LogiQA": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/LogiQA",
+    },
+    "opencompass/lgbench150": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/lgbench150_data",
+    },
     "opencompass/AA-LCR":{
         "ms_id": None,
         "hf_id": None,
         "local": "./data/aa_lcr",
+    },
+    "opencompass/AA-LCR-v1.1": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/aa_lcr_v1_1",
     },
     "opencompass/QASPER":{
         "ms_id": None,
@@ -243,11 +258,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/mbpp_plus/mbpp_plus.jsonl",
     },
-    # 'opencompass/mbpp': {
-    #     'ms_id': 'opencompass/mbpp',
-    #     'hf_id': 'opencompass/mbpp',
-    #     'local': './data/mbpp/mbpp.jsonl',
-    # },
+    "opencompass/mbpp_cn": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/mbpp_cn/mbpp_cn.jsonl",
+    },
     "opencompass/sanitized_mbpp": {
         "ms_id": "opencompass/mbpp",
         "hf_id": "opencompass/mbpp",
@@ -298,6 +313,12 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/korbench",
+    },
+    #ReasonZoo
+    "opencompass/reasonzoo": {
+        "ms_id": "opencompass/ReasonZoo",
+        "hf_id": "opencompass/ReasonZoo",
+        "local": "./data/reasonzoo",
     },
     # Lambada
     "opencompass/lambada": {
@@ -582,6 +603,11 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/OlympiadBench",
     },
+    "opencompass/maritimebench": {
+        "ms_id": "HiDolphin/MaritimeBench",
+        "hf_id": "Hi-Dolphin/MaritimeBench",
+        "local": "./data/maritimebench",
+    },
     "opencompass/ClimaQA-Gold": {
         "ms_id": "",
         "hf_id": "",
@@ -626,6 +652,11 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/medbullets/medbullets.csv",
+    },
+    "opencompass/GrandPhysics": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/GrandPhysics_50_questions.json",
     },
     "opencompass/Chem_exam_gaokao":{
         "ms_id": "",
@@ -692,6 +723,20 @@ DATASETS_MAPPING = {
 }
 
 DATASETS_URL = {
+    "/LogiQA": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/LogiQA.zip",
+        "md5": "98bb4e8bf45a9f84008429110644d37f",
+    },
+    "/reasonzoo": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/reasonzoo.zip",
+        "md5": "f4a410c98a8f8c9206c2799ebc9b133d",
+    },
+    "/lgbench150_data": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/lgbench150_data.zip",
+        "md5": "9013a5c35d2ad5ff1bf5960c26d290cc",
+    },
     "/AA-LCR": {
         "url":"http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/aa_lcr.zip",
         "md5":"d795853a0897f69afa23df955ea8f68f",
@@ -824,6 +869,11 @@ DATASETS_URL = {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_plus.zip",
         "md5": "a1a2207e449462849024660b29e67dde",
+    },
+    "/mbpp_cn/": {
+        "url":
+        "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/mbpp_cn.zip",
+        "md5": "7f449cf86c2e1593a3e6bff700a98bad",
     },
     "/mbpp/": {
         "url":
@@ -1161,5 +1211,9 @@ DATASETS_URL = {
     "/imo-bench-answerbench": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/imo-bench-answerbench.zip",
         "md5": "34b814c97344016d5b597d75a8fff7be",
+    },
+    "/GrandPhysics": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GrandPhysics_50_questions.zip",
+        "md5": "06e37ec7676c800d3c0010ee4cb93765",
     }
 }
