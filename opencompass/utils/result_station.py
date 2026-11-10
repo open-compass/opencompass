@@ -1,3 +1,5 @@
+"""Read and write shared evaluation results as UTF-8 JSON."""
+
 import json
 import os
 import os.path as osp
@@ -54,7 +56,7 @@ def save_to_station(cfg, args):
                             continue
                         raise ValueError(
                             'invalid file: {}'.format(local_result_json))
-                    with open(local_result_json, 'r') as f:
+                    with open(local_result_json, 'r', encoding='utf-8') as f:
                         this_result = json.load(f)
                     f.close()
 
@@ -73,9 +75,10 @@ def save_to_station(cfg, args):
 
                     this_prediction = []
                     for prediction_json in local_prediction_json:
-                        with open(
-                                osp.join(local_prediction_path,
-                                         prediction_json), 'r') as f:
+                        with open(osp.join(local_prediction_path,
+                                           prediction_json),
+                                  'r',
+                                  encoding='utf-8') as f:
                             this_prediction_load_json = json.load(f)
                         f.close()
                         for prekey in this_prediction_load_json.keys():
@@ -100,7 +103,8 @@ def save_to_station(cfg, args):
                         'cfg': this_cfg
                     }
                     with open(osp.join(result_path, result_file_name),
-                              'w') as f:
+                              'w',
+                              encoding='utf-8') as f:
                         json.dump(data_model_results,
                                   f,
                                   ensure_ascii=False,
@@ -169,7 +173,8 @@ def save_to_station(cfg, args):
                                     continue
                                 raise ValueError('invalid file: {}'.format(
                                     local_result_json))
-                            with open(local_result_json, 'r') as f:
+                            with open(local_result_json, 'r',
+                                      encoding='utf-8') as f:
                                 this_result = json.load(f)
                             f.close()
 
@@ -188,9 +193,10 @@ def save_to_station(cfg, args):
 
                             this_prediction = []
                             for prediction_json in local_prediction_json:
-                                with open(
-                                        osp.join(local_prediction_path,
-                                                 prediction_json), 'r') as f:
+                                with open(osp.join(local_prediction_path,
+                                                   prediction_json),
+                                          'r',
+                                          encoding='utf-8') as f:
                                     this_prediction_load_json = json.load(f)
                                 f.close()
                                 for prekey in this_prediction_load_json.keys():
@@ -226,7 +232,8 @@ def save_to_station(cfg, args):
                             }
 
                             with open(osp.join(result_path, result_file_name),
-                                      'w') as f:
+                                      'w',
+                                      encoding='utf-8') as f:
                                 json.dump(data_model_results,
                                           f,
                                           ensure_ascii=False,
@@ -269,7 +276,7 @@ def read_from_station(cfg, args):
                 else:
                     print('find result file: {} with {} at station'.format(
                         model, dataset))
-                    with open(result_file_path, 'r') as f:
+                    with open(result_file_path, 'r', encoding='utf-8') as f:
                         download_json = json.load(f)
                     f.close()
                     existing_results_list.append({
@@ -289,7 +296,7 @@ def read_from_station(cfg, args):
                 this_result_local_path, i['combination'][1] + '.json')
             if osp.exists(this_result_local_file_path):
                 continue
-            with open(this_result_local_file_path, 'w') as f:
+            with open(this_result_local_file_path, 'w', encoding='utf-8') as f:
                 json.dump(this_result, f, ensure_ascii=False, indent=4)
             f.close()
 
@@ -342,7 +349,7 @@ def read_from_station(cfg, args):
 
                 # save all parts of results to local
                 for result_file_path in result_file_path_list:
-                    with open(result_file_path, 'r') as f:
+                    with open(result_file_path, 'r', encoding='utf-8') as f:
                         this_result = json.load(f)['results']
                     f.close()
                     this_result_local_path = osp.join(
@@ -354,7 +361,9 @@ def read_from_station(cfg, args):
                         this_result_local_path, dataset + '.json')
                     if osp.exists(this_result_local_file_path):
                         continue
-                    with open(this_result_local_file_path, 'w') as f:
+                    with open(this_result_local_file_path,
+                              'w',
+                              encoding='utf-8') as f:
                         json.dump(this_result, f, ensure_ascii=False, indent=4)
                     f.close()
 
