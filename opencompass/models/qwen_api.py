@@ -69,6 +69,36 @@ class Qwen(BaseAPIModel):
         self.flush()
         return results
 
+    @staticmethod
+    def _get_response_field(obj, field: str):
+        if obj is None:
+            return None
+        if isinstance(obj, dict):
+            return obj.get(field)
+        return getattr(obj, field, None)
+
+    @classmethod
+    def _extract_response_text(cls, response) -> Optional[str]:
+        output = cls._get_response_field(response, 'output')
+
+        text = cls._get_response_field(output, 'text')
+        if isinstance(text, str):
+            return text
+
+        choices = cls._get_response_field(output, 'choices')
+        if choices:
+            choice = choices[0]
+            message = cls._get_response_field(choice, 'message')
+            content = cls._get_response_field(message, 'content')
+            if isinstance(content, str):
+                return content
+
+            text = cls._get_response_field(choice, 'text')
+            if isinstance(text, str):
+                return text
+
+        return None
+
     def _generate(
         self,
         input: PromptType,
@@ -144,15 +174,15 @@ class Qwen(BaseAPIModel):
                 continue
 
             if response.status_code == 200:
-                try:
-                    msg = response.output.text
+                msg = self._extract_response_text(response)
+                if msg is not None:
                     self.logger.debug(msg)
                     return msg
-                except KeyError:
-                    print(response)
-                    self.logger.error(str(response.status_code))
-                    time.sleep(1)
-                    continue
+                print(response)
+                self.logger.error('No text content found in response.')
+                time.sleep(1)
+                max_num_retries += 1
+                continue
             if response.status_code == 429:
                 print(response)
                 time.sleep(2)

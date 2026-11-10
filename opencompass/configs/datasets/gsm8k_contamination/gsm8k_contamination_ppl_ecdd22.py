@@ -2,7 +2,7 @@ from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import PPLOnlyInferencer
 from opencompass.openicl.icl_evaluator import AveragePPLEvaluator
-from opencompass.datasets import GSM8KDataset, GSM8KReferenceSkywork
+from opencompass.datasets import GSM8KDataset, JsonlDataset
 
 gsm8k_datasets = []
 
@@ -48,7 +48,7 @@ gsm8k_reader_cfg = dict(
 gsm8k_datasets.append(
     dict(
         abbr=f'gsm8k-ref-ppl',
-        type=GSM8KReferenceSkywork,
+        type=JsonlDataset,
         path='./data/gsm8k-extra/mock_gsm8k_test.jsonl',
         reader_cfg=gsm8k_reader_cfg,
         infer_cfg=gsm8k_infer_cfg,

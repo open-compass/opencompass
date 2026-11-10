@@ -25,6 +25,9 @@ import platform
 import signal
 import tempfile
 
+from opencompass.utils.code_execution import (TYPE_AWARE_EQUAL_NAME,
+                                              type_aware_equal)
+
 BASE_IMPORTS = """from itertools import accumulate, chain, combinations, count, permutations, product, groupby, islice, repeat
 from copy import deepcopy
 from string import ascii_lowercase
@@ -103,10 +106,13 @@ def unsafe_execute(check_program, result, timeout):
 
         # Run program.
         try:
+            code, test_case = check_program
             exec_globals = {}
             with swallow_io():
                 with time_limit(timeout):
-                    exec(check_program, exec_globals)
+                    exec(code, exec_globals)
+                    exec_globals[TYPE_AWARE_EQUAL_NAME] = type_aware_equal
+                    exec(test_case, exec_globals)
             result.append('passed')
         except TimeoutException:
             result.append('timed out')

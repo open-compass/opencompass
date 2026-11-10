@@ -25,3 +25,7 @@ categories = [
 biodata_summary_groups = [
     {'name': 'bio_data', 'subsets': [c + '-sample_1k' for c in categories]},
 ]
+
+mini_biodata_summary_groups = [
+    {'name': 'mini_bio_data', 'subsets': [c + '-sample_1k' + '-mini' for c in categories]},
+]

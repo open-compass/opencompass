@@ -29,7 +29,7 @@ svamp_datasets = [
     dict(
         abbr='svamp',
         type=SVAMPDataset,
-        path='./data/svamp/test.jsonl',
+        path='opencompass/SVAMP',
         reader_cfg=dict(input_columns=['question'], output_column='answer'),
         infer_cfg=svamp_infer_cfg,
         eval_cfg=svamp_eval_cfg)
