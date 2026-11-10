@@ -66,7 +66,7 @@ class GaokaoBenchEvaluator(BaseEvaluator):
             answer = ''
             content = re.sub(r'\s+', '', model_output)
             answer_index = content.find('【答案】')
-            if answer_index > 0:
+            if answer_index != -1:
                 temp = content[answer_index:]
                 if len(re.findall(r'[A-D]', temp)) > 0:
                     for t in re.findall(r'[A-D]', temp):
