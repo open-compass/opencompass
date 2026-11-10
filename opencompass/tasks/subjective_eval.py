@@ -4,6 +4,7 @@ import copy
 import fnmatch
 import os.path as osp
 import random
+import re
 import sys
 import time
 from typing import List, Optional, Union
@@ -127,24 +128,26 @@ class SubjectiveEvalTask(BaseTask):
         # 4.Use both partition, with same partition size
         # 5.Use both partition, but different partition size
 
-        # If take SubjectSizePartition, get new filename without _0
-        if 'test_range' in dataset_cfg['reader_cfg']:
-            filename = get_infer_output_path(
-                model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
-            root, ext = osp.splitext(filename)
-            last_underscore_index = root.rfind('_')
-            root = root[:last_underscore_index]
-            filename = root + ext
-        # If take SubjectNaivePartition, get filename
-        else:
-            filename = get_infer_output_path(
-                model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
+        filename = get_infer_output_path(
+            model_cfg, dataset_cfg, osp.join(self.work_dir, 'predictions'))
         for given_pred in given_preds:
             abbr = given_pred['abbr']
             path = given_pred['path']
             path = get_data_path(path, local_mode=True)
             if abbr == model_cfg['abbr']:
                 filename = osp.join(path, osp.basename(filename))
+
+        # A subjective size partition appends a numeric suffix to the dataset
+        # abbr. Prefer the exact path first: a plain test_range used for
+        # sampling does not imply that the abbr is a partition name.
+        root, ext = osp.splitext(filename)
+        partial_filename = root + '_0' + ext
+        if (not osp.exists(filename) and not osp.exists(partial_filename)
+                and 'test_range' in dataset_cfg['reader_cfg']):
+            basename = osp.basename(root)
+            if re.search(r'_\d+$', basename):
+                root = re.sub(r'_\d+$', '', root)
+                filename = root + ext
         # Get partition name
         root, ext = osp.splitext(filename)
         partial_filename = root + '_0' + ext
