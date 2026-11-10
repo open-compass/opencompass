@@ -1,34 +1,13 @@
 """Unit tests for GSM8K dataset.
 
-Covers text postprocessors and the Gsm8kEvaluator. The module is loaded via
-importlib to avoid importing the full opencompass package and its heavy
-dependencies (torch, transformers, etc.).
+Covers text postprocessors and the Gsm8kEvaluator.
 """
 
-import importlib.util
-import sys
 import unittest
-from pathlib import Path
 
-
-def _load_gsm8k_module():
-    module_name = 'opencompass.datasets.gsm8k'
-    if module_name in sys.modules:
-        return sys.modules[module_name]
-
-    root_dir = Path(__file__).resolve().parents[2]
-    module_path = root_dir / 'opencompass' / 'datasets' / 'gsm8k.py'
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
-
-
-gsm8k_module = _load_gsm8k_module()
-gsm8k_postprocess = gsm8k_module.gsm8k_postprocess
-gsm8k_dataset_postprocess = gsm8k_module.gsm8k_dataset_postprocess
-Gsm8kEvaluator = gsm8k_module.Gsm8kEvaluator
+from opencompass.datasets.gsm8k import (Gsm8kEvaluator,
+                                        gsm8k_dataset_postprocess,
+                                        gsm8k_postprocess)
 
 
 class TestGsm8kPostprocess(unittest.TestCase):
@@ -51,6 +30,40 @@ class TestGsm8kPostprocess(unittest.TestCase):
 
     def test_empty_string_returns_null(self):
         self.assertEqual(gsm8k_postprocess(''), 'NULL')
+
+    def test_strips_thousands_separators(self):
+        cases = {
+            r'\boxed{$9{,}500}': '9500',
+            r'\boxed{8,000}': '8000',
+            'The answer is $9,500.': '9500',
+            'The answer is 1,450,000': '1450000',
+            'The total is $1,234,567.89': '1234567.89',
+            r'Thus, Jill earns \(\boxed{\$57,500}\).': '57500',
+            r'Josh incurred a loss: $$ \boxed{-10,000} $$': '-10000',
+            r'The distance is \[ \boxed{180,000 \text{ meters}} \]': '180000',
+            ('$22,500+$35,000 = $57,500 per year. '
+             'The answer is $57,500'): '57500',
+            'The answer is 2,000.\n\nQuestion: He has 5,000 coins.': '2000',
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(gsm8k_postprocess(text), expected)
+
+    def test_keeps_non_thousands_commas(self):
+        # A comma is only a thousands separator when exactly three digits
+        # follow, so lists, coordinates and decimal commas must not be merged.
+        cases = {
+            'The side lengths are 3,4,5': '5',
+            'The point is (3,4)': '4',
+            'Days 1,2 she ran 5 miles; total 12,15': '15',
+            'So x = 2,5': '5',
+            '12,34': '34',
+            '1,2345': '2345',
+            'Sides 3,4,5 give area 6, so it costs $1,200': '1200',
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(gsm8k_postprocess(text), expected)
 
 
 class TestGsm8kDatasetPostprocess(unittest.TestCase):

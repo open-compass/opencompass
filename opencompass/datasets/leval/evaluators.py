@@ -1,10 +1,19 @@
 import json
+from pathlib import Path
 from typing import List
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import ICL_EVALUATORS
 from opencompass.utils.prompt import PromptList
 from opencompass.utils.text_postprocessors import general_postprocess
+
+_MODULE_FILE = Path(__file__).resolve()
+
+
+def _load_battle_samples(battle_model: str) -> List[dict]:
+    resource_path = _MODULE_FILE.with_name(f'{battle_model}.pred.jsonl')
+    with resource_path.open(encoding='utf-8') as f:
+        return [json.loads(line) for line in f]
 
 
 @ICL_EVALUATORS.register_module()
@@ -64,12 +73,7 @@ class LEvalGPTEvaluator(BaseEvaluator):
     def score(self, predictions: List, references: List) -> dict:
         system_prompt = "Please act as an impartial judge and evaluate the quality of the responses provided by two AI assistants to the user question about the content of a long document.  You will be given a reference answer written by human, assistant A's answer, and assistant B's answer. Your job is to evaluate which assistant's answer is better. Begin your evaluation by comparing both assistants' answers with the reference answer. Additional details or information that are not mentioned in reference answer cannot be considered as advantages and do not let them sway your judgment. Your evaluation should also consider the relevance to user's question but it is more important to avoid factual errors according to the reference answer. Avoid any position biases and ensure that the order in which the responses were presented does not influence your decision. Do not allow the length of the responses to influence your evaluation. Do not favor certain names of the assistants. Be as objective as possible. After providing your explanation, output your final verdict by strictly following this format: \"[[A]]\" if assistant A is better, \"[[B]]\" if assistant B is better, and \"[[C]]\" for a tie."  # noqa
         prompt_template = "[User Question]\n{question}\n\n[The Start of Reference Answer]\n{reference}\n[The End of Reference Answer]\n\n[The Start of Assistant A's Answer]\n{answer_a}\n[The End of Assistant A's Answer]\n\n[The Start of Assistant B's Answer]\n{answer_b}\n[The End of Assistant B's Answer]"  # noqa
-        battle_samples = []
-        with open(
-                'opencompass/datasets/leval/' + self.battle_model +
-                '.pred.jsonl', 'r') as f:
-            for i, line in enumerate(f):
-                battle_samples.append(json.loads(line))
+        battle_samples = _load_battle_samples(self.battle_model)
 
         score = 0.
         bad_case = 0

@@ -135,7 +135,7 @@ class ClaudeAllesAPIN(BaseAPIModel):
                 if 'https://errors.aliyun.com/images' in \
                         raw_response.content.decode():
                     return 'request blocked by allesapin'
-                self.logger.error('JsonDecode error, got',
+                self.logger.error('JsonDecode error, got %s',
                                   raw_response.content)
                 continue
             if raw_response.status_code == 200 and response[
