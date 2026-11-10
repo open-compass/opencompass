@@ -543,6 +543,7 @@ class TestOpenICLInferConcurrentTask(unittest.TestCase):
 
         task = OpenICLInferConcurrentTask(self.cfg)
         task.logger = MagicMock()
+        task._run_task_group = MagicMock(return_value=[])
 
         mock_cur_model = MagicMock()
         mock_cur_model.is_api = True
@@ -570,6 +571,56 @@ class TestOpenICLInferConcurrentTask(unittest.TestCase):
         task = OpenICLInferConcurrentTask(cfg)
         # max_workers should be read from model_cfg
         self.assertTrue(hasattr(task, 'model_cfgs'))
+
+    @patch('opencompass.tasks.openicl_infer_concurrent.build_model_from_cfg')
+    @patch('opencompass.tasks.openicl_infer_concurrent.get_infer_output_path')
+    def test_run_reports_failure_after_all_task_groups(self, mock_get_path,
+                                                       mock_build_model):
+        """Test failures are reported after all task groups finish."""
+        mock_get_path.return_value = osp.join(self.temp_dir, 'output.json')
+        mock_build_model.return_value = MagicMock(is_api=True)
+        cfg = ConfigDict({
+            'work_dir':
+            self.temp_dir,
+            'models': [
+                ConfigDict({
+                    'abbr': 'model_1',
+                    'type': 'TestAPIModel',
+                    'run_cfg': {}
+                }),
+                ConfigDict({
+                    'abbr': 'model_2',
+                    'type': 'TestAPIModel',
+                    'run_cfg': {}
+                }),
+            ],
+            'datasets': [self.cfg.datasets[0], self.cfg.datasets[0]],
+        })
+        task = OpenICLInferConcurrentTask(cfg)
+        task._run_task_group = MagicMock(
+            side_effect=[['[model_1/test_dataset]'], []])
+
+        with self.assertRaisesRegex(RuntimeError, r'model_1/test_dataset'):
+            task.run()
+
+        self.assertEqual(task._run_task_group.call_count, 2)
+
+    def test_run_task_group_returns_failed_status(self):
+        """Test a failed infer status is returned after the group finishes."""
+        task = OpenICLInferConcurrentTask(self.cfg)
+
+        def fail_dataset_task(*args):
+            status = args[-1]
+            status.update(status='fail')
+
+        task._run_dataset_task = MagicMock(side_effect=fail_dataset_task)
+
+        failed_tasks = task._run_task_group(self.cfg.models[0],
+                                            self.cfg.datasets[0],
+                                            threading.Semaphore(1), 1)
+
+        self.assertEqual(len(failed_tasks), 1)
+        self.assertIn('test_dataset', failed_tasks[0])
 
     @patch('opencompass.tasks.openicl_infer_concurrent.ICL_INFERENCERS')
     def test_build_inferencer_with_max_infer_workers(self, mock_registry):

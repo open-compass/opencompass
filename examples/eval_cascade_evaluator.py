@@ -1,10 +1,6 @@
-
 from mmengine.config import read_base
 
-from opencompass.openicl.icl_prompt_template import PromptTemplate
-from opencompass.openicl.icl_retriever import ZeroRetriever
-from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.evaluator import (
@@ -12,35 +8,30 @@ from opencompass.evaluator import (
     CascadeEvaluator,
     MATHVerifyEvaluator,
 )
-from opencompass.datasets import generic_llmjudge_postprocess
-from opencompass.datasets import (
-    MATHDataset,
-    math_postprocess_v2,
-    normalize_final_answer,
-)
+from opencompass.datasets import MATHDataset
 #######################################################################
 #                          PART 0  Essential Configs                  #
 #######################################################################
 
 with read_base():
-    # Datasets, Summarizer
-    from opencompass.configs.models.qwen2_5.lmdeploy_qwen2_5_7b_instruct import (
-        models as lmdeploy_qwen2_5_7b_instruct_model,
+    # Model to be evaluated
+    from opencompass.configs.models.openai.gpt_6_astra import (
+        models as gpt_6_astra,
     )
 
 reader_cfg = dict(input_columns=['problem'], output_column='solution')
 
 infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.',
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content=(
+                    '{problem}\nPlease reason step by step, and put your final answer within \\boxed{}.'
                 ),
-            ]
-        ),
+            ),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
@@ -72,43 +63,39 @@ GRADER_TEMPLATE = """
     Judging the correctness of candidates' answers:
 """.strip()
 
-llm_judge_evaluator =   dict(
-        type=GenericLLMEvaluator,
-        prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                    )
-                ],
-                round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
+llm_judge_evaluator = dict(
+    type=GenericLLMEvaluator,
+    prompt_template=dict(
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='system',
+                content=(
+                    "You are a helpful assistant who evaluates the correctness and quality of models' outputs."
+                ),
             ),
-        ),
-        dataset_cfg=dict(
+            dict(role='user', content=GRADER_TEMPLATE),
+        ],
+    ),
+    dataset_cfg=dict(
         type=MATHDataset,
         path='opencompass/math',
         file_name='test_prm800k_500.json',
-        ),
-        judge_cfg=dict(),
-    )
+    ),
+    judge_cfg=dict(),
+)
 
-rule_evaluator =dict(type=MATHVerifyEvaluator)
+rule_evaluator = dict(type=MATHVerifyEvaluator)
 cascade_evaluator = dict(type=CascadeEvaluator,
-                   llm_evaluator=llm_judge_evaluator,
-                   rule_evaluator=rule_evaluator,
-                   parallel=False
-                   )
+                         llm_evaluator=llm_judge_evaluator,
+                         rule_evaluator=rule_evaluator,
+                         parallel=False)
 ########################## #################################
 eval_cfg = dict()
 
 # eval_cfg['evaluator'] = rule_evaluator
 # eval_cfg['evaluator'] = llm_judge_evaluator
-eval_cfg['evaluator'] = cascade_evaluator 
+eval_cfg['evaluator'] = cascade_evaluator
 
 math_datasets = [
     dict(
@@ -122,9 +109,7 @@ math_datasets = [
     )
 ]
 
-
 datasets = math_datasets
-models = lmdeploy_qwen2_5_7b_instruct_model
-
+models = gpt_6_astra
 
 work_dir = 'math_prm800k_500_cascade_evaluator'
