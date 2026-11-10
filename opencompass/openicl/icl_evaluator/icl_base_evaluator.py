@@ -166,72 +166,90 @@ class BaseEvaluator:
                 else:
                     eval_results[key] = np.mean(eval_results[key])
 
-        # Calculate the additional metrics
-        grouped_examples = self.group(n, all_details, original_dataset)
-        can_calculate = False
-        if len(all_details) != 0:
-            eval_details = []
-            for example_abbr, examples in grouped_examples.items():
-                detail = {'predictions': [], 'example_abbr': example_abbr}
+        # Aggregate details across runs only when every score() call
+        # returned complete details aligned with the dataset. Otherwise,
+        # skip cross-run detail aggregation (e.g. G-Pass@k) and keep the
+        # averaged metrics, instead of silently returning the last batch's
+        # result or crashing on partial details.
+        complete = len(all_details) == len(original_dataset)
+        if n > 1 and not complete:
+            logger.warning(
+                f'Repeated evaluation (n={n}): got {len(all_details)} of '
+                f'{len(original_dataset)} detail entries from score(). '
+                'Cross-run detail aggregation (e.g. G-Pass@k) is skipped; '
+                'numeric metrics are still averaged across runs. To enable '
+                'detail aggregation, every score() call must return '
+                'complete, non-empty details aligned with the batch '
+                'samples.')
+        if complete:
+            # Calculate the additional metrics
+            grouped_examples = self.group(n, all_details,
+                                          original_dataset)
+            can_calculate = False
+            if len(all_details) != 0:
+                eval_details = []
+                for example_abbr, examples in grouped_examples.items():
+                    detail = {'predictions': [], 'example_abbr': example_abbr}
 
-                c = 0
-                for example in examples:
-                    detail['predictions'].append(example['detail'])
-                    # only compute G-Pass@k when details have correct labels
-                    if example['detail'].get('correct', None) is not None:
-                        can_calculate = True
-                        c += int(example['detail']['correct'])
-                    elif example['detail'].get('is_correct', None) is not None:
-                        can_calculate = True
-                        c += int(example['detail']['is_correct'])
-                    elif example['detail'].get('cascade_correct',
-                                               None) is not None:
-                        can_calculate = True
-                        c += int(example['detail']['cascade_correct'])
+                    c = 0
+                    for example in examples:
+                        detail['predictions'].append(example['detail'])
+                        # only compute G-Pass@k when details have correct labels
+                        if example['detail'].get('correct', None) is not None:
+                            can_calculate = True
+                            c += int(example['detail']['correct'])
+                        elif example['detail'].get(
+                                'is_correct', None) is not None:
+                            can_calculate = True
+                            c += int(example['detail']['is_correct'])
+                        elif example['detail'].get(
+                                'cascade_correct', None) is not None:
+                            can_calculate = True
+                            c += int(example['detail']['cascade_correct'])
 
-                k_list = [k] if isinstance(k, int) else k
+                    k_list = [k] if isinstance(k, int) else k
+                    if can_calculate and n > 1 and max(k_list) > 1:
+                        thresholds = [0.0, 0.25, 0.5, 0.75, 1.0]
+                        for _k in k_list:
+                            for threshold in thresholds:
+                                g_pass = compute_g_pass_at_k(n=n,
+                                                             c=c,
+                                                             k=_k,
+                                                             t=threshold)
+                                detail[f'G-Pass@{_k}_{threshold}'] = g_pass
+                            detail[f'mG-Pass@{_k}'] = compute_mg_pass_at_k(
+                                n=n, c=c, k=_k)
+
+                    eval_details.append(detail)
+
                 if can_calculate and n > 1 and max(k_list) > 1:
-                    thresholds = [0.0, 0.25, 0.5, 0.75, 1.0]
-                    for _k in k_list:
-                        for threshold in thresholds:
-                            g_pass = compute_g_pass_at_k(n=n,
-                                                         c=c,
-                                                         k=_k,
-                                                         t=threshold)
-                            detail[f'G-Pass@{_k}_{threshold}'] = g_pass
-                        detail[f'mG-Pass@{_k}'] = compute_mg_pass_at_k(n=n,
-                                                                       c=c,
-                                                                       k=_k)
+                    eval_results.update(self.reduce(eval_details))
 
-                eval_details.append(detail)
+                # Store eval_details in eval_results
+                eval_results['details'] = eval_details
 
-            if can_calculate and n > 1 and max(k_list) > 1:
-                eval_results.update(self.reduce(eval_details))
+                # Process details to flatten the predictions
+                for detail in eval_details:
+                    # Extract all prediction fields and flatten them
+                    flattened_predictions = {}
+                    for pred in detail['predictions']:
+                        for k, v in pred.items():
+                            if k not in flattened_predictions:
+                                flattened_predictions[k] = [v]
+                            else:
+                                flattened_predictions[k].append(v)
 
-            # Store eval_details in eval_results
-            eval_results['details'] = eval_details
+                    # Replace the predictions list with the flattened dictionary
+                    for k, v in flattened_predictions.items():
+                        detail[k] = v
 
-            # Process details to flatten the predictions
-            for detail in eval_details:
-                # Extract all prediction fields and flatten them
-                flattened_predictions = {}
-                for pred in detail['predictions']:
-                    for k, v in pred.items():
-                        if k not in flattened_predictions:
-                            flattened_predictions[k] = [v]
-                        else:
-                            flattened_predictions[k].append(v)
+                    # Remove the original predictions field
+                    detail.pop('predictions')
+                return eval_results
 
-                # Replace the predictions list with the flattened dictionary
-                for k, v in flattened_predictions.items():
-                    detail[k] = v
-
-                # Remove the original predictions field
-                detail.pop('predictions')
-            return eval_results
-
-        # If there are no details, return results
-        return results
+        # If there are no (or incomplete) details, return the averaged
+        # metrics for repeated runs, or the raw results for a single run.
+        return eval_results if n > 1 else results
 
     def score(self):
         raise NotImplementedError("Method hasn't been implemented yet")
