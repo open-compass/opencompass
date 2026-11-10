@@ -252,7 +252,7 @@ def _trim_to_compilable_prefix(text: str) -> str:
         candidate = '\n'.join(lines[:end]) + '\n'
         try:
             compile(candidate, '<humaneval_postprocess>', 'exec')
-        except SyntaxError:
+        except Exception:
             continue
         return candidate.rstrip() + '\n'
     return text
