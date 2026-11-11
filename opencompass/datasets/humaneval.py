@@ -71,13 +71,16 @@ class HumanevalDataset(BaseDataset):
 class HumanEvalEvaluator(BaseEvaluator):
     """Evaluator for HumanEval or EvalPlus."""
 
-    def __init__(self, k: List[int] = [1, 10, 100]) -> None:
+    def __init__(self,
+                 k: List[int] = [1, 10, 100],
+                 ignore_incomplete: bool = False) -> None:
         try:
             import human_eval
         except ImportError:
             raise ImportError(HUMANEVAL_IMPORT_ERROR)
 
         self.k = k
+        self.ignore_incomplete = ignore_incomplete
         super().__init__()
 
     def score(self, predictions, references, test_set):
@@ -101,7 +104,13 @@ class HumanEvalEvaluator(BaseEvaluator):
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             write_jsonl(out_dir, humaneval_preds)
-            score = evaluate_functional_correctness(out_dir, self.k, n_workers=4, timeout=3.0, problem_file=HUMAN_EVAL)
+            score = evaluate_functional_correctness(
+                out_dir,
+                self.k,
+                n_workers=4,
+                timeout=3.0,
+                problem_file=HUMAN_EVAL,
+                ignore_incomplete=self.ignore_incomplete)
 
             detail_path = osp.join(tmp_dir, 'human_eval.json_results.jsonl')
             details = {}
@@ -198,6 +207,55 @@ def humaneval_postprocess_v3(text: str) -> str:
     if len(blocks) >= 1:
         text = blocks[-1]
     return text.lstrip()
+
+def humaneval_chat_postprocess(text: str) -> str:
+    """Postprocess chat model outputs for HumanEval.
+
+    Some chat/API models return reasoning before the final code, or emit an
+    opening Markdown code fence that is never closed because the generation is
+    truncated. The regular ``humaneval_postprocess_v2`` intentionally keeps
+    non-fenced text unchanged; this variant first tries to recover a Python
+    code block or a clear top-level Python snippet from chatty responses.
+    """
+    code = _extract_first_code_fence(text)
+    if code is not None:
+        return _trim_to_compilable_prefix(code).lstrip()
+
+    code = _extract_python_snippet(text)
+    if code is not None:
+        return _trim_to_compilable_prefix(code).lstrip()
+
+    return text.lstrip()
+
+def _extract_first_code_fence(text: str):
+    match = re.search(r'```\w*\n(.*?)(?:```|$)', text, re.DOTALL)
+    if match is None:
+        return None
+    return match.group(1)
+
+def _extract_python_snippet(text: str):
+    pattern = re.compile(
+        r'(?m)^\s*(?:from\s+\S+\s+import\s+|import\s+|def\s+|class\s+|@\w)')
+    match = pattern.search(text)
+    if match is None:
+        return None
+    return text[match.start():]
+
+def _trim_to_compilable_prefix(text: str) -> str:
+    stripped = text.lstrip()
+    if not re.match(r'^(?:from\s+\S+\s+import\s+|import\s+|def\s+|class\s+|@\w)',
+                    stripped):
+        return text
+
+    lines = text.splitlines()
+    for end in range(len(lines), 0, -1):
+        candidate = '\n'.join(lines[:end]) + '\n'
+        try:
+            compile(candidate, '<humaneval_postprocess>', 'exec')
+        except Exception:
+            continue
+        return candidate.rstrip() + '\n'
+    return text
 
 def humaneval_internal_v2_postprocess(text: str):
     if text.startswith('   ') and not text.startswith('    '):

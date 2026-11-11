@@ -108,13 +108,13 @@ class KrGPT(BaseAPIModel):
             try:
                 response = raw_response.json()
             except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
+                self.logger.error('JsonDecode error, got %s',
                                   str(raw_response.content))
                 continue
             try:
                 return response['choices'][0]['message']['content'].strip()
             except KeyError:
-                self.logger.error('Find error message in response: ',
+                self.logger.error('Find error message in response: %s',
                                   str(response))
                 # if 'error' in response:
                 #     if response['error']['code'] == 'rate_limit_exceeded':
@@ -125,7 +125,7 @@ class KrGPT(BaseAPIModel):
                 #         self.logger.warn(f'insufficient_quota key: {key}')
                 #         continue
 
-                #     self.logger.error('Find error message in response: ',
+                #     self.logger.error('Find error message in response: %s',
                 #                       str(response['error']))
             max_num_retries += 1
 
