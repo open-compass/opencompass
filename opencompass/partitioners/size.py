@@ -1,6 +1,7 @@
 import copy
 import math
 import os.path as osp
+import torch
 from fnmatch import fnmatch
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -91,6 +92,25 @@ class SizePartitioner(BasePartitioner):
                                       key=lambda x: self.get_cost(x),
                                       reverse=True)
             for model in comb['models']:
+                # modified here, in order to maximize utilization of GPUs,
+                # change the CONSTANT max_task_size parameter to DYNAMIC based on model configuration
+                # if the model requires X gpu,
+                # available gpu is Y
+                # then there must be at least Y // X levels of parallelization, then max_task_size must produce at least Y // X tasks
+                X = model['run_cfg']['num_gpus']
+                Y = torch.cuda.device_count()
+                min_num_parallel_tasks = Y // X
+                if min_num_parallel_tasks > 1:
+                    num_datasets = len(model_dataset_combinations[0]['datasets'])
+                    total_estimated_size = num_datasets * \
+                        min(
+                            model['batch_size'],
+                            sum([ele['num_repeats_per_file'] for ele in model_dataset_combinations[0]['datasets']]) //
+                                len([ele['num_repeats_per_file'] for ele in model_dataset_combinations[0]['datasets']])
+                        ) * \
+                        self.gen_task_coef
+                    self.max_task_size = total_estimated_size // min_num_parallel_tasks - 1
+
                 chunks = []  # elements: tuple(size, dataset_chunk)
                 for dataset in comb['datasets']:
                     filename = get_infer_output_path(model, dataset, out_dir)
