@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
@@ -34,8 +34,8 @@ ANSWER: $LETTER
 
 infer_cfg_common = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[dict(role='HUMAN', prompt=query_template)]),
+        type=RawPromptTemplate,
+        messages=[dict(role='user', content=query_template)],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),

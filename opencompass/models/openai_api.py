@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import inspect
 import json
@@ -415,14 +417,14 @@ class OpenAI(BaseAPIModel):
                         self.logger.warning(f'insufficient_quota key: {key}')
                         continue
                     elif response['error']['code'] == 'invalid_prompt':
-                        self.logger.warning('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt: %s', str(input))
                         return ''
                     elif response['error']['type'] == 'invalid_prompt':
-                        self.logger.warning('Invalid prompt:', str(input))
+                        self.logger.warning('Invalid prompt: %s', str(input))
                         return ''
 
                     self.logger.error(
-                        'Find error message in response: ',
+                        'Find error message in response: %s',
                         str(response['error']),
                     )
             finally:

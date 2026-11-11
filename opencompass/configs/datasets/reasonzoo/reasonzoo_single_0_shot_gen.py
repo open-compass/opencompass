@@ -1,30 +1,17 @@
 from opencompass.datasets.reasonzoo.reasonzoo import reasonzooDataset, reasonzooEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 
-categories = ['communication_code', 'number_calculation', 'gradeschoolmath', 'formal_language', 'operation_research', 'puzzle_and_code','physics','dailylogic','boolean_logic'] 
+categories = ['communication_code', 'number_calculation', 'gradeschoolmath', 'formal_language', 'operation_research', 'puzzle_and_code','physics','dailylogic','boolean_logic']
 
 reasonzoo_0shot_single_datasets = []
 
 for category in categories:
     # Prompt template
     prompt_template = dict(
-        type=PromptTemplate,
-        template=dict(
-            begin=[
-                dict(
-                    role='HUMAN',
-                    prompt=''
-                )
-            ],
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt='{prompt}' # f-string
-                )
-            ]
-        )
+        type=RawPromptTemplate,
+        messages=[dict(role='user', content='{prompt}')],
     )
 
     # Reader configuration

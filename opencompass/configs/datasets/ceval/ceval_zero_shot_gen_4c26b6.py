@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import FixKRetriever, ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.openicl.icl_evaluator import AccEvaluator
@@ -66,23 +66,29 @@ ceval_datasets = []
 for _split in ['val', 'test']:
     for _name in ceval_all_sets:
         _ch_name = ceval_subject_mapping[_name][1]
+        _question_prompt = (
+            f'以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n'
+            '{question}\nA. {A}\nB. {B}\nC. {C}\nD. {D}\n'
+            '让我们一步一步思考。答案: '
+        )
         ceval_infer_cfg = dict(
-            ice_template=dict(
-                type=PromptTemplate,
-                template=dict(
-                    begin='</E>',
-                    round=[
-                        dict(
-                            role='HUMAN',
-                            prompt=
-                            f'以下是中国关于{_ch_name}考试的单项选择题，请选出其中的正确答案。\n{{question}}\nA. {{A}}\nB. {{B}}\nC. {{C}}\nD. {{D}}\n让我们一步一步思考。答案: '
-                        ),
-                        dict(role='BOT', prompt='{answer}'),
-                    ]),
+            prompt_template=dict(
+                type=RawPromptTemplate,
+                messages=[
+                    '</E>',
+                    dict(role='user', content=_question_prompt),
+                ],
                 ice_token='</E>',
             ),
+            ice_template=dict(
+                type=RawPromptTemplate,
+                messages=[
+                    dict(role='user', content=_question_prompt),
+                    dict(role='assistant', content='{answer}'),
+                ],
+            ),
             retriever=dict(type=ZeroRetriever),
-            inferencer=dict(type=GenInferencer, max_out_len=256),
+            inferencer=dict(type=GenInferencer),
         )
 
         ceval_eval_cfg = dict(

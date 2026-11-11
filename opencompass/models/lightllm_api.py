@@ -88,7 +88,7 @@ class LightllmAPI(BaseModel):
                 self.logger.debug(f'generated_text: {generated_text}')
                 return generated_text
             except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
+                self.logger.error('JsonDecode error, got %s',
                                   str(raw_response.content))
             except KeyError:
                 self.logger.error(f'KeyError. Response: {str(response)}')
@@ -157,7 +157,7 @@ class LightllmAPI(BaseModel):
                 ce_loss = -sum(logprobs) / len(logprobs)
                 return ce_loss
             except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
+                self.logger.error('JsonDecode error, got %s',
                                   str(raw_response.content))
             max_num_retries += 1
         raise RuntimeError('Calling LightllmAPI failed after retrying for '

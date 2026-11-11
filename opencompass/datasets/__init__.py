@@ -32,6 +32,7 @@ from .charm import *  # noqa: F401, F403
 from .chatml import *  # noqa: F401, F403
 from .chem_exam import *  # noqa: F401, F403
 from .chembench import *  # noqa: F401, F403
+from .chhallu_src import *  # noqa: F401, F403
 from .chid import *  # noqa: F401, F403
 from .chinese_simpleqa import *  # noqa: F401, F403
 from .cibench import *  # noqa: F401, F403
@@ -212,6 +213,7 @@ from .triviaqarc import *  # noqa: F401, F403
 from .truthfulqa import *  # noqa: F401, F403
 from .tydiqa import *  # noqa: F401, F403
 from .vlmevalkit import VLMEvalKitDataset  # noqa: F401
+from .weddoo_bench import WeddooBenchDataset  # noqa: F401
 from .wic import *  # noqa: F401, F403
 from .wikibench import *  # noqa: F401, F403
 from .winograd import *  # noqa: F401, F403

@@ -14,6 +14,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/aa_lcr",
     },
+    "opencompass/AA-LCR-v1.1": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/aa_lcr_v1_1",
+    },
     "opencompass/QASPER":{
         "ms_id": None,
         "hf_id": None,
@@ -38,6 +43,11 @@ DATASETS_MAPPING = {
         "ms_id": "ZeroLoss-Lab/ELBench",
         "hf_id": "ZeroLoss-Lab/ELBench",
         "local": "./data/elbench",
+    },
+    "opencompass/WeddooBench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/weddoo_bench/weddoo_bench_v1.jsonl",
     },
     "opencompass/S2-TOMG-Bench":{
         "ms_id": None,
@@ -1210,5 +1220,9 @@ DATASETS_URL = {
     "/GrandPhysics": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GrandPhysics_50_questions.zip",
         "md5": "06e37ec7676c800d3c0010ee4cb93765",
+    },
+    "/weddoo_bench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/weddoo_bench.zip",
+        "md5": "31885c7e63748429a12d6c585cff3ca4",
     }
 }
