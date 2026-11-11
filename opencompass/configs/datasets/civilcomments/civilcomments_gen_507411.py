@@ -1,7 +1,7 @@
 from opencompass.datasets import CivilCommentsDataset
 from opencompass.openicl.icl_evaluator import AccEvaluator
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.utils.text_postprocessors import first_option_postprocess
 
@@ -14,17 +14,22 @@ civilcomments_reader_cfg = dict(
 
 civilcomments_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(round=[
-            dict(role='HUMAN',
-                 prompt='Text: {text}\n'
-                 'Question: Does the above text contain rude, hateful, '
-                 'aggressive, disrespectful or unreasonable language?\n'
-                 'A. No\n'
-                 'B. Yes\n'
-                 'Answer with exactly one letter, A or B.\n'
-                 'Answer:'),
-        ])),
+        type=RawPromptTemplate,
+        messages=[
+            {
+                'role':
+                'user',
+                'content':
+                'Text: {text}\n'
+                'Question: Does the above text contain rude, hateful, '
+                'aggressive, disrespectful or unreasonable language?\n'
+                'A. No\n'
+                'B. Yes\n'
+                'Answer with exactly one letter, A or B.\n'
+                'Answer:',
+            },
+        ],
+    ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
 )
