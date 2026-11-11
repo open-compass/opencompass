@@ -15,7 +15,7 @@ with read_base():
         bigcodebench_hard_instruct_datasets
     )
     # livecodebench code generation lite v5
-    from opencompass.configs.datasets.livecodebench.livecodebench_time_split_gen_a4f90b import (
+    from opencompass.configs.datasets.livecodebench.livecodebench_time_split_gen_6966bc import (
         LCB_datasets
     )
     # huamneval series
