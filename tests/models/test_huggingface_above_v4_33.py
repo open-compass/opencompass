@@ -90,8 +90,11 @@ class TestHuggingFacewithChatTemplate(unittest.TestCase):
         mock_input_ids.shape = [1, 3]  # batch_size=1, seq_len=3
         mock_attention_mask = MagicMock()
         mock_attention_mask.to.return_value = mock_attention_mask
+        mock_token_type_ids = MagicMock()
+        mock_token_type_ids.to.return_value = mock_token_type_ids
         mock_tokenizer.batch_encode_plus.return_value = {
             'input_ids': mock_input_ids,
+            'token_type_ids': mock_token_type_ids,
             'attention_mask': mock_attention_mask
         }
         mock_tokenizer.apply_chat_template.return_value = 'Formatted prompt'
@@ -126,6 +129,8 @@ class TestHuggingFacewithChatTemplate(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
         mock_model.generate.assert_called_once()
+        self.assertNotIn('token_type_ids',
+                         mock_model.generate.call_args.kwargs)
 
     @patch('transformers.AutoTokenizer')
     @patch(
@@ -214,8 +219,11 @@ class TestHuggingFaceBaseModel(unittest.TestCase):
         mock_input_ids.to.return_value = mock_input_ids
         mock_attention_mask = MagicMock()
         mock_attention_mask.to.return_value = mock_attention_mask
+        mock_token_type_ids = MagicMock()
+        mock_token_type_ids.to.return_value = mock_token_type_ids
         mock_tokenizer.batch_encode_plus.return_value = {
             'input_ids': mock_input_ids,
+            'token_type_ids': mock_token_type_ids,
             'attention_mask': mock_attention_mask
         }
         mock_tokenizer.batch_decode.return_value = ['Generated response']
@@ -243,6 +251,8 @@ class TestHuggingFaceBaseModel(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0], 'Generated response')
         mock_model.generate.assert_called_once()
+        self.assertNotIn('token_type_ids',
+                         mock_model.generate.call_args.kwargs)
 
     @patch('transformers.AutoTokenizer')
     @patch(
