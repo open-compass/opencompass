@@ -10,7 +10,6 @@ models = [
         max_out_len=131072,
         query_per_second=1,
         retry=10,
-        temperature=1.0,
         thinking=dict(type='adaptive', display='summarized'),
         claude_extra_kwargs=dict(
             output_config=dict(effort='max'),
