@@ -69,6 +69,10 @@ class NumWorkerPartitioner(BasePartitioner):
                     # skip the task if the task output exists
                     if osp.exists(filename):
                         continue
+                    test_range = dataset.reader_cfg.get('test_range', '')
+                    if isinstance(test_range, (int, float)):
+                        chunks.append(dataset)
+                        continue
                     dataset_size = self.get_size(dataset)
                     if self.num_split <= 1:
                         chunks.append(dataset)
@@ -147,7 +151,8 @@ class NumWorkerPartitioner(BasePartitioner):
 
         # Save to cache file
         if self.dataset_size_path:
-            mmengine.mkdir_or_exist('.cache/')
+            tmp_dir_root = osp.dirname(self.dataset_size_path)
+            mmengine.mkdir_or_exist(tmp_dir_root)
             mmengine.dump(self.dataset_size,
                           self.dataset_size_path,
                           indent=4,

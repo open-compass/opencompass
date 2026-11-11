@@ -52,6 +52,24 @@
     paper: https://huggingface.co/datasets/ArtificialAnalysis/AA-LCR
     configpath: opencompass/configs/datasets/aa_lcr/aa_lcr_gen.py
     configpath_llmjudge: opencompass/configs/datasets/aa_lcr/aa_lcr_gen.py
+- aa_lcr_v1_1:
+    name: AA-LCR-v1.1
+    category: Long Context
+    paper: https://huggingface.co/datasets/ArtificialAnalysis/AA-LCR
+    configpath: opencompass/configs/datasets/aa_lcr/aa_lcr_v1_1_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/aa_lcr/aa_lcr_v1_1_gen.py
+- aa_omniscience:
+    name: AA-Omniscience-Public
+    category: Knowledge / Hallucination
+    paper: https://huggingface.co/datasets/ArtificialAnalysis/AA-Omniscience-Public
+    configpath: opencompass/configs/datasets/aa_omniscience/aa_omniscience_llmjudge_rawprompt.py
+    configpath_llmjudge: opencompass/configs/datasets/aa_omniscience/aa_omniscience_llmjudge_rawprompt.py
+- aa_omniscience_v1_1:
+    name: AA-Omniscience-Public-v1.1
+    category: Knowledge / Hallucination
+    paper: https://huggingface.co/datasets/ArtificialAnalysis/AA-Omniscience-Public-v1.1
+    configpath: opencompass/configs/datasets/aa_omniscience/aa_omniscience_v1_1_llmjudge_rawprompt.py
+    configpath_llmjudge: opencompass/configs/datasets/aa_omniscience/aa_omniscience_v1_1_llmjudge_rawprompt.py
 - bigcodebench:
     name: BigCodeBench
     category: Code
@@ -76,6 +94,12 @@
     paper: https://arxiv.org/pdf/2410.06526v1
     configpath: opencompass/configs/datasets/korbench/korbench_gen.py
     configpath_llmjudge: opencompass/configs/datasets/korbench/korbench_llm_judge_gen.py
+- reasonzoo:
+    name: ReasonZoo
+    category: Reasoning
+    paper: https://arxiv.org/abs/2508.15754
+    configpath: opencompass/configs/datasets/reasonzoo/reasonzoo_gen.py
+    configpath_llmjudge: opencompass/configs/datasets/reasonzoo/reasonzoo_llm_judge_gen.py
 - lawbench:
     name: LawBench
     category: Knowledge / Law
@@ -224,6 +248,12 @@
     paper: https://lmsys.org/blog/2024-04-19-arena-hard/
     configpath: opencompass/configs/datasets/subjective/arena_hard
     configpath_llmjudge: ''
+- arenahard_v2:
+    name: Arena-Hard v2
+    category: Subjective / Chatbot
+    paper: https://github.com/lmarena/arena-hard-auto
+    configpath: opencompass/configs/datasets/subjective/arena_hard/arena_hard_v2.py
+    configpath_llmjudge: opencompass/configs/datasets/subjective/arena_hard/arena_hard_v2.py
 - elbench:
     name: ELBench
     category: Subjective / Education
@@ -437,7 +467,7 @@
     name: C-EVAL
     category: Examination
     paper: https://arxiv.org/pdf/2305.08322v1
-    configpath: opencompass/configs/datasets/ceval/ceval_gen.py
+    configpath: opencompass/configs/datasets/ceval/ceval_zero_shot_gen_d47eb7.py
     configpath_llmjudge: ''
 - charm:
     name: CHARM
@@ -623,6 +653,12 @@
     paper: https://lastexam.ai/paper
     configpath: opencompass/configs/datasets/HLE/hle_gen.py
     configpath_llmjudge: ''
+- hle_diamond:
+    name: HLE-Diamond (Text Only)
+    category: Reasoning
+    paper: https://www.nature.com/articles/s41586-025-09962-4
+    configpath: opencompass/configs/datasets/HLE/hle_diamond_llmjudge_rawprompt.py
+    configpath_llmjudge: opencompass/configs/datasets/HLE/hle_diamond_llmjudge_rawprompt.py
 - hellaswag:
     name: HellaSwag
     category: Reasoning
@@ -767,6 +803,12 @@
     paper: https://arxiv.org/pdf/2009.03300
     configpath: opencompass/configs/datasets/mmlu/mmlu_gen.py
     configpath_llmjudge: opencompass/configs/datasets/mmlu/mmlu_llm_judge_gen.py
+- PromptCBLUE:
+    name: PromptCBLUE
+    category: Understanding
+    paper: https://arxiv.org/pdf/2310.14151
+    configpath: opencompass/configs/datasets/PromptCBLUE/PromptCBLUE_0shot_gen_79b536.py
+    configpath_llmjudge: opencompass/configs/datasets/PromptCBLUE/PromptCBLUE_0shot_llmjudge_gen_75c25d.py
 - SciEval:
     name: SciEval
     category: Understanding
@@ -1173,6 +1215,12 @@
     paper: https://arxiv.org/pdf/2203.14371
     configpath: opencompass/configs/datasets/medmcqa/medmcqa_gen.py
     configpath_llmjudge: opencompass/configs/datasets/medmcqa/medmcqa_llmjudge_gen.py
+- grand_physics:
+    name: GrandPhysics
+    category: Science
+    paper: ''
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/GrandPhysics/GrandPhysics_llm_judge_gen.py
 - phybench:
     name: PHYBench
     category: Science /Physics
@@ -1405,3 +1453,76 @@
     paper: https://arxiv.org/abs/2502.01100
     configpath: opencompass/configs/datasets/ZebraLogic/zebralogic_rawprompt_gen_9446ef.py
     configpath_llmjudge: ''
+- lgbench150:
+    name: LG-Bench 150
+    category: Science
+    paper: https://arxiv.org/abs/2610.26787
+    configpath: opencompass/configs/datasets/lgbench150/lgbench150_gen.py
+    configpath_llmjudge: ''
+- chhallu-src-v1:
+    name: CHHallu-Src v1 (Chinese history hallucination & source attribution)
+    category: Knowledge / Hallucination
+    paper: https://huggingface.co/datasets/lizhuojun/chhallu-src-v1
+    configpath: opencompass/configs/datasets/chhallu_src/chhallu_src_gen.py
+    configpath_llmjudge: ''
+- chartqapro:
+    name: ChartQAPro
+    category: Multimodal / Chart Understanding
+    paper: https://arxiv.org/abs/2504.05506
+    configpath: opencompass/configs/datasets/ChartQAPro/ChartQAPro_vlmevalkit_gen.py
+    configpath_llmjudge: ''
+- microvqa:
+    name: MicroVQA
+    category: Multimodal / Biology
+    paper: https://arxiv.org/abs/2503.13399
+    configpath: opencompass/configs/datasets/MicroVQA/MicroVQA_vlmevalkit_gen.py
+    configpath_llmjudge: ''
+- sfe:
+    name: SFE (Scientists' First Exam)
+    category: Multimodal / Science
+    paper: https://arxiv.org/abs/2506.10521
+    configpath: opencompass/configs/datasets/SFE/SFE_vlmevalkit_gen.py
+    configpath_llmjudge: ''
+- scidocbench:
+    name: SciDocBench
+    category: Multimodal / Document Understanding
+    paper: https://arxiv.org/abs/2609.05141
+    configpath: opencompass/configs/datasets/SciDocBench/SciDocBench_vlmevalkit_gen.py
+    configpath_llmjudge: ''
+- maritimebench:
+    name: MaritimeBench
+    category: Knowledge / Maritime
+    paper: https://huggingface.co/datasets/Hi-Dolphin/MaritimeBench
+    configpath: opencompass/configs/datasets/maritimebench/maritimebench_gen.py
+    configpath_llmjudge: ''
+- ethics:
+    name: ETHICS
+    category: Safety / Ethics
+    paper: https://arxiv.org/abs/2008.02275
+    configpath:
+      - opencompass/configs/datasets/Ethics/Ethics_commonsense/Ethics_commonsense_ppl.py
+      - opencompass/configs/datasets/Ethics/Ethics_deontology/Ethics_deontology_ppl.py
+      - opencompass/configs/datasets/Ethics/Ethics_justice/Ethics_justice_ppl.py
+      - opencompass/configs/datasets/Ethics/Ethics_utilitarianism/Ethics_utilitarianism_ppl.py
+      - opencompass/configs/datasets/Ethics/Ethics_virtue/Ethics_virtue_ppl.py
+    configpath_llmjudge: ''
+- logiqa:
+    name: LogiQA
+    category: Reasoning
+    paper: https://arxiv.org/abs/2007.08124
+    configpath:
+      - opencompass/configs/datasets/LogiQA/LogiQA_en_ppl.py
+      - opencompass/configs/datasets/LogiQA/LogiQA_zh_ppl.py
+    configpath_llmjudge: ''
+- wmt19:
+    name: WMT19
+    category: Language / Translation
+    paper: https://aclanthology.org/W19-5301/
+    configpath: opencompass/configs/datasets/wmt19/wmt19_gen.py
+    configpath_llmjudge: ''
+- weddoo_bench:
+    name: WeddooBench
+    category: Knowledge / Wedding Industry
+    paper: ''
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/weddoo_bench/weddoo_bench_llmjudge_gen.py
