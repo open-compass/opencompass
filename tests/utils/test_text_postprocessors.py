@@ -48,6 +48,51 @@ class TestTextPostprocessors(unittest.TestCase):
                                         'ABCD',
                                         cushion=False), 'A')
 
+    def test_first_option_postprocess_ignores_letters_inside_words(self):
+        cases = {
+            'Answer: **B**': 'B',
+            'ANSWER: \\boxed{B}': 'B',
+            'Answer: (B)': 'B',
+            'Answer: All of the above': '',
+            'All of the above': '',
+            'Absolutely, Definitely Correct': '',
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(tp.first_option_postprocess(text, 'ABCD'),
+                                 expected)
+
+    def test_first_option_postprocess_answer_pattern_without_cushion(self):
+        for text in ['Answer: **B**', 'ANSWER: \\boxed{B}', 'Answer: (B)']:
+            with self.subTest(text=text):
+                self.assertEqual(
+                    tp.first_option_postprocess(text, 'ABCD', cushion=False),
+                    'B')
+
+    def test_first_option_postprocess_controls_unchanged(self):
+        cases = {
+            'The answer is B.': 'B',
+            'Answer: B': 'B',
+            '**Answer: B**': 'B',
+            '答案：B': 'B',
+            '答案是B': 'B',
+            '答案：（B）': 'B',
+            '\\boxed{B}': 'B',
+            'Option B is correct': 'B',
+            'B) Paris': 'B',
+            '选B': 'B',
+            '我选择B项': 'B',
+            '所以选C。': 'C',
+            '正确答案是D': 'D',
+            'B': 'B',
+            'A': 'A',
+            '(C)': 'C',
+        }
+        for text, expected in cases.items():
+            with self.subTest(text=text):
+                self.assertEqual(tp.first_option_postprocess(text, 'ABCD'),
+                                 expected)
+
     def test_last_option_postprocess(self):
         text = 'A then C then B'
         self.assertEqual(tp.last_option_postprocess(text, 'ABC'), 'B')
