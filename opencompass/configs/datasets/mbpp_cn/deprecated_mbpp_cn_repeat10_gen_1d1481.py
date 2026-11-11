@@ -57,7 +57,7 @@ mbpp_cn_datasets = [
     dict(
         type=MBPPDatasetV2,
         abbr='mbpp_cn_repeat10',
-        path='./data/mbpp_cn/mbpp_cn.jsonl',
+        path='opencompass/mbpp_cn',
         num_repeats=10,
         reader_cfg=mbpp_reader_cfg,
         infer_cfg=mbpp_infer_cfg,

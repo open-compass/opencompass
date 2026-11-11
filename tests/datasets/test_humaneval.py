@@ -7,6 +7,7 @@ from unittest.mock import Mock, patch
 
 from opencompass.datasets.humaneval import (HumanEvalEvaluator,
                                             HumanEvalPlusEvaluator,
+                                            humaneval_chat_postprocess,
                                             humaneval_postprocess_v2,
                                             humaneval_postprocess_v3)
 
@@ -79,6 +80,52 @@ class TestHumanevalPostprocess(unittest.TestCase):
         self.assertEqual(humaneval_postprocess_v2(raw), expected)
         self.assertEqual(humaneval_postprocess_v3(raw), expected)
 
+    def test_chat_extracts_unclosed_code_block(self):
+        raw = '\n'.join([
+            'Here is the implementation:',
+            '```python',
+            'def truncate_number(number: float) -> float:',
+            '    return number - int(number)',
+        ])
+
+        self.assertEqual(
+            humaneval_chat_postprocess(raw),
+            'def truncate_number(number: float) -> float:\n'
+            '    return number - int(number)\n')
+
+    def test_chat_extracts_code_after_reasoning(self):
+        raw = '\n'.join([
+            'We need to subtract the integer part.',
+            'The final answer is:',
+            'def truncate_number(number: float) -> float:',
+            '    return number - int(number)',
+        ])
+
+        self.assertEqual(
+            humaneval_chat_postprocess(raw),
+            'def truncate_number(number: float) -> float:\n'
+            '    return number - int(number)\n')
+
+    def test_chat_trims_trailing_explanation(self):
+        raw = '\n'.join([
+            'Here is the implementation:',
+            'def truncate_number(number: float) -> float:',
+            '    return number - int(number)',
+            '',
+            'This solves the task.',
+        ])
+
+        self.assertEqual(
+            humaneval_chat_postprocess(raw),
+            'def truncate_number(number: float) -> float:\n'
+            '    return number - int(number)\n')
+
+    def test_chat_keeps_plain_function_body(self):
+        raw = '    return x - int(x)\n'
+
+        self.assertEqual(humaneval_chat_postprocess(raw),
+                         'return x - int(x)\n')
+
 
 class TestHumanEvalEvaluatorDetails(unittest.TestCase):
 
@@ -119,50 +166,60 @@ class TestHumanEvalEvaluatorDetails(unittest.TestCase):
             'human_eval.data': human_eval_data,
             'human_eval.evaluation': human_eval_evaluation,
         }
-        with patch.dict(sys.modules, modules):
-            result = HumanEvalEvaluator(k=[1]).score(
-                predictions=['return 1', 'return 0'],
-                references=['HumanEval/0', 'HumanEval/1'],
-                test_set=[{
-                    'prompt': 'def one():'
-                }, {
-                    'prompt': 'def two():'
-                }],
-            )
+        # The default and the explicit ``ignore_incomplete=True`` used by the
+        # autotest fullbench config must both reach human_eval unchanged.
+        cases = [({}, False), ({'ignore_incomplete': True}, True)]
+        for evaluator_kwargs, ignore_incomplete in cases:
+            with self.subTest(ignore_incomplete=ignore_incomplete):
+                write_jsonl.reset_mock()
+                evaluate.reset_mock()
+                with patch.dict(sys.modules, modules):
+                    result = HumanEvalEvaluator(
+                        k=[1], **evaluator_kwargs).score(
+                            predictions=['return 1', 'return 0'],
+                            references=['HumanEval/0', 'HumanEval/1'],
+                            test_set=[{
+                                'prompt': 'def one():'
+                            }, {
+                                'prompt': 'def two():'
+                            }],
+                        )
 
-        self.assertEqual(result['humaneval_pass@1'], 50.0)
-        self.assertEqual(
-            result['details'], {
-                '0': {
+                self.assertEqual(result['humaneval_pass@1'], 50.0)
+                self.assertEqual(
+                    result['details'], {
+                        '0': {
+                            'task_id': 'HumanEval/0',
+                            'completion': 'return 1',
+                            'passed': True,
+                            'result': 'passed',
+                            'is_correct': True,
+                            'prompt': 'def one():',
+                        },
+                        '1': {
+                            'task_id': 'HumanEval/1',
+                            'completion': 'return 0',
+                            'passed': False,
+                            'result': 'failed: assertion',
+                            'is_correct': False,
+                            'prompt': 'def two():',
+                        },
+                    })
+                sample_file, samples = write_jsonl.call_args.args
+                self.assertEqual(samples, [{
                     'task_id': 'HumanEval/0',
-                    'completion': 'return 1',
-                    'passed': True,
-                    'result': 'passed',
-                    'is_correct': True,
-                    'prompt': 'def one():',
-                },
-                '1': {
+                    'completion': 'return 1'
+                }, {
                     'task_id': 'HumanEval/1',
-                    'completion': 'return 0',
-                    'passed': False,
-                    'result': 'failed: assertion',
-                    'is_correct': False,
-                    'prompt': 'def two():',
-                },
-            })
-        sample_file, samples = write_jsonl.call_args.args
-        self.assertEqual(samples, [{
-            'task_id': 'HumanEval/0',
-            'completion': 'return 1'
-        }, {
-            'task_id': 'HumanEval/1',
-            'completion': 'return 0'
-        }])
-        evaluate.assert_called_once_with(sample_file, [1],
-                                         n_workers=4,
-                                         timeout=3.0,
-                                         problem_file='mock_problem_file.jsonl')
-        self.assertFalse(os.path.exists(os.path.dirname(sample_file)))
+                    'completion': 'return 0'
+                }])
+                evaluate.assert_called_once_with(
+                    sample_file, [1],
+                    n_workers=4,
+                    timeout=3.0,
+                    problem_file='mock_problem_file.jsonl',
+                    ignore_incomplete=ignore_incomplete)
+                self.assertFalse(os.path.exists(os.path.dirname(sample_file)))
 
 
 class TestHumanEvalPlusEvaluatorDetails(unittest.TestCase):
@@ -241,6 +298,13 @@ class TestHumanEvalPlusEvaluatorDetails(unittest.TestCase):
         flags = evaluate.call_args.args[0]
         self.assertEqual(flags.dataset, 'humaneval')
         self.assertEqual(flags.samples, sample_file)
+        # evalplus==0.2.1 ``evaluate(flags)`` reads all of these attributes.
+        self.assertLessEqual(
+            {
+                'dataset', 'samples', 'base_only', 'parallel',
+                'i_just_wanna_run', 'test_details', 'min_time_limit',
+                'gt_time_limit_factor', 'mini', 'noextreme'
+            }, set(vars(flags)))
         self.assertFalse(os.path.exists(os.path.dirname(sample_file)))
 
 

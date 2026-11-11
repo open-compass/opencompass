@@ -43,6 +43,8 @@ def gsm8k_dataset_postprocess(text: str) -> str:
 @TEXT_POSTPROCESSORS.register_module('gsm8k')
 def gsm8k_postprocess(text: str) -> str:
     text = text.split('Question:')[0]
+    # Strip thousands separators.
+    text = re.sub(r'(?<=\d)(?:,|\{,\})(?=\d{3}(?!\d))', '', text)
     numbers = re.findall(r'\-?\d+\.\d+|\-?\d+', text)
     if not numbers:
         return 'NULL'

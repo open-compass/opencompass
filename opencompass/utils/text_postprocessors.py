@@ -89,7 +89,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案为\s*([{options}])',
         f'答案选\s*([{options}])',
         f'选择?\s*([{options}])',
-        f'故选?\s*([{options}])'
+        f'故选?\s*([{options}])',
         f'只有选?项?\s?([{options}])\s?是?对',
         f'只有选?项?\s?([{options}])\s?是?错',
         f'只有选?项?\s?([{options}])\s?不?正确',
@@ -124,7 +124,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'[Tt]he answer to the question is:?\s+\(?([{options}])\)?',
         f'^选项\s?([{options}])',
         f'^([{options}])\s?选?项',
-        f'(\s|^)[{options}][\s。，,：:\.$]',
+        rf'(?:\s|^)([{options}])(?:[\s。，,：:.]|$)',
         f'1.\s?(.*?)$',
         f'1.\s?([{options}])[.。$]?$',
     ]
@@ -280,7 +280,15 @@ def extract_non_reasoning_content(
         return text.split(think_end_token)[-1].strip()
 
     # Original behavior for complete tag pairs
-    reasoning_regex = re.compile(rf'{think_start_token}(.*?){think_end_token}',
-                                 re.DOTALL)
+    reasoning_regex = re.compile(
+        rf'{re.escape(think_start_token)}(.*?){re.escape(think_end_token)}',
+        re.DOTALL)
     non_reasoning_content = reasoning_regex.sub('', text).strip()
     return non_reasoning_content
+
+
+def parse_bracketed_answer(text: str, options: str) -> str:
+    match = re.search(rf'<({options})>', text)
+    if match:
+        return match.group(1)
+    return ''

@@ -39,6 +39,15 @@ class TestTextPostprocessors(unittest.TestCase):
         text = '答案是 B'
         self.assertEqual(tp.first_option_postprocess(text, 'ABCD'), 'B')
 
+    def test_first_option_postprocess_without_cushion(self):
+        self.assertEqual(
+            tp.first_option_postprocess('只有选项 B 是对', 'ABCD', cushion=False),
+            'B')
+        self.assertEqual(
+            tp.first_option_postprocess('reason A because',
+                                        'ABCD',
+                                        cushion=False), 'A')
+
     def test_last_option_postprocess(self):
         text = 'A then C then B'
         self.assertEqual(tp.last_option_postprocess(text, 'ABC'), 'B')
@@ -72,6 +81,16 @@ class TestTextPostprocessors(unittest.TestCase):
                          'How are you?')
         text = 'Start<think>reasoning</think> End'
         self.assertEqual(tp.extract_non_reasoning_content(text), 'Start End')
+
+    def test_extract_non_reasoning_content_regex_special_tokens(self):
+        text = '[THINK]2 + 2 = 4[/THINK]The answer is 4.'
+        self.assertEqual(
+            tp.extract_non_reasoning_content(text, '[THINK]', '[/THINK]'),
+            'The answer is 4.')
+        text = '<|begin_of_thought|>hmm<|end_of_thought|>Final: 4'
+        self.assertEqual(
+            tp.extract_non_reasoning_content(text, '<|begin_of_thought|>',
+                                             '<|end_of_thought|>'), 'Final: 4')
 
 
 if __name__ == '__main__':
