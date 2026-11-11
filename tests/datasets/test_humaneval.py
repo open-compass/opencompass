@@ -1,8 +1,9 @@
 import unittest
 
-from opencompass.datasets.humaneval import (humaneval_chat_postprocess,
-                                            humaneval_postprocess_v2,
-                                            humaneval_postprocess_v3)
+from opencompass.datasets.humaneval import (
+    _call_evaluate_functional_correctness, _supports_ignore_incomplete,
+    humaneval_chat_postprocess, humaneval_postprocess_v2,
+    humaneval_postprocess_v3, logger as humaneval_logger)
 
 
 class TestHumanevalPostprocess(unittest.TestCase):
@@ -118,6 +119,63 @@ class TestHumanevalPostprocess(unittest.TestCase):
 
         self.assertEqual(humaneval_chat_postprocess(raw),
                          'return x - int(x)\n')
+
+
+class TestHumanEvalEvaluatorCompat(unittest.TestCase):
+
+    def test_supports_ignore_incomplete(self):
+
+        def supported(value, ignore_incomplete=False):
+            return value
+
+        def unsupported(value):
+            return value
+
+        def variadic(value, **kwargs):
+            return value
+
+        self.assertTrue(_supports_ignore_incomplete(supported))
+        self.assertFalse(_supports_ignore_incomplete(unsupported))
+        self.assertTrue(_supports_ignore_incomplete(variadic))
+
+    def test_unsupported_function_does_not_receive_flag(self):
+
+        def evaluate(value, n_workers=4):
+            return {'value': value, 'n_workers': n_workers}
+
+        result = _call_evaluate_functional_correctness(
+            evaluate, 'sample', n_workers=2, ignore_incomplete=True)
+
+        self.assertEqual(result, {'value': 'sample', 'n_workers': 2})
+
+    def test_supported_function_receives_flag(self):
+
+        def evaluate(value, ignore_incomplete=False):
+            return ignore_incomplete
+
+        result = _call_evaluate_functional_correctness(
+            evaluate, 'sample', ignore_incomplete=True)
+
+        self.assertTrue(result)
+
+    def test_variadic_function_receives_flag(self):
+
+        def evaluate(value, **kwargs):
+            return kwargs
+
+        result = _call_evaluate_functional_correctness(
+            evaluate, 'sample', ignore_incomplete=True)
+
+        self.assertTrue(result['ignore_incomplete'])
+
+    def test_unsupported_function_warns_when_flag_requested(self):
+
+        def evaluate(value):
+            return value
+
+        with self.assertLogs(humaneval_logger, level='WARNING'):
+            _call_evaluate_functional_correctness(
+                evaluate, 'sample', ignore_incomplete=True)
 
 
 if __name__ == '__main__':
