@@ -112,7 +112,7 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'答案是\s?(\S+)(?:。|$)',
         f'答案应该是\s?(\S+)(?:。|$)',
         f'答案为\s?(\S+)(?:。|$)',
-        f'(?i)ANSWER\s*:\s*([{options}])',
+        f'(?i)ANSWER\s*:\s*(?:\*\*|\\\\boxed\\{{|\\()?\\s*([{options}])(?![A-Za-z])',
         f'[Tt]he answer is:?\s+\(?([{options}])\)?',
         f'[Tt]he answer is:?\s+\(?\*?\*?([{options}])\*?\*?\)?',
         f'[Tt]he answer is option:?\s+\(?([{options}])\)?',
@@ -129,8 +129,8 @@ def first_option_postprocess(text: str, options: str, cushion=True) -> str:
         f'1.\s?([{options}])[.。$]?$',
     ]
     cushion_patterns = [
-        f'([{options}]):',
-        f'([{options}])',
+        f'(?<![A-Za-z])([{options}]):',
+        f'(?<![A-Za-z])([{options}])(?![A-Za-z])',
     ]
     # flake8: noqa
     # yapf: enable
