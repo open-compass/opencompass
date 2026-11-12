@@ -19,6 +19,9 @@ from opencompass.utils.prompt import get_prompt_hash
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match', 'extract_rate']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type']
 
+def _is_bayes_at_n_metric(metric):
+    return metric.rsplit('/', 1)[-1].startswith('Bayes@')
+
 def model_abbr_from_cfg_used_in_summarizer(model):
     if model.get('summarizer_abbr', None):
         return model['summarizer_abbr']
@@ -141,6 +144,8 @@ class DefaultSummarizer:
         each dictionary accordingly."""
         summary_groups = self.summary_groups
         for sg in summary_groups:
+            if _is_bayes_at_n_metric(sg.get('metric', '')) or any(isinstance(subset, (list, tuple)) and _is_bayes_at_n_metric(subset[1]) for subset in sg['subsets']):
+                raise ValueError('Bayes@N outputs describe one dataset; cross-dataset summary groups are unsupported')
             for model_abbr in self.model_abbrs:
                 available_metrics, missing_metrics = [], []
                 for i in sg['subsets']:
@@ -189,11 +194,14 @@ class DefaultSummarizer:
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
                     group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
+                    group_metrics = [metric for metric in group_metrics if not _is_bayes_at_n_metric(metric)]
                     group_metrics.append(default_metric)
                     for metric in group_metrics:
                         for dataset_abbr in sg['subsets']:
                             if metric == default_metric:
-                                metric_default = dataset_metrics[dataset_abbr][0]
+                                metric_default = next((key for key in dataset_metrics[dataset_abbr] if not _is_bayes_at_n_metric(key)), None)
+                                if metric_default is None:
+                                    raise ValueError('Bayes@N outputs describe one dataset; cross-dataset summary groups are unsupported')
                                 scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric_default] = \
                                 parsed_results[model_abbr][dataset_abbr][metric_default]
                                 eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
