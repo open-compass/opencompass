@@ -17,7 +17,7 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
 from opencompass.utils.prompt import get_prompt_hash
 
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match', 'extract_rate']
-METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type']
+METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type', 'num_samples']
 
 def model_abbr_from_cfg_used_in_summarizer(model):
     if model.get('summarizer_abbr', None):
@@ -82,6 +82,8 @@ class DefaultSummarizer:
         parsed_results : Dict[str, Dict[str, Dict[str, float]]] = {}
         # dataset_metrics: {dataset_abbr: [metric]}
         dataset_metrics : Dict[str, List[str]] = {}
+        # _dataset_meta: {model_abbr: {dataset_abbr: {num_samples, test_range}}}
+        self._dataset_meta : Dict[str, Dict[str, Dict[str, Any]]] = {}
 
         for model in self.model_cfgs:
             model_abbr = model_abbr_from_cfg_used_in_summarizer(model)
@@ -94,6 +96,15 @@ class DefaultSummarizer:
                     continue
                 result = mmengine.load(filepath)
                 result.pop('details', None)
+                # Capture comparability metadata (sample count / test range)
+                # attached by the eval task, before metric filtering.
+                meta = {
+                    key: result[key]
+                    for key in ('num_samples', 'test_range') if key in result
+                }
+                if meta:
+                    self._dataset_meta.setdefault(model_abbr,
+                                                  {})[dataset_abbr] = meta
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
                     self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
@@ -256,7 +267,7 @@ class DefaultSummarizer:
 
         return raw_results, parsed_results, dataset_metrics, dataset_eval_mode
 
-    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=None, skip_all_slash=False):
+    def _format_table(self, parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=None, skip_all_slash=False, dataset_meta=None):
         dataset_abbrs = [dataset_abbr_from_cfg(dataset) for dataset in self.dataset_cfgs]
         prompt_version = {dataset_abbr_from_cfg(d): get_prompt_hash(d)[:6] for d in self.dataset_cfgs}
 
@@ -285,6 +296,7 @@ class DefaultSummarizer:
         table = []
         header = ['dataset', 'version', 'metric', 'mode'] + self.model_abbrs
         table.append(header)
+        incomparable = []
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
                 if not skip_all_slash:
@@ -305,8 +317,31 @@ class DefaultSummarizer:
                     row.append('{:.02f}'.format(parsed_results[model_abbr][dataset_abbr][metric]))
                 else:
                     row.append('-')
+            if dataset_meta is not None and self._is_incomparable(
+                    dataset_abbr, parsed_results, dataset_meta):
+                row[0] = f'{dataset_abbr}*'
+                if dataset_abbr not in incomparable:
+                    incomparable.append(dataset_abbr)
             table.append(row)
+        if incomparable:
+            legend = ('* models were evaluated on different sample sizes '
+                      'or test ranges; scores are not directly comparable')
+            table.append([legend] + ['-'] * (len(header) - 1))
         return table
+
+    @staticmethod
+    def _is_incomparable(dataset_abbr, parsed_results, dataset_meta) -> bool:
+        """Whether models scored this dataset on different sample subsets."""
+        evaluated = [
+            model_abbr for model_abbr in parsed_results
+            if dataset_abbr in parsed_results[model_abbr]
+            and dataset_meta.get(model_abbr, {}).get(dataset_abbr)
+        ]
+        if len(evaluated) < 2:
+            return False
+        baseline = dataset_meta[evaluated[0]][dataset_abbr]
+        return any(dataset_meta[m][dataset_abbr] != baseline
+                   for m in evaluated[1:])
 
     def _format_raw_txt(self, raw_results):
         raw_dataset_abbrs = []
@@ -398,7 +433,7 @@ class DefaultSummarizer:
             self._calculate_group_metrics(raw_results, parsed_results, dataset_metrics, dataset_eval_mode)
 
         # format table
-        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=self.dataset_abbrs)
+        table = self._format_table(parsed_results, dataset_metrics, dataset_eval_mode, required_dataset_abbrs=self.dataset_abbrs, dataset_meta=self._dataset_meta)
 
         # format raw txt
         raw_txts = self._format_raw_txt(raw_results)
