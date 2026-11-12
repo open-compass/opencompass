@@ -1,5 +1,6 @@
 import inspect
 import os
+import re
 from typing import Any, Callable, Dict, List, Optional
 
 import mmengine
@@ -104,6 +105,18 @@ class CascadeEvaluator(BaseEvaluator):
                     'answer': reference,
                 }
 
+    @staticmethod
+    def _is_correct_verdict(response: str) -> bool:
+        """Return True only for an unambiguous positive judge verdict.
+
+        ``A`` or ``CORRECT`` must appear as a whole word at the start of the
+        reply, so a reply that merely begins with the letters "CORRECT" —
+        e.g. "Correctness: No, the answer is wrong." or "Correctly? No. B" —
+        is not counted as correct. ``response`` is expected to be already
+        upper-cased and stripped by the caller.
+        """
+        return response == 'A' or bool(re.match(r'CORRECT(?:\W|$)', response))
+
     def _get_llm_correctness(self, llm_detail):
         """Determine if the LLM judge considers the answer correct.
 
@@ -114,11 +127,11 @@ class CascadeEvaluator(BaseEvaluator):
             bool: Whether the answer is correct according to the LLM judge.
         """
         if 'prediction' in llm_detail:
-            response = llm_detail['prediction'].strip().upper()
-            return response == 'A' or response.startswith('CORRECT')
+            return self._is_correct_verdict(
+                llm_detail['prediction'].strip().upper())
         elif 'llm_judge' in llm_detail:
-            response = llm_detail['llm_judge'].strip().upper()
-            return response == 'A' or response.startswith('CORRECT')
+            return self._is_correct_verdict(
+                llm_detail['llm_judge'].strip().upper())
         elif 'correct' in llm_detail:
             return llm_detail['correct']
         elif 'score' in llm_detail:

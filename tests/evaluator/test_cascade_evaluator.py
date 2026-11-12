@@ -63,5 +63,73 @@ class TestCascadeEvaluator(unittest.TestCase):
                          [(['prediction'], ['reference'], [test_item])])
 
 
+class TestGetLlmCorrectness(unittest.TestCase):
+    """Regression for issue #2657.
+
+    A judge reply that merely begins with the letters "CORRECT" — e.g.
+    "Correctness: No, the answer is wrong." or "Correctly? No. B" — must not
+    be counted as a positive verdict, while unambiguous positive verdicts
+    such as "A", "CORRECT" or "correct." remain correct.
+    """
+
+    CASES = [
+        # (llm_detail, expected, note)
+        ({
+            'prediction': 'A'
+        }, True, 'positive letter A'),
+        ({
+            'prediction': 'CORRECT'
+        }, True, 'positive word CORRECT'),
+        ({
+            'prediction': 'correct.'
+        }, True, 'case-insensitive, trailing punct tolerated'),
+        ({
+            'prediction': 'B'
+        }, False, 'negative letter B'),
+        ({
+            'prediction': 'INCORRECT'
+        }, False, 'negative word'),
+        # regression: previously miscounted as correct by startswith('CORRECT')
+        ({
+            'prediction': 'Correctness: No, the answer is wrong.'
+        }, False, 'starts with "Correctness" but verdict is negative'),
+        ({
+            'llm_judge': 'Correctness: incorrect, does not match gold.'
+        }, False, 'same defect via the llm_judge key'),
+        ({
+            'prediction':
+            'Correctness is not met; the final numeric answer '
+            'differs from the gold target.'
+        }, False, 'any verdict opening with "Correctness"'),
+        ({
+            'prediction': 'Correctly? No. B'
+        }, False, '"Correctly" also matched the old prefix'),
+        ({
+            'prediction': ''
+        }, False, 'empty reply is not correct'),
+        ({
+            'correct': True
+        }, True, 'passes through explicit correct flag'),
+        ({
+            'correct': False
+        }, False, 'passes through explicit incorrect flag'),
+        ({
+            'score': 0.8
+        }, True, 'score > 0.5 is correct'),
+        ({
+            'score': 0.2
+        }, False, 'score <= 0.5 is not correct'),
+        ({}, False, 'no recognised field is not correct'),
+    ]
+
+    def test_verdicts(self):
+        ev = CascadeEvaluator.__new__(CascadeEvaluator)
+        for detail, expected, note in self.CASES:
+            with self.subTest(note=note):
+                self.assertEqual(ev._get_llm_correctness(detail),
+                                 expected,
+                                 msg=note)
+
+
 if __name__ == '__main__':
     unittest.main()
