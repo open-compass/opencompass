@@ -98,11 +98,12 @@ runner=dict(
     type=LocalRunner,
     max_num_workers=16,  # 最大并行任务数，默认 16
     max_workers_per_gpu=1,
+    retry=2,             # 任务失败重试次数，默认 0
     task=dict(type=OpenICLInferTask),
 )
 ```
 
-实际并行任务数同时受可用 GPU 资源和 `max_num_workers` 限制。
+实际并行任务数同时受可用 GPU 资源和 `max_num_workers` 限制。失败的任务会按 `retry` 次数重新启动，语义与 SlurmRunner、DLCRunner 一致；`--retry` 命令行参数同样对本地运行生效。
 
 ### SlurmRunner
 
