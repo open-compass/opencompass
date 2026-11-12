@@ -1,8 +1,7 @@
 from opencompass.openicl.icl_prompt_template import PromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
-from opencompass.openicl.icl_evaluator import EMEvaluator
-from opencompass.datasets import CMRCDataset
+from opencompass.datasets import CMRCDataset, CMRCEvaluator
 
 CMRC_reader_cfg = dict(
     input_columns=['question', 'context'], output_column='answers')
@@ -14,7 +13,7 @@ CMRC_infer_cfg = dict(
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer))
 
-CMRC_eval_cfg = dict(evaluator=dict(type=EMEvaluator), )
+CMRC_eval_cfg = dict(evaluator=dict(type=CMRCEvaluator), )
 
 CMRC_datasets = [
     dict(
