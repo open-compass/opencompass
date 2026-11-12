@@ -119,9 +119,9 @@ def extract_prediction(output, options=None, option_inds='ABCDEFGH'):
             r'^\(([A-Za-z])\)$',  # "(b)", "(B)"
             r'^([A-Za-z])$',  # "b", "B"
             r'^([A-Za-z]). ',  # "b", "B"
-            r'[Th]he answer is ([A-Z])',  # "The answer is B"
+            r'[Tt]he answer is ([A-Z])',  # "The answer is B"
             r'^\(([A-Za-z])\) [\s\S]+$',  # "(A) XXXXX"
-            r'[Th]he answer is \(([A-Za-z])\) [\s\S]+$'
+            r'[Tt]he answer is \(([A-Za-z])\) [\s\S]+$'
         ]
 
         # have "X" in the output
@@ -148,8 +148,8 @@ def extract_prediction(output, options=None, option_inds='ABCDEFGH'):
     else:
         # free_text QA problems, numeric answer
         patterns = [
-            r'[Th]he answer is ([\s\S]+)$',  # "The answer is XXXXX.",
-            r'[Th]he table shows that ([\d\$\.\,\/\:]+) ',
+            r'[Tt]he answer is ([\s\S]+)$',  # "The answer is XXXXX.",
+            r'[Tt]he table shows that ([\d\$\.\,\/\:]+) ',
             r' = ([\d\$\.\,\/\:]+)',  # "= $1.40"
             r'(?<= be| is) ([\-\d\$\.\,\/\:]{0,}[\d]+)',  # "will be $1.40"
             r'(?<= are| was) ([\-\d\$\.\,\/\:]{0,}[\d]+)',  # "are $1.40"
