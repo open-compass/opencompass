@@ -20,6 +20,12 @@ class TestTextPostprocessors(unittest.TestCase):
         self.assertEqual(tp.general_cn_postprocess(text), '今 天 天 气 好')
         mock_cut.assert_called_with(text)
 
+    @patch('jieba.cut', side_effect=list)
+    def test_general_cn_postprocess_cleans_before_segmentation(self, mock_cut):
+        text = '北京。\n因为中华人民共和国的首都是北京'
+        self.assertEqual(tp.general_cn_postprocess(text), '北 京')
+        mock_cut.assert_called_once_with('北京')
+
     def test_first_capital_postprocess(self):
         self.assertEqual(tp.first_capital_postprocess('abCDef'), 'C')
         self.assertEqual(tp.first_capital_postprocess('abcdef'), '')

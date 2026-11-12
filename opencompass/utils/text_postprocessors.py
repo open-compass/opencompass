@@ -38,7 +38,7 @@ def general_cn_postprocess(text: str) -> str:
     cleaned_text = re.sub(r'\s+', ' ', no_articles).strip()
     import jieba
 
-    cleaned_text = ' '.join(jieba.cut(text))
+    cleaned_text = ' '.join(jieba.cut(cleaned_text))
     return cleaned_text
 
 
