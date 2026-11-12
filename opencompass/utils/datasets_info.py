@@ -111,6 +111,20 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/biology-instruction-fixed",
     },
+    # MedFailBench v0.2 prompt set, 222 rows (en + tr). This is the file the
+    # official leaderboard and the LM Evaluation Harness task use.
+    "opencompass/MedFailBench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/MedFailBench/medfailbench_prompts_v0_2.jsonl",
+    },
+    # MedFailBench Turkish-only preprint evidence subset, 44 rows. Different
+    # file and different schema from the entry above.
+    "opencompass/MedFailBench-TR-Preprint": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/MedFailBench/medfailbench_safety_layer_docs_v0_1.jsonl",
+    },
     # OpenSWI
     "opencompass/openswi":{
         "ms_id": None,
