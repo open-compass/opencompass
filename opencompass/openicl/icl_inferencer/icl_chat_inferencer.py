@@ -184,8 +184,8 @@ class ChatInferencer(BaseInferencer):
             prompt_template=prompt_template,
         )
 
-        # Create tmp json file for saving intermediate results and future
-        # resuming
+        # Use the same JSONL checkpoint for saving and resuming completed
+        # samples.
         index = 0
         tmp_jsonl_filename = Path('tmp_' + output_json_filename).with_suffix(
             '.jsonl').name
@@ -212,8 +212,8 @@ class ChatInferencer(BaseInferencer):
             # Save intermediate results
             if (self.save_every is not None and index % self.save_every == 0
                     and self.is_main_process):
-                output_handler.write_to_json(output_json_filepath,
-                                             'tmp_' + output_json_filename)
+                output_handler.write_to_jsonl(output_json_filepath,
+                                              tmp_jsonl_filename)
 
         # 4. Output
         if self.is_main_process:
