@@ -17,7 +17,7 @@ class Config:
     def __init__(self, flames_config_path, flames_bench_config_name) -> None:
         config_file_path = osp.join(flames_config_path,
                                     flames_bench_config_name)
-        with open(config_file_path, 'r') as config_file:
+        with open(config_file_path, 'r', encoding='utf-8') as config_file:
             self.config = ''.join(config_file.readlines())
             config_file.close()
 
@@ -41,7 +41,7 @@ class FlamesDataset(SubjectiveCmpDataset):
         config = Config(path, f'{name}_config.txt')
 
         dataset = []
-        with open(osp.join(path, f'{name}.json')) as f:
+        with open(osp.join(path, f'{name}.json'), encoding='utf-8') as f:
             dataset = json.load(f)
         flames_dataset = []
         for ins in dataset:
