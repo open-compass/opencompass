@@ -103,8 +103,8 @@ repos:
     hooks:
     -   id: update-dataset-suffix
         name: dataset suffix updater
-        entry: ./tools/update_dataset_suffix.py
-        language: script
+        entry: python tools/update_dataset_suffix.py
+        language: system
         pass_filenames: true
         require_serial: true
         files: ^opencompass/configs/datasets
@@ -112,8 +112,8 @@ repos:
     hooks:
     -   id: update-dataset-suffix-pacakge
         name: dataset suffix updater(package)
-        entry: ./tools/update_dataset_suffix.py
-        language: script
+        entry: python tools/update_dataset_suffix.py
+        language: system
         pass_filenames: false
         # require_serial: true
         # files: ^opencompass/configs/datasets
