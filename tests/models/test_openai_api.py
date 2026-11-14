@@ -563,6 +563,66 @@ class TestOpenAISDKCompletion(unittest.TestCase):
     @patch('openai.OpenAI')
     @patch('httpx.Client')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_accepts_a_finished_empty_completion(
+            self, mock_httpx_client, mock_openai_class, mock_encoding):
+        setup_tiktoken_mock(mock_encoding)
+        create = mock_openai_class.return_value.completions.create
+        model = OpenAISDKCompletion(path='gpt-3.5-turbo')
+
+        for finish_reason in ('stop', 'content_filter'):
+            with self.subTest(finish_reason=finish_reason):
+                create.reset_mock()
+                create.return_value = MagicMock(
+                    choices=[MagicMock(text='', finish_reason=finish_reason)])
+
+                self.assertEqual(model.generate(['Hello'], max_out_len=10),
+                                 [''])
+                create.assert_called_once()
+
+    @patch('tiktoken.encoding_for_model')
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_returns_the_configured_status_message(
+            self, mock_httpx_client, mock_openai_class, mock_encoding):
+        from httpx import Request, Response
+        from openai import APIStatusError
+
+        setup_tiktoken_mock(mock_encoding)
+        create = mock_openai_class.return_value.completions.create
+        create.side_effect = APIStatusError(
+            'Unavailable',
+            response=Response(503,
+                              request=Request('POST',
+                                              'https://example.invalid')),
+            body=None)
+        model = OpenAISDKCompletion(path='gpt-3.5-turbo',
+                                    status_code_mappings={503: 'Try later'})
+
+        self.assertEqual(model.generate(['Hello'], max_out_len=10),
+                         ['Try later'])
+        create.assert_called_once()
+
+    @patch('tiktoken.encoding_for_model')
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_exhausts_retry_limit_when_choices_are_missing(
+            self, mock_httpx_client, mock_openai_class, mock_encoding):
+        setup_tiktoken_mock(mock_encoding)
+        create = mock_openai_class.return_value.completions.create
+        create.return_value = MagicMock(choices=[])
+        model = OpenAISDKCompletion(path='gpt-3.5-turbo', retry=2)
+
+        with self.assertRaisesRegex(RuntimeError, 'retrying for 2 times'):
+            model.generate(['Hello'], max_out_len=10)
+
+        self.assertEqual(create.call_count, 2)
+
+    @patch('tiktoken.encoding_for_model')
+    @patch('openai.OpenAI')
+    @patch('httpx.Client')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_non_text_prompts_are_rejected_before_tokenization(
             self, mock_httpx_client, mock_openai_class, mock_encoding):
         setup_tiktoken_mock(mock_encoding)
