@@ -379,9 +379,8 @@ class HardMTBenchEvaluator(GenericLLMEvaluator):
         def summarize(indices: List[int]) -> Dict[str, float]:
             # term_acc is a fraction per item, the others are already 0-100
             return {
-                metric:
-                _mean([values[i] for i in indices],
-                      scale=100 if metric == 'term_acc' else 1)
+                metric: _mean([values[i] for i in indices],
+                              scale=100 if metric == 'term_acc' else 1)
                 for metric, values in per_sample.items()
             }
 
