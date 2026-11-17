@@ -53,6 +53,15 @@ def mgsm_postprocess(text: str, lang: str) -> str:
     return numbers[-1].rstrip('.') if numbers else ''
 
 
+def _normalize_answer(answer: str) -> str:
+    """Normalize a number the way openai/simple-evals ``score_mgsm`` does:
+    strip trailing decimal zeros (``18.00`` -> ``18``) and drop thousands
+    separators (``2,125`` -> ``2125``)."""
+    if '.' in answer:
+        answer = answer.rstrip('0').rstrip('.')
+    return answer.replace(',', '')
+
+
 class MGSM_Evaluator(BaseEvaluator):
 
     def score(self, predictions, references):
@@ -62,10 +71,8 @@ class MGSM_Evaluator(BaseEvaluator):
         details = {}
         for index, (references_answer, predictions_answer) in enumerate(
                 zip(references, predictions)):
-            if references_answer == predictions_answer:
-                is_correct = True
-            else:
-                is_correct = False
+            is_correct = (_normalize_answer(references_answer) ==
+                          _normalize_answer(predictions_answer))
 
             num_correct += is_correct
             total += 1
