@@ -37,7 +37,7 @@ GRADER_TEMPLATE = """
     B: INCORRECT
     Just return the letters "A" or "B", with no text around it.
 
-    Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+    Here is your task. Simply reply with either A or B. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
     <Original Question Begin>: {systemp_prompt}\nQuestion: {{RBench_Question_Input}}\nA. {{RBench_Option_A}}\nB. {{RBench_Option_B}}\nC. {{RBench_Option_C}}\nD. {{RBench_Option_D}}\nE. {{RBench_Option_E}}\nF. {{RBench_Option_F}}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{target}\n<Gold Target End>\n\n

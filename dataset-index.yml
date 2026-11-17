@@ -933,6 +933,12 @@
     paper: https://proceedings.neurips.cc/paper_files/paper/2019/file/4496bf24afe7fab6f046bf4923da8de6-Paper.pdf
     configpath: opencompass/configs/datasets/SuperGLUE_ReCoRD/SuperGLUE_ReCoRD_gen.py
     configpath_llmjudge: ''
+- rpcbench:
+    name: RPC-Bench
+    category: Long Context
+    paper: https://arxiv.org/abs/2601.14289
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/rpcbench/rpcbench_llmjudge_rawprompt_gen.py
 - rte:
     name: SuperGLUE / RTE
     category: Reasoning
@@ -1321,6 +1327,12 @@
     paper: https://matharena.ai/
     configpath: opencompass/configs/datasets/aime2026/aime2026_cascade_eval_gen_6ff468.py
     configpath_llmjudge: ''
+- arxivmath:
+    name: ArXivMath
+    category: Math
+    paper: https://arxiv.org/abs/2605.00674
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/arxivmath/arxivmath_llmjudge_rawprompt_gen.py
 - atlas:
     name: ATLAS
     category: Science
@@ -1522,6 +1534,12 @@
     paper: https://aclanthology.org/W19-5301/
     configpath: opencompass/configs/datasets/wmt19/wmt19_gen.py
     configpath_llmjudge: ''
+- hardmtbench:
+    name: HardMTBench
+    category: Language / Translation
+    paper: https://arxiv.org/abs/2605.28315
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/hardmtbench/hardmtbench_llmjudge_rawprompt_gen.py
 - weddoo_bench:
     name: WeddooBench
     category: Knowledge / Wedding Industry

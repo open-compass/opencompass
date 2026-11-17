@@ -35,7 +35,7 @@ A: CORRECT
 B: INCORRECT
 C: INVALID
 Just return the letters "A", "B", or "C", with no text around it.
-Here is your task. Simply reply with either CORRECT, INCORRECT, or INVALID. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+Here is your task. Simply reply with either A, B, or C. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 <Original Question Begin>:
 {problem}
 <Original Question End>

@@ -83,6 +83,7 @@ from .gpqa import *  # noqa: F401, F403
 from .grand_physics import *  # noqa: F401, F403
 from .gsm8k import *  # noqa: F401, F403
 from .gsm_hard import *  # noqa: F401, F403
+from .hardmtbench import *  # noqa: F401, F403
 from .healthbench.healthbench import *  # noqa: F401, F403
 from .hellaswag import *  # noqa: F401, F403
 from .hle import *  # noqa: F401, F403
@@ -181,6 +182,7 @@ from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
 from .reasonzoo import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
+from .rpcbench import *  # noqa: F401, F403
 from .ruler import *  # noqa: F401, F403
 from .s2_tomg_bench import *  # noqa: F401, F403
 from .safety import *  # noqa: F401, F403

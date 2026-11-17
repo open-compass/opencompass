@@ -498,6 +498,26 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/hmmt2026/hmmt_feb_2026.jsonl",
     },
+    "opencompass/arxivmath_0826": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arxivmath/arxivmath_0826.jsonl",
+    },
+    "opencompass/arxivmath_0926": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arxivmath/arxivmath_0926.jsonl",
+    },
+    "opencompass/arxivmath_1026": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arxivmath/arxivmath_1026.jsonl",
+    },
+    "opencompass/hardmtbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/hardmtbench/HardMTBench.jsonl",
+    },
     "opencompass/cmo_fib": {
         "ms_id": "",
         "hf_id": "",
@@ -1107,6 +1127,14 @@ DATASETS_URL = {
     "/hmmt2026": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hmmt_feb_2026.zip",
         "md5": "442642baa94de9e8a67903d7d5aef44b",
+    },
+    "/arxivmath/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arxivmath.zip",
+        "md5": "aef73bc47b01812158fb3d36ce13d067",
+    },
+    "/hardmtbench/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hardmtbench.zip",
+        "md5": "41b911a33865a2a63dbe1ed3e79907da",
     },
     "/cmo": {
         "url":
