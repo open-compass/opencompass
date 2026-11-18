@@ -78,7 +78,7 @@ B: INCORRECT
 C: NOT_ATTEMPTED
 Just return the letters "A", "B", or "C", with no text around it.
 
-Here is a new example. Simply reply with either CORRECT, INCORRECT, NOT ATTEMPTED. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+Here is a new example. Simply reply with either A, B, or C. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 ```
 Question: {question}
 Gold target: {answer}
