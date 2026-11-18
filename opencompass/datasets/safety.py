@@ -23,3 +23,4 @@ class SafetyDataset(BaseDataset):
                     idx += 1
 
         dataset['test'] = Dataset.from_list(data_list)
+        return dataset
