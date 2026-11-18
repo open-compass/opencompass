@@ -153,7 +153,8 @@ class OpenAISDKResponse(OpenAI):
             input, max_out_len, self.max_seq_len, self.mode,
             self.get_token_len)
 
-        query_data = self._build_query_data(messages, max_out_len, temperature)
+        query_data = self._build_query_data(messages, max_out_len,
+                                            self.temperature)
 
         num_retries = 0
         while num_retries < self.retry:
@@ -305,7 +306,7 @@ class OpenAISDKResponse(OpenAI):
         )
         if max_out_len is not None:
             query_data['max_output_tokens'] = max_out_len
-        if temperature is not None and not self._is_reasoning_model():
+        if temperature is not None:
             query_data['temperature'] = temperature
         if self.extra_body:
             query_data['extra_body'] = self.extra_body
