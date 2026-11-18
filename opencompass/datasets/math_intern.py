@@ -143,7 +143,7 @@ class Extractor:
             return cls.clean(x)
         if pred.find('\n\nQuestion:') >= 0:
             pred = pred.split('\n\nQuestion:')[0]
-            if pred.find('The answer is'):
+            if pred.find('The answer is') >= 0:
                 pred = pred[pred.find('The answer is') + len('The answer is'):]
                 return cls.clean(pred)
         if pred.find('# Answer') >= 0:
