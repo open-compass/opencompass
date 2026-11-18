@@ -1,4 +1,5 @@
 import unittest
+from collections import Counter, OrderedDict
 
 from opencompass.utils.code_execution import (TYPE_AWARE_EQUAL_NAME,
                                               make_assertions_type_aware,
@@ -30,6 +31,25 @@ class TestCodeExecution(unittest.TestCase):
 
     def test_type_aware_equal_accepts_nested_builtin_value(self):
         self.assertTrue(type_aware_equal({'value': [1, 2]}, {'value': [1, 2]}))
+
+    def test_type_aware_equal_accepts_int_and_float_with_same_value(self):
+        self.assertTrue(type_aware_equal(240.0, 240))
+        self.assertTrue(type_aware_equal(55, 55.0))
+        self.assertTrue(type_aware_equal([240.0], [240]))
+        self.assertFalse(type_aware_equal(240.5, 240))
+
+    def test_type_aware_equal_accepts_stdlib_dict_subclasses(self):
+        self.assertTrue(type_aware_equal(Counter({2: 3, 1: 2}), {2: 3, 1: 2}))
+        self.assertTrue(type_aware_equal(OrderedDict(a=1), {'a': 1}))
+        self.assertFalse(type_aware_equal(Counter({2: 3}), {2: 4}))
+
+    def test_type_aware_equal_rejects_eq_override_inside_counter(self):
+        self.assertFalse(
+            type_aware_equal(Counter({1: _AlwaysEqualInt()}), {1: 2}))
+
+    def test_type_aware_equal_still_rejects_bool_and_int_subclasses(self):
+        self.assertFalse(type_aware_equal(_AlwaysEqualInt(), 1))
+        self.assertFalse(type_aware_equal(True, 1))
 
     def test_type_aware_assertion_rejects_eq_override(self):
         test_program = make_assertions_type_aware('assert solve() == 1')
