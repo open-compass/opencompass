@@ -14,6 +14,11 @@ DATASETS_MAPPING = {
         "hf_id": None,
         "local": "./data/aa_lcr",
     },
+    "opencompass/AA-LCR-v1.1": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/aa_lcr_v1_1",
+    },
     "opencompass/QASPER":{
         "ms_id": None,
         "hf_id": None,
@@ -38,6 +43,11 @@ DATASETS_MAPPING = {
         "ms_id": "ZeroLoss-Lab/ELBench",
         "hf_id": "ZeroLoss-Lab/ELBench",
         "local": "./data/elbench",
+    },
+    "opencompass/WeddooBench": {
+        "ms_id": None,
+        "hf_id": None,
+        "local": "./data/weddoo_bench/weddoo_bench_v1.jsonl",
     },
     "opencompass/S2-TOMG-Bench":{
         "ms_id": None,
@@ -487,6 +497,26 @@ DATASETS_MAPPING = {
         "ms_id": "",
         "hf_id": "",
         "local": "./data/hmmt2026/hmmt_feb_2026.jsonl",
+    },
+    "opencompass/arxivmath_0826": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arxivmath/arxivmath_0826.jsonl",
+    },
+    "opencompass/arxivmath_0926": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arxivmath/arxivmath_0926.jsonl",
+    },
+    "opencompass/arxivmath_1026": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/arxivmath/arxivmath_1026.jsonl",
+    },
+    "opencompass/hardmtbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/hardmtbench/HardMTBench.jsonl",
     },
     "opencompass/cmo_fib": {
         "ms_id": "",
@@ -1098,6 +1128,14 @@ DATASETS_URL = {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hmmt_feb_2026.zip",
         "md5": "442642baa94de9e8a67903d7d5aef44b",
     },
+    "/arxivmath/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/arxivmath.zip",
+        "md5": "aef73bc47b01812158fb3d36ce13d067",
+    },
+    "/hardmtbench/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hardmtbench.zip",
+        "md5": "41b911a33865a2a63dbe1ed3e79907da",
+    },
     "/cmo": {
         "url":
         "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/cmo.zip",
@@ -1210,5 +1248,9 @@ DATASETS_URL = {
     "/GrandPhysics": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/GrandPhysics_50_questions.zip",
         "md5": "06e37ec7676c800d3c0010ee4cb93765",
+    },
+    "/weddoo_bench": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/weddoo_bench.zip",
+        "md5": "31885c7e63748429a12d6c585cff3ca4",
     }
 }

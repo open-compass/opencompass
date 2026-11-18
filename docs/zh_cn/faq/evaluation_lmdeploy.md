@@ -10,7 +10,7 @@
 
 ### 安装 LMDeploy
 
-使用 pip 安装 LMDeploy (python 3.8+)：
+使用 pip 安装 LMDeploy (python 3.9+)：
 
 ```shell
 pip install lmdeploy

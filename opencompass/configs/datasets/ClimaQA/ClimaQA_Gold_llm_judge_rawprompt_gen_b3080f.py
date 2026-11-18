@@ -25,7 +25,7 @@ GRADER_TEMPLATE_mcq = """
     B: INCORRECT
     Just return the letters "A" or "B", with no text around it.
 
-    Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+    Here is your task. Simply reply with either A or B. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
 
     <Original Question Begin>: \n{input}\n<Original Question End>\n\n
@@ -49,7 +49,7 @@ GRADER_TEMPLATE_cloze = """
     B: INCORRECT
     Just return the letters "A" or "B", with no text around it.
 
-    Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+    Here is your task. Simply reply with either A or B. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
 
 
     <Original Question Begin>: \n{input}\n<Original Question End>\n\n

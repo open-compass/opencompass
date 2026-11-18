@@ -41,7 +41,7 @@ GRADER_TEMPLATE = """
     A: CORRECT 
     B: INCORRECT
     Just return the letters "A" or "B", with no text around it.
-    Here is your task. Simply reply with either CORRECT, INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
+    Here is your task. Simply reply with either A or B. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer.
     <Original Question Begin>: \n{question}\n<Original Question End>\n\n
     <Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n
     <Predicted Answer Begin>: \n{prediction}\n<Predicted End>\n\n

@@ -19,8 +19,8 @@ EVAL_PROMPT = (
     "the \\boxed{{}} and only judge whether the candidate's answer is consistent with the standard answer.\n\n    "
     'Please judge whether the following answers are consistent with the standard answer based on the above criteria. '
     'Grade the predicted answer of this new question as one of:\n    A: CORRECT \n    B: INCORRECT\n    Just return '
-    "the letters \"A\" or \"B\", with no text around it.\n\n    Here is your task. Simply reply with either CORRECT, "
-    "INCORRECT. Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer."
+    "the letters \"A\" or \"B\", with no text around it.\n\n    Here is your task. Simply reply with either A or B. "
+    "Don't apologize or correct yourself if there was a mistake; we are just trying to grade the answer."
     '\n\n\n    <Original Question Begin>: \n\n{question}\n\n<Original Question End>\n\n\n    '
     '<Gold Target Begin>: \n{answer}\n<Gold Target End>\n\n\n    <Predicted Answer Begin>: \n{prediction}\n'
     "<Predicted End>\n\n\n    \n    Judging the correctness of candidates' answers:\"\n"

@@ -306,7 +306,7 @@ class WinRateEvaluator(BaseEvaluator):
             try:
                 response = raw_response.json()
             except requests.JSONDecodeError:
-                openai.logger.error('JsonDecode error, got',
+                openai.logger.error('JsonDecode error, got %s',
                                     str(raw_response.content))
                 continue
             try:
@@ -323,7 +323,7 @@ class WinRateEvaluator(BaseEvaluator):
                         openai.logger.warn(f'insufficient_quota key: {key}')
                         continue
 
-                    openai.logger.error('Find error message in response: ',
+                    openai.logger.error('Find error message in response: %s',
                                         str(response['error']))
             max_num_retries += 1
 

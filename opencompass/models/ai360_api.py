@@ -169,7 +169,7 @@ class AI360GPT(BaseAPIModel):
                 else:
                     print(response)
 
-                self.logger.error('Find error message in response: ',
+                self.logger.error('Find error message in response: %s',
                                   str(response['error']))
 
             print(raw_response)

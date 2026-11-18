@@ -1,4 +1,4 @@
-from opencompass.openicl.icl_prompt_template import PromptTemplate
+from opencompass.openicl.icl_raw_prompt_template import RawPromptTemplate
 from opencompass.openicl.icl_retriever import ZeroRetriever
 from opencompass.openicl.icl_inferencer import GenInferencer
 from opencompass.datasets import (
@@ -36,15 +36,13 @@ grand_physics_reader_cfg = dict(input_columns=['input'], output_column='target')
 
 grand_physics_infer_cfg = dict(
     prompt_template=dict(
-        type=PromptTemplate,
-        template=dict(
-            round=[
-                dict(
-                    role='HUMAN',
-                    prompt=f'Answer the given question step by step. Begin by explaining your reasoning process clearly. Conclude by providing the final answers at the end in LaTeX boxed format. Think step by step before answering. It should be noted that the question may include multiple sub questions, please ensure that each question is answered in order.\n\nQ: {{input}}\nA: ',
-                )
-            ]
-        ),
+        type=RawPromptTemplate,
+        messages=[
+            dict(
+                role='user',
+                content='Answer the given question step by step. Begin by explaining your reasoning process clearly. Conclude by providing the final answers at the end in LaTeX boxed format. Think step by step before answering. It should be noted that the question may include multiple sub questions, please ensure that each question is answered in order.\n\nQ: {input}\nA: ',
+            ),
+        ],
     ),
     retriever=dict(type=ZeroRetriever),
     inferencer=dict(type=GenInferencer),
@@ -54,19 +52,14 @@ grand_physics_eval_cfg = dict(
     evaluator=dict(
         type=GenericLLMEvaluator,
         prompt_template=dict(
-            type=PromptTemplate,
-            template=dict(
-                begin=[
-                    dict(
-                        role='SYSTEM',
-                        fallback_role='HUMAN',
-                        prompt="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
-                    )
-                ],
-                round=[
-                    dict(role='HUMAN', prompt=GRADER_TEMPLATE),
-                ],
-            ),
+            type=RawPromptTemplate,
+            messages=[
+                dict(
+                    role='system',
+                    content="You are a helpful assistant who evaluates the correctness and quality of models' outputs.",
+                ),
+                dict(role='user', content=GRADER_TEMPLATE),
+            ],
         ),
         dataset_cfg=dict(
             type=GrandPhysicsDataset,
@@ -90,4 +83,3 @@ grand_physics_datasets = [
         eval_cfg=grand_physics_eval_cfg,
     )
 ]
-

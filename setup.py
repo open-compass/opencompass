@@ -55,6 +55,12 @@ def parse_requirements(fname='requirements.txt', with_version=True):
             target = line.split(' ')[1]
             for info in parse_require_file(target):
                 yield info
+        elif re.match(r'^[^\s@]+\s*@\s*[A-Za-z+]+://', line):
+            import warnings
+            warnings.warn(
+                f'Skipping direct URL requirement {line!r}: PyPI does not '
+                'allow it in package metadata. Install it manually.',
+                RuntimeWarning)
         else:
             info = {'line': line}
             if line.startswith('-e '):
@@ -128,7 +134,7 @@ def do_setup():
         maintainer='OpenCompass Authors',
         cmdclass={'download_nltk': DownloadNLTK},
         setup_requires=['nltk==3.8'],
-        python_requires='>=3.8.0',
+        python_requires='>=3.9.0',
         install_requires=parse_requirements('requirements/runtime.txt'),
         extras_require={
             'lmdeploy':
@@ -149,6 +155,10 @@ def do_setup():
         },
         license='Apache License 2.0',
         include_package_data=True,
+        package_data={
+            'opencompass.datasets.leval': ['*.jsonl'],
+            'opencompass.datasets.medbench': ['*.jsonl'],
+        },
         packages=find_packages(),
         keywords=[
             'AI',
@@ -160,7 +170,6 @@ def do_setup():
             'llm',
         ],
         classifiers=[
-            'Programming Language :: Python :: 3.8',
             'Programming Language :: Python :: 3.9',
             'Programming Language :: Python :: 3.10',
             'Programming Language :: Python :: 3.12',

@@ -2,6 +2,7 @@
 output_*/
 outputs/
 scripts/
+!.github/scripts/
 icl_inference_output/
 .vscode/
 tmp/

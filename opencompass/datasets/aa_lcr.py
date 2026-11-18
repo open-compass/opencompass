@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 import posixpath
 import re
@@ -49,8 +50,10 @@ def _resolve_local_file(root: str, filename: str) -> Optional[str]:
     return None
 
 
-def _resolve_data_files(path: str, csv_filename: str,
-                        zip_filename: str) -> Tuple[str, str]:
+def _resolve_data_files(path: str,
+                        csv_filename: str,
+                        zip_filename: str,
+                        revision: Optional[str] = None) -> Tuple[str, str]:
     if os.path.isdir(path):
         csv_path = _resolve_local_file(path, csv_filename)
         zip_path = _resolve_local_file(path, zip_filename)
@@ -67,15 +70,21 @@ def _resolve_data_files(path: str, csv_filename: str,
 
     csv_path = hf_hub_download(repo_id=path,
                                filename=csv_filename,
-                               repo_type='dataset')
+                               repo_type='dataset',
+                               revision=revision)
     zip_path = hf_hub_download(repo_id=path,
                                filename=zip_filename,
-                               repo_type='dataset')
+                               repo_type='dataset',
+                               revision=revision)
     return csv_path, zip_path
 
 
 def _resolve_data_path(path: str, csv_filename: str, zip_filename: str) -> str:
     """Prefer OpenCompass data cache and fall back to the AA-LCR Hub repo."""
+    # An explicit Hub repo must not resolve to an unversioned local cache.
+    if path == DEFAULT_REPO_ID:
+        return path
+
     try:
         resolved_path = get_data_path(path)
     except Exception:
@@ -146,10 +155,11 @@ class AALCRDataset(BaseDataset):
     @staticmethod
     def load(path: str = DEFAULT_REPO_ID,
              csv_filename: str = DEFAULT_CSV_FILENAME,
-             zip_filename: str = DEFAULT_ZIP_FILENAME):
+             zip_filename: str = DEFAULT_ZIP_FILENAME,
+             revision: Optional[str] = None):
         path = _resolve_data_path(path, csv_filename, zip_filename)
         csv_path, zip_path = _resolve_data_files(path, csv_filename,
-                                                 zip_filename)
+                                                 zip_filename, revision)
 
         raw_data = []
         with open(csv_path, encoding='utf-8', newline='') as f, \
@@ -187,6 +197,24 @@ class AALCRDataset(BaseDataset):
 
 
 def _parse_aa_lcr_judgement(judgement: str) -> str:
+    # v1.1 requests JSON. Read its verdict before inspecting any explanation.
+    json_text = re.sub(r'^```(?:json)?\s*|\s*```$',
+                       '',
+                       judgement.strip(),
+                       flags=re.IGNORECASE)
+    try:
+        parsed = json.loads(json_text)
+    except json.JSONDecodeError:
+        pass
+    else:
+        verdict = parsed.get('verdict') if isinstance(parsed, dict) else None
+        if isinstance(verdict, str):
+            verdict = verdict.strip().upper()
+            if verdict in {'CORRECT', 'INCORRECT'}:
+                return verdict
+        return 'UNKNOWN'
+
+    # Retain compatibility with the v1.0 plain-text verdicts.
     normalized = judgement.strip().upper()
     if re.search(r'\bINCORRECT\b', normalized):
         return 'INCORRECT'

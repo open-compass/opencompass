@@ -167,7 +167,7 @@ class P_SPP_Evaluator(BaseEvaluator):
             if isinstance(cost_string, int) or cost_string.isdigit():
                 return False, f'No path between from node {start_node} to node {end_node}.'
             else:
-                return True, 'No path found from node {start_node} to node {end_node}.'
+                return True, f'No path found from node {start_node} to node {end_node}.'
 
         try:
             path = list(map(int, path_string.split('->')))

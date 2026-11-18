@@ -15,6 +15,7 @@ class CivilCommentsDataset(BaseDataset):
 
         def pre_process(example):
             example['label'] = int(example['toxicity'] >= 0.5)
+            example['answer'] = 'B' if example['label'] else 'A'
             example['choices'] = ['no', 'yes']
             return example
 

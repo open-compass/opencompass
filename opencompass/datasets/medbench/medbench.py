@@ -1,6 +1,8 @@
 import json
 import os.path as osp
 import sys
+from pathlib import Path
+
 from datasets import Dataset
 from sklearn.metrics import classification_report
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -18,6 +20,15 @@ import re
 from transformers import BasicTokenizer
 from rouge_chinese import Rouge
 basic_tokenizer = BasicTokenizer(tokenize_chinese_chars=True)
+
+_MODULE_FILE = Path(__file__).resolve()
+
+
+def _load_entity_choices():
+    resource_path = _MODULE_FILE.with_name('entity_list.jsonl')
+    with resource_path.open(encoding='utf-8') as f:
+        return json.load(f)
+
 
 @LOAD_DATASET.register_module()
 class MedBenchDataset(BaseDataset):
@@ -117,7 +128,7 @@ def process_generated_results_CMeIE(pred_file):
 
 def process_generated_results_CDN(pred_file):
     structured_output = []
-    answer_choices = json.load(open('./opencompass/datasets/medbench/entity_list.jsonl', 'r'))
+    answer_choices = _load_entity_choices()
     for line in pred_file:
         gen_output = line
 
