@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 from opencompass.models.claude_sdk_api import ClaudeSDK
+from opencompass.utils import get_logger
 from opencompass.utils.prompt import PromptList
 
 
@@ -177,6 +178,34 @@ class TestClaudeSDK(unittest.TestCase):
 
         self.assertEqual(api_params['thinking'], thinking)
         self.assertNotIn('stream', api_params)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_temperature_is_never_sent(self):
+        """Test temperature is left out: the SDK and API reject it."""
+        for kwargs in ({}, {
+                'temperature': 0.3
+        }, {
+                'temperature': None
+        }, {
+                'thinking': {
+                    'type': 'enabled',
+                    'budget_tokens': 1024
+                }
+        }):
+            model, _, client = self.build_model(**kwargs)
+
+            model._generate('hello', max_out_len=64)
+
+            api_params = client.messages.create.call_args.kwargs
+            self.assertNotIn('temperature', api_params)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_configured_temperature_logs_a_warning(self):
+        """Test a configured temperature is reported as ignored."""
+        with self.assertLogs(get_logger(), level='WARNING') as logs:
+            self.build_model(temperature=0.3)
+        self.assertTrue(
+            any('ignores temperature' in line for line in logs.output))
 
     @patch.dict('os.environ', {}, clear=True)
     def test_generate_with_thinking_content(self):

@@ -56,7 +56,7 @@ class ClaudeSDK(BaseAPIModel):
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
-        temperature: Optional[float] = 0.0,
+        temperature: Optional[float] = None,
         thinking: Optional[Dict] = None,
         base_url: Optional[str] = None,
         stream: bool = False,
@@ -92,6 +92,12 @@ class ClaudeSDK(BaseAPIModel):
         self.anthropic = Anthropic(**client_kwargs)
         self.model = path
         self.temperature = temperature
+        if temperature is not None:
+            # anthropic>=1.0 dropped temperature from messages.create, and
+            # the API (2026-10-21) answers 400 to it, so it is never sent.
+            self.logger.warning(
+                'ClaudeSDK ignores temperature: the Anthropic SDK and API no '
+                'longer accept it.')
         self.thinking = thinking
         self.base_url = base_url
         self.stream = stream
@@ -267,7 +273,6 @@ class ClaudeSDK(BaseAPIModel):
                 api_params = {
                     'model': self.model,
                     'max_tokens': max_out_len,
-                    'temperature': self.temperature,
                     'messages': messages,
                 }
                 if system_prompts:
