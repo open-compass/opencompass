@@ -373,6 +373,12 @@ class OpenAI(BaseAPIModel):
                     self.logger.error(f'Request failed with status code '
                                       f'{raw_response.status_code}, response: '
                                       f'{raw_response.content.decode()}')
+                    if raw_response.status_code == 429:
+                        # Rate limit is transient: wait and retry without
+                        # consuming a retry, like `rate_limit_exceeded`.
+                        time.sleep(10)
+                        continue
+                    max_num_retries += 1
                     continue
                 response = raw_response.json()
                 self.logger.debug(str(response))
