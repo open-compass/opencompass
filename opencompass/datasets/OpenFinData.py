@@ -16,7 +16,7 @@ class OpenFinDataDataset(BaseDataset):
     @staticmethod
     def load(path: str, name: str):
         path = get_data_path(path, local_mode=True)
-        with open(osp.join(path, f'{name}.json'), 'r') as f:
+        with open(osp.join(path, f'{name}.json'), 'r', encoding='utf-8') as f:
             data = json.load(f)
             return Dataset.from_list(data)
 

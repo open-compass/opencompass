@@ -21,7 +21,7 @@ class LawBenchDataset(BaseDataset):
     def load(path: str, index: str) -> Dataset:
         path = get_data_path(path, local_mode=True)
         path = os.path.join(path, index + '.json')
-        with open(path, 'r') as f:
+        with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         return Dataset.from_list(data)
 
