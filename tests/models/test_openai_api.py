@@ -193,6 +193,73 @@ class TestOpenAI(unittest.TestCase):
         self.assertEqual(results[0], 'Generated response')
         self.assertEqual(mock_requests.post.call_count, 2)
 
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('opencompass.models.openai_api.requests')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_non_200_respects_retry_limit(self, mock_requests,
+                                                   mock_tiktoken):
+        """A persistent non-200 response must stop after `retry` attempts."""
+        setup_tiktoken_mock(mock_tiktoken)
+
+        mock_response_fail = MagicMock()
+        mock_response_fail.status_code = 401
+        mock_response_fail.content = b'{"error": "unauthorized"}'
+        calls = []
+
+        def post(*args, **kwargs):
+            calls.append(1)
+            if len(calls) > 10:
+                raise AssertionError('retry limit ignored on non-200')
+            return mock_response_fail
+
+        mock_requests.post.side_effect = post
+
+        model = OpenAI(
+            path='gpt-3.5-turbo',
+            max_seq_len=16384,
+            retry=2,
+        )
+
+        with self.assertRaises(RuntimeError):
+            model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(mock_requests.post.call_count, 2)
+
+    @patch('opencompass.models.openai_api.time')
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch('opencompass.models.openai_api.requests')
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_generate_429_then_success(self, mock_requests, mock_tiktoken,
+                                       mock_time):
+        """Rate limiting (429) is transient and must not use up retries."""
+        setup_tiktoken_mock(mock_tiktoken)
+
+        rate_limited = MagicMock()
+        rate_limited.status_code = 429
+        rate_limited.content = b'{"error": "rate limited"}'
+        ok = MagicMock()
+        ok.status_code = 200
+        ok.json.return_value = {
+            'choices': [{
+                'message': {
+                    'content': 'Generated response'
+                }
+            }]
+        }
+        mock_requests.post.side_effect = [rate_limited, rate_limited, ok]
+
+        model = OpenAI(
+            path='gpt-3.5-turbo',
+            max_seq_len=16384,
+            retry=2,
+        )
+
+        results = model.generate(['Hello'], max_out_len=100)
+
+        self.assertEqual(results, ['Generated response'])
+        self.assertEqual(mock_requests.post.call_count, 3)
+        self.assertEqual(mock_time.sleep.call_count, 2)
+
 
 class TestOpenAISDK(unittest.TestCase):
     """Test cases for OpenAISDK."""
