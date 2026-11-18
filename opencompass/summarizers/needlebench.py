@@ -453,7 +453,7 @@ class NeedleBenchSummarizer(DefaultSummarizer):
         table.append(header)
 
         for key in dataset_metrics:
-            dataset_metrics[key] = list(set(dataset_metrics[key]))
+            dataset_metrics[key] = list(dict.fromkeys(dataset_metrics[key]))
 
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
@@ -638,7 +638,7 @@ class NeedleBenchATCSummarizer(DefaultSummarizer):
         table.append(header)
 
         for key in dataset_metrics:
-            dataset_metrics[key] = list(set(dataset_metrics[key]))
+            dataset_metrics[key] = list(dict.fromkeys(dataset_metrics[key]))
 
         for dataset_abbr, metric in summarizer_dataset_abbrs:
             if dataset_abbr not in dataset_metrics:
