@@ -31,6 +31,28 @@ class TestPromptTemplate(unittest.TestCase):
 
         self.assertEqual(pt.template, template)
 
+    def test_generate_item_preserves_field_contents(self):
+        question = r'Print \1 and the literal {answer}.'
+        for field in ('question', 'question.text', 'question[0]'):
+            text = (f'{{{field}}}\n{{{field}}}\n'
+                    '{"literal": 1} {unknown}\nAnswer: {answer}')
+            expected = (f'{question}\n{question}\n'
+                        '{"literal": 1} {unknown}\nAnswer: ')
+            for reverse in (False, True):
+                fields = [(field, question), ('answer', 'gold answer')]
+                entry = dict(reversed(fields) if reverse else fields)
+                for meta in (False, True):
+                    with self.subTest(field=field, reverse=reverse, meta=meta):
+                        template = text
+                        if meta:
+                            template = dict(
+                                round=[dict(role='HUMAN', prompt=text)])
+                        pt = PromptTemplate(template)
+                        prompt = pt.generate_item(entry, output_field='answer')
+
+                        self.assertEqual(str(prompt), expected)
+                        self.assertEqual(entry['answer'], 'gold answer')
+
     def test_generate_ice_item(self):
         # Test simple prompt
         template = 'Translate the following English text to French: {input}.'

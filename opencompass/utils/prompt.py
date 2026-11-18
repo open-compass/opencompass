@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from copy import deepcopy
 from typing import Dict, List, Union
 
@@ -10,7 +11,8 @@ from mmengine.config import ConfigDict
 
 def safe_format(input_str: str, **kwargs) -> str:
     """Safely formats a string with the given keyword arguments. If a keyword
-    is not found in the string, it will be ignored.
+    is not found in the string, it will be ignored. Replacement values are
+    inserted verbatim, without formatting them again.
 
     Args:
         input_str (str): The string to be formatted.
@@ -19,20 +21,12 @@ def safe_format(input_str: str, **kwargs) -> str:
     Returns:
         str: The formatted string.
     """
-    # import re
-    # segs = [input_str]
-    # for k, v in kwargs.items():
-    #     regex = re.compile(f'(?<={{{k}}})(?={{{k}}})|({{{k}}})')
-    #     segs = [regex.split(seg) for seg in segs]
-    #     segs = sum(segs, [])
-    # replace_dict = {f'{{{k}}}': str(v) for k, v in kwargs.items()}
-    # segs = [replace_dict.get(seg, seg) for seg in segs]
-    # output_str = ''.join(segs)
-    # return output_str
-
-    for k, v in kwargs.items():
-        input_str = input_str.replace(f'{{{k}}}', str(v))
-    return input_str
+    if not kwargs:
+        return input_str
+    replacements = {f'{{{key}}}': str(value) for key, value in kwargs.items()}
+    pattern = '|'.join(re.escape(key) for key in replacements)
+    return re.sub(pattern, lambda match: replacements[match.group()],
+                  input_str)
 
 
 def get_prompt_hash(dataset_cfg: Union[ConfigDict, List[ConfigDict]]) -> str:
