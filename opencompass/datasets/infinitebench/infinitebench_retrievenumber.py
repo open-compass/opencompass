@@ -4,7 +4,7 @@ from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
 
 from ..base import BaseDataset
-from .utils import iter_jsonl
+from .utils import get_single_answer, iter_jsonl
 
 
 @LOAD_DATASET.register_module()
@@ -20,7 +20,7 @@ class InfiniteBenchretrievenumberDataset(BaseDataset):
         for item in dataset:
             context = item['context']
             input = item['input']
-            answer = item['answer']
+            answer = get_single_answer(item)
             raw_data.append({
                 'context': context,
                 'input': input,
