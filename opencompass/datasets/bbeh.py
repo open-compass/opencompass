@@ -29,6 +29,15 @@ class BBEHDataset(BaseDataset):
         return dataset
 
 
+def _drop_trailing_period(answer: str) -> str:
+    """Strip whitespace and one trailing '.', as the official BBEH
+    evaluate.py does before comparing answers."""
+    answer = answer.strip()
+    if answer.endswith('.'):
+        answer = answer[:-1]
+    return answer
+
+
 @TEXT_POSTPROCESSORS.register_module('bbeh_freeform')
 def bbeh_freeform_postprocess(text: str) -> str:
     # Extract answer using specified prefixes
@@ -53,6 +62,7 @@ def bbeh_freeform_postprocess(text: str) -> str:
     # Take first line and clean
     if '\n' in answer:
         answer = answer.split('\n')[0].strip()
+    answer = _drop_trailing_period(answer)
 
     return answer.strip().lower()
 
@@ -70,12 +80,13 @@ def bbeh_mcq_postprocess(text: str) -> str:
             answer = text.split(prefix)[-1]
             break
 
-    # Remove parentheses if present
-    answer = answer.strip('()')
-
     # Take first line and clean
     if '\n' in answer:
-        answer = answer.split('\n')[0].strip()
+        answer = answer.split('\n')[0]
+    answer = _drop_trailing_period(answer)
+
+    # Remove parentheses if present
+    answer = answer.strip('()')
 
     return answer.strip().lower()
 
@@ -90,8 +101,9 @@ class BBEHEvaluator(BaseEvaluator):
             }
 
         processed_preds = [bbeh_freeform_postprocess(p) for p in predictions]
-        # References are already in correct format
-        processed_refs = [r.lower() for r in references]
+        # References are already in correct format. A few end with a period
+        # (e.g. in bbeh_linguini), which is dropped from predictions.
+        processed_refs = [_drop_trailing_period(r.lower()) for r in references]
 
         details = []
         correct_count = 0
