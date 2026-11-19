@@ -37,20 +37,29 @@ class InfiniteBenchmathcalcEvaluator(BaseEvaluator):
         for i in range(len(predictions)):
             prediction = predictions[i]
             reference = references[i]
+            # math_calc.jsonl as published before its August 2024 update
+            # wraps the values in one more list.
+            if reference and isinstance(reference[0], list):
+                reference = reference[0]
             prediction_nums = []
             prediction_list = re.split('[^0-9]', prediction)
             for item in prediction_list:
                 if item != '':
                     prediction_nums.append(int(item))
 
+            correct = 0
             for j in range(len(reference)):
                 if j >= len(prediction_nums):
                     break
 
                 if reference[j] == prediction_nums[j]:
-                    score += 1
+                    correct += 1
                 else:
                     break
+
+            # As in the official compute_scores.py: the share of the
+            # expected values that are right before the first mistake.
+            score += correct / len(reference)
 
         score = score / len(predictions) * 100
         return {'score': score}
