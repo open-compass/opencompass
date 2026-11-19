@@ -135,7 +135,7 @@ def parse_args():
                         default=1)
     parser.add_argument(
         '--retry',
-        help='Number of retries if the job failed when using slurm or dlc. '
+        help='Number of retries if the job failed. '
         'Will be overrideen by the "retry" argument in the config.',
         type=int,
         default=2)
