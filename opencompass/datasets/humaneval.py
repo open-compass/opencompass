@@ -1,6 +1,7 @@
 # flake8: noqa: E501
 # yapf: disable
 import copy
+import inspect
 import json
 import os.path as osp
 import re
@@ -13,14 +14,15 @@ from datasets import Dataset
 
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
-from opencompass.utils import get_data_path
+from opencompass.utils import get_data_path, get_logger
 
 from .base import BaseDataset
 
+logger = get_logger()
+
 HUMANEVAL_IMPORT_ERROR = '''\
-Please install human_eval use following steps:
-git clone git@github.com:open-compass/human-eval.git
-cd human-eval && pip install -e .'''
+Please install human_eval using the following command:
+pip install git+https://github.com/open-compass/human-eval.git'''
 
 HUMANEVAL_PLUS_IMPORT_ERROR = '''\
 Please install evalplus use following steps:
@@ -68,6 +70,35 @@ class HumanevalDataset(BaseDataset):
         return dataset
 
 
+def _supports_ignore_incomplete(func) -> bool:
+    """Return whether ``func`` accepts an ``ignore_incomplete`` argument."""
+    params = inspect.signature(func).parameters
+    return ('ignore_incomplete' in params
+            or any(param.kind is inspect.Parameter.VAR_KEYWORD
+                   for param in params.values()))
+
+
+def _call_evaluate_functional_correctness(func,
+                                          *args,
+                                          ignore_incomplete=False,
+                                          **kwargs):
+    """Call ``func`` without ``ignore_incomplete`` if it is unsupported.
+
+    Older versions of ``human-eval`` (including the fork currently installed
+    from ``requirements/extra.txt``) do not accept the keyword argument.
+    Passing it unconditionally makes evaluation fail with ``TypeError``.
+    """
+    if _supports_ignore_incomplete(func):
+        kwargs['ignore_incomplete'] = ignore_incomplete
+    elif ignore_incomplete:
+        logger.warning(
+            'The installed human_eval package does not support '
+            '`ignore_incomplete`; the argument will be ignored. Install a '
+            'version that supports it to skip the check that all problems '
+            'are attempted.')
+    return func(*args, **kwargs)
+
+
 class HumanEvalEvaluator(BaseEvaluator):
     """Evaluator for HumanEval or EvalPlus."""
 
@@ -104,7 +135,8 @@ class HumanEvalEvaluator(BaseEvaluator):
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             write_jsonl(out_dir, humaneval_preds)
-            score = evaluate_functional_correctness(
+            score = _call_evaluate_functional_correctness(
+                evaluate_functional_correctness,
                 out_dir,
                 self.k,
                 n_workers=4,
