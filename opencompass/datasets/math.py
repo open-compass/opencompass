@@ -71,18 +71,24 @@ def normalize_final_answer(final_answer: str) -> str:
     SUBSTITUTIONS = [('an ', ''), ('a ', ''), ('.$', '$'), ('\\$', ''),
                      (r'\ ', ''), (' ', ''), ('mbox', 'text'),
                      (',\\text{and}', ','), ('\\text{and}', ','),
-                     ('\\text{m}', '\\text{}'), ('\\le', '<')]
+                     ('\\text{m}', '\\text{}')]
     REMOVED_EXPRESSIONS = [
         'square', 'ways', 'integers', 'dollars', 'mph', 'inches', 'ft',
         'hours', 'km', 'units', '\\ldots', 'sue', 'points', 'feet', 'minutes',
         'digits', 'cents', 'degrees', 'cm', 'gm', 'pounds', 'meters', 'meals',
         'edges', 'students', 'childrentickets', 'multiples', '\\text{s}',
         '\\text{.}', '\\text{\ns}', '\\text{}^2', '\\text{}^3', '\\text{\n}',
-        '\\text{}', r'\mathrm{th}', r'^\circ', r'^{\circ}', r'\;', r',\!',
-        '{,}', '"', '\\dots', '\n', '\r', '\f'
+        '\\text{}', r'\mathrm{th}', r'^\circ', r'^{\circ}', r'\;', r',\!', '"',
+        '\\dots', '\n', '\r', '\f'
     ]
     for before, after in SUBSTITUTIONS:
         final_answer = final_answer.replace(before, after)
+    # \le and \leq both mean "less than or equal", so they cannot be turned
+    # into "<": that made strict and non-strict inequalities compare equal.
+    final_answer = re.sub(r'\\le(?:q)?(?![a-zA-Z])', '<=', final_answer)
+    # "{,}" is a thousands separator in "1{,}000", a plain comma in "3{,}4".
+    final_answer = re.sub(r'(?<=\d)\{,\}(?=\d{3}(?!\d))', '', final_answer)
+    final_answer = final_answer.replace('{,}', ',')
     for expr in REMOVED_EXPRESSIONS:
         final_answer = final_answer.replace(expr, '')
 
@@ -121,8 +127,9 @@ def normalize_final_answer(final_answer: str) -> str:
     final_answer = re.sub(r'(sqrt)([^{])', 'sqrt{\\2}', final_answer)
     final_answer = final_answer.replace('$', '')
 
-    # Normalize 100,000 -> 100000
-    if final_answer.replace(',', '').isdigit():
+    # Normalize 100,000 -> 100000, but only when the whole answer is a number
+    # with thousands separators. A list such as "1,2" must stay a list.
+    if re.fullmatch(r'[+-]?\d{1,3}(,\d{3})+(\.\d+)?', final_answer):
         final_answer = final_answer.replace(',', '')
 
     return final_answer
@@ -419,7 +426,7 @@ class MATHEvaluator(BaseEvaluator):
         string = string.replace('{.', '{0.')
 
         # cdot
-        string = string.replace('\\cdot', '')
+        string = re.sub(r'\\cdot(?![a-zA-Z])', '*', string)
 
         # inf
         string = string.replace('infinity', '\\infty')
@@ -428,7 +435,7 @@ class MATHEvaluator(BaseEvaluator):
         string = string.replace('+\\inity', '\\infty')
 
         # and
-        string = string.replace('and', '')
+        string = re.sub(r'(?<![A-Za-z])and(?![A-Za-z])', ',', string)
         string = string.replace('\\mathbf', '')
 
         # use regex to remove \mbox{...}
