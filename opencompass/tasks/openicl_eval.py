@@ -114,6 +114,7 @@ class OpenICLEvalTask(BaseTask):
             )
 
             # Save results
+            self._attach_dataset_meta(result, test_set)
             self._save_results(result)
 
         else:
@@ -128,7 +129,25 @@ class OpenICLEvalTask(BaseTask):
             )
 
             # Save results
+            self._attach_dataset_meta(result, test_set)
             self._save_results(result)
+
+    def _attach_dataset_meta(self, result, test_set) -> None:
+        """Attach sample-count / test-range comparability metadata.
+
+        ``test_range`` changes the score but, without the sample count,
+        results computed on different subsets would be compared side by
+        side in summary tables as if they were comparable.
+        """
+        if not isinstance(result, dict):
+            return
+        if 'num_samples' in result or 'test_range' in result:
+            return
+        n = self.dataset_cfg.get('n', 1)
+        result['num_samples'] = len(test_set) // n if n > 0 else len(test_set)
+        test_range = self.dataset_cfg.get('reader_cfg', {}).get('test_range')
+        if test_range is not None:
+            result['test_range'] = test_range
 
     def _load_and_preprocess_test_data(self):
         """Load test dataset and apply postprocessing if needed."""
