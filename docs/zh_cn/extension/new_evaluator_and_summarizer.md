@@ -99,7 +99,7 @@ class MyEvaluator(BaseEvaluator):
 - `'details'`（`list[dict]`）在接口形式上可选，但当前实现存在限制：当 `n > 1` 且需要正确返回跨份平均指标时，`score()` 每次调用都必须返回与当前批次样本一一对应的完整且非空 `details`；否则最终只会返回最后一份的评分结果。基类会将 `details` 跨重复运行聚合并写回结果文件，供 `--dump-eval-details` 逐条复核。每条 detail 不必包含正确性字段；只有计算 G-Pass@k、mG-Pass@k 等跨次指标时，才需要提供 `correct` / `is_correct` / `cascade_correct` 布尔字段；
 - 自定义类不应重写 `evaluate()`，除非确有必要改变重复运行的切分语义。
 
-实现时应返回稳定的指标名称，并针对正常、空输入、解析失败、边界值及多参考答案编写测试。若评测器会访问网络、调用 Judge 或执行代码，必须提供超时、错误记录和隔离策略。
+实现时应返回稳定的指标名称，并针对正常、空输入、解析失败、边界值及多参考答案编写测试。若评测器会访问网络、调用 Judge 或执行代码，必须提供超时、错误记录和隔离策略。`BaseEvaluator` 已内置这些设施：在构造时传入 `timeout`（秒，单样本粒度）、`failure_mode`（`'count'` 记录后继续，`'raise'` 向上抛出）与 `max_failure_ratio`（隔离失败比例超过时整批以 `'error'` 结果失败），并把逐样本逻辑通过 `protected_sample(fn, idx, *args)` 执行。失败记录可通过 `export_failures()` 导出（含 `idx`、`error`、`elapsed` 的结构化列表）；只要发生过样本隔离，`evaluate()` 就会在结果中附加 `failure_stats` 汇总（`count`、`ratio`、`max_failure_ratio_exceeded`），便于判断基于部分样本算出的分数是否具代表性。注意：超时无法强制杀死工作线程中的 CPU 密集任务，该机制面向 judge 请求、网络调用等 I/O 型逐样本场景。
 
 ## Summarizer
 
