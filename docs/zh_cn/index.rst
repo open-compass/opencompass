@@ -58,6 +58,7 @@ OpenCompass 是面向大语言模型与多模态模型的一站式评测平台�
    evaluation/subjective_evaluation.md
    evaluation/repeated_evaluation.md
    evaluation/vlmevalkit.md
+   evaluation/agent_evaluation.md
 
 .. toctree::
    :maxdepth: 1
