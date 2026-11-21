@@ -60,6 +60,7 @@ directly to the corresponding topic.
    evaluation/subjective_evaluation.md
    evaluation/repeated_evaluation.md
    evaluation/vlmevalkit.md
+   evaluation/agent_evaluation.md
 
 .. toctree::
    :maxdepth: 1
