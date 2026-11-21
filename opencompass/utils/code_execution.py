@@ -1,8 +1,12 @@
 import ast
+import inspect
+import textwrap
 from collections.abc import Mapping
+from functools import lru_cache
 from typing import Any
 
 TYPE_AWARE_EQUAL_NAME = '__opencompass_type_aware_equal'
+TYPE_AWARE_CLOSE_NAME = '__opencompass_type_aware_close'
 
 
 def type_aware_equal(actual: Any, expected: Any) -> bool:
@@ -60,6 +64,27 @@ def type_aware_equal(actual: Any, expected: Any) -> bool:
     return type(result) is bool and result
 
 
+def type_aware_close(actual: Any, expected: Any, tolerance: Any) -> bool:
+    """Compare numbers within tolerance without a forged ``__sub__``."""
+    if type(actual) is not int and type(actual) is not float:
+        return False
+    if type(expected) is not int and type(expected) is not float:
+        return False
+    if type(tolerance) is not int and type(tolerance) is not float:
+        return False
+    try:
+        difference = abs(actual - expected)
+    except Exception:
+        return False
+    if type(difference) is not int and type(difference) is not float:
+        return False
+    try:
+        result = difference < tolerance
+    except Exception:
+        return False
+    return type(result) is bool and result
+
+
 class _TypeAwareAssertTransformer(ast.NodeTransformer):
     """Replace ``assert actual == expected`` with a type-aware comparison."""
 
@@ -85,3 +110,67 @@ def make_assertions_type_aware(source: str) -> str:
     tree = _TypeAwareAssertTransformer().visit(tree)
     ast.fix_missing_locations(tree)
     return ast.unparse(tree)
+
+
+class _TypeAwareToleranceTransformer(ast.NodeTransformer):
+    """Replace absolute-difference asserts with a type-aware check."""
+
+    def visit_Assert(self, node: ast.Assert) -> ast.Assert:
+        self.generic_visit(node)
+        comparison = node.test
+        if not isinstance(comparison, ast.Compare):
+            return node
+        if len(comparison.ops) != 1 or not isinstance(comparison.ops[0],
+                                                      ast.Lt):
+            return node
+        call = comparison.left
+        if not (isinstance(call, ast.Call) and isinstance(call.func, ast.Name)
+                and call.func.id == 'abs' and len(call.args) == 1
+                and not call.keywords):
+            return node
+        difference = call.args[0]
+        if not (isinstance(difference, ast.BinOp)
+                and isinstance(difference.op, ast.Sub)):
+            return node
+        node.test = ast.Call(
+            func=ast.Name(id=TYPE_AWARE_CLOSE_NAME, ctx=ast.Load()),
+            args=[
+                difference.left, difference.right, comparison.comparators[0]
+            ],
+            keywords=[],
+        )
+        return node
+
+
+def _alias_function_source(fn: Any, public_name: str) -> str:
+    """Return ``fn``'s source with its name replaced by ``public_name``."""
+    source = textwrap.dedent(inspect.getsource(fn))
+    return source.replace(fn.__name__, public_name)
+
+
+@lru_cache(maxsize=1)
+def _humaneval_helper_prelude() -> str:
+    """Source of the helpers HumanEval must define inside the test program.
+
+    ``human_eval`` runs the prompt, the completion and the test in one
+    ``exec`` with empty globals, so the helpers cannot be injected through
+    ``exec_globals`` the way MBPP and LCBench do.
+    """
+    return '\n'.join([
+        'from collections.abc import Mapping',
+        'from typing import Any',
+        _alias_function_source(type_aware_equal, TYPE_AWARE_EQUAL_NAME),
+        _alias_function_source(type_aware_close, TYPE_AWARE_CLOSE_NAME),
+    ]) + '\n'
+
+
+def make_humaneval_test_type_aware(source: str) -> str:
+    """Harden a HumanEval test against forged equality and subtraction."""
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        return source
+    tree = _TypeAwareAssertTransformer().visit(tree)
+    tree = _TypeAwareToleranceTransformer().visit(tree)
+    ast.fix_missing_locations(tree)
+    return _humaneval_helper_prelude() + ast.unparse(tree) + '\n'
