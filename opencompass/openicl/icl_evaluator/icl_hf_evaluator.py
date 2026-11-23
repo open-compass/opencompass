@@ -303,7 +303,7 @@ class SquadEvaluator(HuggingfaceEvaluator):
         Returns:
             dict: postprocessed scores.
         """
-        return scores['f1']
+        return {'f1': scores['f1']}
 
 
 @ICL_EVALUATORS.register_module()
