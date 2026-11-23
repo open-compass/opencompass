@@ -1,10 +1,14 @@
 """Unit tests for ClaudeSDK."""
 
+import threading
+import time
 import types
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import MagicMock, patch
 
 from opencompass.models.claude_sdk_api import ClaudeSDK
+from opencompass.utils import get_logger
 from opencompass.utils.prompt import PromptList
 
 
@@ -179,6 +183,34 @@ class TestClaudeSDK(unittest.TestCase):
         self.assertNotIn('stream', api_params)
 
     @patch.dict('os.environ', {}, clear=True)
+    def test_temperature_is_never_sent(self):
+        """Test temperature is left out: the SDK and API reject it."""
+        for kwargs in ({}, {
+                'temperature': 0.3
+        }, {
+                'temperature': None
+        }, {
+                'thinking': {
+                    'type': 'enabled',
+                    'budget_tokens': 1024
+                }
+        }):
+            model, _, client = self.build_model(**kwargs)
+
+            model._generate('hello', max_out_len=64)
+
+            api_params = client.messages.create.call_args.kwargs
+            self.assertNotIn('temperature', api_params)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_configured_temperature_logs_a_warning(self):
+        """Test a configured temperature is reported as ignored."""
+        with self.assertLogs(get_logger(), level='WARNING') as logs:
+            self.build_model(temperature=0.3)
+        self.assertTrue(
+            any('ignores temperature' in line for line in logs.output))
+
+    @patch.dict('os.environ', {}, clear=True)
     def test_generate_with_thinking_content(self):
         """Test non-streaming thinking content is preserved."""
         thinking = {'type': 'enabled', 'budget_tokens': 1024}
@@ -284,6 +316,57 @@ class TestClaudeSDK(unittest.TestCase):
             self.assertEqual(model.generate(['hello'], 64), ['OK'])
 
         mock_tqdm.assert_not_called()
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_max_workers_sizes_the_thread_pool(self):
+        """Test max_workers is used for batched generation threads."""
+        model, _, _ = self.build_model(max_workers=3)
+
+        with patch('opencompass.models.claude_sdk_api.ThreadPoolExecutor',
+                   wraps=ThreadPoolExecutor) as mock_pool:
+            self.assertEqual(model.generate(['hello', 'world'], 64),
+                             ['OK', 'OK'])
+
+        self.assertEqual(model.max_workers, 3)
+        self.assertEqual(mock_pool.call_args.kwargs['max_workers'], 3)
+        self.assertEqual(self.build_model()[0].max_workers, 32)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_concurrent_tokens_cap_in_flight_requests(self):
+        """Test the semaphore injected by concurrent infer caps requests."""
+        model, _, client = self.build_model()
+        model.tokens = threading.Semaphore(2)
+        lock = threading.Lock()
+        state = {'current': 0, 'peak': 0}
+
+        def create(**kwargs):
+            with lock:
+                state['current'] += 1
+                state['peak'] = max(state['peak'], state['current'])
+            time.sleep(0.05)
+            with lock:
+                state['current'] -= 1
+            return types.SimpleNamespace(
+                content=[types.SimpleNamespace(type='text', text='OK')])
+
+        client.messages.create.side_effect = create
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = list(
+                executor.map(lambda _: model._generate('hi', 16), range(8)))
+
+        self.assertEqual(results, ['OK'] * 8)
+        self.assertEqual(state['peak'], 2)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_failed_request_releases_concurrent_token(self):
+        """Test a failed request gives its semaphore slot back."""
+        model, _, client = self.build_model()
+        model.tokens = threading.Semaphore(1)
+        client.messages.create.side_effect = RuntimeError('boom')
+
+        with self.assertRaises(RuntimeError):
+            model._generate('hi', 16)
+        self.assertTrue(model.tokens.acquire(blocking=False))
 
 
 if __name__ == '__main__':

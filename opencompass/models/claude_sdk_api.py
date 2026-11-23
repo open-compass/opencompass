@@ -47,6 +47,9 @@ class ClaudeSDK(BaseAPIModel):
             text. Defaults to '</think>'.
         claude_extra_kwargs (Dict, optional): Extra keyword arguments passed
             to anthropic.messages.create.
+        max_workers (int, optional): Maximum number of worker threads for
+            batched generation. Concurrent inference tasks also read it from
+            the model config to cap in-flight requests. Defaults to 32.
     """
 
     def __init__(
@@ -56,7 +59,7 @@ class ClaudeSDK(BaseAPIModel):
         query_per_second: int = 2,
         max_seq_len: int = 2048,
         meta_template: Optional[Dict] = None,
-        temperature: Optional[float] = 0.0,
+        temperature: Optional[float] = None,
         thinking: Optional[Dict] = None,
         base_url: Optional[str] = None,
         stream: bool = False,
@@ -64,6 +67,7 @@ class ClaudeSDK(BaseAPIModel):
         extra_headers: Optional[Dict[str, str]] = None,
         think_tag: str = '</think>',
         claude_extra_kwargs: Optional[Dict] = None,
+        max_workers: Optional[int] = 32,
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -92,11 +96,18 @@ class ClaudeSDK(BaseAPIModel):
         self.anthropic = Anthropic(**client_kwargs)
         self.model = path
         self.temperature = temperature
+        if temperature is not None:
+            # anthropic>=1.0 dropped temperature from messages.create, and
+            # the API (2026-10-21) answers 400 to it, so it is never sent.
+            self.logger.warning(
+                'ClaudeSDK ignores temperature: the Anthropic SDK and API no '
+                'longer accept it.')
         self.thinking = thinking
         self.base_url = base_url
         self.stream = stream
         self.think_tag = think_tag
         self.claude_extra_kwargs = claude_extra_kwargs
+        self.max_workers = max_workers
 
     @staticmethod
     def _resolve_base_url(base_url: Optional[str] = None) -> Optional[str]:
@@ -226,7 +237,7 @@ class ClaudeSDK(BaseAPIModel):
             # Forget multi-thread for single inference.
             return [self._generate(inputs[0], max_out_len)]
 
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             results = list(
                 tqdm(
                     executor.map(self._generate, inputs,
@@ -262,12 +273,11 @@ class ClaudeSDK(BaseAPIModel):
 
         num_retries = 0
         while num_retries < self.retry:
-            self.wait()
+            self.acquire()
             try:
                 api_params = {
                     'model': self.model,
                     'max_tokens': max_out_len,
-                    'temperature': self.temperature,
                     'messages': messages,
                 }
                 if system_prompts:
@@ -290,6 +300,8 @@ class ClaudeSDK(BaseAPIModel):
                 return self._parse_response(responses, self.think_tag)
             except Exception as e:
                 self.logger.error(e)
+            finally:
+                self.release()
             num_retries += 1
         raise RuntimeError('Calling Claude API failed after retrying for '
                            f'{self.retry} times. Check the logs for details.')

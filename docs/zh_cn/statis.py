@@ -6,22 +6,9 @@ import yaml
 from tabulate import tabulate
 
 OC_ROOT = Path(__file__).absolute().parents[2]
+DOC_ROOT = Path(__file__).absolute().parent
 GITHUB_PREFIX = 'https://github.com/open-compass/opencompass/tree/main/'
-DATASETZOO_TEMPLATE = """\
-# 数据集统计
-
-在本页面中，我们列举了OpenCompass所支持的所有数据集。
-
-你可以使用排序和搜索功能找到需要的数据集。
-
-我们对每一个数据集都给出了推荐的运行配置，部分数据集中还提供了基于LLM Judge的推荐配置。
-
-你可以基于推荐配置快速启动评测。但请注意，推荐配置可能随时间推移被更新。
-
-"""
-
-with open('dataset_statistics.md', 'w') as f:
-    f.write(DATASETZOO_TEMPLATE)
+statistics_fragment = DOC_ROOT / 'dataset_statistics.inc'
 
 load_path = str(OC_ROOT / 'dataset-index.yml')
 
@@ -49,7 +36,11 @@ def table_format(data_list):
 
             for index in HEADER:
                 if index == 'paper':
-                    table_format_list_sub.append('[链接](' + i[j][index] + ')')
+                    if i[j][index]:
+                        table_format_list_sub.append('[链接](' + i[j][index] +
+                                                     ')')
+                    else:
+                        table_format_list_sub.append('')
                 elif index == 'configpath_llmjudge':
                     if i[j][index] == '':
                         table_format_list_sub.append(i[j][index])
@@ -84,21 +75,19 @@ data_format_list = table_format(data_list)
 
 
 def generate_table(data_list, title=None):
+    table_cfg = dict(tablefmt='pipe',
+                     floatfmt='.2f',
+                     numalign='right',
+                     stralign='center')
+    header = ['数据集名称', '数据集类型', '原文或资源地址', '推荐配置', '推荐配置(基于LLM评估)']
+    table = tabulate(data_list, header, **table_cfg)
 
-    with open('dataset_statistics.md', 'a') as f:
-        if title is not None:
-            f.write(f'\n{title}')
-        f.write("""\n```{table}\n:class: dataset\n""")
-        header = ['数据集名称', '数据集类型', '原文或资源地址', '推荐配置', '推荐配置(基于LLM评估)']
-        table_cfg = dict(tablefmt='pipe',
-                         floatfmt='.2f',
-                         numalign='right',
-                         stralign='center')
-        f.write(tabulate(data_list, header, **table_cfg))
+    # The fragment is embedded in user_guides/datasets.md. The .inc suffix
+    # prevents Sphinx from treating it as a standalone document.
+    with open(statistics_fragment, 'w') as f:
+        f.write("""```{table}\n:class: dataset\n""")
+        f.write(table)
         f.write('\n```\n')
 
 
-generate_table(
-    data_list=data_format_list,
-    title='## 支持数据集列表',
-)
+generate_table(data_list=data_format_list)

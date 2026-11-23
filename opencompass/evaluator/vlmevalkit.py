@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from opencompass.datasets.vlmevalkit.builder import (_lmu_data_root,
+from opencompass.datasets.vlmevalkit.builder import (_VLMEVAL_INSTALL,
+                                                     _lmu_data_root,
                                                      build_vlmeval_dataset)
 from opencompass.datasets.vlmevalkit.dataset import make_vlmeval_sample_id
 from opencompass.openicl.icl_evaluator import BaseEvaluator
@@ -12,7 +13,12 @@ from opencompass.registry import ICL_EVALUATORS
 
 
 def _flatten_vlmeval_metrics(raw_metrics):
-    from vlmeval.smp.status_report import flatten_summary_metrics
+    try:
+        from vlmeval.smp.status_report import flatten_summary_metrics
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError(
+            f'VLMEvalKit is required for this evaluator. {_VLMEVAL_INSTALL}'
+        ) from e
 
     return flatten_summary_metrics(raw_metrics)
 
@@ -40,9 +46,6 @@ class VLMEvalKitEvaluator(BaseEvaluator):
         if len(predictions) != len(test_set):
             raise ValueError(
                 'VLMEvalKit predictions and test set have different lengths.')
-        if any(prediction is None or not str(prediction).strip()
-               for prediction in predictions):
-            raise ValueError('Missing VLMEvalKit prediction.')
 
         sample_id = list(test_set['sample_id'])
         vlmeval_index = list(test_set['vlmeval_index'])

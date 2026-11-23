@@ -33,6 +33,9 @@ class DLCRunner(BaseRunner):
         retry (int): Number of retries when job failed. Default: 2.
         debug (bool): Whether to run in debug mode. Default: False.
         lark_bot_url (str): Lark bot url. Default: None.
+        keep_tmp_file (bool): Whether to keep the temporary file.
+            Default: True.
+        tmp_dir (str): The directory to store temporary files. Default: 'tmp'.
     """
 
     def __init__(
@@ -46,8 +49,12 @@ class DLCRunner(BaseRunner):
         lark_bot_url: str = None,
         keep_tmp_file: bool = True,
         preemptible: bool = False,
+        tmp_dir: str = 'tmp',
     ):
-        super().__init__(task=task, debug=debug, lark_bot_url=lark_bot_url)
+        super().__init__(task=task,
+                         debug=debug,
+                         lark_bot_url=lark_bot_url,
+                         tmp_dir=tmp_dir)
         self.aliyun_cfg = aliyun_cfg
         self.max_num_workers = max_num_workers
         self.retry = retry
@@ -116,12 +123,13 @@ class DLCRunner(BaseRunner):
                     break
 
         # Dump task config to file
-        mmengine.mkdir_or_exist('tmp/')
+        mmengine.mkdir_or_exist(self.tmp_dir)
         # Using uuid to avoid filename conflict
         import uuid
 
         uuid_str = str(uuid.uuid4())
-        param_file = f'tmp/{uuid_str}_params.py'
+        param_file = f'{uuid_str}_params.py'
+        param_file = osp.join(self.tmp_dir, param_file)
         pwd = os.getcwd()
         try:
             cfg.dump(param_file)

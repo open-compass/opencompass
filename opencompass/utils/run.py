@@ -282,7 +282,10 @@ def change_accelerator(models, accelerator):
     for model in models:
         logger.info(f'Transforming {model["abbr"]} to {accelerator}')
         # change HuggingFace model to VLLM or LMDeploy
-        if model['type'] in [HuggingFace, HuggingFaceCausalLM, HuggingFaceChatGLM3, f'{HuggingFaceBaseModel.__module__}.{HuggingFaceBaseModel.__name__}']:
+        if model['type'] in [HuggingFace, HuggingFaceCausalLM,
+                             HuggingFaceChatGLM3, HuggingFaceBaseModel,
+                             f'{HuggingFaceBaseModel.__module__}.'
+                             f'{HuggingFaceBaseModel.__name__}']:
             gen_args = dict()
             generation_kwargs = _get_generation_kwargs(model)
             if generation_kwargs:
@@ -303,20 +306,25 @@ def change_accelerator(models, accelerator):
             if accelerator == 'lmdeploy':
                 logger.info(f'Transforming {model["abbr"]} to {accelerator}')
                 mod = TurboMindModelwithChatTemplate
+                max_seq_len = model.get('max_seq_len')
+                engine_config = dict(
+                    max_batch_size=model['batch_size'],
+                    tp=model['run_cfg']['num_gpus'],
+                )
+                if max_seq_len is not None:
+                    engine_config['session_len'] = max_seq_len
                 acc_model = dict(
                     type=f'{mod.__module__}.{mod.__name__}',
                     abbr=model['abbr'].replace('hf', 'lmdeploy') if '-hf' in model['abbr'] else model['abbr'] + '-lmdeploy',
                     path=model['path'],
-                    engine_config=dict(session_len=model['max_seq_len'],
-                                       max_batch_size=model['batch_size'],
-                                       tp=model['run_cfg']['num_gpus']),
+                    engine_config=engine_config,
                     gen_config=dict(top_k=gen_args['top_k'],
                                     temperature=gen_args['temperature'],
                                     top_p=gen_args['top_p'],
                                     max_new_tokens=model['max_out_len'],
                                     stop_words=gen_args['stop_token_ids']),
                     max_out_len=model['max_out_len'],
-                    max_seq_len=model['max_seq_len'],
+                    max_seq_len=max_seq_len,
                     batch_size=model['batch_size'],
                     run_cfg=model['run_cfg'],
                 )
@@ -345,7 +353,9 @@ def change_accelerator(models, accelerator):
                         acc_model[item] = model[item]
             else:
                 raise ValueError(f'Unsupported accelerator {accelerator} for model type {model["type"]}')
-        elif model['type'] in [HuggingFacewithChatTemplate, f'{HuggingFacewithChatTemplate.__module__}.{HuggingFacewithChatTemplate.__name__}']:
+        elif model['type'] in [HuggingFacewithChatTemplate,
+                               f'{HuggingFacewithChatTemplate.__module__}.'
+                               f'{HuggingFacewithChatTemplate.__name__}']:
             if accelerator == 'vllm':
                 model_kwargs = dict(tensor_parallel_size=model['run_cfg']['num_gpus'], max_model_len=model.get('max_seq_len', None))
                 model_kwargs.update(model.get('model_kwargs') or {})
@@ -569,7 +579,7 @@ def consturct_chatml_datasets(custom_cfg: List[Dict[str, Any]]):
         if 'test_range' in dataset and 'dataset_cfg' in chatobj_custom_dataset['eval_cfg']['evaluator'] and 'reader_cfg' in chatobj_custom_dataset[
             'eval_cfg']['evaluator']['dataset_cfg']:
             chatobj_custom_dataset['eval_cfg']['evaluator']['dataset_cfg']['reader_cfg'][
-            'test_range'] = '[0:16]'
+            'test_range'] = dataset['test_range']
 
         chatobj_custom_dataset_list.append(chatobj_custom_dataset)
 

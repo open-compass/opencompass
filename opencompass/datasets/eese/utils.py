@@ -25,7 +25,8 @@ def extract_first_numeric_score(score_text):
 
         if match:
             return int(match.group())
-        return 0
+        # A missing number is not a score of 0. The caller maps words.
+        return None
 
 
 def process_results(results, overall_avg):

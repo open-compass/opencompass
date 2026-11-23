@@ -19,6 +19,7 @@ from .extract_utils import (extract_code_execution, extract_code_generation,
 from .livecodebench import LCBCodeGenerationDataset
 from .pass_k_utils import compute_metrics_from_results
 
+# Additional virtual address space available to each test worker.
 DEFAULT_MEMORY_LIMIT_BYTES = 4 * 1024 * 1024 * 1024
 
 

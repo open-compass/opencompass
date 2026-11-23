@@ -3,7 +3,11 @@ import os
 import sys
 from contextlib import contextmanager
 
-_VLMEVAL_INSTALL = 'Install VLMEvalKit so `import vlmeval` works.'
+_VLMEVAL_COMMIT = '0d2511fcefdcac5a603c40d48f06269ffea23900'
+_VLMEVAL_INSTALL = (
+    'OpenCompass pins a specific VLMEvalKit commit, which is not bundled '
+    'in the package. Please install it with: pip install "vlmeval @ '
+    f'git+https://github.com/open-compass/VLMEvalKit.git@{_VLMEVAL_COMMIT}"')
 
 
 def _load_build_dataset():

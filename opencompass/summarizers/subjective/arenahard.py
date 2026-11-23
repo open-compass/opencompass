@@ -9,6 +9,7 @@ import os.path as osp
 import re
 from collections import defaultdict
 from datetime import datetime
+from functools import partial
 from glob import glob
 from itertools import product
 
@@ -28,7 +29,11 @@ from opencompass.utils import dataset_abbr_from_cfg, model_abbr_from_cfg
 from .utils import get_outdir
 
 
-def compute_mle_elo(df, SCALE=400, BASE=10, INIT_RATING=1000):
+def compute_mle_elo(df,
+                    SCALE=400,
+                    BASE=10,
+                    INIT_RATING=1000,
+                    base_model_name='gpt4-0314'):
     models = pd.concat([df['model_a'], df['model_b']]).unique()
     models = pd.Series(np.arange(len(models)), index=models)
 
@@ -55,9 +60,9 @@ def compute_mle_elo(df, SCALE=400, BASE=10, INIT_RATING=1000):
 
     elo_scores = SCALE * lr.coef_[0] + INIT_RATING
 
-    # set anchor as gpt4-0314 = 1000
-    if 'gpt4-0314' in models.index:
-        elo_scores += 1000 - elo_scores[models['gpt4-0314']]
+    # Set the requested baseline model's rating to 1000.
+    if base_model_name in models.index:
+        elo_scores += 1000 - elo_scores[models[base_model_name]]
     return pd.Series(elo_scores, index = models.index).sort_values(ascending=False)
 
 
@@ -280,10 +285,13 @@ class ArenaHardSummarizer:
                     battles = pd.concat([battles, new_battle], ignore_index=True)
                 battles.to_json(os.path.join(output_dir,'arena_hard_battles_judged-by--'+ judge_model+'.jsonl'), lines=True, orient='records')
 
-                bootstrap_online_elo = compute_mle_elo(battles)
+                compute_elo = partial(compute_mle_elo,
+                                      base_model_name=model1)
+                bootstrap_online_elo = compute_elo(battles)
 
                 np.random.seed(42)
-                bootstrap_elo_lu = get_bootstrap_result(battles, compute_mle_elo, 100)
+                bootstrap_elo_lu = get_bootstrap_result(
+                    battles, compute_elo, 100)
                 bootstrap_elo_lu.to_json(os.path.join(output_dir,'arena_hard_bootstrapping_results_judged-by--'+ judge_model+'.jsonl'), lines=True, orient='records')
 
                 stats = pd.DataFrame()
@@ -307,7 +315,7 @@ class ArenaHardSummarizer:
                         model_preds = load_model_preds(file_name)
                         pred_length = 0
                         for model_pred in model_preds:
-                            pred_length += len(tiktoken.encoding_for_model('gpt-3.5-turbo').encode(model_pred, disallowed_special=()))
+                            pred_length += len(tiktoken.encoding_for_model('gpt-4').encode(model_pred, disallowed_special=()))
                         pred_length /= len(model_preds)
                         stats.at[i, 'avg_tokens'] = pred_length
                     stats.at[i, 'results'] = bootstrap_elo_lu[model].tolist()

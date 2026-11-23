@@ -28,8 +28,8 @@ name_dict = {
     'SIDER': 'property_prediction-sider',
 }
 
-pp_acc_datasets_0shot_instruct = []
-mini_pp_acc_datasets_0shot_instruct = []
+pp_acc_0shot_instruct_datasets = []
+mini_pp_acc_0shot_instruct_datasets = []
 for _name in pp_acc_hint_dict:
     _hint = pp_acc_hint_dict[_name]
 
@@ -49,7 +49,7 @@ for _name in pp_acc_hint_dict:
         pred_postprocessor=dict(type=smolinstruct_acc_0shot_postprocess)
     )
 
-    pp_acc_datasets_0shot_instruct.append(
+    pp_acc_0shot_instruct_datasets.append(
         dict(
             abbr=f'PP-{_name}-0shot-instruct',
             type=SmolInstructDataset,
@@ -59,7 +59,7 @@ for _name in pp_acc_hint_dict:
             infer_cfg=pp_acc_infer_cfg,
             eval_cfg=pp_acc_eval_cfg,
         ))
-    mini_pp_acc_datasets_0shot_instruct.append(
+    mini_pp_acc_0shot_instruct_datasets.append(
         dict(
             abbr=f'PP-{_name}-0shot-instruct-mini',
             type=SmolInstructDataset,

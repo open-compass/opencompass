@@ -83,6 +83,37 @@ def _verify_with_timeout(pred, ref, timeout=10):
 @ICL_EVALUATORS.register_module()
 class MATHVerifyEvaluator(BaseEvaluator):
 
+    def _score_single_prediction(self, prediction, reference):
+        result = _verify_with_timeout(prediction, reference, timeout=10)
+
+        if result.get('timed_out') or result.get('error'):
+            detail = {
+                'pred':
+                prediction if result.get('timed_out') else result.get(
+                    'msg', ''),
+                'answer':
+                reference,
+                'correct':
+                False,
+            }
+            return 0.0, detail
+
+        if result.get('skipped'):
+            return 0.0, {
+                'pred': prediction,
+                'answer': reference,
+                'correct': False,
+                'skipped': True,
+            }
+
+        answer_correct = result['answer_correct']
+        detail = {
+            'pred': result['answer_parsed'],
+            'answer': result['gold_parsed'],
+            'correct': True if answer_correct else False,
+        }
+        return answer_correct, detail
+
     def score(self, predictions, references, test_set=None):
         try:
             from latex2sympy2_extended import NormalizationConfig
@@ -100,28 +131,37 @@ class MATHVerifyEvaluator(BaseEvaluator):
         details = []
         for i, j in zip(predictions, references):
             count += 1
-            result = _verify_with_timeout(i, j, timeout=10)
+            if isinstance(i, (list, tuple)):
+                candidate_scores = []
+                candidate_details = []
+                for prediction in i:
+                    score, detail = self._score_single_prediction(
+                        prediction, j)
+                    candidate_scores.append(score)
+                    if detail is not None:
+                        candidate_details.append(detail)
 
-            if result.get('timed_out') or result.get('error'):
-                detail = {
-                    'pred':
-                    i if result.get('timed_out') else result.get('msg', ''),
-                    'answer': j,
-                    'correct': False,
-                }
-                details.append(detail)
+                answer_correct = (sum(candidate_scores) / len(candidate_scores)
+                                  if candidate_scores else 0.0)
+                correct += answer_correct
+                details.append({
+                    'pred': [detail['pred'] for detail in candidate_details],
+                    'answer':
+                    candidate_details[0]['answer'] if candidate_details else j,
+                    'correct':
+                    answer_correct == 1.0,
+                    'pass_at_1':
+                    answer_correct,
+                    'candidate_details':
+                    candidate_details,
+                })
                 continue
 
-            if result.get('skipped'):
+            answer_correct, detail = self._score_single_prediction(i, j)
+            if detail is None:
                 continue
 
-            answer_correct = result['answer_correct']
             correct += answer_correct
-            detail = {
-                'pred': result['answer_parsed'],
-                'answer': result['gold_parsed'],
-                'correct': True if answer_correct else False,
-            }
             details.append(detail)
         result = {'accuracy': 100 * correct / count, 'details': details}
         return result

@@ -1,2 +1,4 @@
 google-genai==1.2.0
 litellm==1.83.0
+rouge_score
+vlmeval @ git+https://github.com/open-compass/VLMEvalKit.git@0d2511fcefdcac5a603c40d48f06269ffea23900

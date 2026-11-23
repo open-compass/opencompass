@@ -305,6 +305,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
+        tokens.pop('token_type_ids', None)
         outputs = self.model(**tokens)[0]
 
         batch_size, seq_len, vocab_size = outputs.shape
@@ -506,6 +507,7 @@ class HuggingFacewithChatTemplate(BaseModel):
         self.logger.info(generation_kwargs)
 
         # step-2: conduct model forward to generate output
+        tokens.pop('token_type_ids', None)
         outputs = self.model.generate(**tokens, **generation_kwargs)
         outputs = outputs[:, tokens['input_ids'].shape[1]:]
 
@@ -608,6 +610,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
         generation_kwargs['pad_token_id'] = self.tokenizer.pad_token_id
 
         # step-2: conduct model forward to generate output
+        tokens.pop('token_type_ids', None)
         outputs = self.model.generate(**tokens, **generation_kwargs)
         outputs = outputs[:, tokens['input_ids'].shape[1]:]
 
@@ -657,6 +660,7 @@ class HuggingFaceBaseModel(HuggingFacewithChatTemplate):
             tokens = self.tokenizer.batch_encode_plus(messages, **tokenize_kwargs)
 
         tokens = {k: v.to(self.model.device) for k, v in tokens.items()}
+        tokens.pop('token_type_ids', None)
         outputs = self.model(**tokens)[0]
 
         batch_size, seq_len, vocab_size = outputs.shape

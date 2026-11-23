@@ -102,7 +102,9 @@ class TestOpenAISDKResponse(unittest.TestCase):
         mock_httpx_client.return_value = MagicMock()
 
         with fake_openai_module(mock_client):
-            model = OpenAISDKResponse(path='gpt-4.1', max_seq_len=16384)
+            model = OpenAISDKResponse(path='gpt-4.1',
+                                      max_seq_len=16384,
+                                      temperature=0.7)
             results = model.generate(['Hello'], max_out_len=100)
 
         self.assertEqual(results, ['Generated response'])

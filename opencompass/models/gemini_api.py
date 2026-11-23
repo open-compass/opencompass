@@ -172,7 +172,7 @@ class Gemini(BaseAPIModel):
             try:
                 response = raw_response.json()
             except requests.JSONDecodeError:
-                self.logger.error('JsonDecode error, got',
+                self.logger.error('JsonDecode error, got %s',
                                   str(raw_response.content))
                 time.sleep(1)
                 continue

@@ -217,6 +217,10 @@ def parse_conversation(conversation):
 class WildBenchDataset(BaseDataset):
 
     def load(self, path: str, K=-1, eval_mode='pair', *args, **kwargs):
+        if eval_mode not in ('single', 'pair'):
+            raise ValueError(
+                f'Eval mode {eval_mode} must be either "single" or "pair".')
+        prompt_template = score_prompt if eval_mode == 'single' else pair_prompt
         path = get_data_path(path, local_mode=True)
         dataset = DatasetDict()
         raw_data = []
@@ -230,13 +234,7 @@ class WildBenchDataset(BaseDataset):
                 for checklist_item in item['checklist']:
                     checklist_mardkdown += f'- {checklist_item}\n'
 
-                if eval_mode == 'single':
-                    prompt = score_prompt
-                elif eval_mode == 'pair':
-                    prompt = pair_prompt
-                else:
-                    assert NotImplementedError(
-                        f'Eval mode {eval_mode} not in single or pair.')
+                prompt = prompt_template
 
                 prompt = prompt.replace('{history}', history)
                 prompt = prompt.replace('{user_query}', last_query)
@@ -448,6 +446,10 @@ def wildbench_bradleyterry_postprocess(
 class WildBenchWithRawPromptDataset(BaseDataset):
 
     def load(self, path: str, K=-1, eval_mode='pair', *args, **kwargs):
+        if eval_mode not in ('single', 'pair'):
+            raise ValueError(
+                f'Eval mode {eval_mode} must be either "single" or "pair".')
+        prompt_template = score_prompt if eval_mode == 'single' else pair_prompt
         path = get_data_path(path, local_mode=True)
         raw_data = []
         with open(path, 'r', encoding='utf-8') as file:
@@ -478,13 +480,7 @@ class WildBenchWithRawPromptDataset(BaseDataset):
                 for checklist_item in item['checklist']:
                     checklist_mardkdown += f'- {checklist_item}\n'
 
-                if eval_mode == 'single':
-                    prompt = score_prompt
-                elif eval_mode == 'pair':
-                    prompt = pair_prompt
-                else:
-                    assert NotImplementedError(
-                        f'Eval mode {eval_mode} not in single or pair.')
+                prompt = prompt_template
 
                 prompt = prompt.replace('{history}', history)
                 prompt = prompt.replace('{user_query}', last_query)

@@ -99,6 +99,7 @@ class OpenICLInferConcurrentTask(BaseTask):
 
     def run(self, cur_model=None, cur_model_abbr=None):
         self.logger.info(f'Task {task_abbr_from_cfg(self.cfg)}')
+        failed_tasks = []
         for model_cfg, dataset_cfgs in zip(self.model_cfgs, self.dataset_cfgs):
 
             self.model_cfg = model_cfg
@@ -128,7 +129,14 @@ class OpenICLInferConcurrentTask(BaseTask):
             self.logger.info(
                 f'Concurrent infer settings: max_workers={max_workers}.')
 
-            self._run_task_group(model_cfg, tasks, tokens, max_workers)
+            failed_tasks.extend(
+                self._run_task_group(model_cfg, tasks, tokens, max_workers))
+
+        if failed_tasks:
+            failed_task_names = ', '.join(failed_tasks)
+            raise RuntimeError(
+                f'Concurrent inference failed for {len(failed_tasks)} '
+                f'dataset task(s): {failed_task_names}')
 
     def _default_max_workers(self) -> int:
         cpu_count = os.cpu_count() or 1
@@ -291,6 +299,9 @@ class OpenICLInferConcurrentTask(BaseTask):
                         'datasets': [[dataset_cfg]],
                     })
                     progress = _ProgressTracker(task_name)
+                    entry = status_entries.get(task_name)
+                    if entry is not None:
+                        entry.update(status='running')
                     future = executor.submit(
                         self._run_dataset_task,
                         model_cfg,
@@ -301,9 +312,6 @@ class OpenICLInferConcurrentTask(BaseTask):
                         status_entries[task_name],
                     )
                     running.append(_RunningTask(task_name, progress, future))
-                    entry = status_entries.get(task_name)
-                    if entry is not None:
-                        entry.update(status='running')
                     self.logger.info(f'Start dataset task {task_name}')
                     remaining_total = self._remaining_total(
                         running, max_pending_samples)
@@ -329,6 +337,11 @@ class OpenICLInferConcurrentTask(BaseTask):
 
                 if running:
                     time.sleep(self.poll_interval)
+
+        return [
+            task_name for task_name, entry in status_entries.items()
+            if entry.infer_status.get('status') == 'fail'
+        ]
 
 
 def parse_args():

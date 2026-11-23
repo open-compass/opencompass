@@ -1,4 +1,5 @@
 # flake8: noqa: E501
+import ast
 import csv
 import os
 import os.path as osp
@@ -36,7 +37,7 @@ def post_process_followbench(item):
         else:
             satisfy_list = re.search(r'\[.*\]', satisfy)
             if satisfy_list:
-                satisfy_list = eval(satisfy_list.group())
+                satisfy_list = ast.literal_eval(satisfy_list.group())
                 if len(satisfy_list) == level:
                     num_true = 0
                     for i in satisfy_list:

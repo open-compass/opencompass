@@ -15,7 +15,8 @@ from datasets import Dataset
 
 from opencompass.datasets.base import BaseDataset
 from opencompass.openicl.icl_evaluator.icl_base_evaluator import BaseEvaluator
-from opencompass.registry import ICL_EVALUATORS, LOAD_DATASET
+from opencompass.registry import (DICT_POSTPROCESSORS, ICL_EVALUATORS,
+                                  LOAD_DATASET)
 from opencompass.utils import get_data_path
 
 MATERIAL_FILES = {
@@ -115,6 +116,33 @@ def _extract_property_value(text, property_name):
 
     # Some models answer with a bare number on regression tasks.
     return extract_scireasoner15_float(text)
+
+
+def extract_property_gold(text, property_name):
+    text = _strip_reasoning(text)
+    if not text:
+        return None
+
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, dict) and property_name in parsed:
+            try:
+                return float(parsed[property_name])
+            except (TypeError, ValueError):
+                return None
+    except Exception:
+        pass
+
+    pattern = (
+        r'\{[^{}]*["\']?' + re.escape(property_name) +
+        r'["\']?\s*:\s*["\']?([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)')
+    match = re.search(pattern, text, flags=re.DOTALL | re.IGNORECASE)
+    if match:
+        try:
+            return float(match.group(1))
+        except ValueError:
+            return None
+    return None
 
 
 def _extract_binary_score(text):
@@ -287,8 +315,8 @@ class SciReasoner15Dataset(BaseDataset):
         rows = []
         for row_id, item in enumerate(_read_json_or_jsonl(data_path)):
             if task_type == 'material':
-                gold = _extract_property_value(item.get('output', ''),
-                                               property_name)
+                gold = extract_property_gold(item.get('output', ''),
+                                             property_name)
                 if gold is None:
                     continue
                 rows.append({
@@ -578,3 +606,107 @@ class SciReasoner15DudeEvaluator(BaseEvaluator):
             'invalid_examples': invalid_examples,
             'target_metrics': target_metrics,
         }
+
+
+# ---------------------------------------------------------------------------
+# LLM-extraction postprocessors for the GenericLLMEvaluator pipeline.
+#
+# The Material/TMScore evaluators above fall back to the first number in the
+# response when regex extraction fails, which occasionally picks reasoning
+# numbers and dominates MAE. In the GenericLLMEvaluator pipeline a judge LLM
+# extracts the final numeric value instead; these postprocessors parse the
+# judge output, drop invalid / out-of-range values, and compute the same
+# regression metrics as the evaluators above.
+# ---------------------------------------------------------------------------
+
+
+def _parse_judge_value(judgement):
+    """Parse the numeric value extracted by the judge LLM.
+
+    The judge is instructed to reply with a bare number or ``INVALID``; the
+    first-float fallback only guards against chatty judge outputs.
+    """
+    text = _strip_reasoning(judgement)
+    if not text:
+        return None
+    token = text.strip().strip('.,!;:')
+    if token.upper() == 'INVALID':
+        return None
+    return extract_scireasoner15_float(text)
+
+
+def _llm_extraction_regression(output, value_range=None):
+    """Compute regression metrics from judge-extracted values vs gold.
+
+    Args:
+        output (dict): GenericLLMEvaluator output mapping the sample index
+            to ``{'origin_prompt', 'prediction', 'gold'}``, where
+            ``prediction`` is the judge's extraction and ``gold`` is the
+            dataset answer dict.
+        value_range (tuple): optional ``(low, high)`` bounds; extracted
+            values outside them are excluded (e.g. TM-score on [0, 1]).
+    """
+    y_true, y_pred = [], []
+    invalid_examples = []
+    parse_invalid_count = 0
+    out_of_range_count = 0
+    for idx in sorted(output, key=lambda key: int(key)):
+        item = output[idx]
+        ref = _reference_dict(item.get('gold'))
+        try:
+            gold = float(ref['value'])
+        except (KeyError, TypeError, ValueError):
+            gold = None
+        pred = _parse_judge_value(item.get('prediction', ''))
+        reason = None
+        if gold is None or not math.isfinite(gold):
+            reason = 'no_gold'
+        elif pred is None or not math.isfinite(pred):
+            reason = 'no_number'
+        elif value_range is not None and not (value_range[0] <= pred <=
+                                              value_range[1]):
+            reason = 'out_of_range'
+        if reason is not None:
+            if reason == 'no_number':
+                parse_invalid_count += 1
+            elif reason == 'out_of_range':
+                out_of_range_count += 1
+            if len(invalid_examples) < 20:
+                invalid_examples.append({
+                    'index':
+                    int(idx),
+                    'reason':
+                    reason,
+                    'judge_prediction':
+                    item.get('prediction'),
+                    'answer':
+                    gold,
+                })
+            continue
+        y_true.append(gold)
+        y_pred.append(pred)
+    total = len(output)
+    result = _regression_scores(y_true, y_pred, total)
+    result['invalid_count'] = total - len(y_true)
+    result['parse_invalid_count'] = parse_invalid_count
+    result['out_of_range_count'] = out_of_range_count
+    result['invalid_examples'] = invalid_examples
+    return result
+
+
+@DICT_POSTPROCESSORS.register_module()
+def scireasoner15_material_llm_postprocess(output: dict,
+                                           output_path: str) -> dict:
+    """Regression metrics for material subsets from judge-extracted values."""
+    return _llm_extraction_regression(output)
+
+
+@DICT_POSTPROCESSORS.register_module()
+def scireasoner15_tmscore_llm_postprocess(output: dict,
+                                          output_path: str) -> dict:
+    """Regression metrics for the TMScore subset from judge-extracted values.
+
+    TM-scores are defined on [0, 1]; extracted values outside that range are
+    counted and excluded from the metrics.
+    """
+    return _llm_extraction_regression(output, value_range=(0.0, 1.0))
