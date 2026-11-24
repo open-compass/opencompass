@@ -81,13 +81,16 @@ class TokenizerWrapper:
             self._pool = None
             self._pool_workers = 0
 
-    def tokenize(self, text: str) -> List[str]:
+    def tokenize(self,
+                 text: str,
+                 add_special_tokens: bool = True) -> List[str]:
         if self.tokenizer_type == 'tiktoken':
             return [
                 self.tokenizer.decode([t])
                 for t in self.tokenizer.encode(text, disallowed_special=())
             ]
-        ids = self.tokenizer(text, add_special_tokens=True).input_ids
+        ids = self.tokenizer(text,
+                             add_special_tokens=add_special_tokens).input_ids
         return self.tokenizer.convert_ids_to_tokens(ids)
 
     def iter_batch_tokenize(
@@ -299,12 +302,35 @@ def _repeat_pattern_stats(
             best_offset = i
             best_count = count
 
+    if best_count == 0:
+        return _empty_repeat_pattern_stats()
+
     best_pattern = tokens[best_offset:best_offset + pattern_size]
     return {
         'repeat_pattern_ratio': min(best_ratio, 1.0),
         'repeat_pattern': ' '.join(best_pattern),
         'repeat_pattern_count': best_count,
     }
+
+
+def _find_token_subsequence(tokens: List[str],
+                            subsequence: List[str]) -> Optional[int]:
+    """Return the first start index of subsequence in tokens, or None."""
+    sub_len = len(subsequence)
+    if sub_len == 0 or sub_len > len(tokens):
+        return None
+    if sub_len == 1:
+        target = subsequence[0]
+        try:
+            return tokens.index(target)
+        except ValueError:
+            return None
+    first = subsequence[0]
+    limit = len(tokens) - sub_len + 1
+    for i in range(limit):
+        if tokens[i] == first and tokens[i:i + sub_len] == subsequence:
+            return i
+    return None
 
 
 def _gzip_compression_ratio(text: str) -> float:
@@ -428,9 +454,10 @@ def _analyze_benchmark(
     for model_abbr, indices in needs_tokenize.items():
         tokenizer = tokenizer_map[model_abbr]
         if think_tag:
-            think_token = tokenizer.tokenize(think_tag)[0]
+            think_tokens = tokenizer.tokenize(think_tag,
+                                              add_special_tokens=False)
         else:
-            think_token = None
+            think_tokens = None
         texts = [records[i]['text'] for i in indices]
         for batch_tokens in tokenizer.iter_batch_tokenize(
                 texts, batch_size=batch_size):
@@ -439,14 +466,23 @@ def _analyze_benchmark(
             for idx, tokens in zip(batch_indices, batch_tokens):
                 records[idx]['length'] = len(tokens)
                 records[idx]['_tokens'] = tokens
-                if think_token:
+                if think_tokens:
                     records[idx]['reasoning_length'] = 0
                     records[idx]['content_length'] = len(tokens)
-                    if think_token in tokens:
-                        records[idx]['reasoning_length'] = tokens.index(
-                            think_token)
+                    split_idx = _find_token_subsequence(tokens, think_tokens)
+                    if split_idx is not None:
+                        records[idx]['reasoning_length'] = split_idx
+                        records[idx]['content_length'] = (
+                            len(tokens) - split_idx - len(think_tokens))
+                    elif think_tag in records[idx]['text']:
+                        prefix, suffix = records[idx]['text'].split(
+                            think_tag, 1)
+                        records[idx]['reasoning_length'] = len(
+                            tokenizer.tokenize(prefix,
+                                               add_special_tokens=True))
                         records[idx]['content_length'] = len(
-                            tokens) - tokens.index(think_token) - 1
+                            tokenizer.tokenize(suffix,
+                                               add_special_tokens=False))
                 if progress_bar:
                     progress_bar.update()
 
@@ -609,7 +645,7 @@ def _build_abnormal_samples(
     for record in records:
         stats = benchmark_stats[record['benchmark']]
         sample = _sample_with_thresholds(record, stats)
-        if (record['repeat_pattern_count'] >
+        if (record['repeat_pattern_count'] >=
                 stats['repeat_pattern_ratio']['threshold']):
             abnormal_samples['repeat_pattern'].append(sample)
         if (record['gzip_compression_ratio'] >
@@ -649,8 +685,9 @@ def _fill_abnormal_predictions(
 
 
 def _format_analysis_summary_table(report: Dict[str, Any]) -> List[List[str]]:
-    with_reasoning = 'reasoning_length' in list(
-        report['benchmark_stats'].values())[0]
+    benchmark_values = list(report.get('benchmark_stats', {}).values())
+    with_reasoning = (bool(benchmark_values)
+                      and 'reasoning_length' in benchmark_values[0])
 
     if with_reasoning:
         abnormal_counts = defaultdict(
@@ -852,15 +889,15 @@ def analyze_repeat_predictions(config: ConfigDict,
             'repeat_analysis_threshold':
             'p75 of benchmark token lengths',
             'pattern_rule':
-            f'periodic pattern with count > {MIN_PATTERN_COUNT}',
+            f'periodic pattern with count >= {MIN_PATTERN_COUNT}',
             'gzip_rule':
             f'gzip_compression_ratio > {GZIP_THRESHOLD}',
             'repeat_analysis_min_length_rule':
             'pattern/gzip skipped when length < p75',
         },
         'summary': {
-            'model':
-            model_abbr_from_cfg(config['models'][0]),
+            'model': (model_abbr_from_cfg(config['models'][0])
+                      if config.get('models') else ''),
             'num_benchmarks':
             len(benchmark_stats),
             'num_samples':
