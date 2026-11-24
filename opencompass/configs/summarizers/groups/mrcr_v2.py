@@ -23,3 +23,11 @@ mrcr_v2_summary_groups = [
         'subsets': [f'mrcr_v2_{n}_upto_128K' for n in needles],
     },
 ]
+
+# Per context length: matches datasets/mrcr/mrcr_v2_{size}_rawprompt_gen.py
+context_window_sizes = ['8k', '16k', '32k', '64k', '128k', '256k', '512k', '1m']
+for size, r in zip(context_window_sizes, ranges):
+    mrcr_v2_summary_groups.append({
+        'name': f'MRCR_v2_{size}',
+        'subsets': [f'mrcr_v2_{n}_{r}_{size}' for n in needles],
+    })

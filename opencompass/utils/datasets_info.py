@@ -518,6 +518,16 @@ DATASETS_MAPPING = {
         "hf_id": "",
         "local": "./data/hardmtbench/HardMTBench.jsonl",
     },
+    "opencompass/rebuttalbench": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/rebuttalbench/",
+    },
+    "opencompass/sumsurvey": {
+        "ms_id": "",
+        "hf_id": "",
+        "local": "./data/sumsurvey/sumsurvey.jsonl",
+    },
     "opencompass/cmo_fib": {
         "ms_id": "",
         "hf_id": "",
@@ -1135,6 +1145,14 @@ DATASETS_URL = {
     "/hardmtbench/": {
         "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/hardmtbench.zip",
         "md5": "41b911a33865a2a63dbe1ed3e79907da",
+    },
+    "/rebuttalbench/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/rebuttalbench.zip",
+        "md5": "f8272c40a5f49d92611c8fe54ed52c4a",
+    },
+    "/sumsurvey/": {
+        "url": "http://opencompass.oss-cn-shanghai.aliyuncs.com/datasets/data/sumsurvey.zip",
+        "md5": "f4f07eb68369c695c32571fbad0b4c25",
     },
     "/cmo": {
         "url":

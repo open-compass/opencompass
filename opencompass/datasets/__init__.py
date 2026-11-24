@@ -181,6 +181,7 @@ from .rbench import *  # noqa: F401, F403
 from .realtoxicprompts import *  # noqa: F401, F403
 from .reasonbench import ReasonBenchDataset  # noqa: F401, F403
 from .reasonzoo import *  # noqa: F401, F403
+from .rebuttalbench import *  # noqa: F401, F403
 from .record import *  # noqa: F401, F403
 from .rpcbench import *  # noqa: F401, F403
 from .ruler import *  # noqa: F401, F403
@@ -203,6 +204,7 @@ from .strategyqa import *  # noqa: F401, F403
 from .subjective import *  # noqa: F401, F403
 from .summedits import *  # noqa: F401, F403
 from .summscreen import *  # noqa: F401, F403
+from .sumsurvey import *  # noqa: F401, F403
 from .supergpqa import *  # noqa: F401, F403
 from .svamp import *  # noqa: F401, F403
 from .tabmwp import *  # noqa: F401, F403
