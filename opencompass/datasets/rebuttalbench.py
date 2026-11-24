@@ -136,10 +136,8 @@ def aggregate_scores(categories: List[str],
             dim_pool[dim].append(value)
 
     cat_dim_avg = {
-        cat: {
-            dim: _mean(buckets[cat][dim])
-            for dim in DIMENSIONS
-        }
+        cat: {dim: _mean(buckets[cat][dim])
+              for dim in DIMENSIONS}
         for cat in CATEGORIES
     }
     cat_means = [

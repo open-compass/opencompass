@@ -228,10 +228,9 @@ class SumSurveyEvaluator(GenericLLMEvaluator):
                 statuses[i],
                 'score':
                 weighted_score(judgement) if judgements[i] else None,
-                'dimensions': {
-                    key: judgement[key]
-                    for key in DIMENSIONS
-                } if judgements[i] else None,
+                'dimensions':
+                {key: judgement[key]
+                 for key in DIMENSIONS} if judgements[i] else None,
                 'missing_key_points':
                 judgement.get('missing_key_points'),
                 'unsupported_or_conflicting_claims':
