@@ -1,24 +1,3 @@
-"""SumSurvey: summarising long survey papers, scored by an LLM judge.
-
-Paper: SumSurvey: An Abstractive Dataset of Scientific Survey Papers for Long
-Document Summarization (Findings of ACL 2024),
-https://aclanthology.org/2024.findings-acl.574/
-Data:  https://github.com/Oswald1997/SumSurvey (1,888 test papers)
-
-Inference uses the zero-shot prompt of the paper. Scoring follows the
-"SumSurvey Eval 1.1" protocol instead of the paper's ROUGE: one judge call per
-summary compares the candidate with the author abstract (never the full
-paper) and returns four integer scores from 0 to 4, combined as
-
-    100 * (0.45*coverage + 0.30*precision + 0.15*coherence
-           + 0.10*non_redundancy) / 4
-
-The system score is the mean over successfully judged samples only. Empty
-model outputs (``source_failed``) and samples whose judge output never parses
-(``judge_failed``) are left out and counted separately, so ``score`` must be
-read together with ``scored_ratio``. The judge prompt is kept verbatim in
-``configs/datasets/SumSurvey/``.
-"""
 import copy
 import json
 import os.path as osp
@@ -43,7 +22,7 @@ from .base import BaseDataset
 logger = get_logger()
 
 NUM_SAMPLES = 1888
-# Zero-shot prompt of the paper, prepended to the paper text
+# zero-shot prompt of the paper
 SUMSURVEY_PROMPT = ('Please summarize the following contents with no more '
                     'than 256 words: ')
 
@@ -60,7 +39,6 @@ JUDGE_KEYS = set(DIMENSIONS) | {
 
 
 def build_judge_input(reference: str, candidate: str) -> str:
-    """The ``INPUT JSON`` of v1.1: canonical JSON of the two abstracts."""
     return json.dumps(
         {
             'author_abstract': reference,
@@ -72,24 +50,8 @@ def build_judge_input(reference: str, candidate: str) -> str:
         allow_nan=False)
 
 
-# ---------------------------------------------------------------------------
-# Dataset loading
-# ---------------------------------------------------------------------------
-
-
 @LOAD_DATASET.register_module()
 class SumSurveyDataset(BaseDataset):
-    """Loader for the SumSurvey test split.
-
-    Args:
-        path: dataset id (``opencompass/sumsurvey``, resolved by
-            ``get_data_path`` and downloaded from OSS if missing) or a
-            ``*.jsonl`` file with ``id``, ``prompt`` (paper text) and
-            ``reference`` (author abstract) per line.
-
-    The ``messages`` column holds the single user turn of the paper's
-    zero-shot prompt.
-    """
 
     @staticmethod
     def load(path: str = 'opencompass/sumsurvey') -> Dataset:
@@ -114,23 +76,11 @@ class SumSurveyDataset(BaseDataset):
                 })
         if len(samples) != NUM_SAMPLES:
             logger.warning(f'SumSurvey: expected {NUM_SAMPLES} rows, got '
-                           f'{len(samples)}. The data file may have changed.')
+                           f'{len(samples)}.')
         return Dataset.from_list(samples)
 
 
-# ---------------------------------------------------------------------------
-# Judge parsing and aggregation
-# ---------------------------------------------------------------------------
-
-
 def parse_judge_output(text: Optional[str]) -> Optional[Dict]:
-    """``parse_json_object`` of v1.1, returning None instead of raising.
-
-    Accepts the whole output as one JSON object, optionally wrapped in a
-    markdown fence. The object must have exactly the seven keys of the
-    rubric, integer scores from 0 to 4, lists of at most 12 non-empty strings
-    and a non-empty rationale.
-    """
     if not isinstance(text, str):
         return None
     text = text.strip()
@@ -148,7 +98,6 @@ def parse_judge_output(text: Optional[str]) -> Optional[Dict]:
     if not isinstance(value, dict) or set(value) != JUDGE_KEYS:
         return None
     for key in DIMENSIONS:
-        # bool is an int subclass; 3.0 is rejected too
         if type(value[key]) is not int or not 0 <= value[key] <= 4:
             return None
     for key in ('missing_key_points', 'unsupported_or_conflicting_claims'):
@@ -164,23 +113,11 @@ def parse_judge_output(text: Optional[str]) -> Optional[Dict]:
 
 
 def weighted_score(judgement: Dict) -> float:
-    """Sample score on a 0-100 scale."""
     return sum(judgement[key] * WEIGHTS[key] for key in DIMENSIONS) / 4 * 100
 
 
 def aggregate_scores(statuses: List[str],
                      judgements: List[Optional[Dict]]) -> Dict[str, float]:
-    """``aggregate`` of v1.1.
-
-    - ``score``: mean of the sample scores over successfully judged samples;
-    - ``dim_{dimension}``: mean 0-4 score of each dimension over the same
-      samples;
-    - ``scored_ratio``: judged samples / all samples, the ``coverage`` field
-      of v1.1's eval record;
-    - ``score_failures_as_zero``: not in v1.1; the same mean with every
-      failed sample counted as 0, comparable across models with different
-      failure counts.
-    """
     scored = [
         j for status, j in zip(statuses, judgements) if status == 'succeeded'
     ]
@@ -189,6 +126,7 @@ def aggregate_scores(statuses: List[str],
     sample_scores = [weighted_score(j) for j in scored]
     results = {
         'score': mean(sample_scores) if scored else nan,
+        # failed samples counted as 0, not in v1.1
         'score_failures_as_zero': sum(sample_scores) / n if n else nan,
         'scored_ratio': len(scored) / n if n else nan,
         'num_scored': len(scored),
@@ -202,22 +140,6 @@ def aggregate_scores(statuses: List[str],
 
 @ICL_EVALUATORS.register_module()
 class SumSurveyEvaluator(GenericLLMEvaluator):
-    """Scores each summary against the author abstract with the v1.1 judge
-    prompt.
-
-    Args:
-        prompt_template (ConfigDict): judge prompt; the ``judge_input`` column
-            holds the canonical JSON of the two abstracts.
-        judge_cfg (ConfigDict): judge model config. Empty falls back to the
-            ``OC_JUDGE_*`` environment variables. v1.1 used
-            deepseek-v4.1-flash at temperature 0 with a 32k completion
-            budget.
-        max_attempts (int): judge calls per sample. Outputs that fail the
-            v1.1 schema check are judged again; v1.1 makes 5 attempts.
-            Samples still invalid afterwards are ``judge_failed``.
-        pred_postprocessor (ConfigDict): applied to the model output before
-            judging.
-    """
 
     def __init__(self,
                  prompt_template: ConfigDict,
@@ -227,13 +149,11 @@ class SumSurveyEvaluator(GenericLLMEvaluator):
         BaseEvaluator.__init__(self, pred_postprocessor=pred_postprocessor)
         self.prompt_template = ICL_PROMPT_TEMPLATES.build(prompt_template)
         self.judge_cfg = judge_cfg
-        # e.g. strip the reasoning of a thinking judge before parsing
         self.judge_pred_postprocessor = (judge_cfg
                                          or {}).get('pred_postprocessor', None)
         self.max_attempts = max_attempts
 
     def _judge(self, judge_inputs: List[str], name: str) -> Dict:
-        """Run (or reuse) one judge pass over ``judge_inputs``."""
         output_path = (f'{self._out_dir}_replica{self.dataset_replica_idx}'
                        f'_{name}.json')
         if not osp.exists(output_path):
