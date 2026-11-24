@@ -1546,3 +1546,15 @@
     paper: ''
     configpath: ''
     configpath_llmjudge: opencompass/configs/datasets/weddoo_bench/weddoo_bench_llmjudge_gen.py
+- rebuttalbench:
+    name: RebuttalBench
+    category: Subjective / Academic Rebuttal
+    paper: https://arxiv.org/abs/2601.15715
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/RebuttalBench/rebuttalbench_rar_test_base_llmjudge_gen.py
+- sumsurvey:
+    name: SumSurvey
+    category: Summarization / Long Document
+    paper: https://aclanthology.org/2024.findings-acl.574/
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/SumSurvey/sumsurvey_llmjudge_gen.py
