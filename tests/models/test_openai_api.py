@@ -54,6 +54,20 @@ class TestOpenAI(unittest.TestCase):
         self.assertEqual(model.keys[1], 'key2')
 
     @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch.dict('os.environ', {'CUSTOM_API_KEY': 'key1,key2'}, clear=True)
+    def test_initialization_with_custom_key_env(self, mock_tiktoken):
+        """Test loading API keys from a custom environment variable."""
+        setup_tiktoken_mock(mock_tiktoken)
+
+        model = OpenAI(
+            path='custom-model',
+            key='ENV',
+            key_env='CUSTOM_API_KEY',
+        )
+
+        self.assertEqual(model.keys, ['key1', 'key2'])
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
     @patch('opencompass.models.openai_api.requests')
     @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
     def test_generate_basic(self, mock_requests, mock_tiktoken):
