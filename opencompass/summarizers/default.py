@@ -1,6 +1,7 @@
 # flake8: noqa
 # yapf: disable
 import functools
+import glob
 import getpass
 import math
 import os.path as osp
@@ -15,6 +16,7 @@ from opencompass.utils import (LarkReporter, dataset_abbr_from_cfg,
                                get_infer_output_path, get_logger,
                                model_abbr_from_cfg)
 from opencompass.utils.prompt import get_prompt_hash
+from opencompass.utils.result import RESULT_METADATA_KEY, SAMPLE_COUNT_KEY
 
 METRIC_WHITELIST = ['score', 'auc_score', 'accuracy', 'humaneval_pass@1', 'rouge1', 'avg_toxicity_score', 'bleurt_diff', 'matthews_correlation', 'truth', 'f1', 'exact_match', 'extract_rate']
 METRIC_BLACKLIST = ['bp', 'sys_len', 'ref_len', 'type']
@@ -64,6 +66,107 @@ class DefaultSummarizer:
             model_abbrs.append(model_abbr)
         self.model_abbrs = model_abbrs
 
+    def _load_result(self, filepath):
+        if osp.exists(filepath):
+            return mmengine.load(filepath)
+        return self._load_split_results(filepath)
+
+    def _load_split_results(self, filepath):
+        split_paths = self._find_split_result_paths(filepath)
+        if not split_paths:
+            return None
+
+        split_results = [(path, mmengine.load(path)) for path in split_paths]
+        return self._combine_split_results(filepath, split_results)
+
+    def _find_split_result_paths(self, filepath):
+        root, ext = osp.splitext(filepath)
+        pattern = glob.escape(root) + '_*' + ext
+        split_indices_and_paths = []
+        for path in glob.glob(pattern):
+            suffix = path[len(root) + 1:-len(ext)] if ext else path[len(root) + 1:]
+            if suffix.isdigit():
+                split_indices_and_paths.append((int(suffix), path))
+
+        if not split_indices_and_paths:
+            return []
+
+        split_indices_and_paths.sort()
+        split_indices = [index for index, _ in split_indices_and_paths]
+        expected_indices = list(range(split_indices[-1] + 1))
+        if split_indices != expected_indices:
+            self.logger.warning(
+                f'skip incomplete split results for {filepath}: '
+                f'found split indices {split_indices}, expected {expected_indices}')
+            return []
+
+        return [path for _, path in split_indices_and_paths]
+
+    def _combine_split_results(self, filepath, split_results):
+        sample_counts = []
+        for split_path, result in split_results:
+            if 'error' in result:
+                return {'error': f'{split_path}: {result["error"]}'}
+
+            sample_count = self._get_result_sample_count(result)
+            if sample_count is None:
+                self.logger.warning(
+                    f'skip split results for {filepath}: '
+                    f'{split_path} does not contain sample count metadata or details')
+                return None
+            sample_counts.append(sample_count)
+
+        total_samples = sum(sample_counts)
+        if total_samples <= 0:
+            self.logger.warning(f'skip split results for {filepath}: no samples found')
+            return None
+
+        metric_sets = []
+        for _, result in split_results:
+            metric_sets.append({
+                metric
+                for metric, score in result.items()
+                if metric not in (METRIC_BLACKLIST + [RESULT_METADATA_KEY, 'details'])
+                and isinstance(score, (int, float))
+            })
+
+        common_metrics = set.intersection(*metric_sets) if metric_sets else set()
+        if not common_metrics:
+            self.logger.warning(
+                f'skip split results for {filepath}: no common numeric metrics found')
+            return None
+
+        merged_result = {}
+        for metric in sorted(common_metrics):
+            merged_result[metric] = sum(
+                result[metric] * sample_count
+                for (_, result), sample_count in zip(split_results, sample_counts)) / total_samples
+        merged_result[RESULT_METADATA_KEY] = {SAMPLE_COUNT_KEY: total_samples}
+        return merged_result
+
+    @staticmethod
+    def _get_result_sample_count(result):
+        metadata = result.get(RESULT_METADATA_KEY)
+        if isinstance(metadata, dict):
+            sample_count = metadata.get(SAMPLE_COUNT_KEY)
+            if isinstance(sample_count, int):
+                return sample_count
+
+        details = result.get('details')
+        if isinstance(details, list):
+            return len(details)
+        if isinstance(details, dict):
+            sample_details = {k: v for k, v in details.items() if k != 'type'}
+            if not sample_details:
+                return 0
+            if all(isinstance(v, dict) for v in sample_details.values()):
+                return len(sample_details)
+            if len(sample_details) == 1:
+                values = next(iter(sample_details.values()))
+                if isinstance(values, list):
+                    return len(values)
+        return None
+
     def _pick_up_results(self):
         """The function reads the numerical results of evaluations from the
         output folder based on the configuration file, and ultimately returns
@@ -90,10 +193,11 @@ class DefaultSummarizer:
             for dataset in self.dataset_cfgs:
                 dataset_abbr = dataset_abbr_from_cfg(dataset)
                 filepath = get_infer_output_path(model, dataset, osp.join(self.work_dir, 'results'))
-                if not osp.exists(filepath):
+                result = self._load_result(filepath)
+                if result is None:
                     continue
-                result = mmengine.load(filepath)
                 result.pop('details', None)
+                result.pop(RESULT_METADATA_KEY, None)
                 raw_results[model_abbr][dataset_abbr] = result
                 if 'error' in result:
                     self.logger.debug(f'error in {model_abbr} {dataset_abbr} {result["error"]}')
