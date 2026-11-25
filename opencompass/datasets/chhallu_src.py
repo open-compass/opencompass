@@ -97,13 +97,31 @@ def _norm_chapter(s):
 
 
 def _parse_json(text):
-    m = re.search(r'\{.*\}', text or '', re.DOTALL)
-    if not m:
-        return None
-    try:
-        return json.loads(m.group(0))
-    except json.JSONDecodeError:
-        return None
+    # Scan for balanced top-level ``{...}`` objects and return the last one
+    # that parses. A greedy ``{.*}`` match would span from the first ``{`` to
+    # the last ``}``, fusing unrelated fragments (e.g. a model that echoes the
+    # required ``{"choice": "A"}`` format from the prompt and then appends its
+    # real answer) into invalid JSON, which silently scores a correct answer
+    # as wrong. The prompt instructs the answer be returned at the end, so the
+    # last valid object is the answer.
+    text = text or ''
+    last = None
+    depth = 0
+    start = None
+    for i, ch in enumerate(text):
+        if ch == '{':
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch == '}' and depth > 0:
+            depth -= 1
+            if depth == 0 and start is not None:
+                try:
+                    last = json.loads(text[start:i + 1])
+                except json.JSONDecodeError:
+                    pass
+                start = None
+    return last
 
 
 def _score_one(row, pred_text):
