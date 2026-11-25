@@ -120,6 +120,21 @@ class TestRawPromptTemplate(unittest.TestCase):
         self.assertEqual(result[1]['content'], 'Translate to French: {input}')
         self.assertEqual(result[2]['content'], '{output}')
 
+    def test_generate_item_preserves_field_contents(self):
+        question = r'Print \1 and the literal {answer}.'
+        rpt = RawPromptTemplate([
+            dict(role='user', content='{question}'),
+            dict(role='assistant', content='{answer}'),
+        ])
+        for reverse in (False, True):
+            fields = [('question', question), ('answer', 'gold answer')]
+            entry = dict(reversed(fields) if reverse else fields)
+            with self.subTest(reverse=reverse):
+                result = rpt.generate_item(entry)
+
+                self.assertEqual(result[0]['content'], question)
+                self.assertEqual(result[1]['content'], 'gold answer')
+
     def test_generate_item_does_not_modify_original(self):
         """测试 generate_item 不修改原始 messages"""
         rpt = RawPromptTemplate(self.simple_messages)
