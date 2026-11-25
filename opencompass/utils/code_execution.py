@@ -1,13 +1,30 @@
 import ast
+from collections import Counter, OrderedDict, defaultdict
 from collections.abc import Mapping
 from typing import Any
 
 TYPE_AWARE_EQUAL_NAME = '__opencompass_type_aware_equal'
 
 
+# Exact built-in types that may be compared with each other even though they
+# are different classes. Subclasses are not listed, so a user-defined class
+# with a forged ``__eq__`` is still rejected.
+_NUMBER_TYPES = (int, float)
+_DICT_TYPES = (dict, Counter, OrderedDict, defaultdict)
+
+
+def _compatible_types(actual: Any, expected: Any) -> bool:
+    actual_type, expected_type = type(actual), type(expected)
+    if actual_type is expected_type:
+        return True
+    if actual_type in _NUMBER_TYPES and expected_type in _NUMBER_TYPES:
+        return True
+    return actual_type in _DICT_TYPES and expected_type in _DICT_TYPES
+
+
 def type_aware_equal(actual: Any, expected: Any) -> bool:
     """Compare values without accepting forged ``__eq__`` on return objects."""
-    if type(actual) is not type(expected):
+    if not _compatible_types(actual, expected):
         return False
 
     if isinstance(actual, (list, tuple)):
