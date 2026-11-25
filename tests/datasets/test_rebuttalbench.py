@@ -1,7 +1,7 @@
 import hashlib
 import json
 import math
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 from datasets import Dataset
@@ -158,6 +158,20 @@ def test_dimension_scores_requires_all_four_dimensions():
     assert dimension_scores(None) is None
 
 
+@pytest.mark.parametrize('bad', [
+    -1, 99, True, False, 'NaN', 'Infinity', '-Infinity', None, 'unrated',
+    pytest.param(10**400, id='overflow')
+])
+def test_invalid_dimension_excludes_whole_judgement(bad):
+    valid = json.loads(_judge_json(0, '8', 6.5, 10))
+    invalid = json.loads(_judge_json(8, 8, bad, 8))
+    result = aggregate_scores([CATEGORIES[0]] * 2, [invalid, valid])
+
+    assert dimension_scores(invalid) is None
+    assert result['num_scored'] == 1
+    assert result['score'] == pytest.approx((0 + 8 + 6.5 + 10) / 4)
+
+
 def test_aggregate_scores_matches_ag_avg():
     categories = [
         'Experimental Rigor',
@@ -248,6 +262,65 @@ def test_evaluator_retries_unparsable_judgements(tmp_path):
     details = result['details']
     assert [d['judge_attempts'] for d in details] == [1, 2, 3]
     assert [d['counted'] for d in details] == [True, True, False]
+
+
+@pytest.mark.parametrize('unusable', ['{}', _judge_json(8, 8, 99, 8)],
+                         ids=['missing-scores', 'out-of-range'])
+def test_retry_invalid_scores_with_existing_judge_files(tmp_path, unusable):
+    evaluator = _evaluator(tmp_path, max_attempts=2)
+    initial = {
+        '0': {
+            'prediction': _judge_json(8, 8, 8, 8)
+        },
+        '1': {
+            'prediction': unusable
+        },
+        '2': {
+            'prediction': 'not JSON'
+        },
+    }
+    (tmp_path / 'rebuttalbench_replica0_judge.json').write_text(
+        json.dumps(initial), encoding='utf-8')
+    # The old retry batch contained only sample 2, at position 0.
+    legacy = {'0': {'prediction': _judge_json(10, 10, 10, 10)}}
+    (tmp_path / 'rebuttalbench_replica0_judge_retry1.json').write_text(
+        json.dumps(legacy), encoding='utf-8')
+
+    test_set = _test_set()
+    predictions = ['r0', 'r1', 'r2']
+    recovered = _judge_json(6, 6, 6, 6)
+    exhausted = _judge_json(99, 99, 99, 99)
+    retry_replies = {
+        build_judge_input(test_set[1], predictions[1]): recovered,
+        build_judge_input(test_set[2], predictions[2]): exhausted,
+    }
+
+    def generate(prompts, **kwargs):
+        return [retry_replies.pop(chat[0]['content']) for chat in prompts]
+
+    model = Mock(is_api=True, generation_kwargs={})
+    model.parse_template.side_effect = lambda prompts, mode: prompts
+    model.generate_from_template.side_effect = generate
+    with patch('opencompass.datasets.rebuttalbench.build_model_from_cfg',
+               return_value=model):
+        result = evaluator.score(predictions, test_set=test_set)
+
+    details = result['details']
+    assert [d['judge_attempts'] for d in details] == [1, 2, 2]
+    assert [d['counted'] for d in details] == [True, True, False]
+    assert [d['judge_output'] for d in details
+            ] == [initial['0']['prediction'], recovered, exhausted]
+    assert details[2]['scores'] is None
+    assert result['judge_parse_failures'] == 1
+    assert result['num_scored'] == 2
+    assert result['score'] == pytest.approx(7)
+    assert not retry_replies
+
+    # A second run reads the new retry file with the same row mapping.
+    with patch('opencompass.datasets.rebuttalbench.build_model_from_cfg',
+               side_effect=AssertionError('unexpected judge request')):
+        resumed = evaluator.score(predictions, test_set=test_set)
+    assert resumed['details'] == details
 
 
 def test_evaluate_judges_raw_outputs_on_a_built_dataset(tmp_path):
