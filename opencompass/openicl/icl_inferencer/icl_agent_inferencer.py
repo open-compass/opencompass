@@ -1,5 +1,4 @@
 """Agent Inferencer."""
-import os.path as osp
 import types
 from typing import List
 
@@ -7,20 +6,14 @@ from opencompass.models.lagent import LagentAgent
 from opencompass.registry import ICL_INFERENCERS
 
 from ..utils.logging import get_logger
-from .icl_base_inferencer import dump_results_dict
+from .icl_base_inferencer import ChatOutputHandler
 from .icl_chat_inferencer import ChatInferencer
 
 logger = get_logger(__name__)
 
 
-class AgentInferencerOutputHandler:
-
-    def __init__(self) -> None:
-        self.results_dict = {}
-
-    def write_to_json(self, save_dir: str, filename: str):
-        """Dump the result to a json file."""
-        dump_results_dict(self.results_dict, osp.join(save_dir, filename))
+class AgentInferencerOutputHandler(ChatOutputHandler):
+    """Keep agent steps while sharing the chat checkpoint protocol."""
 
     def save_results(self,
                      origin_prompt: list,
