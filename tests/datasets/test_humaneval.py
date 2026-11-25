@@ -1,6 +1,8 @@
+import gzip
 import json
 import os
 import sys
+import tempfile
 import unittest
 from types import ModuleType
 from unittest.mock import Mock, patch
@@ -134,8 +136,31 @@ class TestHumanEvalEvaluatorDetails(unittest.TestCase):
         human_eval_data = ModuleType('human_eval.data')
         human_eval_evaluation = ModuleType('human_eval.evaluation')
         write_jsonl = Mock()
+        problems = [
+            {
+                'task_id': 'HumanEval/0',
+                'prompt': 'def one():\n',
+                'entry_point': 'one',
+                'canonical_solution': '    return 1\n',
+                'test': 'def check(candidate):\n    assert candidate() == 1\n',
+            },
+            {
+                'task_id': 'HumanEval/2',
+                'prompt': 'def truncate(number):\n',
+                'entry_point': 'truncate',
+                'canonical_solution': '    return number\n',
+                'test': ('def check(candidate):\n'
+                         '    assert abs(candidate(1.5) - 1.5) < 1e-6\n'),
+            },
+        ]
+        captured = {}
 
         def fake_evaluate(sample_file, *args, **kwargs):
+            with open(kwargs['problem_file'], 'r', encoding='utf-8') as handle:
+                captured['problems'] = [
+                    json.loads(line) for line in handle if line.strip()
+                ]
+            captured['problem_file'] = kwargs['problem_file']
             result_file = sample_file + '_results.jsonl'
             rows = [
                 {
@@ -157,7 +182,6 @@ class TestHumanEvalEvaluatorDetails(unittest.TestCase):
             return {'pass@1': 0.5}
 
         evaluate = Mock(side_effect=fake_evaluate)
-        human_eval_data.HUMAN_EVAL = 'mock_problem_file.jsonl'
         human_eval_data.write_jsonl = write_jsonl
         human_eval_evaluation.evaluate_functional_correctness = evaluate
 
@@ -169,57 +193,80 @@ class TestHumanEvalEvaluatorDetails(unittest.TestCase):
         # The default and the explicit ``ignore_incomplete=True`` used by the
         # autotest fullbench config must both reach human_eval unchanged.
         cases = [({}, False), ({'ignore_incomplete': True}, True)]
-        for evaluator_kwargs, ignore_incomplete in cases:
-            with self.subTest(ignore_incomplete=ignore_incomplete):
-                write_jsonl.reset_mock()
-                evaluate.reset_mock()
-                with patch.dict(sys.modules, modules):
-                    result = HumanEvalEvaluator(
-                        k=[1], **evaluator_kwargs).score(
-                            predictions=['return 1', 'return 0'],
-                            references=['HumanEval/0', 'HumanEval/1'],
-                            test_set=[{
-                                'prompt': 'def one():'
-                            }, {
-                                'prompt': 'def two():'
-                            }],
-                        )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            problem_path = os.path.join(tmp_dir, 'HumanEval.jsonl.gz')
+            with gzip.open(problem_path, 'wt', encoding='utf-8') as handle:
+                for problem in problems:
+                    handle.write(json.dumps(problem) + '\n')
+            human_eval_data.HUMAN_EVAL = problem_path
+            for evaluator_kwargs, ignore_incomplete in cases:
+                with self.subTest(ignore_incomplete=ignore_incomplete):
+                    write_jsonl.reset_mock()
+                    evaluate.reset_mock()
+                    captured.clear()
+                    with patch.dict(sys.modules, modules):
+                        result = HumanEvalEvaluator(
+                            k=[1], **evaluator_kwargs).score(
+                                predictions=['return 1', 'return 0'],
+                                references=['HumanEval/0', 'HumanEval/1'],
+                                test_set=[{
+                                    'prompt': 'def one():'
+                                }, {
+                                    'prompt': 'def two():'
+                                }],
+                            )
 
-                self.assertEqual(result['humaneval_pass@1'], 50.0)
-                self.assertEqual(
-                    result['details'], {
-                        '0': {
-                            'task_id': 'HumanEval/0',
-                            'completion': 'return 1',
-                            'passed': True,
-                            'result': 'passed',
-                            'is_correct': True,
-                            'prompt': 'def one():',
-                        },
-                        '1': {
-                            'task_id': 'HumanEval/1',
-                            'completion': 'return 0',
-                            'passed': False,
-                            'result': 'failed: assertion',
-                            'is_correct': False,
-                            'prompt': 'def two():',
-                        },
-                    })
-                sample_file, samples = write_jsonl.call_args.args
-                self.assertEqual(samples, [{
-                    'task_id': 'HumanEval/0',
-                    'completion': 'return 1'
-                }, {
-                    'task_id': 'HumanEval/1',
-                    'completion': 'return 0'
-                }])
-                evaluate.assert_called_once_with(
-                    sample_file, [1],
-                    n_workers=4,
-                    timeout=3.0,
-                    problem_file='mock_problem_file.jsonl',
-                    ignore_incomplete=ignore_incomplete)
-                self.assertFalse(os.path.exists(os.path.dirname(sample_file)))
+                    self.assertEqual(result['humaneval_pass@1'], 50.0)
+                    self.assertEqual(
+                        result['details'], {
+                            '0': {
+                                'task_id': 'HumanEval/0',
+                                'completion': 'return 1',
+                                'passed': True,
+                                'result': 'passed',
+                                'is_correct': True,
+                                'prompt': 'def one():',
+                            },
+                            '1': {
+                                'task_id': 'HumanEval/1',
+                                'completion': 'return 0',
+                                'passed': False,
+                                'result': 'failed: assertion',
+                                'is_correct': False,
+                                'prompt': 'def two():',
+                            },
+                        })
+                    sample_file, samples = write_jsonl.call_args.args
+                    self.assertEqual(samples, [{
+                        'task_id': 'HumanEval/0',
+                        'completion': 'return 1'
+                    }, {
+                        'task_id': 'HumanEval/1',
+                        'completion': 'return 0'
+                    }])
+                    evaluate.assert_called_once_with(
+                        sample_file, [1],
+                        n_workers=4,
+                        timeout=3.0,
+                        problem_file=captured['problem_file'],
+                        ignore_incomplete=ignore_incomplete)
+                    self.assertNotEqual(captured['problem_file'], problem_path)
+                    rewritten = {
+                        item['task_id']: item['test']
+                        for item in captured['problems']
+                    }
+                    self.assertEqual(
+                        set(rewritten), {'HumanEval/0', 'HumanEval/2'})
+                    self.assertIn(
+                        'assert __opencompass_type_aware_equal(candidate(), 1)',
+                        rewritten['HumanEval/0'])
+                    self.assertNotIn('assert candidate() == 1',
+                                     rewritten['HumanEval/0'])
+                    self.assertIn('assert __opencompass_type_aware_close(',
+                                  rewritten['HumanEval/2'])
+                    self.assertNotIn('assert abs(', rewritten['HumanEval/2'])
+                    self.assertFalse(
+                        os.path.exists(os.path.dirname(sample_file)))
 
 
 class TestHumanEvalPlusEvaluatorDetails(unittest.TestCase):

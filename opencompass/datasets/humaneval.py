@@ -1,6 +1,7 @@
 # flake8: noqa: E501
 # yapf: disable
 import copy
+import gzip
 import json
 import os.path as osp
 import re
@@ -14,6 +15,7 @@ from datasets import Dataset
 from opencompass.openicl.icl_evaluator import BaseEvaluator
 from opencompass.registry import LOAD_DATASET
 from opencompass.utils import get_data_path
+from opencompass.utils.code_execution import make_humaneval_test_type_aware
 
 from .base import BaseDataset
 
@@ -68,6 +70,27 @@ class HumanevalDataset(BaseDataset):
         return dataset
 
 
+def _iter_problem_jsonl(path: str):
+    """Yield problems from a jsonl or gzipped jsonl file."""
+    if path.endswith('.gz'):
+        handle = gzip.open(path, 'rt', encoding='utf-8')
+    else:
+        handle = open(path, 'r', encoding='utf-8')
+    with handle as problem_file:
+        for line in problem_file:
+            if line.strip():
+                yield json.loads(line)
+
+
+def _write_type_aware_problem_file(problem_file: str, out_path: str) -> None:
+    """Copy ``problem_file`` with each ``test`` hardened against forged compares."""
+    with open(out_path, 'w', encoding='utf-8') as output:
+        for problem in _iter_problem_jsonl(problem_file):
+            problem = dict(problem)
+            problem['test'] = make_humaneval_test_type_aware(problem['test'])
+            output.write(json.dumps(problem) + '\n')
+
+
 class HumanEvalEvaluator(BaseEvaluator):
     """Evaluator for HumanEval or EvalPlus."""
 
@@ -104,12 +127,18 @@ class HumanEvalEvaluator(BaseEvaluator):
         with tempfile.TemporaryDirectory() as tmp_dir:
             out_dir = osp.join(tmp_dir, 'human_eval.json')
             write_jsonl(out_dir, humaneval_preds)
+            # human_eval execs prompt + completion + test with empty globals,
+            # so forged ``__eq__`` / ``__sub__`` on a returned object pass the
+            # stock tests. Rewrite those checks into a temporary problem file.
+            # https://github.com/open-compass/opencompass/issues/2746
+            problem_file = osp.join(tmp_dir, 'human_eval_problems.jsonl')
+            _write_type_aware_problem_file(HUMAN_EVAL, problem_file)
             score = evaluate_functional_correctness(
                 out_dir,
                 self.k,
                 n_workers=4,
                 timeout=3.0,
-                problem_file=HUMAN_EVAL,
+                problem_file=problem_file,
                 ignore_incomplete=self.ignore_incomplete)
 
             detail_path = osp.join(tmp_dir, 'human_eval.json_results.jsonl')
