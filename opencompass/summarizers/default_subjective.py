@@ -1,6 +1,5 @@
 # flake8: noqa
 # yapf: disable
-import functools
 import getpass
 import math
 import os.path as osp
@@ -224,7 +223,8 @@ class DefaultSubjectiveSummarizer:
                         scores.setdefault(default_metric, {})[dataset_abbr + '@' + metric] = parsed_results[model_abbr][dataset_abbr][metric]
                         eval_modes.append(dataset_eval_mode.get(dataset_abbr, 'unknown'))
                 else:
-                    group_metrics = list(functools.reduce(lambda a, b: a & b, [set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']]))
+                    common_metrics = set.intersection(*(set(dataset_metrics[dataset_abbr]) for dataset_abbr in sg['subsets']))
+                    group_metrics = sorted(common_metrics, key=dataset_metrics[sg['subsets'][0]].index)
                     if need_smart_metric and len(group_metrics) > 1:
                         for metric in group_metrics:
                             for dataset_abbr in sg['subsets']:
