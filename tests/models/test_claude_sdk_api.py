@@ -283,6 +283,10 @@ class TestClaudeSDK(unittest.TestCase):
                 delta=types.SimpleNamespace(type='thinking_delta',
                                             thinking='Thinking process'),
             ),
+            types.SimpleNamespace(
+                type='message_delta',
+                delta=types.SimpleNamespace(stop_reason='end_turn'),
+            ),
             types.SimpleNamespace(type='message_stop'),
         ])
 
@@ -291,6 +295,73 @@ class TestClaudeSDK(unittest.TestCase):
         api_params = client.messages.create.call_args.kwargs
 
         self.assertTrue(api_params['stream'])
+
+    @staticmethod
+    def stream_events(text, stop_reason=None, as_dict=False):
+        """Build stream events, truncated when stop_reason is None."""
+        deltas = [('content_block_delta', dict(thinking='Thinking')),
+                  ('content_block_delta', dict(text=text))]
+        if stop_reason is not None:
+            deltas.append(('message_delta', dict(stop_reason=stop_reason)))
+        if as_dict:
+            return iter([dict(type=t, delta=d) for t, d in deltas])
+        return iter([
+            types.SimpleNamespace(type=t, delta=types.SimpleNamespace(**d))
+            for t, d in deltas
+        ])
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_stream_without_stop_reason_is_retried(self):
+        """Test a truncated stream is dropped and requested again."""
+        for as_dict in (False, True):
+            with self.subTest(as_dict=as_dict):
+                model, _, client = self.build_model(stream=True)
+                model.retry = 2
+                client.messages.create.side_effect = [
+                    self.stream_events('par', as_dict=as_dict),
+                    self.stream_events('full', 'end_turn', as_dict=as_dict),
+                ]
+
+                self.assertEqual(model._generate('hello', max_out_len=64),
+                                 'Thinking</think>full')
+                self.assertEqual(client.messages.create.call_count, 2)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_stream_without_stop_reason_fails_after_retries(self):
+        """Test a truncated reply is never returned as the prediction."""
+        model, _, client = self.build_model(stream=True)
+        model.retry = 2
+        client.messages.create.side_effect = [
+            self.stream_events('par'),
+            self.stream_events('par'),
+        ]
+
+        with self.assertRaises(RuntimeError):
+            model._generate('hello', max_out_len=64)
+        self.assertEqual(client.messages.create.call_count, 2)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_stream_max_tokens_is_not_retried(self):
+        """Test a reply that used up max_tokens counts as finished."""
+        model, _, client = self.build_model(stream=True)
+        model.retry = 2
+        client.messages.create.side_effect = [
+            self.stream_events('par', 'max_tokens')
+        ]
+
+        self.assertEqual(model._generate('hello', max_out_len=64),
+                         'Thinking</think>par')
+        self.assertEqual(client.messages.create.call_count, 1)
+
+    @patch.dict('os.environ', {}, clear=True)
+    def test_stop_reason_confirm_can_be_disabled(self):
+        """Test stop_reason_confirm=False keeps the truncated reply."""
+        model, _, client = self.build_model(stream=True,
+                                            stop_reason_confirm=False)
+        client.messages.create.side_effect = [self.stream_events('par')]
+
+        self.assertEqual(model._generate('hello', max_out_len=64),
+                         'Thinking</think>par')
 
     @patch.dict('os.environ', {}, clear=True)
     def test_generate_multiple_inputs_uses_progress_bar(self):

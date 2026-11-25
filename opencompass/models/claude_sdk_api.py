@@ -50,6 +50,8 @@ class ClaudeSDK(BaseAPIModel):
         max_workers (int, optional): Maximum number of worker threads for
             batched generation. Concurrent inference tasks also read it from
             the model config to cap in-flight requests. Defaults to 32.
+        stop_reason_confirm (bool): Whether to treat a streaming response
+            without stop_reason as truncated and retry it. Defaults to True.
     """
 
     def __init__(
@@ -68,6 +70,7 @@ class ClaudeSDK(BaseAPIModel):
         think_tag: str = '</think>',
         claude_extra_kwargs: Optional[Dict] = None,
         max_workers: Optional[int] = 32,
+        stop_reason_confirm: bool = True,
     ):
         super().__init__(path=path,
                          max_seq_len=max_seq_len,
@@ -108,6 +111,7 @@ class ClaudeSDK(BaseAPIModel):
         self.think_tag = think_tag
         self.claude_extra_kwargs = claude_extra_kwargs
         self.max_workers = max_workers
+        self.stop_reason_confirm = stop_reason_confirm
 
     @staticmethod
     def _resolve_base_url(base_url: Optional[str] = None) -> Optional[str]:
@@ -168,8 +172,12 @@ class ClaudeSDK(BaseAPIModel):
         return text
 
     @classmethod
-    def _parse_stream_response(cls, responses, think_tag: str) -> str:
+    def _parse_stream_response(cls,
+                               responses,
+                               think_tag: str,
+                               stop_reason_confirm: bool = True) -> str:
         """Accumulate thinking/text deltas from a streaming response."""
+        stop_reason = None
         thinking_chunks = []
         text_chunks = []
         for event in responses:
@@ -178,15 +186,27 @@ class ClaudeSDK(BaseAPIModel):
                 text = delta.get('text') if isinstance(delta, dict) else None
                 thinking = (delta.get('thinking')
                             if isinstance(delta, dict) else None)
+                reason = (delta.get('stop_reason')
+                          if isinstance(delta, dict) else None)
             else:
                 delta = getattr(event, 'delta', None)
                 text = getattr(delta, 'text', None)
                 thinking = getattr(delta, 'thinking', None)
+                reason = getattr(delta, 'stop_reason', None)
 
             if thinking:
                 thinking_chunks.append(thinking)
             if text:
                 text_chunks.append(text)
+            if reason is not None:
+                stop_reason = reason
+
+        if stop_reason_confirm and stop_reason is None:
+            raise RuntimeError(
+                'Streaming ended without stop_reason (truncated). '
+                f'text_len={sum(len(x) for x in text_chunks)} '
+                f'thinking_len={sum(len(x) for x in thinking_chunks)}')
+
         return cls._merge_thinking_and_text(''.join(thinking_chunks),
                                             ''.join(text_chunks), think_tag)
 
@@ -295,8 +315,8 @@ class ClaudeSDK(BaseAPIModel):
                 responses = self.anthropic.messages.create(**api_params)
 
                 if api_params.get('stream'):
-                    return self._parse_stream_response(responses,
-                                                       self.think_tag)
+                    return self._parse_stream_response(
+                        responses, self.think_tag, self.stop_reason_confirm)
                 return self._parse_response(responses, self.think_tag)
             except Exception as e:
                 self.logger.error(e)

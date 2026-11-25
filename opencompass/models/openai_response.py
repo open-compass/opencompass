@@ -49,6 +49,10 @@ class OpenAISDKResponse(OpenAI):
             arguments. Kept as an alias for ``openai_extra_kwargs``.
         stream (bool): Whether to call Responses API with ``stream=True``.
         timeout (int): Request timeout in seconds.
+        finish_reason_confirm (bool): Whether to treat a stream without a
+            terminal event (``response.completed`` or
+            ``response.incomplete``) as truncated and retry it. Defaults to
+            True.
     """
 
     is_api: bool = True
@@ -80,6 +84,7 @@ class OpenAISDKResponse(OpenAI):
         response_kwargs: Optional[Dict] = None,
         stream: bool = False,
         timeout: int = 3600,
+        finish_reason_confirm: bool = True,
     ):
         super().__init__(
             path=path,
@@ -116,6 +121,7 @@ class OpenAISDKResponse(OpenAI):
         self.response_kwargs = self.openai_extra_kwargs
         self.stream = stream
         self.timeout = timeout
+        self.finish_reason_confirm = finish_reason_confirm
         self.openai_client = self._create_fresh_client()
         if self.verbose:
             self.logger.info(f'Used openai_client: {self.openai_client}')
@@ -177,11 +183,22 @@ class OpenAISDKResponse(OpenAI):
                 else:
                     text = self._extract_response_text(response)
 
-                if text:
-                    return text
+                # A failed response may still carry partial content.
+                if self._get_value(response, 'status') == 'failed':
+                    self.logger.error('Responses API returned error: %s',
+                                      self._get_value(response, 'error'))
+                    num_retries += 1
+                    continue
 
                 incomplete_reason = self._get_nested_value(
                     response, 'incomplete_details', 'reason')
+                if text:
+                    if incomplete_reason == 'max_output_tokens':
+                        self.logger.warning(
+                            'Response is incomplete because it reached '
+                            'max_output_tokens.')
+                    return text
+
                 if incomplete_reason == 'content_filter':
                     self.logger.info('Response is filtered by content_filter.')
                     return ''
@@ -419,9 +436,16 @@ class OpenAISDKResponse(OpenAI):
         reasoning_item_chunks = []
         message_chunks = []
         final_response = None
+        finished = False
 
         for event in stream:
             event_type = self._get_value(event, 'type')
+
+            if event_type in {'error', 'response.failed'}:
+                error = self._get_nested_value(event, 'response', 'error')
+                raise RuntimeError(
+                    f'Responses API stream returned <{event_type}>: '
+                    f'{error or event}')
 
             if event_type in {
                     'response.output_text.delta',
@@ -482,9 +506,20 @@ class OpenAISDKResponse(OpenAI):
             if event_type in {
                     'response.completed',
                     'response.incomplete',
-                    'response.failed',
             }:
+                finished = True
                 final_response = self._get_value(event, 'response')
+
+        # The SDK ends iteration without raising when a stream is closed
+        # cleanly midway, so a truncated reply has to be detected here.
+        if self.finish_reason_confirm and not finished:
+            content_len = sum(len(x) for x in message_chunks)
+            reasoning_len = sum(
+                len(x) for x in reasoning_content_chunks +
+                reasoning_item_chunks + reasoning_summary_chunks)
+            raise RuntimeError(
+                'Streaming ended without a terminal event (truncated). '
+                f'content_len={content_len} reasoning_len={reasoning_len}')
 
         reasoning_text = ''.join(reasoning_content_chunks)
         if not reasoning_text:

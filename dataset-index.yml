@@ -1333,6 +1333,12 @@
     paper: https://arxiv.org/abs/2605.00674
     configpath: ''
     configpath_llmjudge: opencompass/configs/datasets/arxivmath/arxivmath_llmjudge_rawprompt_gen.py
+- brokenarxiv:
+    name: BrokenArXiv
+    category: Math
+    paper: https://arxiv.org/abs/2605.00674
+    configpath: ''
+    configpath_llmjudge: opencompass/configs/datasets/brokenarxiv/brokenarxiv_1026_llmjudge_rawprompt_gen.py
 - atlas:
     name: ATLAS
     category: Science

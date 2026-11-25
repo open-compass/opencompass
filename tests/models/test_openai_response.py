@@ -515,6 +515,131 @@ class TestOpenAISDKResponse(unittest.TestCase):
 
         self.assertEqual(results, ['Raw reasoning</think>Final answer'])
 
+    PARTIAL = [
+        {
+            'type': 'response.reasoning_summary_text.delta',
+            'delta': 'Thinking'
+        },
+        {
+            'type': 'response.output_text.delta',
+            'delta': 'par'
+        },
+    ]
+    FULL = [
+        {
+            'type': 'response.output_text.delta',
+            'delta': 'full'
+        },
+        {
+            'type': 'response.completed',
+            'response': {
+                'status': 'completed',
+                'output': []
+            }
+        },
+    ]
+
+    def run_responses(self, responses, **kwargs):
+        """Generate once, returning the model, client and a callable."""
+        mock_client = MagicMock()
+        mock_client.responses.create.side_effect = responses
+        kwargs = {'stream': True, 'retry': 2, **kwargs}
+        with patch('opencompass.models.openai_api.tiktoken',
+                   create=True) as mock_tiktoken, \
+                patch('httpx.Client'), \
+                patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'}), \
+                fake_openai_module(mock_client):
+            setup_tiktoken_mock(mock_tiktoken)
+            model = OpenAISDKResponse(path='gpt-4.1', **kwargs)
+            model.logger = MagicMock()
+            try:
+                result = model.generate(['Hello'], max_out_len=100)[0]
+            except RuntimeError as e:
+                result = e
+        return result, mock_client.responses.create.call_count, model
+
+    def test_truncated_stream_is_retried(self):
+        """Test streams cut in thinking or in text are requested again."""
+        for cut in (self.PARTIAL[:1], self.PARTIAL):
+            with self.subTest(events=len(cut)):
+                result, calls, _ = self.run_responses([cut, self.FULL])
+                self.assertEqual(result, 'full')
+                self.assertEqual(calls, 2)
+
+    def test_truncated_stream_fails_after_retries(self):
+        """Test a truncated reply is never returned as the prediction."""
+        result, calls, _ = self.run_responses([self.PARTIAL, self.PARTIAL])
+        self.assertIsInstance(result, RuntimeError)
+        self.assertEqual(calls, 2)
+
+    def test_failed_stream_with_partial_text_is_retried(self):
+        """Test failed and error events discard the partial text."""
+        ends = [
+            {
+                'type': 'response.failed',
+                'response': {
+                    'status': 'failed',
+                    'error': {
+                        'code': 'server_error'
+                    }
+                }
+            },
+            {
+                'type': 'error',
+                'code': 'server_error',
+                'message': 'boom'
+            },
+        ]
+        for end in ends:
+            for confirm in (True, False):
+                with self.subTest(event=end['type'], confirm=confirm):
+                    result, calls, _ = self.run_responses(
+                        [self.PARTIAL + [end], self.FULL],
+                        finish_reason_confirm=confirm)
+                    self.assertEqual(result, 'full')
+                    self.assertEqual(calls, 2)
+
+    def test_failed_response_with_partial_text_is_retried(self):
+        """Test non-streaming failed responses discard the partial text."""
+        result, calls, _ = self.run_responses([
+            types.SimpleNamespace(
+                status='failed', output_text='par', error='boom'),
+            types.SimpleNamespace(status='completed', output_text='full'),
+        ], stream=False)
+        self.assertEqual(result, 'full')
+        self.assertEqual(calls, 2)
+
+    def test_incomplete_stream_is_not_retried(self):
+        """Test incomplete is a terminal state, warning on max tokens."""
+        for reason, warned in (('max_output_tokens', True),
+                               ('content_filter', False)):
+            with self.subTest(reason=reason):
+                end = {
+                    'type': 'response.incomplete',
+                    'response': {
+                        'status': 'incomplete',
+                        'incomplete_details': {
+                            'reason': reason
+                        }
+                    }
+                }
+                result, calls, model = self.run_responses(
+                    [self.PARTIAL + [end]])
+                self.assertEqual(result, 'Thinking</think>par')
+                self.assertEqual(calls, 1)
+                messages = [
+                    str(c) for c in model.logger.warning.call_args_list
+                ]
+                self.assertEqual(
+                    any('max_output_tokens' in m for m in messages), warned)
+
+    def test_finish_reason_confirm_can_be_disabled(self):
+        """Test finish_reason_confirm=False keeps the truncated reply."""
+        result, calls, _ = self.run_responses([self.PARTIAL],
+                                              finish_reason_confirm=False)
+        self.assertEqual(result, 'Thinking</think>par')
+        self.assertEqual(calls, 1)
+
 
 if __name__ == '__main__':
     unittest.main()
