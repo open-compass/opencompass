@@ -12,9 +12,14 @@ from .base import BaseDataset
 
 @TEXT_POSTPROCESSORS.register_module('strategyqa')
 def strategyqa_pred_postprocess(text: str) -> str:
-    text = text.split('\n\n')[0]
-    text = text.split('answer is ')[-1]
-    match = re.search(r'(yes|no)', text.lower())
+    # An explicit "answer is yes/no" is the verdict; without one, the first
+    # yes or no in the output is, since later ones sit in the reasoning.
+    markers = list(
+        re.finditer(r'answer\s+is\s*[:,]?\s*(yes|no)(?![a-z])', text,
+                    re.IGNORECASE))
+    if markers:
+        return markers[-1].group(1).lower()
+    match = re.search(r'(?<![a-z])(yes|no)(?![a-z])', text.lower())
     if match:
         return match.group(1)
     return ''
