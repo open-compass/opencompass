@@ -100,18 +100,22 @@ def parse_judge_output(text: Optional[str]) -> Optional[Dict]:
     return obj if isinstance(obj, dict) else None
 
 
-def _safe_float(value) -> Optional[float]:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
+def _parse_score(value) -> Optional[float]:
+    if isinstance(value, bool):
         return None
+    try:
+        score = float(value)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return score if 0 <= score <= 10 else None
 
 
 def dimension_scores(judgement: Optional[Dict]) -> Optional[Dict]:
+    """Return the four scores only when every value is in the rubric range."""
     scores = (judgement or {}).get('score', {})
     if not isinstance(scores, dict):
         return None
-    values = {dim: _safe_float(scores.get(dim)) for dim in DIMENSIONS}
+    values = {dim: _parse_score(scores.get(dim)) for dim in DIMENSIONS}
     if any(v is None for v in values.values()):
         return None
     return values
@@ -220,23 +224,27 @@ class RebuttalBenchEvaluator(GenericLLMEvaluator):
             for row, pred in zip(test_set, predictions)
         ]
 
-        # re-judge unparsable outputs, as the official scripts do
         judgements = [None] * len(predictions)
         outputs = [None] * len(predictions)
         attempts = [0] * len(predictions)
         pending = list(range(len(predictions)))
+        retry_prefix = 'judge_retry'
         for attempt in range(self.max_attempts):
             if not pending:
                 break
-            name = 'judge' if attempt == 0 else f'judge_retry{attempt}'
+            name = 'judge' if attempt == 0 else f'{retry_prefix}{attempt}'
             judged = self._judge([judge_inputs[i] for i in pending], name)
             still_pending = []
             for j, i in enumerate(pending):
                 outputs[i] = judged[str(j)]['prediction']
                 attempts[i] = attempt + 1
                 judgements[i] = parse_judge_output(outputs[i])
-                if judgements[i] is None:
+                if dimension_scores(judgements[i]) is None:
                     still_pending.append(i)
+                    if judgements[i] is not None:
+                        # Legacy retry files index only JSON parse failures.
+                        # Adding this row changes the positions in later files.
+                        retry_prefix = 'judge_score_retry'
             pending = still_pending
 
         categories = test_set['category']
