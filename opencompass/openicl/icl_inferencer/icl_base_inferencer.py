@@ -115,20 +115,33 @@ class GenInferencerOutputHandler:
         self.dumped_indices = set()
 
     def write_to_jsonl(self, save_dir: str, filename: str):
+        """Append newly completed results in their original insertion order."""
         filename = Path(save_dir) / filename
-        with open(filename, 'a', encoding='utf-8') as json_file:
-            new_lines = []
-            for idx, result in self.results_dict.items():
-                if idx in self.dumped_indices:
-                    continue
-                new_lines.append(
-                    json.dumps({
-                        'idx': idx,
-                        **result
-                    }, ensure_ascii=False))
-                self.dumped_indices.add(idx)
-            if new_lines:
-                json_file.write('\n'.join(new_lines) + '\n')
+        # All restored or successfully written keys form a prefix. Sample IDs
+        # may finish out of order, so walk insertion order, not numeric order.
+        pending = []
+        for idx in reversed(self.results_dict):
+            if idx in self.dumped_indices:
+                break
+            pending.append(idx)
+
+        offset = None
+        try:
+            with open(filename, 'a', encoding='utf-8') as json_file:
+                if not pending:
+                    return
+                lines = []
+                for idx in reversed(pending):
+                    row = {'idx': idx, **self.results_dict[idx]}
+                    lines.append(json.dumps(row, ensure_ascii=False))
+                offset = json_file.tell()
+                json_file.write('\n'.join(lines) + '\n')
+        except OSError:
+            if offset is not None:
+                # Discard a partial append before retrying the same batch.
+                os.truncate(filename, offset)
+            raise
+        self.dumped_indices.update(pending)
 
     def restore_from_jsonl(self, save_dir: str, filename: str) -> dict:
         logger = get_logger()
@@ -150,7 +163,7 @@ class GenInferencerOutputHandler:
                                f'move to {bak_file} to avoid error.')
             else:
                 self.results_dict = result_dict
-                self.dumped_indices.update(result_dict.keys())
+                self.dumped_indices = set(result_dict)
         return self.results_dict
 
     def write_to_json(self, save_dir: str, filename: str):
