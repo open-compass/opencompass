@@ -314,7 +314,14 @@ class OpenICLEvalTask(BaseTask):
         # Call evaluate with the appropriate parameters
         k = self.dataset_cfg.get('k', 1)
         n = self.dataset_cfg.get('n', 1)
-        result = evaluator.evaluate(k, n, copy.deepcopy(test_set), **preds)
+        evaluate_options = {}
+        if self.eval_cfg.get('bayes_at_n', False):
+            if 'bayes_at_n' not in signature(evaluator.evaluate).parameters:
+                raise ValueError('bayes_at_n requires an evaluator using '
+                                 'BaseEvaluator.evaluate')
+            evaluate_options['bayes_at_n'] = True
+        result = evaluator.evaluate(k, n, copy.deepcopy(test_set),
+                                    **evaluate_options, **preds)
 
         # Format details if needed
         if self.dump_details:
