@@ -115,7 +115,11 @@ class TopkRetriever(BaseRetriever):
             idx = entry['metadata']['id']
             embed = np.expand_dims(entry['embed'], axis=0)
             near_ids = self.index.search(embed, ice_num)[1][0].tolist()
-            rtr_idx_list[idx] = near_ids
+            # Faiss pads missing neighbors with -1, which would otherwise
+            # select the last dataset example through Python indexing.
+            rtr_idx_list[idx] = [
+                near_id for near_id in near_ids if near_id >= 0
+            ]
         return rtr_idx_list
 
     def forward(self, dataloader, process_bar=False, information=''):
@@ -140,7 +144,10 @@ class TopkRetriever(BaseRetriever):
         return res_list
 
     def retrieve(self):
-        """Retrieve the in-context example index for each test example."""
+        """Retrieve up to ``ice_num`` available examples for each test example.
+
+        Missing neighbors are omitted when the index has fewer examples.
+        """
         return self.knn_search(self.ice_num)
 
 
