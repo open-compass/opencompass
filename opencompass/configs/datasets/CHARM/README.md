@@ -1,6 +1,6 @@
 # CHARM✨ Benchmarking Chinese Commonsense Reasoning of LLMs: From Chinese-Specifics to Reasoning-Memorization Correlations [ACL2024]
 [![arXiv](https://img.shields.io/badge/arXiv-2403.14112-b31b1b.svg)](https://arxiv.org/abs/2403.14112)
-[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](./LICENSE)
+[![license](https://img.shields.io/github/license/InternLM/opencompass.svg)](../../../../LICENSE)
 <div align="center">
 
 📃[Paper](https://arxiv.org/abs/2403.14112)
