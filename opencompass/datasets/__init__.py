@@ -21,6 +21,7 @@ from .beyondaime import *  # noqa: F401, F403
 from .bigcodebench import *  # noqa: F401, F403
 from .biodata import *  # noqa: F401, F403
 from .boolq import *  # noqa: F401, F403
+from .brokenarxiv import *  # noqa: F401, F403
 from .bustum import *  # noqa: F401, F403
 from .BuySideFinBench import *  # noqa: F401, F403
 from .c3 import *  # noqa: F401, F403
