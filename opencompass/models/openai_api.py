@@ -198,6 +198,7 @@ class OpenAI(BaseAPIModel):
         else:
             self.orgs = org
         self.org_ctr = 0
+        self._org_lock = Lock()
         self.url = openai_api_base
 
         if openai_proxy_url == 'ENV':
@@ -206,6 +207,20 @@ class OpenAI(BaseAPIModel):
             self.proxy_url = os.getenv('OPENAI_PROXY_URL')
         else:
             self.proxy_url = openai_proxy_url
+
+    def _next_org(self):
+        """Rotate to the next organization and return it.
+
+        ``_generate`` runs in several threads at once, so the counter is
+        advanced and read under one shared lock. Without it, two threads can
+        both step past the last index, the wrap-around check never matches
+        again and every later request fails with an ``IndexError``.
+        """
+        with self._org_lock:
+            self.org_ctr += 1
+            if self.org_ctr >= len(self.orgs):
+                self.org_ctr = 0
+            return self.orgs[self.org_ctr]
 
     def _next_valid_key(self):
         with self._key_lock:
@@ -302,11 +317,7 @@ class OpenAI(BaseAPIModel):
             }
 
             if self.orgs:
-                with Lock():
-                    self.org_ctr += 1
-                    if self.org_ctr == len(self.orgs):
-                        self.org_ctr = 0
-                header['OpenAI-Organization'] = self.orgs[self.org_ctr]
+                header['OpenAI-Organization'] = self._next_org()
 
             self.acquire()
             try:

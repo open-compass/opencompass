@@ -194,6 +194,47 @@ class TestOpenAI(unittest.TestCase):
         self.assertEqual(mock_requests.post.call_count, 2)
 
 
+class TestOpenAIOrgRotation(unittest.TestCase):
+    """Test cases for rotating OpenAI organizations."""
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_next_org_rotates_in_order(self, mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+        model = OpenAI(path='gpt-3.5-turbo', org=['org-a', 'org-b', 'org-c'])
+
+        self.assertEqual([model._next_org() for _ in range(4)],
+                         ['org-b', 'org-c', 'org-a', 'org-b'])
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_next_org_recovers_from_out_of_range_counter(self, mock_tiktoken):
+        setup_tiktoken_mock(mock_tiktoken)
+        model = OpenAI(path='gpt-3.5-turbo', org=['org-a', 'org-b'])
+        model.org_ctr = 5
+
+        self.assertEqual(model._next_org(), 'org-a')
+
+    @patch('opencompass.models.openai_api.tiktoken', create=True)
+    @patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'})
+    def test_next_org_is_thread_safe(self, mock_tiktoken):
+        from collections import Counter
+        from concurrent.futures import ThreadPoolExecutor
+
+        setup_tiktoken_mock(mock_tiktoken)
+        orgs = ['org-a', 'org-b', 'org-c']
+        model = OpenAI(path='gpt-3.5-turbo', org=orgs)
+
+        with ThreadPoolExecutor(max_workers=16) as executor:
+            picked = list(
+                executor.map(lambda _: model._next_org(), range(3000)))
+
+        # Each organization is used equally often, and the counter is
+        # still a valid index afterwards.
+        self.assertEqual(Counter(picked), {org: 1000 for org in orgs})
+        self.assertIn(model.org_ctr, range(len(orgs)))
+
+
 class TestOpenAISDK(unittest.TestCase):
     """Test cases for OpenAISDK."""
 
