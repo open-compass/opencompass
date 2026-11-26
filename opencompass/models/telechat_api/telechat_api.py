@@ -195,16 +195,16 @@ class TeleChat(BaseAPIModel):
                     if msg:
                         if len(msg) > 0:
                             return msg
-                    self.logger.error('Find error message in response: ',
+                    self.logger.error('Find error message in response: %s',
                                       raw_response.text)
                     continue
                 else:
-                    self.logger.error('Find error message in response: ',
+                    self.logger.error('Find error message in response: %s',
                                       raw_response.text)
                     continue
             if raw_response.status_code != 200:
                 self.logger.error(raw_response.status_code)
-                self.logger.error('Find error message in response: ',
+                self.logger.error('Find error message in response: %s',
                                   str(response))
                 continue
 
