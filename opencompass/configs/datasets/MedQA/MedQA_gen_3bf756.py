@@ -44,11 +44,18 @@ MedQA_subsets = {
     'Taiwan': 'xuxuxuxuxu/MedQA_Taiwan_test',
 }
 
+# US and Mainland questions have five options (A-E), Taiwan questions four.
+MedQA_options = {
+    'US': 'ABCDE',
+    'Mainland': 'ABCDE',
+    'Taiwan': 'ABCD',
+}
+
 for split in list(MedQA_subsets.keys()):
 
     MedQA_eval_cfg = dict(
         evaluator=dict(type=AccEvaluator),
-        pred_postprocessor=dict(type=first_option_postprocess, options='ABCD')
+        pred_postprocessor=dict(type=first_option_postprocess, options=MedQA_options[split])
     )
 
     MedQA_datasets.append(
