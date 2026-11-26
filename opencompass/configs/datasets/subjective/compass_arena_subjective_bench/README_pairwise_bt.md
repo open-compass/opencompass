@@ -23,7 +23,7 @@ During the inference stage, each LLM makes an inference based on the question pr
 
 ### Evaluation
 
-During the evaluation stage, the judge model respond with a critique and chooses the LLM with a better answer for each pair. This preference will be used later to form the "winner" response variable in the postprocessor. Note that the predictions for each model must be saved (by setting `keep_predictions=True` in the evaluator config) in order for the postporcessor to calculate style features. See this [example](`opencompass/configs/datasets/subjective/compass_arena_subjective_bench/singleturn/pairwise_bt_judge.py`) for more details.
+During the evaluation stage, the judge model respond with a critique and chooses the LLM with a better answer for each pair. This preference will be used later to form the "winner" response variable in the postprocessor. Note that the predictions for each model must be saved (by setting `keep_predictions=True` in the evaluator config) in order for the postporcessor to calculate style features. See this [example](singleturn/pairwise_bt_judge.py) for more details.
 
 
 #### Postprocessor
