@@ -26,12 +26,7 @@ class SQuAD20Dataset(BaseDataset):
                         answers = list(
                             set([answer['text'] for answer in qa['answers']]))
                     else:
-                        answers = list(
-                            set([
-                                answer['text']
-                                for answer in qa['plausible_answers']
-                            ]))
-                        answers += ['impossible to answer']
+                        answers = ['impossible to answer']
                     item = {
                         'context': paragraph['context'],
                         'question': qa['question'],
